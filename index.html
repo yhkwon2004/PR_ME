@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>권용현 — Physical AI Portfolio</title>
+    <meta name="description" content="드론 · 로봇 · 모빌리티 · AI. 권용현의 피지컬 AI 포트폴리오 — 한 편의 영화처럼 이어지는 3D 인터랙티브 포트폴리오." />
+    <meta name="theme-color" content="#05070c" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="권용현 — Physical AI Portfolio" />
+    <meta property="og:description" content="Drone · Robot · Mobility · AI — 한 편의 영화처럼 이어지는 3D 포트폴리오" />
+    <meta property="og:image" content="/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <div class="scrim" aria-hidden="true"><i class="s-left"></i><i class="s-right"></i><i class="s-bottom"></i><i class="s-center"></i></div>
+    <div class="letterbox" aria-hidden="true"><i class="lb-top"></i><i class="lb-bottom"></i></div>
+
+    <!-- 부팅 시퀀스 -->
+    <section id="boot" aria-label="로딩">
+      <div class="boot-frame">
+        <div class="boot-head">
+          <span>KWON/PHYSICAL-AI</span>
+          <span id="boot-clock">00:00:00:00</span>
+        </div>
+        <ol class="boot-log" id="boot-log"></ol>
+        <div class="boot-meter">
+          <span class="boot-pct"><b id="boot-pct">000</b>%</span>
+          <span class="boot-bar"><i id="boot-bar"></i></span>
+        </div>
+        <div class="boot-title" aria-hidden="true">
+          <span>DRONE</span><span>ROBOT</span><span>MOBILITY</span><span>AI</span>
+        </div>
+        <div class="boot-actions" id="boot-actions" hidden>
+          <button class="btn-enter" id="enter-sound" type="button">
+            <span class="btn-enter-icon">▶</span>
+            <span><b>START FILM</b><small>사운드와 함께 보기</small></span>
+          </button>
+          <button class="btn-quiet" id="enter-quiet" type="button">무음으로 시작</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HUD -->
+    <header class="hud-top" id="hud-top">
+      <a class="brand" href="#" id="brand" aria-label="처음 장면으로">
+        <span class="brand-mark">KWON</span>
+        <span class="brand-sub">Physical AI<br />Portfolio 2026</span>
+      </a>
+      <div class="hud-meta" aria-hidden="true">
+        <span class="rec"><i></i>REC</span>
+        <span id="hud-scene">SC 00 / 08</span>
+        <span id="hud-tc">TC 00:00:00:00</span>
+      </div>
+      <nav class="hud-nav" aria-label="재생 제어">
+        <button type="button" id="btn-play" aria-pressed="true"><span class="ico-play"></span><span class="lbl">AUTO</span></button>
+        <button type="button" id="btn-sound" aria-pressed="false"><span class="ico-sound"><i></i><i></i><i></i><i></i></span><span class="lbl">SOUND</span></button>
+        <button type="button" id="btn-index" aria-expanded="false" aria-controls="index"><span class="ico-index"><i></i><i></i></span><span class="lbl">INDEX</span></button>
+      </nav>
+    </header>
+
+    <main id="stage" aria-live="polite"></main>
+
+    <div class="title-card" id="title-card" aria-hidden="true">
+      <span class="tc-no"></span>
+      <span class="tc-name"></span>
+    </div>
+
+    <footer class="hud-bottom" id="hud-bottom">
+      <ol class="timeline" id="timeline" aria-label="장면 목록"></ol>
+      <div class="hint" id="hint" aria-hidden="true">
+        <span class="hint-mouse"><i></i></span>
+        <span>SCROLL · SWIPE · ← →</span>
+      </div>
+    </footer>
+
+    <div class="tooltip" id="tooltip" aria-hidden="true"><b></b><small></small></div>
+    <div class="cursor" id="cursor" aria-hidden="true"><i></i></div>
+
+    <nav class="index" id="index" aria-label="전체 장면" hidden>
+      <div class="index-inner">
+        <p class="index-kicker">SCENE INDEX — 장면 바로가기</p>
+        <ol id="index-list"></ol>
+      </div>
+    </nav>
+
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="미디어 보기" hidden>
+      <button class="lb-close" type="button" aria-label="닫기">×</button>
+      <button class="lb-prev" type="button" aria-label="이전">←</button>
+      <figure class="lb-figure"><div class="lb-media"></div><figcaption></figcaption></figure>
+      <button class="lb-next" type="button" aria-label="다음">→</button>
+    </div>
+
+    <noscript><p class="noscript">이 포트폴리오는 JavaScript가 필요합니다. — 권용현 · yhkwon2004@gmail.com</p></noscript>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
