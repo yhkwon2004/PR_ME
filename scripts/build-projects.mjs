@@ -6,30 +6,37 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const input = process.argv[2];
-if (!input) {
-  console.error('usage: node scripts/build-projects.mjs <journal.jsonl | results.json>');
+const inputs = process.argv.slice(2);
+if (!inputs.length) {
+  console.error('usage: node scripts/build-projects.mjs <journal.jsonl | drafts.json | results.json> ...');
   process.exit(1);
 }
 
-let results = [];
-if (input.endsWith('.jsonl')) {
-  const labels = new Map();
-  const harvest = new Map();
-  const verify = new Map();
-  for (const line of fs.readFileSync(input, 'utf8').split('\n')) {
-    if (!line.trim()) continue;
-    const j = JSON.parse(line);
-    if (j.type === 'started') labels.set(j.key, j.label);
-    if (j.type === 'result' && j.result && typeof j.result === 'object') {
-      const label = labels.get(j.key) || '';
-      if (label.startsWith('verify:')) verify.set(j.result.id, j.result);
-      else if (label.startsWith('harvest:')) harvest.set(j.result.id, j.result);
+// 여러 워크플로 저널을 합친다: 검증 결과 > 수집 초안 > drafts.json
+const harvest = new Map();
+const verify = new Map();
+for (const input of inputs) {
+  if (input.endsWith('.jsonl')) {
+    const labels = new Map();
+    for (const line of fs.readFileSync(input, 'utf8').split('\n')) {
+      if (!line.trim()) continue;
+      const j = JSON.parse(line);
+      if (j.type === 'started') labels.set(j.key, j.label);
+      if (j.type === 'result' && j.result && typeof j.result === 'object' && j.result.id) {
+        const label = labels.get(j.key) || '';
+        if (label.startsWith('verify:')) verify.set(j.result.id, j.result);
+        else if (label.startsWith('harvest:')) harvest.set(j.result.id, j.result);
+      }
     }
+  } else {
+    const data = JSON.parse(fs.readFileSync(input, 'utf8'));
+    const list = Array.isArray(data) ? data : Object.values(data);
+    for (const r of list) if (r?.id && !harvest.has(r.id)) harvest.set(r.id, r);
   }
-  for (const [id, r] of harvest) results.push(verify.get(id) || { ...r, _unverified: true });
-} else {
-  results = JSON.parse(fs.readFileSync(input, 'utf8'));
+}
+const results = [];
+for (const id of new Set([...harvest.keys(), ...verify.keys()])) {
+  results.push(verify.get(id) || { ...harvest.get(id), _unverified: true });
 }
 
 const exists = (f) => f && fs.existsSync(path.join(ROOT, 'public', f));

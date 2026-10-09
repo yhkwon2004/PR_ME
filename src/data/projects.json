@@ -1,5 +1,138 @@
 [
  {
+  "id": "ai-pedal-blackbox",
+  "title": "인지오류 예방 AI 페달 블랙박스",
+  "titleEn": "AI Pedal Black Box",
+  "year": "2026",
+  "period": "",
+  "category": "mobility",
+  "oneLiner": "페달 블랙박스를 사고 전 경고 장치로 확장하는 아이디어",
+  "summary": "페달 블랙박스를 활용해 사고 전 경고형 안내장치로 확장하는 아이디어 프로젝트입니다.",
+  "role": [],
+  "team": "",
+  "tools": [],
+  "awards": [],
+  "metrics": [],
+  "story": [
+   {
+    "label": "PROBLEM",
+    "title": "인지오류 예방",
+    "text": "프로젝트명이 가리키는 목표는 인지오류로 이어지는 사고를 예방하는 것입니다."
+   },
+   {
+    "label": "IDEA",
+    "title": "사고 전 경고 장치",
+    "text": "페달 블랙박스를 활용해 사고 전에 경고하는 안내장치로 확장하는 아이디어입니다."
+   }
+  ],
+  "images": [],
+  "cover": "",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/333faf73802f8000b265d7e04aeb385e"
+   }
+  ]
+ },
+ {
+  "id": "airsim-driving",
+  "title": "AirSim 딥러닝 자율주행",
+  "titleEn": "AirSim Deep Learning Driving",
+  "year": "",
+  "period": "",
+  "category": "mobility",
+  "oneLiner": "가상환경에서 딥러닝으로 학습시킨 AirSim 자율주행",
+  "summary": "AirSim 가상 주행 환경에서 딥러닝 모델을 학습시켜 조향과 주차 신호 인식을 다룬 시뮬레이터. 미래자동차 경진대회 조향 및 주차 신호인식 부문 장려상.",
+  "role": [],
+  "team": "",
+  "tools": [
+   "AirSim",
+   "딥러닝",
+   "Python",
+   "Keras"
+  ],
+  "awards": [
+   "미래자동차 경진대회 · 조향 및 주차 신호인식 부문 장려상"
+  ],
+  "metrics": [],
+  "story": [
+   {
+    "label": "PROBLEM",
+    "title": "실차 대신 가상환경",
+    "text": "실제 차량에서 반복하기 어려운 조향과 주차 신호 인식을 가상환경에서 먼저 검토했다.",
+    "image": "media/projects/airsim-driving/03.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "AirSim에서 딥러닝 학습",
+    "text": "AirSim 주행 환경에서 딥러닝을 학습시키고, 조향과 주차 신호 인식 기능을 연결했다.",
+    "image": "media/projects/airsim-driving/02.webp"
+   },
+   {
+    "label": "TEST",
+    "title": "API 제어 주행",
+    "text": "학습한 Keras 모델(model-010)을 불러와 API 제어 모드로 주택가 도로와 교차로를 주행했다.",
+    "image": "media/projects/airsim-driving/04.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "경진대회 장려상",
+    "text": "미래자동차 경진대회 조향 및 주차 신호인식 부문에서 장려상을 받았다.",
+    "image": "media/projects/airsim-driving/05.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/airsim-driving/01.webp",
+    "caption": "교차로에서 정지 표지판 옆을 돌아 나가는 차량",
+    "kind": "screenshot",
+    "w": 640,
+    "h": 360
+   },
+   {
+    "file": "media/projects/airsim-driving/02.webp",
+    "caption": "Keras 모델을 불러오는 코드와 AirSim 주행 화면",
+    "kind": "screenshot",
+    "w": 1280,
+    "h": 720
+   },
+   {
+    "file": "media/projects/airsim-driving/03.webp",
+    "caption": "주택가 도로를 직진하는 차량 (API 제어 모드)",
+    "kind": "screenshot",
+    "w": 640,
+    "h": 360
+   },
+   {
+    "file": "media/projects/airsim-driving/04.webp",
+    "caption": "교차로에 접근하는 차량과 조향 값 표시",
+    "kind": "screenshot",
+    "w": 640,
+    "h": 360
+   },
+   {
+    "file": "media/projects/airsim-driving/05.webp",
+    "caption": "회전 후 그늘진 주택가 도로를 주행",
+    "kind": "screenshot",
+    "w": 640,
+    "h": 360
+   }
+  ],
+  "cover": "media/projects/airsim-driving/01.webp",
+  "videos": [
+   {
+    "url": "/media/airsim-demo.mp4",
+    "caption": "AirSim 자율주행 제어 시뮬레이션"
+   },
+   {
+    "url": "https://youtu.be/sLgSZitPeOc",
+    "caption": "YouTube 원본 (같은 영상)"
+   }
+  ],
+  "links": []
+ },
+ {
   "id": "av-competition",
   "title": "산업부 자율주행 경진대회",
   "titleEn": "Autonomous Ride-on Car Contest",
@@ -111,6 +244,192 @@
   ]
  },
  {
+  "id": "baja-ev-formula",
+  "title": "자작차 BAJA·EV·Formula",
+  "titleEn": "Student-Built BAJA·EV·Formula",
+  "year": "2024",
+  "period": "2024.03 – 2024.12",
+  "category": "mobility",
+  "oneLiner": "기계공학과 동아리에서 BAJA·EV·Formula 차량 제작에 참여",
+  "summary": "원광대 기계공학과 자작차 동아리 '메카니즘'에서 BAJA·EV·Formula 차량의 CATIA 설계, 가공, 조립, 주행 테스트에 참여했습니다. 소프트웨어 전공자로 하드웨어 제작 현장을 경험했습니다.",
+  "role": [
+   "CATIA 차량 프레임·주요 부품 설계",
+   "프레임·서스펜션·브래킷 가공 및 조립",
+   "주행 테스트 참여",
+   "전체 팀원 단체 모임 주선(팀워크 개선)"
+  ],
+  "team": "원광대학교 기계공학과 자작차 동아리 '메카니즘'",
+  "tools": [
+   "CATIA",
+   "선반",
+   "밀링",
+   "그라인더",
+   "용접기"
+  ],
+  "awards": [],
+  "metrics": [
+   {
+    "value": "3종",
+    "label": "BAJA · EV · Formula 차량"
+   },
+   {
+    "value": "1mm",
+    "label": "가공 작업에서 요구된 정밀도 단위"
+   }
+  ],
+  "story": [
+   {
+    "label": "BUILD",
+    "title": "설계부터 가공·조립까지",
+    "text": "CATIA로 프레임과 주요 부품을 설계하고 선반·밀링·그라인더·용접기로 프레임, 서스펜션, 브래킷을 가공·조립했습니다.",
+    "image": "media/projects/baja-ev-formula/04.webp"
+   },
+   {
+    "label": "PROBLEM",
+    "title": "소통이 끊긴 팀",
+    "text": "교류 부족으로 부품 중복 제작과 일정 지연이 생기자, 팀장이 아니었지만 전체 팀원 모임을 직접 주선해 정보 공유를 늘렸습니다.",
+    "image": "media/projects/baja-ev-formula/02.webp"
+   },
+   {
+    "label": "TEST",
+    "title": "3종 차량, 주행까지",
+    "text": "오프로드 BAJA, 전기차 EV, 레이싱 Formula까지 목적이 다른 3종 차량 제작과 주행 테스트에 참여했습니다.",
+    "image": "media/projects/baja-ev-formula/03.webp"
+   },
+   {
+    "label": "LEARNED",
+    "title": "1mm의 무게",
+    "text": "1mm 오차가 진동·변형·파손으로 이어질 수 있다는 점과, 소통이 기술만큼 중요하다는 점을 체감했습니다.",
+    "image": "media/projects/baja-ev-formula/01.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/baja-ev-formula/01.webp",
+    "caption": "흙길 코스를 달리는 오프로드 자작차",
+    "kind": "photo",
+    "w": 989,
+    "h": 662
+   },
+   {
+    "file": "media/projects/baja-ev-formula/02.webp",
+    "caption": "작업장에서 프레임을 조립·용접하는 팀원들",
+    "kind": "photo",
+    "w": 967,
+    "h": 1194
+   },
+   {
+    "file": "media/projects/baja-ev-formula/04.webp",
+    "caption": "차체 프레임과 금속 판재 부품 클로즈업",
+    "kind": "photo",
+    "w": 1015,
+    "h": 661
+   },
+   {
+    "file": "media/projects/baja-ev-formula/03.webp",
+    "caption": "콘 코스 위 포뮬러형 자작차와 드라이버",
+    "kind": "photo",
+    "w": 1439,
+    "h": 1130
+   }
+  ],
+  "cover": "media/projects/baja-ev-formula/01.webp",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/2c7faf73802f83608670817daab3504e"
+   },
+   {
+    "label": "Notion 원문 (2026 포트폴리오)",
+    "url": "https://www.notion.so/330faf73802f80c7b854e0317d7e8c56"
+   },
+   {
+    "label": "관련 기사 · 고카넷 모터스포츠",
+    "url": "http://www.gocarnet.co.kr/motorsports_tunning/2025/09/105170"
+   }
+  ]
+ },
+ {
+  "id": "carla-e2e",
+  "title": "CARLA 엔드투엔드 자율주행 시뮬레이터",
+  "titleEn": "CARLA End-to-End Driving Sim",
+  "year": "2024",
+  "period": "",
+  "category": "mobility",
+  "oneLiner": "Python API로 CARLA 차량을 제어한 엔드투엔드 자율주행",
+  "summary": "언리얼 엔진 기반 CARLA 시뮬레이터를 Python API로 제어했습니다. End-to-End 학습으로 화면 곡률에 맞춘 조향을 내고, 전이 학습으로 가중치를 보완했습니다.",
+  "role": [
+   "시뮬레이터 개발"
+  ],
+  "team": "1인 프로젝트 (학술동아리 성과 보고)",
+  "tools": [
+   "Python",
+   "Unreal Engine",
+   "CARLA"
+  ],
+  "awards": [],
+  "metrics": [
+   {
+    "value": "약 3회 → 1회 이하",
+    "label": "안정 주행 10회 중 충돌"
+   },
+   {
+    "value": "1인",
+    "label": "개발 인원"
+   }
+  ],
+  "story": [
+   {
+    "label": "BUILD",
+    "title": "Python API 제어",
+    "text": "언리얼 엔진 기반 CARLA 시뮬레이터를 구성하고 Python API로 차량을 제어했습니다.",
+    "image": "media/projects/carla-e2e/01.webp"
+   },
+   {
+    "label": "IDEA",
+    "title": "End-to-End 조향 학습",
+    "text": "화면에 따른 곡률을 값으로 나누고, 그 값만큼 조향을 전달하도록 End-to-End 학습을 진행했습니다."
+   },
+   {
+    "label": "TEST",
+    "title": "전이 학습으로 보완",
+    "text": "더 정밀한 주행을 위해 전이 학습을 추가하고, 과적합이 없도록 가중치를 계속 조정했습니다."
+   },
+   {
+    "label": "RESULT",
+    "title": "충돌 횟수 감소",
+    "text": "안정적 주행 환경 10회 동작 중 약 3회이던 충돌을 1회 이하로 줄였습니다."
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/carla-e2e/01.webp",
+    "caption": "CARLA 0.9.14 릴리스 화면과 도로 항공 뷰",
+    "kind": "screenshot",
+    "w": 606,
+    "h": 351
+   }
+  ],
+  "cover": "media/projects/carla-e2e/01.webp",
+  "videos": [
+   {
+    "url": "https://youtu.be/sLgSZitPeOc",
+    "caption": "자율주행 시뮬레이터 제어 영상"
+   }
+  ],
+  "links": [
+   {
+    "label": "Notion 프로젝트 기록",
+    "url": "https://www.notion.so/3e1faf73802f821a947c81458de18459"
+   },
+   {
+    "label": "Notion 프로젝트 기록 (이전 포트폴리오)",
+    "url": "https://www.notion.so/333faf73802f8099b798ca6b64f6b3c1"
+   }
+  ]
+ },
+ {
   "id": "drone-soccer",
   "title": "드론 축구",
   "titleEn": "Drone Soccer",
@@ -177,6 +496,135 @@
    {
     "label": "Notion 원문 (활동 기록)",
     "url": "https://www.notion.so/336faf73802f805eaf09f934e75304b1"
+   }
+  ]
+ },
+ {
+  "id": "ev-medical",
+  "title": "심부전 환자를 위한 EV 의료차량",
+  "titleEn": "EV Mobile Medical Vehicle",
+  "year": "2025",
+  "period": "",
+  "category": "mobility",
+  "oneLiner": "실측 전기차를 모델링해 만든 심부전 환자 이송용 의료차량 개선안",
+  "summary": "실측 EV 차량을 모델링하고, 심부전증 환자의 이송과 응급 대응을 고려한 이동형 의료 차량 개선안을 제안했습니다. 임상 적용 전 제안 단계입니다.",
+  "role": [],
+  "team": "",
+  "tools": [
+   "Fusion 360"
+  ],
+  "awards": [
+   "미래수송기기 아이디어 해커톤 경진대회 · 우수상",
+   "자율주행 로봇제작 및 스마트 모빌리티 아이디어 경진대회 · 우수상"
+  ],
+  "metrics": [],
+  "story": [
+   {
+    "label": "PROBLEM",
+    "title": "심부전 환자 이송",
+    "text": "심부전증 환자 이송에는 환자 상태를 고려한 공간 구성과 응급 대응이 중요합니다.",
+    "image": "media/projects/ev-medical/02.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "실측 EV 모델링",
+    "text": "실측 전기차를 모델링해 차량 구조와 내부 공간을 검토했습니다.",
+    "image": "media/projects/ev-medical/01.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "이동형 의료차량 개선안",
+    "text": "환자 이동·응급 대응 중심의 개선 방향을 제안했습니다. 임상 적용·성능 검증 전 단계입니다.",
+    "image": "media/projects/ev-medical/02.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/ev-medical/01.webp",
+    "caption": "침상·장비를 배치한 의료 EV 내부 CAD 모델",
+    "kind": "screenshot",
+    "w": 1600,
+    "h": 738
+   },
+   {
+    "file": "media/projects/ev-medical/02.webp",
+    "caption": "다른 각도에서 본 후면 개방부와 실내 배치",
+    "kind": "screenshot",
+    "w": 1600,
+    "h": 738
+   }
+  ],
+  "cover": "media/projects/ev-medical/01.webp",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/cccfaf73802f8331959701de9de1f4b0"
+   },
+   {
+    "label": "Notion 원문 (사진)",
+    "url": "https://www.notion.so/333faf73802f80c8a2b7e86ecaeffe31"
+   }
+  ]
+ },
+ {
+  "id": "manual-ev",
+  "title": "아두이노 수동 제어 전기차량",
+  "titleEn": "Arduino Manual-Control EV",
+  "year": "2024",
+  "period": "",
+  "category": "mobility",
+  "oneLiner": "사람이 탑승할 수 있는 아두이노 기반 수동 제어 전기차량",
+  "summary": "파워서플라이와 페달을 활용해 사람이 탑승할 수 있는 크기의 전기차량을 제작했습니다. 만드는 과정에서 조향장치와 제어 로직을 익혔습니다.",
+  "role": [],
+  "team": "",
+  "tools": [
+   "Arduino"
+  ],
+  "awards": [],
+  "metrics": [],
+  "story": [
+   {
+    "label": "BUILD",
+    "title": "탑승형 전기차량 제작",
+    "text": "파워서플라이와 페달을 활용해 사람이 탑승할 수 있는 크기의 차량을 만들었습니다.",
+    "image": "media/projects/manual-ev/02.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "완성 차량과 제작 팀",
+    "text": "1인용 전기 차량을 완성해 팀원들과 함께 운동장에서 촬영했습니다.",
+    "image": "media/projects/manual-ev/01.webp"
+   },
+   {
+    "label": "LEARNED",
+    "title": "조향장치와 제어 로직",
+    "text": "차량을 직접 만들며 조향장치와 아두이노 기반 제어 로직에 대한 이해를 높였습니다.",
+    "image": "media/projects/manual-ev/02.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/manual-ev/01.webp",
+    "caption": "운동장에서 완성 차량과 함께한 제작 팀",
+    "kind": "photo",
+    "w": 1440,
+    "h": 1440
+   },
+   {
+    "file": "media/projects/manual-ev/02.webp",
+    "caption": "핸들·시트·알루미늄 프레임을 갖춘 완성 차량",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   }
+  ],
+  "cover": "media/projects/manual-ev/01.webp",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/33afaf73802f808b9eaad2ac3d37f544"
    }
   ]
  },
@@ -270,6 +718,72 @@
    {
     "label": "Notion 원문 (사진)",
     "url": "https://www.notion.so/333faf73802f802788f4ecc0ff3e2dea"
+   }
+  ]
+ },
+ {
+  "id": "quadruped-robot",
+  "title": "4족보행 로봇",
+  "titleEn": "Quadruped Walking Robot",
+  "year": "2026",
+  "period": "",
+  "category": "robotics",
+  "oneLiner": "사족 보행 구조와 제어 흐름을 탐색하는 로봇 프로젝트",
+  "summary": "서보모터와 출력 부품으로 4족 보행 로봇의 몸체와 다리를 조립한 초기 단계 프로젝트입니다. 보행 패턴과 관절 제어 방식은 아직 설계 후보 단계입니다.",
+  "role": [],
+  "team": "",
+  "tools": [
+   "서보모터",
+   "3D 프린팅 부품"
+  ],
+  "awards": [],
+  "metrics": [],
+  "story": [
+   {
+    "label": "IDEA",
+    "title": "사족 보행 구조 탐색",
+    "text": "사족 보행 구조와 제어 흐름을 탐색하는 프로젝트로, trot gait 보행과 관절 PID 제어를 설계 후보로 두었습니다.",
+    "image": "media/projects/quadruped-robot/01.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "서보모터 다리 조립",
+    "text": "서보모터와 출력 부품을 조립해 몸체와 네 다리를 구성했습니다.",
+    "image": "media/projects/quadruped-robot/02.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "네 다리로 선 로봇",
+    "text": "조립한 로봇이 네 다리로 서 있는 모습입니다. 보행 시험과 검증 결과는 아직 기록되지 않았습니다.",
+    "image": "media/projects/quadruped-robot/01.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/quadruped-robot/01.webp",
+    "caption": "흰 출력 프레임에 서보모터를 단 4족 로봇이 선 모습",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/quadruped-robot/02.webp",
+    "caption": "서보모터를 단 네 다리를 몸체에 조립하는 과정",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   }
+  ],
+  "cover": "media/projects/quadruped-robot/01.webp",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/e0dfaf73802f8234bb3681434d3d8e96"
+   },
+   {
+    "label": "Notion 기록 (사진)",
+    "url": "https://www.notion.so/333faf73802f805582b6e4b6970a187f"
    }
   ]
  },
@@ -379,6 +893,42 @@
    {
     "label": "Notion 원문 (2)",
     "url": "https://www.notion.so/330faf73802f80da9529d35696f4588d"
+   }
+  ]
+ },
+ {
+  "id": "vision-robot-arm",
+  "title": "비전 기반 로봇팔 제어",
+  "titleEn": "Vision-Based Robot Arm Control",
+  "year": "2026",
+  "period": "",
+  "category": "robotics",
+  "oneLiner": "비전 인식으로 로봇팔을 제어하는 흐름을 3D 설계와 함께 검토",
+  "summary": "비전 인식 기반으로 로봇팔을 제어하는 흐름을 3D 설계와 함께 검토한 2026년 프로젝트입니다.",
+  "role": [],
+  "team": "",
+  "tools": [],
+  "awards": [],
+  "metrics": [],
+  "story": [
+   {
+    "label": "IDEA",
+    "title": "비전으로 로봇팔 제어",
+    "text": "비전 인식 결과를 바탕으로 로봇팔을 제어하는 흐름을 검토했습니다."
+   },
+   {
+    "label": "BUILD",
+    "title": "3D 설계와 함께",
+    "text": "로봇팔 제어 흐름을 3D 설계와 함께 살펴봤습니다."
+   }
+  ],
+  "images": [],
+  "cover": "",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/333faf73802f80a3a073d981caee0c8a"
    }
   ]
  }

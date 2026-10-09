@@ -22,7 +22,7 @@ function typeCover(p, cls = '') {
   return `<div class="type-cover ${cls}" data-cat="${esc(p.category)}" aria-hidden="true">
     <span class="tc-cat">${esc(c.label)}</span>
     <b>${esc(p.titleEn || p.title)}</b>
-    <span class="tc-year">${esc(p.year)}</span>
+    <span class="tc-year">${esc(p.year || '')}</span>
   </div>`;
 }
 
@@ -35,7 +35,7 @@ export function projectCard(p, i, { cls = 'card' } = {}) {
   const c = categoryOf(p.category);
   return `<a class="${cls}" href="${p.path}" data-link data-cat="${esc(p.category)}">
     <figure class="card-media">${p.cover ? img(p.cover, { sizes: '(max-width: 820px) 60vw, 300px' }) : typeCover(p)}<span class="card-open" aria-hidden="true">↗</span></figure>
-    <div class="card-meta"><span class="card-no">${pad(i + 1)}</span><span>${esc(p.year)} · ${esc(c.label)}</span></div>
+    <div class="card-meta"><span class="card-no">${pad(i + 1)}</span><span>${[p.year, c.label].filter(Boolean).map(esc).join(' · ')}</span></div>
     <h3 class="card-title">${esc(p.title)}</h3>
   </a>`;
 }
@@ -101,7 +101,7 @@ function detailPage(p) {
     <section class="d-hero">
       <div class="d-hero-media">${p.cover ? img(p.cover, { eager: true, full: true }) : typeCover(p, 'is-hero')}</div>
       <div class="d-hero-text">
-        <p class="d-cat"><span>${esc(c.label)}</span><span>${esc(p.year)}</span><span>${pad(i + 1)} / ${pad(projects.length)}</span></p>
+        <p class="d-cat"><span>${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}<span>${pad(i + 1)} / ${pad(projects.length)}</span></p>
         <h1 class="d-title">${esc(p.title)}</h1>
         ${p.titleEn ? `<p class="d-en">${esc(p.titleEn)}</p>` : ''}
         <p class="d-one">${esc(p.oneLiner)}</p>
