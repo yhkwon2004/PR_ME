@@ -3,6 +3,7 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/600.css';
 import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import './styles/main.css';
+import './styles/pages.css';
 
 import * as THREE from 'three';
 import gsap from 'gsap';
@@ -19,6 +20,7 @@ import { createHud, createCursor } from './ui/hud.js';
 import { createInput } from './ui/input.js';
 import { createLightbox } from './ui/lightbox.js';
 import { createAudio } from './audio.js';
+import { createSite } from './pages/site.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canvas = document.getElementById('gl');
@@ -81,7 +83,6 @@ let hoverHold = false;
 
 const panels = createPanels($('stage'), scenes, {
   reducedMotion: reduced,
-  onMedia: (scene, i, el) => lightbox.show(scene, i, el),
   onReplay: () => goTo(0),
 });
 const hud = createHud(scenes, {
@@ -97,6 +98,26 @@ const hud = createHud(scenes, {
   },
 });
 hud.setAuto(auto);
+
+// ── 작품 아카이브 · 상세 페이지 ─────────────────────────────────
+let pageCovered = false;
+const site = createSite({
+  lightbox,
+  reducedMotion: reduced,
+  onOpen: () => {
+    pageCovered = true;
+    video?.pause();
+    if (!started) $('boot').hidden = true;
+  },
+  onClose: () => {
+    pageCovered = false;
+    if (!started) {
+      $('boot').hidden = false;
+      start(false);
+    } else if (scenes[director.index]?.id === 'ground') video?.play().catch(() => {});
+    site.markFilm();
+  },
+});
 
 function onTransition(i, prev, duration) {
   elapsed = 0;
@@ -115,9 +136,10 @@ createInput({
   prev: () => goTo(director.index - 1),
   first: () => goTo(0),
   last: () => goTo(scenes.length - 1),
-  isBlocked: () => !started || lightbox.open || hud.indexOpen,
+  isBlocked: () => !started || lightbox.open || hud.indexOpen || site.open,
   onKey: (e) => {
     if (lightbox.key(e)) return true;
+    if (site.key(e)) return true;
     if (e.key === 'Escape' && hud.indexOpen) {
       hud.closeIndex();
       return true;
@@ -163,7 +185,7 @@ addEventListener('pointermove', (e) => {
     hovered = null;
     cursor.setActor(null);
   }
-  hoverHold = fine && !!e.target.closest?.('.panel-content, .media-rail, .credits');
+  hoverHold = fine && !!e.target.closest?.('.panel-content, .credits');
   if (down && director?.drag && e.pointerType === 'mouse') {
     director.drag.set(((e.clientX - down.x) / innerWidth) * 1.4, ((e.clientY - down.y) / innerHeight) * 0.6);
   }
@@ -301,6 +323,7 @@ function start(withSound) {
     }, 5000);
   }
   director.go(0);
+  site.markFilm();
 }
 
 $('enter-sound').addEventListener('click', () => start(true));
@@ -326,7 +349,7 @@ function loop(now) {
     hud.setTime(filmTime);
     const s = scenes[director.index];
     if (s) {
-      const busy = director.trans || lightbox.open || hud.indexOpen || hoverHold;
+      const busy = director.trans || lightbox.open || hud.indexOpen || hoverHold || site.open;
       if (auto && s.hold > 0 && !busy) elapsed += dt;
       hud.setProgress(s.hold > 0 ? elapsed / s.hold : 0);
       if (auto && s.hold > 0 && elapsed >= s.hold) goTo(director.index + 1);
@@ -335,7 +358,7 @@ function loop(now) {
   if (!stage) return;
   if (pointerDirty && frame % 3 === 0) pick();
   // 부팅 화면이 덮고 있는 동안은 렌더하지 않는다
-  if (!started || frozen) return;
+  if (!started || frozen || pageCovered) return;
   director.update(dt, t);
   stage.dust.update(t);
   stage.film.uniforms.uTime.value = t;
@@ -353,6 +376,8 @@ if (stage) {
 }
 requestAnimationFrame(loop);
 boot();
+// /works 주소로 바로 들어오면 부팅 화면 없이 페이지를 연다
+site.start(site.initial);
 
 // 검증용 훅(?capture): 장면으로 즉시 이동하고 시뮬레이션을 빨리 감는다
 if (stage && new URLSearchParams(location.search).has('capture')) {

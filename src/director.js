@@ -9,10 +9,10 @@ const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) 
 const SHOTS = {
   intro: { pos: add(SETS.hangar, 0, 2.1, 6.4), target: add(SETS.hangar, 0, 1.8, 0), fov: 34, shift: [0.23, 0.13] },
   prologue: { pos: add(SETS.hangar, 5.5, 3.4, 7.4), target: add(SETS.hangar, 0, 2.2, 0), fov: 36, shift: [0.2, 0] },
-  aerial: { pos: add(SETS.aerial, 12, 9.5, 17), target: add(SETS.aerial, 0, 3.2, 0), fov: 42, shift: [0.18, 0] },
-  ground: { pos: add(SETS.ground, 9.5, 6.4, 11.5), target: add(SETS.ground, -2.2, 1.2, -2.2), fov: 44, shift: [-0.2, 0.02] },
-  robotics: { pos: add(SETS.robotics, -0.4, 3.7, 9.6), target: add(SETS.robotics, 0.5, 0.9, -0.4), fov: 40, shift: [0.21, 0.02] },
-  intelligence: { pos: add(SETS.core, 7.5, 1.2, 11.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [-0.19, 0] },
+  aerial: { pos: add(SETS.aerial, 11, 8.5, 16), target: add(SETS.aerial, 0, 3.4, 0), fov: 42, shift: [0.17, 0.17] },
+  ground: { pos: add(SETS.ground, 9.5, 6.4, 11.5), target: add(SETS.ground, -2.2, 1.2, -2.2), fov: 44, shift: [0.16, 0.17] },
+  robotics: { pos: add(SETS.robotics, -0.4, 3.9, 10.2), target: add(SETS.robotics, 0.5, 0.9, -0.4), fov: 40, shift: [0.18, 0.17] },
+  intelligence: { pos: add(SETS.core, 8, 1.4, 12.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [0.18, 0.16] },
   loop: { pos: V(0, 44, 50), target: V(0, 1, -6), fov: 44, shift: [0, 0.1] },
   record: { pos: add(SETS.record, -1.5, 4.2, 12.5), target: add(SETS.record, 0, 2.0, 0), fov: 40, shift: [0.2, 0] },
   finale: { pos: add(SETS.hangar, 0, 7.5, 17), target: add(SETS.hangar, 0, 2.8, -4), fov: 40, shift: [0, -0.04] },
@@ -73,7 +73,8 @@ export class Director {
       const back = pos.clone().sub(target).multiplyScalar(id === 'loop' ? 1.25 : 1.45);
       pos.copy(target).add(back);
       fov += 8;
-      shift.set(0, id === 'finale' ? 0.12 : 0.2);
+      const reel = this.scenes.find((x) => x.id === id)?.layout === 'reel';
+      shift.set(0, id === 'finale' ? 0.12 : reel ? 0.06 : 0.2);
     } else if (aspect < 1.3) {
       const back = pos.clone().sub(target).multiplyScalar(1.15);
       pos.copy(target).add(back);

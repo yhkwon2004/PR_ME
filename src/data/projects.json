@@ -1,0 +1,385 @@
+[
+ {
+  "id": "av-competition",
+  "title": "산업부 자율주행 경진대회",
+  "titleEn": "Autonomous Ride-on Car Contest",
+  "year": "2024",
+  "period": "",
+  "category": "mobility",
+  "oneLiner": "유아용 자동차를 자율주행 플랫폼으로 개조해 경진대회에 참여",
+  "summary": "유아용 자동차를 개조해 조향·도로 주행·신호등 인식·주차 로직을 개발했습니다. 산업통상자원부 주관 자율주행 경진대회에 참여해 실제 차량에서 시스템 통합을 경험했습니다.",
+  "role": [],
+  "team": "",
+  "tools": [],
+  "awards": [],
+  "metrics": [],
+  "story": [
+   {
+    "label": "BUILD",
+    "title": "차량 플랫폼 개조",
+    "text": "유아용 자동차를 분해해 자율주행 기능을 올릴 수 있는 플랫폼으로 개조했습니다.",
+    "image": "media/projects/av-competition/02.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "주행 로직 개발",
+    "text": "조향·도로 주행 로직과 신호등 인식, 주차 상황에 대응하는 로직을 개발했습니다.",
+    "image": "media/projects/av-competition/04.webp"
+   },
+   {
+    "label": "TEST",
+    "title": "트랙 현장 테스트",
+    "text": "주차 칸과 횡단보도가 그려진 실내 트랙에서 차량을 주행하며 점검했습니다.",
+    "image": "media/projects/av-competition/05.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "산업부 경진대회 참여",
+    "text": "2024년 8월 가천대에서 열린 제3회 미래형자동차 자율주행 SW경진대회에 참여했습니다.",
+    "image": "media/projects/av-competition/03.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/av-competition/06.webp",
+    "caption": "대회장 실내 트랙 위의 참가 차량들",
+    "kind": "photo",
+    "w": 1600,
+    "h": 901
+   },
+   {
+    "file": "media/projects/av-competition/02.webp",
+    "caption": "전동 드릴로 유아용 자동차 차체를 분해",
+    "kind": "photo",
+    "w": 1440,
+    "h": 1440
+   },
+   {
+    "file": "media/projects/av-competition/07.webp",
+    "caption": "부품을 꺼내는 팀원들과 카메라를 단 차량",
+    "kind": "photo",
+    "w": 1411,
+    "h": 1058
+   },
+   {
+    "file": "media/projects/av-competition/08.webp",
+    "caption": "테스트 트랙에서 차량을 점검하는 팀",
+    "kind": "photo",
+    "w": 1600,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/av-competition/04.webp",
+    "caption": "초음파 센서 배선과 노트북 코드 작업",
+    "kind": "photo",
+    "w": 1440,
+    "h": 1440
+   },
+   {
+    "file": "media/projects/av-competition/05.webp",
+    "caption": "주차 칸·횡단보도가 있는 대회 코스 전경",
+    "kind": "photo",
+    "w": 1600,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/av-competition/03.webp",
+    "caption": "경진대회장에 모인 참가자들",
+    "kind": "photo",
+    "w": 1600,
+    "h": 901
+   },
+   {
+    "file": "media/projects/av-competition/01.webp",
+    "caption": "제3회 미래형자동차 자율주행 SW경진대회 시상식",
+    "kind": "photo",
+    "w": 1600,
+    "h": 901
+   }
+  ],
+  "cover": "media/projects/av-competition/06.webp",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/717faf73802f8326ada601f64793fa06"
+   },
+   {
+    "label": "Notion 원문 (사진 기록)",
+    "url": "https://www.notion.so/333faf73802f806da756fdaadd4f250c"
+   }
+  ]
+ },
+ {
+  "id": "drone-soccer",
+  "title": "드론 축구",
+  "titleEn": "Drone Soccer",
+  "year": "2023",
+  "period": "",
+  "category": "drone",
+  "oneLiner": "2023 인천 드론축구 대회 참여와 동아리 연습 활동",
+  "summary": "드론축구 대회 참여와 동아리 연습으로 기체 조작, 경기 중 팀 역할 조율, 사전 점검과 안전 운용을 경험한 활동입니다.",
+  "role": [
+   "기체 조종"
+  ],
+  "team": "",
+  "tools": [],
+  "awards": [],
+  "metrics": [],
+  "story": [
+   {
+    "label": "TEST",
+    "title": "경기 전 점검",
+    "text": "경기 전 기체 상태와 주변 환경을 점검하고, 조종 입력에 따른 기체 반응을 확인하며 연습했습니다.",
+    "image": "media/projects/drone-soccer/01.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "대회·연습 경기",
+    "text": "2023년 인천 드론축구 대회에 참여하고, 경기 상황에 따라 팀원과 역할·움직임을 조율했습니다.",
+    "image": "media/projects/drone-soccer/02.webp"
+   },
+   {
+    "label": "LEARNED",
+    "title": "안전과 소통",
+    "text": "조종 기술뿐 아니라 사전 점검, 안전 수칙 준수, 팀 간 의사소통의 중요성을 확인했습니다.",
+    "image": "media/projects/drone-soccer/02.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/drone-soccer/02.webp",
+    "caption": "실내 경기장 상공의 드론볼과 골대, 조종자들",
+    "kind": "photo",
+    "w": 899,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/drone-soccer/01.webp",
+    "caption": "야간 운동장에서 드론볼 기체를 점검하는 모습",
+    "kind": "photo",
+    "w": 899,
+    "h": 1600
+   }
+  ],
+  "cover": "media/projects/drone-soccer/02.webp",
+  "videos": [
+   {
+    "url": "https://youtu.be/Et9ZNEpqrYI",
+    "caption": "드론 축구 활동 영상"
+   }
+  ],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/275faf73802f8321b42e01bd930736ca"
+   },
+   {
+    "label": "Notion 원문 (활동 기록)",
+    "url": "https://www.notion.so/336faf73802f805eaf09f934e75304b1"
+   }
+  ]
+ },
+ {
+  "id": "pixhawk-drone",
+  "title": "픽스호크 활용 자율주행 드론",
+  "titleEn": "Pixhawk Autonomous Drone",
+  "year": "2024",
+  "period": "",
+  "category": "drone",
+  "oneLiner": "Pixhawk와 Mission Planner로 만든 자율 비행 드론",
+  "summary": "다중콥터 기체에 Pixhawk 비행제어기를 적용하고, Mission Planner에서 설정한 비행 경로를 기체 제어와 연결해 자율 비행 흐름을 구성했습니다.",
+  "role": [],
+  "team": "",
+  "tools": [
+   "Pixhawk",
+   "Mission Planner"
+  ],
+  "awards": [],
+  "metrics": [],
+  "story": [
+   {
+    "label": "BUILD",
+    "title": "Pixhawk 기체 구성",
+    "text": "다중콥터 기체에 Pixhawk 비행제어기를 적용하고 조종 장비와 함께 구성했습니다.",
+    "image": "media/projects/pixhawk-drone/02.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "경로 계획과 제어 연계",
+    "text": "Mission Planner에서 비행 경로를 설정하고, 계획된 경로를 기체의 비행 제어와 연결했습니다.",
+    "image": "media/projects/pixhawk-drone/04.webp"
+   },
+   {
+    "label": "TEST",
+    "title": "야외 현장 운용 준비",
+    "text": "야외 운용 장소에서 기체와 조종 장비를 점검하고 팀 단위로 운용을 준비했습니다.",
+    "image": "media/projects/pixhawk-drone/03.webp"
+   },
+   {
+    "label": "LEARNED",
+    "title": "시스템 통합 경험",
+    "text": "하드웨어 구성, 미션 설정, 현장 운용 준비가 서로 맞물린 시스템 통합 과제임을 확인했습니다.",
+    "image": "media/projects/pixhawk-drone/05.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/pixhawk-drone/01.webp",
+    "caption": "인조잔디 필드에서 드론 기체를 점검하는 팀",
+    "kind": "photo",
+    "w": 1440,
+    "h": 1080
+   },
+   {
+    "file": "media/projects/pixhawk-drone/02.webp",
+    "caption": "비행제어기를 얹은 드론 프레임과 조종기",
+    "kind": "photo",
+    "w": 1040,
+    "h": 1387
+   },
+   {
+    "file": "media/projects/pixhawk-drone/04.webp",
+    "caption": "노트북으로 설정을 확인하며 협업하는 팀원들",
+    "kind": "photo",
+    "w": 1440,
+    "h": 1080
+   },
+   {
+    "file": "media/projects/pixhawk-drone/03.webp",
+    "caption": "배터리 상자 옆에서 드론 기체를 점검하는 모습",
+    "kind": "photo",
+    "w": 1440,
+    "h": 1080
+   },
+   {
+    "file": "media/projects/pixhawk-drone/05.webp",
+    "caption": "야외 운용 장소에서 비행을 준비하는 팀",
+    "kind": "photo",
+    "w": 1440,
+    "h": 1080
+   }
+  ],
+  "cover": "media/projects/pixhawk-drone/01.webp",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/11cfaf73802f82dea03801c68a509bd4"
+   },
+   {
+    "label": "Notion 원문 (사진)",
+    "url": "https://www.notion.so/333faf73802f802788f4ecc0ff3e2dea"
+   }
+  ]
+ },
+ {
+  "id": "ros2-nav2",
+  "title": "ROS2 Nav2 자율주행 스터디",
+  "titleEn": "ROS2 Nav2 Autonomy Study",
+  "year": "2024",
+  "period": "",
+  "category": "mobility",
+  "oneLiner": "Gazebo·ROS2 Nav2로 웨이포인트 자율주행을 실습한 스터디",
+  "summary": "리눅스 ROS2 환경에서 Gazebo 3D 맵 구성부터 LiDAR 2D 맵, RViz 시각화, Nav2 웨이포인트 자율주행까지 실습했습니다. 학습부원 3인과 PID·차선 인식도 공부했습니다.",
+  "role": [
+   "YOLO 활용 자율주행 실험 멘토",
+   "개발 (1인)"
+  ],
+  "team": "개발 1인 · 학습부원 3인",
+  "tools": [
+   "ROS2",
+   "Nav2",
+   "Gazebo",
+   "RViz",
+   "Linux",
+   "LiDAR",
+   "YOLO",
+   "CARLA"
+  ],
+  "awards": [],
+  "metrics": [
+   {
+    "value": "4단계",
+    "label": "Waypoint 자율주행 구현 과정"
+   },
+   {
+    "value": "3인",
+    "label": "학습부원"
+   }
+  ],
+  "story": [
+   {
+    "label": "IDEA",
+    "title": "스터디 주제",
+    "text": "YOLO 객체 감지, PID 제어, 차선 인식, Pure Pursuit 경로 추종, CARLA End-to-End 학습을 다뤘습니다.",
+    "image": "media/projects/ros2-nav2/02.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "LiDAR 2D 맵 작성",
+    "text": "Gazebo 3D 맵 환경에서 LiDAR로 주변을 스캔해 2D 맵을 작성했습니다.",
+    "image": "media/projects/ros2-nav2/05.webp"
+   },
+   {
+    "label": "TEST",
+    "title": "Nav2 웨이포인트 주행",
+    "text": "데이터를 전처리해 RViz로 시각화하고 Nav2 기반 웨이포인트 자율주행을 실행했습니다.",
+    "image": "media/projects/ros2-nav2/04.webp"
+   },
+   {
+    "label": "LEARNED",
+    "title": "구현 흐름 이해",
+    "text": "정해진 틀의 ROS 학습을 넘어 자율주행 구현 흐름을 이해했고, 다음 목표는 실제 하드웨어 적용입니다.",
+    "image": "media/projects/ros2-nav2/01.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/ros2-nav2/01.webp",
+    "caption": "Gazebo 3D 맵과 LiDAR 스캔 범위(파란색)",
+    "kind": "screenshot",
+    "w": 821,
+    "h": 789
+   },
+   {
+    "file": "media/projects/ros2-nav2/02.webp",
+    "caption": "Pure Pursuit 경로 추종 알고리즘 스터디 자료",
+    "kind": "diagram",
+    "w": 1398,
+    "h": 782
+   },
+   {
+    "file": "media/projects/ros2-nav2/05.webp",
+    "caption": "LiDAR 기반으로 작성한 2D 맵(map.pgm)",
+    "kind": "screenshot",
+    "w": 352,
+    "h": 296
+   },
+   {
+    "file": "media/projects/ros2-nav2/04.webp",
+    "caption": "RViz에 표시된 비용지도와 로봇 위치 추정",
+    "kind": "screenshot",
+    "w": 643,
+    "h": 760
+   }
+  ],
+  "cover": "media/projects/ros2-nav2/01.webp",
+  "videos": [
+   {
+    "url": "https://youtu.be/uLocyb7mwn8",
+    "caption": "ROS2 자율주행 스터디 영상"
+   }
+  ],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/373faf73802f830b929b01a0e98f5016"
+   },
+   {
+    "label": "Notion 원문 (2)",
+    "url": "https://www.notion.so/330faf73802f80da9529d35696f4588d"
+   }
+  ]
+ }
+]

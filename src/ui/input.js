@@ -13,6 +13,15 @@ function scrollableAncestor(el, dir) {
   return null;
 }
 
+// 가로로 스크롤 가능한 조상(프로젝트 릴)
+function scrollableX(el) {
+  while (el && el !== document.body) {
+    if (el.scrollWidth > el.clientWidth + 2 && /(auto|scroll)/.test(getComputedStyle(el).overflowX)) return el;
+    el = el.parentElement;
+  }
+  return null;
+}
+
 export function createInput({ next, prev, first, last, isBlocked, onKey }) {
   let acc = 0;
   let lockUntil = 0;
@@ -29,7 +38,10 @@ export function createInput({ next, prev, first, last, isBlocked, onKey }) {
     'wheel',
     (e) => {
       if (isBlocked()) return;
-      const d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      const horizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+      // 트랙패드 가로 스크롤은 릴을 넘긴다
+      if (horizontal && scrollableX(e.target)) return;
+      const d = horizontal ? e.deltaX : e.deltaY;
       if (scrollableAncestor(e.target, Math.sign(d))) return;
       e.preventDefault();
       if (performance.now() < lockUntil) {
@@ -80,7 +92,7 @@ export function createInput({ next, prev, first, last, isBlocked, onKey }) {
       const dir = dist < 0 ? 1 : -1;
       // 세로 스와이프가 패널 스크롤이었다면 장면을 넘기지 않는다
       if (!horizontal && (couldScroll[dir] || scrollableAncestor(startEl, dir))) return;
-      if (startEl?.closest?.('.rail-strip, .tool-chips') && horizontal) return;
+      if (horizontal && startEl && scrollableX(startEl)) return;
       fire(dir, 900);
     },
     { passive: true }

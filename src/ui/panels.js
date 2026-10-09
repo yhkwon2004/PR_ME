@@ -1,5 +1,7 @@
 import gsap from 'gsap';
 import { profile } from '../content.js';
+import { byId } from '../data/projects.js';
+import { projectCard } from '../pages/site.js';
 
 // 빈 선택자에 대한 GSAP 경고를 피한다
 const has = (t) => t && (t.length === undefined || t.length > 0);
@@ -14,44 +16,11 @@ function kicker(scene, i) {
   return `<p class="kicker" data-r><span class="kicker-no">SC ${pad(i)}</span><span class="kicker-txt">${esc(scene.kicker)}</span></p>`;
 }
 
-function items(list = []) {
-  if (!list.length) return '';
-  return `<ol class="items">${list
-    .map(
-      (it) => `<li class="item" data-r>
-        <span class="item-year">${esc(it.year)}</span>
-        <div class="item-body">
-          <h3>${esc(it.title)}${it.badge ? ` <em class="badge">${esc(it.badge)}</em>` : ''}</h3>
-          <p>${esc(it.text)}</p>
-          ${it.tags ? `<ul class="tags">${it.tags.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
-        </div>
-      </li>`
-    )
-    .join('')}</ol>`;
-}
-
 function stats(list = []) {
   if (!list.length) return '';
   return `<dl class="stats" data-r>${list
     .map((s) => `<div class="stat"><dt>${esc(s.label)}</dt><dd><b data-count="${esc(s.value)}">${esc(s.value)}</b>${s.unit ? `<small>${esc(s.unit)}</small>` : ''}</dd></div>`)
     .join('')}</dl>`;
-}
-
-function mediaRail(scene, side) {
-  if (!scene.media?.length) return '';
-  return `<div class="media-rail rail-${side}" data-r>
-    <span class="rail-label">FOOTAGE · 실제 기록</span>
-    <div class="rail-strip">${scene.media
-      .map(
-        (m, i) => `<button type="button" class="thumb${m.type === 'video' ? ' is-video' : ''}" data-media="${i}" aria-label="${esc(m.caption)} 크게 보기">
-          <img src="${esc(m.poster || m.src)}" alt="${esc(m.caption)}" loading="lazy" decoding="async" />
-          <span class="thumb-no">${pad(i + 1)}</span>
-          ${m.type === 'video' ? '<span class="thumb-play" aria-hidden="true">▶</span>' : ''}
-          <span class="thumb-cap">${esc(m.caption)}</span>
-        </button>`
-      )
-      .join('')}</div>
-  </div>`;
 }
 
 function render(scene, i) {
@@ -68,6 +37,25 @@ function render(scene, i) {
           <p class="hero-lead">${esc(scene.lead)}</p>
         </div>
         <ul class="hero-tags" data-r>${scene.tags.map((t, j) => `<li><span>${pad(j + 1)}</span>${esc(t)}</li>`).join('')}</ul>
+      </div>
+    </div>`;
+  }
+  if (L === 'reel') {
+    const list = scene.projects.map(byId).filter(Boolean);
+    return `<div class="reel-scene">
+      <div class="reel-head panel-content">
+        ${kicker(scene, i)}
+        <h2 class="title">${lines(scene.title)}</h2>
+        ${scene.subtitle ? `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>` : ''}
+        ${scene.stats ? `<ul class="mini-stats" data-r>${scene.stats.map((s) => `<li><b>${esc(s.value)}</b><span>${esc(s.label)}</span></li>`).join('')}</ul>` : ''}
+      </div>
+      <div class="reel panel-content" data-r>
+        <div class="reel-bar">
+          <span class="reel-count">${pad(list.length)} PROJECTS</span>
+          <a class="reel-all" href="/works?c=${esc(scene.category)}" data-link>VIEW ALL ↗</a>
+          <span class="reel-nav"><button type="button" data-reel="-1" aria-label="이전 프로젝트">←</button><button type="button" data-reel="1" aria-label="다음 프로젝트">→</button></span>
+        </div>
+        <div class="reel-track">${list.map((p, k) => projectCard(p, k, { cls: 'r-card' })).join('')}</div>
       </div>
     </div>`;
   }
@@ -112,6 +100,7 @@ function render(scene, i) {
           )
           .join('')}</ul>
         <div class="endcard-actions" data-r>
+          <a class="btn-works" href="/works" data-link>모든 프로젝트 보기 <span aria-hidden="true">↗</span></a>
           <button type="button" class="btn-replay" id="btn-replay"><span aria-hidden="true">↺</span> 처음부터 다시 보기</button>
           <span class="sig">${esc(profile.name)} · ${esc(profile.en)} — ${esc(profile.role)}</span>
         </div>
@@ -119,7 +108,6 @@ function render(scene, i) {
     </div>`;
   }
   // split-left / split-right
-  const side = L === 'split-left' ? 'right' : 'left';
   let body = '';
   if (scene.subtitle) body += `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>`;
   if (scene.lead) body += `<p class="lead" data-r>${esc(scene.lead)}</p>`;
@@ -135,22 +123,68 @@ function render(scene, i) {
       .join('')}</dl>`;
   if (scene.highlights)
     body += `<ol class="highlights">${scene.highlights
-      .map((h) => `<li data-r><span class="hl-year">${esc(h.year)}</span><span class="hl-title">${esc(h.title)}</span><em>${esc(h.grade)}</em></li>`)
+      .map((h) =>
+        h.link && byId(h.link)
+          ? `<li data-r><a href="/works/${esc(h.link)}" data-link><span class="hl-year">${esc(h.year)}</span><span class="hl-title">${esc(h.title)} <i aria-hidden="true">↗</i></span><em>${esc(h.grade)}</em></a></li>`
+          : `<li data-r><span class="hl-year">${esc(h.year)}</span><span class="hl-title">${esc(h.title)}</span><em>${esc(h.grade)}</em></li>`
+      )
       .join('')}</ol>`;
   if (scene.timeline)
     body += `<ol class="mini-timeline" data-r>${scene.timeline.map(([y, t]) => `<li><b>${esc(y)}</b><span>${esc(t)}</span></li>`).join('')}</ol>`;
-  body += items(scene.items);
   return `<div class="split">
     <div class="col panel-content">
       ${kicker(scene, i)}
       <h2 class="title${scene.titleKo ? ' title-ko' : ''}">${lines(scene.title)}</h2>
       ${body}
     </div>
-    ${mediaRail(scene, side)}
   </div>`;
 }
 
-export function createPanels(root, scenes, { onMedia, onReplay, reducedMotion }) {
+// 릴: 버튼 · 마우스 드래그로 가로 이동, 드래그 후 클릭은 무시
+function bindReel(el) {
+  const track = el.querySelector('.reel-track');
+  if (!track) return;
+  el.querySelectorAll('[data-reel]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const card = track.querySelector('.r-card');
+      const step = card ? card.getBoundingClientRect().width + 14 : 300;
+      track.scrollBy({ left: +b.dataset.reel * step * 2, behavior: 'smooth' });
+    })
+  );
+  let down = null;
+  let moved = false;
+  track.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    down = { x: e.clientX, left: track.scrollLeft };
+    moved = false;
+  });
+  addEventListener('pointermove', (e) => {
+    if (!down) return;
+    const dx = e.clientX - down.x;
+    if (Math.abs(dx) > 5) moved = true;
+    if (moved) {
+      track.scrollLeft = down.left - dx;
+      track.classList.add('is-dragging');
+    }
+  });
+  addEventListener('pointerup', () => {
+    down = null;
+    setTimeout(() => track.classList.remove('is-dragging'), 0);
+  });
+  track.addEventListener(
+    'click',
+    (e) => {
+      if (moved) {
+        e.preventDefault();
+        e.stopPropagation();
+        moved = false;
+      }
+    },
+    true
+  );
+}
+
+export function createPanels(root, scenes, { onReplay, reducedMotion }) {
   const panels = scenes.map((scene, i) => {
     const el = document.createElement('section');
     el.className = `panel layout-${scene.layout}`;
@@ -160,7 +194,7 @@ export function createPanels(root, scenes, { onMedia, onReplay, reducedMotion })
     el.hidden = true;
     el.inert = true;
     root.appendChild(el);
-    el.querySelectorAll('[data-media]').forEach((b) => b.addEventListener('click', () => onMedia(scene, +b.dataset.media, b)));
+    bindReel(el);
     return el;
   });
 
@@ -229,6 +263,13 @@ export function createPanels(root, scenes, { onMedia, onReplay, reducedMotion })
     }
     if (has(reveal)) tl.to(reveal, { autoAlpha: 1, y: 0, duration: 0.8 * D, ease: 'power3.out', stagger: 0.055 * D }, heroChars.length ? 0.6 : 0.25);
     tl.add(() => countUp(el), 0.4);
+    const cards = el.querySelectorAll('.r-card');
+    if (cards.length) {
+      set(cards, { autoAlpha: 0, x: 80, rotateY: -12 });
+      tl.to(cards, { autoAlpha: 1, x: 0, rotateY: 0, duration: 1.1 * D, ease: 'expo.out', stagger: 0.07 * D }, 0.35);
+      const track = el.querySelector('.reel-track');
+      if (track) track.scrollLeft = 0;
+    }
     const col = el.querySelector('.col');
     if (col) col.scrollTop = 0;
 
