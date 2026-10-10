@@ -56,7 +56,7 @@
     "image": "media/projects/ai-detector/06.webp"
    },
    {
-    "label": "RESULT",
+    "label": "BUILD",
     "title": "외부 교차 검증",
     "text": "내부 분석 결과를 GDELT·Reuters API·HuggingFace 모델과 교차 검증해 보고서·검증 링크로 제공한다.",
     "image": "media/projects/ai-detector/03.webp"
@@ -399,6 +399,137 @@
    {
     "label": "Notion 원문 (사진 기록)",
     "url": "https://www.notion.so/333faf73802f806da756fdaadd4f250c"
+   }
+  ]
+ },
+ {
+  "id": "baekchul-sikhye",
+  "title": "발효 백출 식혜",
+  "titleEn": "Fermented Baekchul Sikhye",
+  "year": "2023–2024",
+  "period": "",
+  "category": "product",
+  "oneLiner": "쓴 한약재 백출을 발효해 식혜로 만든 데이터 기반 식품 개발",
+  "summary": "식품영양공학과 2명, 컴퓨터소프트웨어공학과 1명이 백출 식혜를 만들고 배합 조건별 당도(°Bx) 데이터를 분석해 최적 제조 조건을 찾았습니다. LINC 3.0 창의대첩 대상을 받았습니다.",
+  "role": [
+   "실험 데이터 구조화·전처리",
+   "조건별 당도 데이터 비교·분석",
+   "최적 배합 조건 탐색"
+  ],
+  "team": "고단수 — 권용현, 송민아, 정선민 (식품영양공학과 2명 · 컴퓨터소프트웨어공학과 1명)",
+  "tools": [
+   "당도(°Bx) 측정",
+   "기술통계(평균·분산·표준편차)",
+   "상관관계 분석",
+   "데이터 시각화"
+  ],
+  "awards": [
+   "2024학년도 LINC 3.0 창의대첩 · 대상"
+  ],
+  "metrics": [
+   {
+    "value": "700,000원",
+    "label": "창의대첩 대상 상금"
+   },
+   {
+    "value": "3명",
+    "label": "식품영양공학 2 + 컴퓨터SW 1 융합팀"
+   }
+  ],
+  "story": [
+   {
+    "label": "PROBLEM",
+    "title": "쓴맛 한약재를 음료로",
+    "text": "쓴맛이 있는 한약재 백출에 주목했습니다. 위염 환자 증가 추이를 근거로 위장 건강을 겨냥한 식혜를 기획했습니다.",
+    "image": "media/projects/baekchul-sikhye/03.webp"
+   },
+   {
+    "label": "IDEA",
+    "title": "발효 백출 × 식혜",
+    "text": "한약을 발효하면 효능이 높아진다는 자료를 근거로 발효 백출을 썼고, 익산쌀을 활용한 지역 연계 아이템으로 제안했습니다.",
+    "image": "media/projects/baekchul-sikhye/04.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "배합 조건별 제조",
+    "text": "원료 배합 비율과 제조 조건에 따라 실험군을 나눠 식혜를 만들고, 같은 기준으로 당도(°Bx)를 측정했습니다.",
+    "image": "media/projects/baekchul-sikhye/05.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "데이터로 배합 탐색",
+    "text": "당도 데이터를 정리해 평균·표준편차와 상관관계를 비교하고 최적 배합을 탐색했습니다. 창의대첩에서 대상을 받았습니다.",
+    "image": "media/projects/baekchul-sikhye/07.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/baekchul-sikhye/01.webp",
+    "caption": "LINC 3.0 창의대첩 행사장 앞 대상 수상 기념 사진",
+    "kind": "photo",
+    "w": 1600,
+    "h": 1200
+   },
+   {
+    "file": "media/projects/baekchul-sikhye/02.webp",
+    "caption": "발표 표지 · 발효 백출을 활용한 위장 장애 식혜 개발",
+    "kind": "document",
+    "w": 1155,
+    "h": 651
+   },
+   {
+    "file": "media/projects/baekchul-sikhye/03.webp",
+    "caption": "발표 자료 · 2018–2023 위염 환자 증가 추이 그래프",
+    "kind": "document",
+    "w": 1148,
+    "h": 619
+   },
+   {
+    "file": "media/projects/baekchul-sikhye/04.webp",
+    "caption": "발표 자료 · 발효 백출의 위염 억제 근거 정리",
+    "kind": "document",
+    "w": 1154,
+    "h": 625
+   },
+   {
+    "file": "media/projects/baekchul-sikhye/05.webp",
+    "caption": "현장에서 냄비와 체로 식혜를 만드는 과정",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/baekchul-sikhye/06.webp",
+    "caption": "밥솥에서 밥알을 삭히는 식혜 제조 과정",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/baekchul-sikhye/07.webp",
+    "caption": "병에 담아 완성한 발효 백출 식혜",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/baekchul-sikhye/08.webp",
+    "caption": "2024학년도 LINC 3.0 창의대첩 대상 상장",
+    "kind": "document",
+    "w": 1132,
+    "h": 1600
+   }
+  ],
+  "cover": "media/projects/baekchul-sikhye/01.webp",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/db3faf73802f825ab64581504b93aaa8"
+   },
+   {
+    "label": "Notion 원문 (이전 버전)",
+    "url": "https://www.notion.so/333faf73802f80b0b391d7fe4e6af52f"
    }
   ]
  },
@@ -762,6 +893,113 @@
   ]
  },
  {
+  "id": "coffee-box",
+  "title": "커피박 업사이클 상자",
+  "titleEn": "Coffee-Grounds Upcycled Box",
+  "year": "2025",
+  "period": "",
+  "category": "product",
+  "oneLiner": "강릉에서 수거한 커피박으로 만든 업사이클 상자",
+  "summary": "강릉 지역의 커피박 문제에서 출발해, 수거한 커피박을 소재로 상자를 제작하고 폐자원의 재사용 가능성을 탐색한 업사이클 프로젝트입니다.",
+  "role": [],
+  "team": "Re:ocean(강릉 캠프) · de:caffeine(전주 대회) · 프론티어(호남·제주 대회)",
+  "tools": [],
+  "awards": [
+   "근거기반 지역문제 해결 캠프 in 강릉 · 대상 (강릉시장 표창)",
+   "전주 청년 창업경진대회 · 최우수상 (전북중기청장 표창)",
+   "호남·제주권 대학 연합 창업경진대회 · 장려상"
+  ],
+  "metrics": [
+   {
+    "value": "3",
+    "label": "관련 수상"
+   },
+   {
+    "value": "50만원",
+    "label": "강릉 캠프 대상 상금"
+   }
+  ],
+  "story": [
+   {
+    "label": "PROBLEM",
+    "title": "강릉의 커피박 문제",
+    "text": "커피 추출 후 남는 커피박은 활용 경로가 없으면 폐기됩니다. 강릉 커피축제의 커피박 문제를 현장 조사로 검증했습니다.",
+    "image": "media/projects/coffee-box/05.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "커피박으로 만든 상자",
+    "text": "강릉에서 수거한 커피박을 소재로 상자를 구상하고, 제품 형태로 구현하며 제작 과정을 기록했습니다.",
+    "image": "media/projects/coffee-box/03.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "강릉 캠프 대상",
+    "text": "근거기반 지역문제 해결 캠프 in 강릉에서 대상(강릉시장 표창)을 받았습니다.",
+    "image": "media/projects/coffee-box/01.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "금형 기반 시제품으로",
+    "text": "전주 청년 창업경진대회에서 커피박 친환경 패키징을 금형 기반 시제품까지 연결해 최우수상을 받았습니다.",
+    "image": "media/projects/coffee-box/04.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/coffee-box/03.webp",
+    "caption": "커피박으로 만든 6칸 상자와 원형 컵",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/coffee-box/02.webp",
+    "caption": "홈 패턴이 있는 짙은 회색 판재 샘플",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/coffee-box/01.webp",
+    "caption": "강릉 캠프 대상 보드·상장과 커피박 상자",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/coffee-box/05.webp",
+    "caption": "2025 근거기반 지역문제 해결 캠프 대상 수상",
+    "kind": "photo",
+    "w": 900,
+    "h": 482
+   },
+   {
+    "file": "media/projects/coffee-box/04.webp",
+    "caption": "전주청년창업경진대회 전북지방중소벤처기업청장상 수상",
+    "kind": "photo",
+    "w": 1600,
+    "h": 901
+   }
+  ],
+  "cover": "media/projects/coffee-box/03.webp",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문 · 커피박 업사이클 상자",
+    "url": "https://www.notion.so/ef5faf73802f83a8840181d78c5ffbeb"
+   },
+   {
+    "label": "Notion 원문 · 커피박 상자 제작 기록",
+    "url": "https://www.notion.so/333faf73802f80cea845ee4a96cd48dd"
+   },
+   {
+    "label": "원광대 보도 · 근거기반 지역문제 해결 캠프 대상",
+    "url": "https://www.wku.ac.kr/2025-근거기반-지역문제-해결-캠프서-대상-수상원광대학.html"
+   }
+  ]
+ },
+ {
   "id": "drone-soccer",
   "title": "드론 축구",
   "titleEn": "Drone Soccer",
@@ -932,7 +1170,7 @@
    {
     "label": "IDEA",
     "title": "AI는 판단하지 않는다",
-    "text": "AI는 법적 판단 없이 사용자가 제공한 사실만 구조화하고, 증거는 원문 대신 이름·설명·해시만 다룬다.",
+    "text": "AI는 법적 판단 없이 사용자가 준 사실만 구조화한다. 증거 원문은 AI에 보내지 않고 파일명·설명·해시로 관리한다.",
     "image": "media/projects/factline/02.webp"
    },
    {
@@ -1400,8 +1638,8 @@
   "story": [
    {
     "label": "PROBLEM",
-    "title": "피해는 늘고, 부담은 개인에게",
-    "text": "학교폭력 피해응답률은 5년 연속 올랐지만, 상담 전 증거 수집·진술 정리·사건 순서 구성은 피해 학생 개인에게 큰 부담입니다.",
+    "title": "피해는 늘고, 정리는 개인 몫",
+    "text": "학교폭력 피해응답률은 5년 연속 올랐지만, 상담 전 증거 수집·진술 정리·사건 순서 구성은 여전히 피해 학생 개인의 부담입니다.",
     "image": "media/projects/huss-evidence-ai/03.webp"
    },
    {
@@ -1413,7 +1651,7 @@
    {
     "label": "BUILD",
     "title": "만들지 않고 정리",
-    "text": "판례·진술서 데이터를 바탕으로 입력에서 시간·인물·장소·행위를 추출해 사건 Timeline을 세우고, 빠졌을 수 있는 정보를 묻습니다."
+    "text": "판례·진술서로 문장 구조를 분석하고, 입력에서 시간·인물·장소·행위를 추출해 사건 Timeline과 누락 정보를 제시합니다."
    },
    {
     "label": "RESULT",
@@ -1425,21 +1663,21 @@
   "images": [
    {
     "file": "media/projects/huss-evidence-ai/01.webp",
-    "caption": "AI 경진대회 우수상(한국연구재단 이사장상) 시상",
+    "caption": "HUSS 융합캠프 AI 경진대회 우수상 시상",
     "kind": "photo",
     "w": 1600,
     "h": 890
    },
    {
     "file": "media/projects/huss-evidence-ai/03.webp",
-    "caption": "문제 정의 슬라이드 · 학교폭력 피해응답률 추이(교육부)",
+    "caption": "문제 정의 슬라이드 · 학교폭력 피해응답률 추이",
     "kind": "document",
     "w": 1600,
     "h": 897
    },
    {
     "file": "media/projects/huss-evidence-ai/04.webp",
-    "caption": "문제 정의 슬라이드 · 정부의 학교폭력 대응 현황",
+    "caption": "문제 정의 슬라이드 · 정부의 학교폭력 대응",
     "kind": "document",
     "w": 1543,
     "h": 873
@@ -1466,7 +1704,7 @@
   "period": "",
   "category": "iot",
   "oneLiner": "기존 링거폴대에 붙여 수액 상태를 확인하는 IoT 장치",
-  "summary": "임의 조작과 수액 확인 누락을 줄이려 기존 링거폴대에 탈부착하는 ESP32 모니터링 장치를 만들었습니다. 회로·PCB와 3D 설계를 맡았고, 팀은 WON+UP 캡스톤디자인 대상을 받았습니다.",
+  "summary": "환자 임의 조작과 모니터링 누락을 줄이려 기존 링거폴대에 탈부착하는 IoT 장치를 개발했습니다. 회로·PCB와 3D 설계를 맡았고, 팀은 WON+UP 캡스톤디자인 대상을 받았습니다.",
   "role": [
    "PCB / 회로 설계",
    "3D 설계",
@@ -1493,7 +1731,7 @@
   "story": [
    {
     "label": "IDEA",
-    "title": "기존 폴대에 끼우는 장치",
+    "title": "기존 폴대에 붙이는 장치",
     "text": "간호 업무 부담과 임의 조작 위험을 줄이려, 링거폴대를 바꾸지 않고 바로 부착하는 장치로 설계하고 하우징을 여러 버전 다듬었습니다.",
     "image": "media/projects/iot-iv-pole/02.webp"
    },
@@ -1700,13 +1938,178 @@
   ]
  },
  {
+  "id": "kakao-fin-next",
+  "title": "kakao FIN:NEXT 웹툰 펀딩",
+  "titleEn": "WEEK Webtoon Funding App",
+  "year": "2025",
+  "period": "2025.05 – 2025.07",
+  "category": "software",
+  "oneLiner": "팬이 웹툰 영상화에 소액 투자하는 크라우드펀딩 웹앱",
+  "summary": "웹툰 드라마화 과정의 불투명한 수익 분배 문제를 풀기 위한 팬 참여형 크라우드펀딩 웹앱입니다. 권용현은 프론트엔드 개발, Supabase 연동, UI/UX 구현을 맡았습니다.",
+  "role": [
+   "프론트엔드 개발",
+   "Supabase 연동",
+   "UI/UX 구현"
+  ],
+  "team": "Art in Vest (경영학 2인 · 컴퓨터공학 1인)",
+  "tools": [
+   "Next.js 15",
+   "React 19",
+   "TypeScript",
+   "Tailwind CSS",
+   "shadcn/ui",
+   "Radix UI",
+   "Supabase (PostgreSQL·Auth·Storage)",
+   "Recharts",
+   "React Hook Form",
+   "Zod",
+   "Vercel"
+  ],
+  "awards": [
+   "2025 도전! 생활혁신 아이디어 리그 · 최우수상"
+  ],
+  "metrics": [
+   {
+    "value": "92%",
+    "label": "설문 참여자 79명 중 웹툰 투자를 모르는 비율"
+   },
+   {
+    "value": "35팀",
+    "label": "참가한 생활혁신 아이디어리그에서 최우수상"
+   },
+   {
+    "value": "30+",
+    "label": "통합한 shadcn/ui·Radix UI 컴포넌트"
+   }
+  ],
+  "story": [
+   {
+    "label": "PROBLEM",
+    "title": "닫혀 있는 웹툰 투자",
+    "text": "드라마 한 편에 약 10억~50억 원이 들지만 투자는 B2B 위주라 시민이 참여하기 어렵고, 창작자 수익 분배도 불투명합니다.",
+    "image": "media/projects/kakao-fin-next/03.webp"
+   },
+   {
+    "label": "IDEA",
+    "title": "팬이 곧 투자자",
+    "text": "팬이 좋아하는 웹툰의 드라마 제작비에 소액 투자하고, 작품이 성공하면 수익을 나눠 받는 구조를 기획했습니다.",
+    "image": "media/projects/kakao-fin-next/04.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "투자 흐름 구현",
+    "text": "Next.js 15와 Supabase로 웹툰 목록, Zod 투자 금액 검증, 투자 내역 저장, Recharts 수익률 그래프를 구현했습니다.",
+    "image": "media/projects/kakao-fin-next/08.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "최우수상 수상",
+    "text": "시민 참여형 웹툰 펀딩 플랫폼 아이디어로 2025 도전! 생활혁신 아이디어 리그에서 최우수상을 받았습니다.",
+    "image": "media/projects/kakao-fin-next/10.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/kakao-fin-next/01.webp",
+    "caption": "시민 참여형 웹툰 펀딩 플랫폼 WEEK 표지",
+    "kind": "document",
+    "w": 1046,
+    "h": 587
+   },
+   {
+    "file": "media/projects/kakao-fin-next/02.webp",
+    "caption": "웹툰 영상화 현황과 설문(79명) 결과 슬라이드",
+    "kind": "document",
+    "w": 1046,
+    "h": 589
+   },
+   {
+    "file": "media/projects/kakao-fin-next/03.webp",
+    "caption": "웹툰 산업 수익 구조와 폐쇄적 투자 문제",
+    "kind": "document",
+    "w": 1046,
+    "h": 588
+   },
+   {
+    "file": "media/projects/kakao-fin-next/04.webp",
+    "caption": "해결안 3가지: 간편 투자·포트폴리오·마일리지",
+    "kind": "document",
+    "w": 1119,
+    "h": 608
+   },
+   {
+    "file": "media/projects/kakao-fin-next/05.webp",
+    "caption": "앱 홈 화면: 내 투자와 투자 가능한 웹툰",
+    "kind": "screenshot",
+    "w": 717,
+    "h": 1136
+   },
+   {
+    "file": "media/projects/kakao-fin-next/06.webp",
+    "caption": "포트폴리오 확인 화면을 담은 발표 슬라이드",
+    "kind": "document",
+    "w": 1119,
+    "h": 624
+   },
+   {
+    "file": "media/projects/kakao-fin-next/07.webp",
+    "caption": "로그인부터 투자 완료까지 사용자 흐름도",
+    "kind": "diagram",
+    "w": 942,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/kakao-fin-next/08.webp",
+    "caption": "프론트엔드·브라우저·DB 시스템 구성도",
+    "kind": "diagram",
+    "w": 1600,
+    "h": 1345
+   },
+   {
+    "file": "media/projects/kakao-fin-next/09.webp",
+    "caption": "Supabase 테이블 ERD (users·webtoons 등)",
+    "kind": "diagram",
+    "w": 1228,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/kakao-fin-next/10.webp",
+    "caption": "생활혁신 아이디어 리그 최우수상 상장",
+    "kind": "document",
+    "w": 1132,
+    "h": 1600
+   }
+  ],
+  "cover": "media/projects/kakao-fin-next/01.webp",
+  "videos": [
+   {
+    "url": "https://youtube.com/shorts/NZwp7W0fqdU",
+    "caption": "앱 시연 영상 (YouTube Shorts)"
+   }
+  ],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/437faf73802f8332b1558127d690e5d3"
+   },
+   {
+    "label": "Notion 원문 (사본)",
+    "url": "https://www.notion.so/333faf73802f804db2a7e52ae01b5142"
+   },
+   {
+    "label": "원광대 보도 · 생활혁신 아이디어리그 최우수상",
+    "url": "https://www.wku.ac.kr/컴퓨터소프트웨어공학과-권용현-학생-생활혁신-아.html"
+   }
+  ]
+ },
+ {
   "id": "legal-ai-platform",
   "title": "비전문가용 리걸 AI 정리 플랫폼",
   "titleEn": "Legal AI Case Organizer",
   "year": "2026",
   "period": "",
   "category": "ai",
-  "oneLiner": "흩어진 사건 자료를 시간순으로 정리하는 비전문가용 도구 기획",
+  "oneLiner": "사건 자료를 시간순으로 구조화하는 비전문가용 도구 기획",
   "summary": "사건 정보를 시간 순서와 구조화된 데이터로 정리해 비전문가도 사실관계와 증거의 흐름을 파악하도록 돕는 도구를 기획했습니다. 법률 판단이 아닌 정보 정리 지원이 목표입니다.",
   "role": [],
   "team": "",
@@ -1724,13 +2127,13 @@
    {
     "label": "PROBLEM",
     "title": "흩어진 사건 자료",
-    "text": "사건 자료는 문서·메모·기록으로 흩어질 수 있어 경과와 자료 간 관계를 한눈에 파악하기 어렵습니다.",
+    "text": "사건 자료는 문서·메모·기록으로 흩어지기 쉬워 경과와 자료 간 관계를 한눈에 파악하기 어렵습니다.",
     "image": "media/projects/legal-ai-platform/03.webp"
    },
    {
     "label": "IDEA",
     "title": "시간축 위의 사건 구조",
-    "text": "사건 요소를 항목화해 발생 시점순으로 배열하는 표현을 구상하고, 3차원 배열 기반 구조를 검토했습니다.",
+    "text": "사건 요소를 항목화해 시점순으로 배열하는 표현과 단계별 확인 흐름을 구상하고, 3차원 배열 구조를 검토했습니다.",
     "image": "media/projects/legal-ai-platform/02.webp"
    },
    {
@@ -1928,6 +2331,223 @@
    {
     "label": "Notion 원문 (2026 포트폴리오)",
     "url": "https://www.notion.so/330faf73802f8007b1b5f8f59cc56b92"
+   }
+  ]
+ },
+ {
+  "id": "moisture-dehumidifier",
+  "title": "수분 자가발전 제습장치",
+  "titleEn": "Moisture-Powered Dehumidifier",
+  "year": "2024",
+  "period": "",
+  "category": "iot",
+  "oneLiner": "제습 중 나온 수분으로 발전하도록 설계한 순환형 제습장치",
+  "summary": "실리카겔 B형이 흡수한 습기를 PTC 세라믹 발열소자로 방출시키고, 그 수분을 수분자가발전부로 모아 전기를 얻는 구조를 설계했습니다. 3D 프린팅 케이스와 회로로 시제품을 만들어 전시했습니다.",
+  "role": [
+   "팀장"
+  ],
+  "team": "HIT (원광대학교) · 권용현(팀장), 현하늘, 박상현",
+  "tools": [
+   "실리카겔 B형",
+   "PTC 세라믹 발열소자",
+   "탄소섬유 멤브레인",
+   "3D 설계",
+   "3D 프린팅",
+   "회로 설계"
+  ],
+  "awards": [
+   "2024 G-Startup 아이디어 캠프 · 최우수상",
+   "2024 G-Startup 아이디어 캠프 · 에너지위너상",
+   "제1회 전북권 지역 문제 해결 아이디어 경진대회 · 우수상",
+   "2024학년도 2학기 LINC 3.0 창의대첩 · 최우수상"
+  ],
+  "metrics": [],
+  "story": [
+   {
+    "label": "PROBLEM",
+    "title": "버려지는 제습 수분",
+    "text": "제습기는 전력을 계속 쓰지만, 제거한 수분은 에너지로 쓰이지 못하고 그대로 버려집니다.",
+    "image": "media/projects/moisture-dehumidifier/02.webp"
+   },
+   {
+    "label": "IDEA",
+    "title": "습기로 습기를 잡는다",
+    "text": "실리카겔 흡습 → PTC 가열로 수분 방출 → 한 통로로 모아 수분자가발전부로 전달하는 순환 구조.",
+    "image": "media/projects/moisture-dehumidifier/04.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "케이스·회로 제작",
+    "text": "상·하부 케이스와 내부 구조를 3D 설계·출력하고, 회로를 구성해 조립·테스트했습니다.",
+    "image": "media/projects/moisture-dehumidifier/01.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "시제품 전시·수상",
+    "text": "RIS 에너지신산업 성과공유회에 시제품을 전시했고, G-Startup 캠프 최우수상 등을 받았습니다.",
+    "image": "media/projects/moisture-dehumidifier/03.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/moisture-dehumidifier/02.webp",
+    "caption": "온·습도 LCD와 실리카겔 팩이 놓인 장치 상판",
+    "kind": "photo",
+    "w": 1600,
+    "h": 901
+   },
+   {
+    "file": "media/projects/moisture-dehumidifier/04.webp",
+    "caption": "실리카겔 팩을 넣은 좌우 흡습 칸과 내부 배선",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/moisture-dehumidifier/01.webp",
+    "caption": "케이스 내부 제어 보드·릴레이 배선 작업",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/moisture-dehumidifier/03.webp",
+    "caption": "RIS 성과공유회 전시 부스의 포스터와 시제품",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   }
+  ],
+  "cover": "media/projects/moisture-dehumidifier/02.webp",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/0c8faf73802f83d9af4501fcce70a9b8"
+   },
+   {
+    "label": "Notion 원문 (사본)",
+    "url": "https://www.notion.so/330faf73802f80baa069e8cf86b99000"
+   }
+  ]
+ },
+ {
+  "id": "peltier-cooler",
+  "title": "펠티어 열전 노트북 쿨러",
+  "titleEn": "Peltier Laptop Cooler",
+  "year": "2024–2025",
+  "period": "",
+  "category": "iot",
+  "oneLiner": "노트북 폐열을 펠티어 소자로 회수해 냉각에 재활용하려는 쿨러",
+  "summary": "펠티어 소자의 열전 발전 원리로 노트북 폐열을 회수해 냉각 보조에 재활용하는 구조를 탐색했습니다. 3D 프린팅으로 거치대형 시제품을 제작했고, 아이디어로 장려상을 받았습니다.",
+  "role": [
+   "팀장"
+  ],
+  "team": "늘솔길 (권용현·이규환·현하늘)",
+  "tools": [
+   "펠티어 소자",
+   "3D 설계",
+   "3D 프린팅",
+   "회로 설계"
+  ],
+  "awards": [
+   "생활 속 에너지 창업 아이디어 경진대회 · 장려상"
+  ],
+  "metrics": [],
+  "story": [
+   {
+    "label": "PROBLEM",
+    "title": "냉각에도 에너지가 든다",
+    "text": "노트북 발열을 낮추는 냉각은 별도의 에너지를 쓰고, 그 과정에서 나온 열은 그대로 버려집니다.",
+    "image": "media/projects/peltier-cooler/06.webp"
+   },
+   {
+    "label": "IDEA",
+    "title": "버려지는 열을 전기로",
+    "text": "펠티어 소자의 열전 발전 원리로 노트북 폐열을 회수해 냉각 보조에 재활용하는 구조를 구상했습니다.",
+    "image": "media/projects/peltier-cooler/01.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "3D 프린팅 거치대",
+    "text": "상·하부 케이스와 내부 구조를 3D로 설계·출력하고, 소자 연결부와 내부 회로, 배터리 부품을 조립했습니다.",
+    "image": "media/projects/peltier-cooler/07.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "전시와 수상",
+    "text": "RIS 에너지신산업 성과공유회에 시제품을 전시했고, 생활 속 에너지 창업 아이디어 경진대회 장려상을 받았습니다.",
+    "image": "media/projects/peltier-cooler/02.webp"
+   }
+  ],
+  "images": [
+   {
+    "file": "media/projects/peltier-cooler/05.webp",
+    "caption": "완성된 거치대형 쿨러 시제품",
+    "kind": "photo",
+    "w": 1440,
+    "h": 1081
+   },
+   {
+    "file": "media/projects/peltier-cooler/07.webp",
+    "caption": "3D 프린팅으로 출력한 거치대 부품들",
+    "kind": "photo",
+    "w": 1080,
+    "h": 1440
+   },
+   {
+    "file": "media/projects/peltier-cooler/06.webp",
+    "caption": "뒷면: 냉각 팬 2개와 배선",
+    "kind": "photo",
+    "w": 1440,
+    "h": 1081
+   },
+   {
+    "file": "media/projects/peltier-cooler/03.webp",
+    "caption": "정면: 통풍 그릴과 받침대 표시창 2개",
+    "kind": "photo",
+    "w": 1440,
+    "h": 1081
+   },
+   {
+    "file": "media/projects/peltier-cooler/01.webp",
+    "caption": "상판 덮개를 연 내부 배선과 회로 기판",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/peltier-cooler/04.webp",
+    "caption": "전시 부스에서 통풍 덮개를 분리하는 모습",
+    "kind": "photo",
+    "w": 901,
+    "h": 1600
+   },
+   {
+    "file": "media/projects/peltier-cooler/02.webp",
+    "caption": "RIS 에너지신산업 성과공유회 전시 부스",
+    "kind": "photo",
+    "w": 1600,
+    "h": 901
+   },
+   {
+    "file": "media/projects/peltier-cooler/08.webp",
+    "caption": "생활 속 에너지 창업 아이디어 경진대회 장려상 상장",
+    "kind": "document",
+    "w": 1132,
+    "h": 1600
+   }
+  ],
+  "cover": "media/projects/peltier-cooler/05.webp",
+  "videos": [],
+  "links": [
+   {
+    "label": "Notion 원문",
+    "url": "https://www.notion.so/b47faf73802f831c9b498199798ec388"
+   },
+   {
+    "label": "Notion 원문 (사진 기록)",
+    "url": "https://www.notion.so/333faf73802f800780eade7b89c890b9"
    }
   ]
  },
@@ -2556,15 +3176,15 @@
   "year": "2024",
   "period": "2024.11 – 2024.12",
   "category": "software",
-  "oneLiner": "C# 윈도우 폼으로 만든 확장형 레트로 미니게임 패키지",
-  "summary": "점프·자동차·기억력·숫자야구·뱀·지뢰찾기·테트리스 7개 게임을 모듈로 분리해 한 플랫폼에서 실행하고, 로그인·회원가입·점수 기록을 갖춘 5인 팀 프로젝트.",
+  "oneLiner": "C# Windows Forms로 만든 확장형 레트로 미니게임 패키지",
+  "summary": "로그인·회원가입·점수 기록을 갖춘 Windows Forms 플랫폼에 7개 미니게임을 모듈로 묶었습니다. 5인 팀에서 숫자야구·뱀·지뢰찾기·테트리스를 맡았습니다.",
   "role": [
-   "숫자야구 게임 담당",
-   "뱀 게임 담당",
-   "지뢰찾기 게임 담당",
-   "테트리스 게임 담당"
+   "숫자야구 게임 구현",
+   "뱀 게임 구현",
+   "지뢰찾기 게임 구현",
+   "테트리스 게임 구현"
   ],
-  "team": "5인 팀 (컴퓨터소프트웨어공학과) · 김택균, 이주원, 이상훈, 박찬민, 권용현",
+  "team": "5인 팀 · 컴퓨터소프트웨어공학과 (김택균, 이주원, 이상훈, 박찬민, 권용현)",
   "tools": [
    "C#",
    "Windows Forms",
@@ -2581,43 +3201,39 @@
    },
    {
     "value": "1개월",
-    "label": "개발 기간 (2024.11.6–12.5)"
-   },
-   {
-    "value": "4종",
-    "label": "권용현 담당 게임"
+    "label": "개발 기간"
    }
   ],
   "story": [
    {
     "label": "IDEA",
-    "title": "게임별 독립 모듈",
-    "text": "각 게임은 독립적으로 구동하고, 모듈화 설계로 하나의 통합 패키지처럼 운영하도록 구조를 잡았다.",
+    "title": "독립 게임을 한 패키지로",
+    "text": "각 게임은 독립적으로 구동하고, 모듈화 설계로 하나의 통합 패키지처럼 운영하도록 구조를 잡았습니다.",
     "image": "media/projects/retrofit-game/01.webp"
    },
    {
     "label": "BUILD",
-    "title": "4개 게임 구현",
-    "text": "숫자야구·뱀·지뢰찾기·테트리스를 C#으로 구현하고, 게임 종료 시 점수를 반환하도록 맞췄다.",
+    "title": "4개 게임 직접 구현",
+    "text": "숫자야구·뱀·지뢰찾기·테트리스를 C#으로 구현하고, 게임 종료 시 점수를 Score 속성으로 넘기도록 했습니다.",
     "image": "media/projects/retrofit-game/01.webp"
    },
    {
     "label": "TEST",
-    "title": "버그를 잡은 방법",
-    "text": "뱀 게임 깜빡임은 더블 버퍼링으로, 지뢰찾기 연쇄 오픈은 재귀 호출과 경계 체크로 해결했다.",
+    "title": "버그를 하나씩 해결",
+    "text": "뱀 게임 깜빡임은 더블 버퍼링으로, 지뢰찾기 연쇄 오픈은 재귀 경계 검사로, 테트리스 회전은 위치 검증으로 해결했습니다.",
     "image": "media/projects/retrofit-game/01.webp"
    },
    {
     "label": "LEARNED",
     "title": "GitHub 협업 흐름",
-    "text": "feature 브랜치 작업 → PR 리뷰 후 develop 병합 → 테스트 후 main 병합 흐름으로 협업했다.",
+    "text": "feature → develop → main 브랜치와 PR 리뷰로 팀원 작업을 병합하는 흐름을 실습했습니다.",
     "image": "media/projects/retrofit-game/01.webp"
    }
   ],
   "images": [
    {
     "file": "media/projects/retrofit-game/01.webp",
-    "caption": "로그인·회원가입·메인·로딩·게임 폼 전환 구조도",
+    "caption": "로그인→메인→로딩→게임으로 이어지는 폼 전환 구조도",
     "kind": "diagram",
     "w": 1600,
     "h": 900
@@ -2702,7 +3318,7 @@
    },
    {
     "file": "media/projects/robot-push-hackathon/02.webp",
-    "caption": "리프팅·클램핑 구조를 포함한 로봇 3D 모델링 화면",
+    "caption": "로봇 기구부 3D 모델링 화면 모음",
     "kind": "diagram",
     "w": 501,
     "h": 596
@@ -2882,7 +3498,7 @@
    "객체 인식",
    "Python 기반 데이터·모델 처리"
   ],
-  "team": "세잎(Safe) 4인 팀 · 약학과 이태연, 컴퓨터소프트웨어공학과 최용운·권용현·신찬솔",
+  "team": "4인 · 약학과 이태연, 컴퓨터소프트웨어공학과 최용운·권용현·신찬솔",
   "tools": [
    "Swift",
    "Python",
