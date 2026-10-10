@@ -541,7 +541,7 @@
   "period": "2024.03 – 2024.12",
   "category": "mobility",
   "oneLiner": "기계공학과 동아리에서 BAJA·EV·Formula 차량 제작에 참여",
-  "summary": "원광대 기계공학과 자작차 동아리 '메카니즘'에서 BAJA·EV·Formula 차량의 CATIA 설계, 가공, 조립, 주행 테스트에 참여했습니다. 소프트웨어 전공자로 하드웨어 제작 현장을 경험했습니다.",
+  "summary": "원광대 기계공학과 자작차 동아리 '메카니즘'에서 BAJA·EV·Formula 차량의 CATIA 설계, 가공, 조립, 주행 테스트에 참여했습니다. 소프트웨어 전공자로 제작 현장을 경험했습니다.",
   "role": [
    "CATIA 차량 프레임·주요 부품 설계",
    "프레임·서스펜션·브래킷 가공 및 조립",
@@ -758,7 +758,7 @@
     "label": "LEARNED",
     "title": "눈높이에 맞춘 설명",
     "text": "기술 내용을 상대의 배경과 이해 수준에 맞춰 설명하는 경험을 쌓았습니다.",
-    "image": "media/projects/chiangmai-seminar/01.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -1032,7 +1032,7 @@
     "label": "LEARNED",
     "title": "안전과 소통",
     "text": "조종 기술뿐 아니라 사전 점검, 안전 수칙 준수, 팀 간 의사소통의 중요성을 확인했습니다.",
-    "image": "media/projects/drone-soccer/02.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -1105,7 +1105,7 @@
     "label": "RESULT",
     "title": "이동형 의료차량 개선안",
     "text": "환자 이동·응급 대응 중심의 개선 방향을 제안했습니다. 임상 적용·성능 검증 전 단계입니다.",
-    "image": "media/projects/ev-medical/02.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -1357,19 +1357,19 @@
     "label": "BUILD",
     "title": "낯선 환경부터 구축",
     "text": "카카오 공공 GPU 접속 테스트 후 WSL Ubuntu, CUDA 12.0, anaconda, TensorFlowTTS 환경을 세팅했습니다.",
-    "image": "media/projects/gan-tts/01.webp"
+    "image": ""
    },
    {
     "label": "TEST",
     "title": "MeCab 오류 해결",
     "text": "목소리 학습 중 konlpy가 MeCab을 찾지 못하는 오류가 나, 자료 조사로 해결 방법을 찾았습니다.",
-    "image": "media/projects/gan-tts/01.webp"
+    "image": ""
    },
    {
     "label": "RESULT",
     "title": "단어·음소 정렬 확인",
     "text": "문장을 단어와 자모 단위 음소로 나눈 TextGrid 정렬 결과를 저장하고 확인했습니다.",
-    "image": "media/projects/gan-tts/01.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -1527,7 +1527,7 @@
     "label": "RESULT",
     "title": "하중 측정과 시제품 제작",
     "text": "하중 데이터를 측정하고 외형 제작과 회로 구성을 완료했습니다. 2024 호남제주권 제품 제작 역량강화 캠프에서 우수상을 받았습니다.",
-    "image": "media/projects/growth-footrest/01.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -2212,7 +2212,7 @@
     "label": "LEARNED",
     "title": "조향장치와 제어 로직",
     "text": "차량을 직접 만들며 조향장치와 아두이노 기반 제어 로직에 대한 이해를 높였습니다.",
-    "image": "media/projects/manual-ev/02.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -2290,7 +2290,7 @@
     "label": "LEARNED",
     "title": "막힌 곳과 해결",
     "text": "마커에 store_id를 저장해 가게를 식별했고, 대용량 삽입 오류에는 배치 삽입·트랜잭션 처리가 필요했습니다.",
-    "image": "media/projects/meal-reservation-app/01.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -2579,13 +2579,13 @@
     "label": "BUILD",
     "title": "필요 기능 정리",
     "text": "LAB 색 모델의 명도와 MTCNN 얼굴영역 추출을 필요 기능으로 정리했습니다.",
-    "image": "media/projects/personal-color-bot/01.webp"
+    "image": ""
    },
    {
     "label": "BUILD",
     "title": "Slack 챗봇 서비스 흐름",
     "text": "챗봇 대화 → 배경색·피부색 입력 → 색상 정보 조합 → 퍼스널 컬러 추천 순서로 구성했습니다.",
-    "image": "media/projects/personal-color-bot/01.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -2902,7 +2902,7 @@
     "label": "RESULT",
     "title": "네 다리로 선 로봇",
     "text": "조립한 로봇이 네 다리로 서 있는 모습입니다. 보행 시험과 검증 결과는 아직 기록되지 않았습니다.",
-    "image": "media/projects/quadruped-robot/01.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -3120,13 +3120,13 @@
     "label": "BUILD",
     "title": "Unity·C# VR 게임",
     "text": "C#과 Unity로 재활 환자의 움직임을 반영하는 VR 헬스케어 게임을 설계하고 구현했습니다.",
-    "image": "media/projects/rehab-game/01.webp"
+    "image": "media/projects/rehab-game/06.webp"
    },
    {
     "label": "RESULT",
     "title": "경진대회 우수상",
     "text": "2023학년도 스마트헬스케어 SW비교과 경진대회에서 우수상(SW중심대학사업단장상)을 받았습니다.",
-    "image": "media/projects/rehab-game/06.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -3211,19 +3211,19 @@
     "label": "BUILD",
     "title": "4개 게임 직접 구현",
     "text": "숫자야구·뱀·지뢰찾기·테트리스를 C#으로 구현하고, 게임 종료 시 점수를 Score 속성으로 넘기도록 했습니다.",
-    "image": "media/projects/retrofit-game/01.webp"
+    "image": ""
    },
    {
     "label": "TEST",
     "title": "버그를 하나씩 해결",
     "text": "뱀 게임 깜빡임은 더블 버퍼링으로, 지뢰찾기 연쇄 오픈은 재귀 경계 검사로, 테트리스 회전은 위치 검증으로 해결했습니다.",
-    "image": "media/projects/retrofit-game/01.webp"
+    "image": ""
    },
    {
     "label": "LEARNED",
     "title": "GitHub 협업 흐름",
     "text": "feature → develop → main 브랜치와 PR 리뷰로 팀원 작업을 병합하는 흐름을 실습했습니다.",
-    "image": "media/projects/retrofit-game/01.webp"
+    "image": ""
    }
   ],
   "images": [
@@ -3295,13 +3295,13 @@
     "label": "TEST",
     "title": "시스템 통합 점검",
     "text": "전원 배선 안정성, 부품 간 간섭, 제어 명령과 실제 동작의 일치 여부를 함께 점검하며 통합했다.",
-    "image": "media/projects/robot-push-hackathon/01.webp"
+    "image": "media/projects/robot-push-hackathon/03.webp"
    },
    {
     "label": "RESULT",
     "title": "해커톤 최우수상",
     "text": "2023 Ticket to the Dream 대학생 해커톤에서 팀 '용진은 못말려'(4명)로 최우수상을 받았다.",
-    "image": "media/projects/robot-push-hackathon/03.webp"
+    "image": ""
    }
   ],
   "images": [

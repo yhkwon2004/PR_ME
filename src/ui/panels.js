@@ -88,8 +88,8 @@ function render(scene, i) {
           ${scene.credits.map(([r, n]) => `<div class="credit"><span>${esc(r)}</span><b>${esc(n)}</b></div>`).join('')}
           <p class="credits-thanks">감사합니다</p>
         </div>
-        <button type="button" class="skip" id="skip-credits">SKIP ▸</button>
       </div>
+      <button type="button" class="skip" id="skip-credits">SKIP ▸</button>
       <div class="endcard panel-content">
         <p class="endcard-kicker" data-r>THE END — 그리고 다음 장면</p>
         <h2 class="title title-end">${lines(scene.end)}</h2>
@@ -151,6 +151,11 @@ function bindReel(el) {
       track.scrollBy({ left: +b.dataset.reel * step * 2, behavior: 'smooth' });
     })
   );
+  // 끝까지 넘기면 오른쪽 페이드를 걷어 마지막 카드를 온전히 보여 준다
+  const edge = () => track.classList.toggle('is-end', track.scrollLeft + track.clientWidth >= track.scrollWidth - 4);
+  track.addEventListener('scroll', edge, { passive: true });
+  addEventListener('resize', edge);
+  edge();
   let down = null;
   let moved = false;
   track.addEventListener('pointerdown', (e) => {
@@ -268,7 +273,10 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
       set(cards, { autoAlpha: 0, x: 80, rotateY: -12 });
       tl.to(cards, { autoAlpha: 1, x: 0, rotateY: 0, duration: 1.1 * D, ease: 'expo.out', stagger: 0.07 * D }, 0.35);
       const track = el.querySelector('.reel-track');
-      if (track) track.scrollLeft = 0;
+      if (track) {
+        track.scrollLeft = 0;
+        track.dispatchEvent(new Event('scroll'));
+      }
     }
     const col = el.querySelector('.col');
     if (col) col.scrollTop = 0;
@@ -282,7 +290,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
     const card = el.querySelector('.endcard');
     const skip = el.querySelector('#skip-credits');
     gsap.set(card, { autoAlpha: 0 });
-    gsap.set(credits, { autoAlpha: 1 });
+    gsap.set([credits, skip], { autoAlpha: 1 });
     gsap.set(card.querySelectorAll('.title .line > span'), { yPercent: 112 });
     gsap.set(card.querySelectorAll('[data-r]'), { autoAlpha: 0, y: 22 });
     const showCard = () => {
@@ -290,7 +298,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
       creditsTl.kill();
       creditsTl = gsap.timeline();
       creditsTl
-        .to(credits, { autoAlpha: 0, duration: 0.6 })
+        .to([credits, skip], { autoAlpha: 0, duration: 0.6 })
         .set(card, { autoAlpha: 1 })
         .to(card.querySelectorAll('.title .line > span'), { yPercent: 0, duration: 1.2, ease: 'expo.out', stagger: 0.12 })
         .to(card.querySelectorAll('[data-r]'), { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08 }, '-=0.8');

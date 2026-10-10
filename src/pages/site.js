@@ -65,7 +65,7 @@ function worksPage(cat) {
     <ul class="works-grid">
       ${projects
         .map(
-          (p, i) => `<li class="w-item${p.wide ? ' is-wide' : ''}${cat !== 'all' && p.category !== cat ? ' is-out' : ''}" data-cat="${esc(p.category)}">
+          (p, i) => `<li class="w-item${cat !== 'all' && p.category !== cat ? ' is-out' : ''}" data-cat="${esc(p.category)}"${p.wide ? ' data-wide' : ''}>
             ${projectCard(p, i, { cls: 'w-card' })}
           </li>`
         )
@@ -73,6 +73,22 @@ function worksPage(cat) {
     </ul>
     ${footer()}
   </div>`;
+}
+
+// 넓은 카드는 줄 안에 자리가 있을 때만 두 칸을 쓴다 — 보이는 순서와 번호가 항상 일치
+function layoutGrid(grid) {
+  const cols = parseInt(getComputedStyle(grid).getPropertyValue('--cols'), 10) || 4;
+  let col = 0;
+  let n = 0;
+  for (const li of grid.children) {
+    if (li.classList.contains('is-out')) continue;
+    const span = li.hasAttribute('data-wide') && col + 2 <= cols ? 2 : 1;
+    li.classList.toggle('is-wide', span === 2);
+    col = (col + span) % cols;
+    const no = li.querySelector('.card-no');
+    if (no) no.textContent = pad(++n);
+  }
+  return cols;
 }
 
 function footer() {
@@ -180,6 +196,14 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   let filmEntered = false;
   let busy = false;
   let observer = null;
+  let gridCols = 0;
+
+  addEventListener('resize', () => {
+    const grid = page.querySelector('.works-grid');
+    if (!grid) return;
+    const cols = parseInt(getComputedStyle(grid).getPropertyValue('--cols'), 10);
+    if (cols !== gridCols) gridCols = layoutGrid(grid);
+  });
 
   const parse = () => {
     const path = location.pathname.replace(/\/+$/, '') || '/';
@@ -219,7 +243,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     bind(route);
     const p = route.name === 'detail' ? byId(route.id) : null;
     document.title = p ? `${p.title} — 권용현 Physical AI Portfolio` : 'Works — 권용현 Physical AI Portfolio';
-    page.querySelector('.pg-close')?.focus({ preventScroll: true });
+    page.focus({ preventScroll: true });
   }
 
   function unmount() {
@@ -251,6 +275,8 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     page.querySelectorAll('.reveal, .w-item').forEach((el) => observer.observe(el));
 
     if (route.name === 'works') {
+      const grid = page.querySelector('.works-grid');
+      gridCols = layoutGrid(grid);
       page.querySelector('.chips').addEventListener('click', (e) => {
         const b = e.target.closest('button[data-cat]');
         if (!b) return;
@@ -258,6 +284,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
         page.querySelectorAll('.chips button').forEach((x) => x.classList.toggle('is-on', x === b));
         const items = [...page.querySelectorAll('.w-item')];
         items.forEach((li) => li.classList.toggle('is-out', cat !== 'all' && li.dataset.cat !== cat));
+        gridCols = layoutGrid(grid);
         history.replaceState(history.state, '', cat === 'all' ? '/works' : `/works?c=${cat}`);
         gsap.fromTo(items.filter((li) => !li.classList.contains('is-out')), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.03, ease: 'power3.out' });
       });

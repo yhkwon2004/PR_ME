@@ -63,6 +63,7 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
     lastFocus?.focus?.();
   }
   btnIndex.addEventListener('click', () => (indexOpen ? closeIndex() : openIndex()));
+  indexEl.querySelector('.index-close').addEventListener('click', () => closeIndex());
   indexEl.addEventListener('click', (e) => {
     if (e.target === indexEl) closeIndex();
   });

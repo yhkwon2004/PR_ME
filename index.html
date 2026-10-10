@@ -81,13 +81,14 @@
     <div class="cursor" id="cursor" aria-hidden="true"><i></i></div>
 
     <nav class="index" id="index" aria-label="전체 장면" hidden>
+      <button class="index-close" type="button" aria-label="장면 목록 닫기">×</button>
       <div class="index-inner">
         <p class="index-kicker">SCENE INDEX — 장면 바로가기</p>
         <ol id="index-list"></ol>
       </div>
     </nav>
 
-    <div class="page" id="page" hidden></div>
+    <div class="page" id="page" tabindex="-1" hidden></div>
     <div class="curtain" id="curtain" aria-hidden="true"><span class="curtain-label"></span></div>
 
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="미디어 보기" hidden>

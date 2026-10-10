@@ -71,6 +71,26 @@ export function createLightbox() {
   box.addEventListener('click', (e) => {
     if (e.target === box) close();
   });
+  // 터치: 좌우로 밀어서 이전/다음
+  let sx = 0;
+  let sy = 0;
+  box.addEventListener(
+    'touchstart',
+    (e) => {
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+    },
+    { passive: true }
+  );
+  box.addEventListener(
+    'touchend',
+    (e) => {
+      const dx = e.changedTouches[0].clientX - sx;
+      const dy = e.changedTouches[0].clientY - sy;
+      if (list.length > 1 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) step(dx < 0 ? 1 : -1);
+    },
+    { passive: true }
+  );
 
   return {
     show,
