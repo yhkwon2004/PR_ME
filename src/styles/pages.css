@@ -1049,6 +1049,19 @@ body.page-open .title-card {
   .reel {
     --card-h: clamp(150px, 25vh, 230px);
     left: var(--pad);
+    isolation: isolate;
+  }
+  /* 세로 화면: 바닥의 3D 글자가 카드 제목 뒤로 비치지 않도록 */
+  .reel::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    left: calc(-1 * var(--pad));
+    right: calc(-1 * var(--pad));
+    top: 45%;
+    bottom: calc(-1 * var(--bottom) - 10px);
+    background: linear-gradient(180deg, rgba(5, 7, 12, 0), rgba(5, 7, 12, 0.94) 38%);
+    pointer-events: none;
   }
   .reel-nav {
     display: none;
