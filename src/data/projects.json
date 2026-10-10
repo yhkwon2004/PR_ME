@@ -1500,9 +1500,9 @@
   "titleEn": "Smar.F Adjustable Footrest",
   "year": "2024",
   "period": "",
-  "category": "iot",
+  "category": "product",
   "oneLiner": "성장에 맞춰 발 지지 높이를 조절하는 아동용 발 받힘대",
-  "summary": "책상·의자 높이가 체형과 맞지 않는 성장기 아동을 위해 높이 조절형 발 받힘대 Smar.F를 기획했습니다. 하중 데이터 측정, 외형 제작, 회로 구성을 거쳐 캠프 우수상을 받았습니다.",
+  "summary": "책상·의자 높이가 체형과 맞지 않는 성장기 아동을 위해 높이 조절형 발 받힘대 Smar.F를 기획했습니다. 하중 데이터 측정, 외형 제작, 회로 구성을 진행했고 캠프에서 우수상을 받았습니다.",
   "role": [],
   "team": "SMARF 팀 (5조 '자세를 부탁해') · 은아영, 임다현, 권용현, 안도현, 권성주",
   "tools": [],
@@ -1514,7 +1514,7 @@
    {
     "label": "PROBLEM",
     "title": "의자에 앉아 보내는 시간",
-    "text": "학생들은 공부와 여가 대부분을 의자에 앉아 보냅니다. 책상·의자가 체형과 맞지 않으면 발이 바닥에 안정적으로 닿지 않습니다.",
+    "text": "학생들은 공부와 여가 대부분을 의자에 앉아 보냅니다. 책상·의자 높이가 체형과 맞지 않으면 발이 바닥에 안정적으로 닿지 않을 수 있습니다.",
     "image": "media/projects/growth-footrest/03.webp"
    },
    {
@@ -1526,7 +1526,7 @@
    {
     "label": "RESULT",
     "title": "하중 측정과 시제품 제작",
-    "text": "하중 데이터를 측정하고 외형 제작과 회로 구성을 완료해 2024 호남제주권 제품 제작 역량강화 캠프에서 우수상을 받았습니다.",
+    "text": "하중 데이터를 측정하고 외형 제작과 회로 구성을 완료했습니다. 2024 호남제주권 제품 제작 역량강화 캠프에서 우수상을 받았습니다.",
     "image": "media/projects/growth-footrest/01.webp"
    }
   ],
@@ -2775,13 +2775,13 @@
  },
  {
   "id": "pressure-clicker",
-  "title": "압력센서 발달장애 측정 클리커",
+  "title": "압력센서 발달장애 측정 클릭커",
   "titleEn": "Pressure-Sensing Clicker",
   "year": "2025",
   "period": "",
   "category": "iot",
-  "oneLiner": "손잡이 압력센서로 손 누름 동작을 기록하는 측정 클리커",
-  "summary": "압력센서를 손 움직임 지표로 삼아 발달장애 아동의 뇌인지 능력을 측정하려는 프로토타입. 손잡이형 하우징을 설계하고, 센서 데이터를 보호자 앱 점수로 보여주는 흐름을 구상했다.",
+  "oneLiner": "손잡이 압력센서로 손 누름 동작을 기록하는 측정 클릭커",
+  "summary": "압력센서로 발달장애 아동의 손 움직임을 측정하려는 클릭커 프로토타입. 손잡이형 하우징을 설계하고, 센서 데이터를 보호자 앱 점수로 보여주는 흐름을 구상했다.",
   "role": [
    "하우징 CAD 설계"
   ],
@@ -2797,18 +2797,14 @@
   "metrics": [
    {
     "value": "4개",
-    "label": "압력센서 입력 채널"
-   },
-   {
-    "value": "4개",
-    "label": "AI 평가 지표 (AUROC·정확도·정밀도·재현율)"
+    "label": "압력센서 입력 채널 (알고리즘 설계)"
    }
   ],
   "story": [
    {
     "label": "PROBLEM",
     "title": "치료 골든타임 6세",
-    "text": "발달지연 치료는 6세 전이 골든타임이지만, 월 평균 200만원 치료비에 건강보험이 적용되지 않는다."
+    "text": "인용 기사: 발달지연 치료 골든타임은 6세지만, 한 달 평균 200만원 치료비에 아직 건강보험이 적용되지 않는다."
    },
    {
     "label": "IDEA",
@@ -2819,23 +2815,30 @@
    {
     "label": "BUILD",
     "title": "압력센서 손잡이 하우징",
-    "text": "압력센서 손잡이·커버·스위치 삽입구를 나눠 설계하고, 하단 나사를 풀면 USB-C로 충전하도록 했다.",
+    "text": "압력센서 손잡이·커버·스위치 삽입구를 나눠 설계했다. 하단 나사를 풀면 USB-C 포트로 충전하는 구조다.",
     "image": "media/projects/pressure-clicker/01.webp"
    },
    {
     "label": "LEARNED",
-    "title": "진단 전 검증 과제",
-    "text": "진단에 쓰려면 센서 보정, 사용자별 편차·반복성 검증과 전문가 검토가 먼저 필요하다.",
+    "title": "임상 활용 전 검증 과제",
+    "text": "측정엔 센서 보정·사용자별 편차·반복성 검증이, 임상·발달 평가엔 별도 검증과 전문가 검토가 먼저 필요하다.",
     "image": "media/projects/pressure-clicker/07.webp"
    }
   ],
   "images": [
    {
     "file": "media/projects/pressure-clicker/01.webp",
-    "caption": "클리커 하우징 CAD 도면 · 압력센서 손잡이와 USB-C 충전부",
+    "caption": "클릭커 하우징 CAD 도면 · 압력센서 손잡이와 USB-C 충전부",
     "kind": "diagram",
     "w": 928,
     "h": 649
+   },
+   {
+    "file": "media/projects/pressure-clicker/05.webp",
+    "caption": "보호자 서비스 구조 · 센서→MQTT→DB→앱 점수",
+    "kind": "diagram",
+    "w": 1150,
+    "h": 648
    },
    {
     "file": "media/projects/pressure-clicker/06.webp",
@@ -2850,13 +2853,6 @@
     "kind": "document",
     "w": 1155,
     "h": 650
-   },
-   {
-    "file": "media/projects/pressure-clicker/05.webp",
-    "caption": "보호자 서비스 구조 · 센서→MQTT→DB→앱 점수",
-    "kind": "diagram",
-    "w": 1150,
-    "h": 648
    }
   ],
   "cover": "media/projects/pressure-clicker/01.webp",
