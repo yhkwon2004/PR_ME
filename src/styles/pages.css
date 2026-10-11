@@ -111,6 +111,13 @@
   backdrop-filter: blur(6px);
   transition: border-color 0.3s, color 0.3s;
 }
+.reel-nav[hidden] {
+  display: none;
+}
+.reel-nav button:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
 .reel-nav button:hover {
   border-color: var(--cyan);
   color: var(--cyan);
@@ -272,6 +279,35 @@
 .d-next-media .type-cover .tc-cat,
 .d-next-media .type-cover .tc-year {
   display: none;
+}
+
+/* 캡처·문서·저해상도 표지: 흐린 배경 위에 잘리지 않은 원본 */
+.card-media img.blur-fill,
+.d-hero-media img.blur-fill,
+.d-next-media img.blur-fill {
+  position: absolute;
+  inset: -40px;
+  width: calc(100% + 80px);
+  height: calc(100% + 80px);
+  max-width: none;
+  object-fit: cover;
+  filter: blur(24px) brightness(0.4) saturate(1.2);
+}
+.card-media img.is-contain,
+.d-hero-media img.is-contain,
+.d-next-media img.is-contain {
+  position: relative;
+  object-fit: contain;
+}
+.card-media img.is-contain {
+  padding: 10% 8%;
+}
+.d-hero-media img.is-contain {
+  padding: calc(var(--top) + 8px) 8vw 38vh;
+}
+.d-next-media img.is-contain {
+  padding: 5% 10% 26%;
+  filter: brightness(0.7);
 }
 
 /* 기록 하이라이트 링크 */
@@ -747,6 +783,9 @@ body.page-open .title-card {
   max-height: 80vh;
   object-fit: cover;
 }
+.st-media img:not([data-kind='photo']) {
+  object-fit: contain;
+}
 .st-media:hover img {
   transform: scale(1.035);
 }
@@ -809,6 +848,13 @@ body.page-open .title-card {
   columns: 3 280px;
   column-gap: 12px;
   padding: 0 var(--pad);
+}
+.gal[data-n='1'] {
+  columns: 1;
+  max-width: 980px;
+}
+.gal[data-n='2'] {
+  columns: 2;
 }
 .gal-item {
   position: relative;
@@ -980,6 +1026,43 @@ body.page-open .title-card {
   word-break: keep-all;
 }
 
+/* 상세 페이지의 모든 구획을 같은 왼쪽 선에 맞춘다(넓은 화면에서는 1500px 틀 안) */
+.pg-detail {
+  --edge: max(var(--pad), calc(50vw - 750px));
+}
+.pg-detail .d-hero-text {
+  left: var(--edge);
+  right: var(--edge);
+}
+.pg-detail .d-intro,
+.pg-detail .st-row {
+  max-width: none;
+  margin: 0;
+  padding-left: var(--edge);
+  padding-right: var(--edge);
+}
+.pg-detail .st-row.no-img {
+  grid-template-columns: minmax(0, 860px);
+}
+.pg-detail .d-h,
+.pg-detail .gal,
+.pg-detail .d-links ul,
+.pg-detail .d-next,
+.pg-detail .vid {
+  padding-left: var(--edge);
+  padding-right: var(--edge);
+}
+.pg-detail .vid {
+  max-width: none;
+  margin: 0 0 30px;
+}
+.pg-detail .vid > * {
+  max-width: 1200px;
+}
+.pg-detail .gal[data-n='1'] {
+  max-width: calc(760px + 2 * var(--edge));
+}
+
 /* ── 커튼 전환 ─────────────────────────── */
 .curtain {
   position: fixed;
@@ -1127,6 +1210,12 @@ body.page-open .title-card {
     inset: auto;
     aspect-ratio: var(--ar);
     max-height: 62svh;
+  }
+  .d-hero.is-land .d-hero-media img.is-contain {
+    padding: 0;
+  }
+  .d-hero-media img.is-contain {
+    padding: calc(var(--top) + 6px) 4vw 40vh;
   }
   .d-hero.is-land .d-hero-media::after {
     content: '';

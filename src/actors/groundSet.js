@@ -103,8 +103,8 @@ class TrafficLight {
     this.group.add(bb);
     this.bbox = bb;
     this.tag = makeLabel(['TRAFFIC_LIGHT', 'RED · conf 0.97'], { width: 420, height: 110, size: 30 });
-    this.tag.position.set(0, 3.45, 1.2);
-    this.tag.scale.multiplyScalar(2.2);
+    this.tag.position.set(0, 3.05, 1.2);
+    this.tag.scale.multiplyScalar(1.6);
     this.group.add(this.tag);
     this.state = 'green';
     this.t = 0;
@@ -270,8 +270,8 @@ export class GroundSet {
       bb.position.set(x, 0.9, z);
       this.group.add(bb);
       const tag = makeLabel(['PEDESTRIAN', 'conf 0.94 · 2.1m/s'], { color: '#ffb547', width: 420, height: 110, size: 30 });
-      tag.position.set(x, 2.15, z);
-      tag.scale.multiplyScalar(1.9);
+      tag.position.set(x, 2.05, z);
+      tag.scale.multiplyScalar(1.35);
       this.group.add(tag);
     };
     addPed(-6.2, 6.3, 0.4);

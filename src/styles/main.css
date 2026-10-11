@@ -356,11 +356,14 @@ body.is-moving .letterbox i {
   z-index: 20;
   padding: 0 var(--pad);
   opacity: 0;
-  transition: opacity 1.2s 0.8s;
+  /* 시작 전에는 보이지 않는 버튼에 포커스가 가지 않게 */
+  visibility: hidden;
+  transition: opacity 1.2s 0.8s, visibility 0s 0.8s;
 }
 body.is-started .hud-top,
 body.is-started .hud-bottom {
   opacity: 1;
+  visibility: visible;
 }
 .hud-top {
   top: 0;
@@ -561,7 +564,7 @@ body.is-started .hud-bottom {
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.12em;
-  color: var(--dim);
+  color: var(--muted);
   text-align: left;
   transition: color 0.4s;
   white-space: nowrap;
@@ -584,7 +587,7 @@ body.is-started .hud-bottom {
   box-shadow: 0 0 8px rgba(94, 242, 255, 0.6);
 }
 .timeline button.is-past {
-  color: var(--muted);
+  color: var(--fg-2);
 }
 .timeline button.is-active {
   color: var(--fg);
@@ -594,7 +597,7 @@ body.is-started .hud-bottom {
 }
 .tl-no {
   color: inherit;
-  opacity: 0.6;
+  opacity: 0.75;
 }
 .hint {
   position: fixed;
@@ -1224,6 +1227,25 @@ body.is-started[data-scene='intro'] .hint {
   text-align: center;
   visibility: hidden;
 }
+/* 엔드 카드 뒤의 은은한 어둠 — 3D 링·지구본 위에서도 글이 읽히도록 */
+.endcard {
+  isolation: isolate;
+}
+.endcard::before {
+  content: '';
+  position: absolute;
+  inset: -60px -40px -30px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(64% 58% at 50% 50%, rgba(5, 7, 12, 0.82), rgba(5, 7, 12, 0) 78%);
+}
+.endcard-kicker,
+.credits-kicker {
+  display: inline-block;
+  padding: 6px 14px;
+  background: rgba(5, 7, 12, 0.72);
+  backdrop-filter: blur(6px);
+}
 .endcard-kicker {
   font-family: var(--mono);
   font-size: 11px;
@@ -1627,10 +1649,6 @@ body.is-started .cursor {
     min-height: 40px;
     padding: 15px 0 10px;
     font-size: 10px;
-    color: var(--muted);
-  }
-  .timeline button.is-past {
-    color: var(--fg-2);
   }
   .scrim i:not(.s-bottom):not(.s-center) {
     opacity: 0 !important;
@@ -1744,14 +1762,7 @@ body.is-started .cursor {
     transform: translateX(-50%);
     isolation: isolate;
   }
-  .endcard::before {
-    content: '';
-    position: absolute;
-    inset: -48px -16px -24px;
-    z-index: -1;
-    pointer-events: none;
-    background: radial-gradient(70% 60% at 50% 50%, rgba(5, 7, 12, 0.86), rgba(5, 7, 12, 0) 76%);
-  }
+
   .endcard-kicker {
     margin-bottom: 14px;
   }

@@ -156,7 +156,7 @@ createInput({
   prev: () => goTo(director.index - 1),
   first: () => goTo(0),
   last: () => goTo(scenes.length - 1),
-  isBlocked: () => !started || lightbox.open || hud.indexOpen || site.open,
+  isBlocked: () => !started || lightbox.open || hud.indexOpen || site.open || site.busy,
   onKey: (e) => {
     if (lightbox.key(e)) return true;
     if (site.key(e)) return true;
@@ -309,14 +309,16 @@ async function boot() {
       bar.style.transform = `scaleX(${progress})`;
       const want = Math.min(bootLines.length, Math.floor(progress * bootLines.length + 0.6));
       while (shown < want) addLine(shown++);
-      if (progress >= 1) resolve();
+      if (progress >= 1 || started) resolve();
       else requestAnimationFrame(step);
     };
     step();
   });
   await work;
   clearInterval(clockTimer);
+  // 상세 페이지에서 바로 필름을 열었다면 부팅 화면은 이미 사라졌다
   const actions = $('boot-actions');
+  if (started || !actions) return;
   actions.hidden = false;
   gsap.fromTo(actions.children, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, stagger: 0.1, duration: 0.6, ease: 'power3.out' });
   $('enter-sound').focus({ preventScroll: true });

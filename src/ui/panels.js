@@ -52,7 +52,7 @@ function render(scene, i) {
       <div class="reel panel-content" data-r>
         <div class="reel-bar">
           <span class="reel-count">${pad(list.length)} PROJECTS</span>
-          <a class="reel-all" href="/works?c=${esc(scene.category)}" data-link>VIEW ALL ↗</a>
+          <a class="reel-all" href="/works?c=${esc([...new Set(list.map((p) => p.category))].join(','))}" data-link>VIEW ALL ↗</a>
           <span class="reel-nav"><button type="button" data-reel="-1" aria-label="이전 프로젝트">←</button><button type="button" data-reel="1" aria-label="다음 프로젝트">→</button></span>
         </div>
         <div class="reel-track">${list.map((p, k) => projectCard(p, k, { cls: 'r-card' })).join('')}</div>
@@ -152,19 +152,39 @@ function bindReel(el) {
     })
   );
   // 끝까지 넘기면 오른쪽 페이드를 걷어 마지막 카드를 온전히 보여 준다
-  const edge = () => track.classList.toggle('is-end', track.scrollLeft + track.clientWidth >= track.scrollWidth - 4);
+  // 넘길 것이 없으면 ←/→ 버튼을 숨기고, 양 끝에서는 해당 버튼을 끈다
+  const nav = el.querySelector('.reel-nav');
+  const edge = () => {
+    const end = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    track.classList.toggle('is-end', end);
+    if (!nav || !track.clientWidth) return;
+    nav.hidden = track.scrollWidth <= track.clientWidth + 4;
+    nav.querySelector('[data-reel="-1"]').disabled = track.scrollLeft < 4;
+    nav.querySelector('[data-reel="1"]').disabled = end;
+  };
   track.addEventListener('scroll', edge, { passive: true });
   addEventListener('resize', edge);
   edge();
+  // 마우스 드래그로 넘기기 — 드래그한 뒤의 클릭은 카드를 열지 않는다
+  track.addEventListener('dragstart', (e) => e.preventDefault());
   let down = null;
   let moved = false;
+  const end = () => {
+    if (!down) return;
+    down = null;
+    setTimeout(() => {
+      track.classList.remove('is-dragging');
+      moved = false; // 드래그 직후의 클릭만 막고, 다음 키보드 Enter는 통과
+    }, 0);
+  };
   track.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'mouse') return;
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
     down = { x: e.clientX, left: track.scrollLeft };
     moved = false;
   });
   addEventListener('pointermove', (e) => {
     if (!down) return;
+    if (!(e.buttons & 1)) return end();
     const dx = e.clientX - down.x;
     if (Math.abs(dx) > 5) moved = true;
     if (moved) {
@@ -172,14 +192,12 @@ function bindReel(el) {
       track.classList.add('is-dragging');
     }
   });
-  addEventListener('pointerup', () => {
-    down = null;
-    setTimeout(() => track.classList.remove('is-dragging'), 0);
-  });
+  addEventListener('pointerup', end);
+  addEventListener('pointercancel', end);
   track.addEventListener(
     'click',
     (e) => {
-      if (moved) {
+      if (moved && e.detail !== 0) {
         e.preventDefault();
         e.stopPropagation();
         moved = false;
@@ -321,6 +339,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
     go(i, prev, duration) {
       if (prev >= 0) hide(prev);
       current = i;
+      // 다음 장면의 릴 썸네일을 미리 받아 카드가 빈 상자로 날아들지 않게
+      panels[i + 1]?.querySelectorAll('.reel-track img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
       const delay = prev < 0 ? 0.9 : Math.max(0.5, duration * 0.62);
       show(i, delay);
     },

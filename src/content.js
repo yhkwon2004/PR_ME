@@ -1,6 +1,8 @@
 // 포트폴리오 콘텐츠 — 출처: 2026 Notion 포트폴리오, yhkwon2004/portfoli 기록 데이터.
 // 장면(scene) 순서가 곧 영화의 순서입니다. 3D 연출은 director.js의 SHOTS가 같은 id로 대응합니다.
 
+import projectData from './data/projects.json';
+
 const M = (file) => `/media/${file}`;
 
 export const profile = {
@@ -132,7 +134,7 @@ export const scenes = [
     title: ['THE', 'RECORD'],
     counters: [
       { value: 37, label: '수상 기록' },
-      { value: 39, label: '프로젝트' },
+      { value: projectData.length, label: '프로젝트' }, // 아카이브(/works)와 같은 수
       { value: 9, label: '자격증' },
       { value: 9, label: '공식 보도' },
     ],

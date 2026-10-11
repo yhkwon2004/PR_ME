@@ -16,6 +16,14 @@ function youtubeId(url) {
   }
 }
 
+// 화면 캡처·문서·도표나 해상도가 낮은 사진은 잘라 쓰지 않고 흐린 배경 위에 전체를 보여 준다
+const fitsCover = (im) => (im.kind || 'photo') === 'photo' && (im.w || 0) >= 1200;
+function media(im, opts = {}) {
+  if (!im) return '';
+  if (fitsCover(im) || (opts.allowSmall && (im.kind || 'photo') === 'photo')) return img(im, opts);
+  return `<img class="blur-fill" src="${esc(im.thumb)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />${img(im, { ...opts, cls: `${opts.cls || ''} is-contain` })}`;
+}
+
 // 이미지가 없는 프로젝트를 위한 활자 표지
 function typeCover(p, cls = '') {
   const c = categoryOf(p.category);
@@ -28,13 +36,13 @@ function typeCover(p, cls = '') {
 
 function img(im, { cls = '', eager = false, full = false, sizes = '' } = {}) {
   if (!im) return '';
-  return `<img class="${cls}" src="${esc(full ? im.src : im.thumb)}" ${full ? '' : `srcset="${esc(im.thumb)} 720w, ${esc(im.src)} 1600w" sizes="${sizes || '(max-width: 820px) 100vw, 50vw'}"`} alt="${esc(im.caption)}" width="${im.w || ''}" height="${im.h || ''}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`;
+  return `<img class="${cls}" data-kind="${esc(im.kind || 'photo')}" src="${esc(full ? im.src : im.thumb)}" ${full ? '' : `srcset="${esc(im.thumb)} 720w, ${esc(im.src)} 1600w" sizes="${sizes || '(max-width: 820px) 100vw, 50vw'}"`} alt="${esc(im.caption)}" width="${im.w || ''}" height="${im.h || ''}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`;
 }
 
 export function projectCard(p, i, { cls = 'card' } = {}) {
   const c = categoryOf(p.category);
   return `<a class="${cls}" href="${p.path}" data-link data-cat="${esc(p.category)}">
-    <figure class="card-media">${p.cover ? img(p.cover, { sizes: '(max-width: 820px) 60vw, 300px' }) : typeCover(p)}<span class="card-open" aria-hidden="true">↗</span></figure>
+    <figure class="card-media">${p.cover ? media(p.cover, { sizes: '(max-width: 820px) 60vw, 300px', allowSmall: true }) : typeCover(p)}<span class="card-open" aria-hidden="true">↗</span></figure>
     <div class="card-meta"><span class="card-no">${pad(i + 1)}</span><span>${[p.year, c.label].filter(Boolean).map(esc).join(' · ')}</span></div>
     <h3 class="card-title">${esc(p.title)}</h3>
   </a>`;
@@ -48,7 +56,11 @@ function bar(back) {
   </header>`;
 }
 
+// cat: 'all' 또는 'robotics,iot'처럼 쉼표로 이은 분야 목록
+const catList = (cat) => (cat === 'all' ? null : cat.split(','));
+
 function worksPage(cat) {
+  const on = catList(cat);
   const counts = Object.fromEntries(CATEGORIES.map((c) => [c.id, projects.filter((p) => p.category === c.id).length]));
   return `<div class="pg pg-works">
     ${bar({ href: '/', label: 'FILM' })}
@@ -58,14 +70,14 @@ function worksPage(cat) {
       <nav class="chips" aria-label="분야">
         <button type="button" data-cat="all" class="${cat === 'all' ? 'is-on' : ''}">All<sup>${projects.length}</sup></button>
         ${CATEGORIES.filter((c) => counts[c.id])
-          .map((c) => `<button type="button" data-cat="${c.id}" class="${cat === c.id ? 'is-on' : ''}">${esc(c.label)}<sup>${counts[c.id]}</sup></button>`)
+          .map((c) => `<button type="button" data-cat="${c.id}" class="${on?.includes(c.id) ? 'is-on' : ''}">${esc(c.label)}<sup>${counts[c.id]}</sup></button>`)
           .join('')}
       </nav>
     </section>
     <ul class="works-grid">
       ${projects
         .map(
-          (p, i) => `<li class="w-item${cat !== 'all' && p.category !== cat ? ' is-out' : ''}" data-cat="${esc(p.category)}"${p.wide ? ' data-wide' : ''}>
+          (p, i) => `<li class="w-item${on && !on.includes(p.category) ? ' is-out' : ''}" data-cat="${esc(p.category)}"${p.wide ? ' data-wide' : ''}>
             ${projectCard(p, i, { cls: 'w-card' })}
           </li>`
         )
@@ -78,15 +90,26 @@ function worksPage(cat) {
 // 넓은 카드는 줄 안에 자리가 있을 때만 두 칸을 쓴다 — 보이는 순서와 번호가 항상 일치
 function layoutGrid(grid) {
   const cols = parseInt(getComputedStyle(grid).getPropertyValue('--cols'), 10) || 4;
-  let col = 0;
-  let n = 0;
-  for (const li of grid.children) {
-    if (li.classList.contains('is-out')) continue;
-    const span = li.hasAttribute('data-wide') && col + 2 <= cols ? 2 : 1;
-    li.classList.toggle('is-wide', span === 2);
-    col = (col + span) % cols;
-    const no = li.querySelector('.card-no');
-    if (no) no.textContent = pad(++n);
+  const items = [...grid.children].filter((li) => !li.classList.contains('is-out'));
+  const narrow = new Set();
+  const pass = () => {
+    let col = 0;
+    const wides = [];
+    items.forEach((li, n) => {
+      const span = li.hasAttribute('data-wide') && !narrow.has(li) && col + 2 <= cols ? 2 : 1;
+      li.classList.toggle('is-wide', span === 2);
+      if (span === 2) wides.push(li);
+      col = (col + span) % cols;
+      const no = li.querySelector('.card-no');
+      if (no) no.textContent = pad(n + 1);
+    });
+    return { col, wides };
+  };
+  // 마지막 줄에 카드 한 장만 남으면 뒤쪽의 넓은 카드를 한 칸으로 줄여 다시 배치
+  for (let guard = 0; guard < 8; guard++) {
+    const { col, wides } = pass();
+    if (cols < 3 || col !== 1 || !wides.length) break;
+    narrow.add(wides[wides.length - 1]);
   }
   return cols;
 }
@@ -117,16 +140,16 @@ function detailPage(p) {
   const spare = gallery.filter((im) => im.file !== coverFile && !used.has(im.file));
   const story = p.story.map((s) => (s.img && s.img.file === coverFile && p.story.length > 1 ? { ...s, img: spare.shift() || null } : s));
   const storyImgs = new Set(story.map((s) => s.img?.file).filter(Boolean));
-  const rest = gallery.map((im, k) => ({ im, k })).filter(({ im }) => !storyImgs.has(im.file));
-  const showGallery = rest.length > 1 || (rest.length === 1 && rest[0].im.file !== coverFile);
+  const rest = gallery.map((im, k) => ({ im, k })).filter(({ im }) => !storyImgs.has(im.file) && im.file !== coverFile);
+  const showGallery = rest.length > 0;
   return `<article class="pg pg-detail" data-cat="${esc(p.category)}">
     ${bar({ href: '/works', label: 'WORKS' })}
     <section class="d-hero${p.cover && p.cover.ratio >= 0.9 ? ' is-land' : ''}" style="--ar:${(p.cover?.ratio || 1).toFixed(3)}">
-      <div class="d-hero-media">${p.cover ? img(p.cover, { eager: true, full: true }) : typeCover(p, 'is-hero')}</div>
+      <div class="d-hero-media">${p.cover ? media(p.cover, { eager: true, full: true }) : typeCover(p, 'is-hero')}</div>
       <div class="d-hero-text">
         <p class="d-cat"><span>${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}<span>${pad(i + 1)} / ${pad(projects.length)}</span></p>
         <h1 class="d-title">${esc(p.title)}</h1>
-        ${p.titleEn ? `<p class="d-en">${esc(p.titleEn)}</p>` : ''}
+        ${p.titleEn && p.cover ? `<p class="d-en">${esc(p.titleEn)}</p>` : ''}
         <p class="d-one">${esc(p.oneLiner)}</p>
       </div>
       <span class="d-scroll" aria-hidden="true">SCROLL</span>
@@ -167,7 +190,7 @@ function detailPage(p) {
     ${
       showGallery
         ? `<section class="d-gallery reveal"><h2 class="d-h">GALLERY<sup>${rest.length}</sup></h2>
-          <div class="gal">${rest
+          <div class="gal" data-n="${Math.min(rest.length, 3)}">${rest
             .map(
               ({ im, k }) => `<button type="button" class="gal-item" data-gallery="${k}" style="--ar:${Math.min(1.8, Math.max(0.6, im.ratio)).toFixed(3)}" aria-label="${esc(im.caption)} 크게 보기">${img(im, { sizes: '(max-width: 820px) 50vw, 25vw' })}<span class="gal-cap">${esc(im.caption)}</span></button>`
             )
@@ -186,7 +209,7 @@ function detailPage(p) {
     <nav class="d-next" aria-label="다른 프로젝트">
       <a class="d-prev-link" href="${prev.path}" data-link>← ${esc(prev.title)}</a>
       <a class="d-next-card" href="${next.path}" data-link>
-        <div class="d-next-media">${next.cover ? img(next.cover, { sizes: '100vw' }) : typeCover(next)}</div>
+        <div class="d-next-media">${next.cover ? media(next.cover, { sizes: '100vw' }) : typeCover(next)}</div>
         <span class="d-next-k">NEXT PROJECT — ${esc(categoryOf(next.category).label)}</span>
         <b class="d-next-t">${esc(next.title)}</b>
       </a>
@@ -204,6 +227,9 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   let busy = false;
   let observer = null;
   let gridCols = 0;
+  let backPending = false; // history.back()을 보냈고 popstate를 기다리는 중
+  let pendingPop = false; // 커튼이 도는 동안 들어온 popstate
+  let filmOpener = null; // 필름에서 페이지를 연 요소(닫으면 포커스를 돌려준다)
 
   addEventListener('resize', () => {
     const grid = page.querySelector('.works-grid');
@@ -216,9 +242,13 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     const m = path.match(/^\/works(?:\/([\w-]+))?$/);
     if (!m) return { name: 'film' };
-    if (m[1]) return byId(m[1]) ? { name: 'detail', id: m[1] } : { name: 'works', cat: 'all' };
+    if (m[1]) {
+      const id = m[1].toLowerCase();
+      return byId(id) ? { name: 'detail', id } : { name: 'works', cat: 'all', missing: true };
+    }
     const cat = new URLSearchParams(location.search).get('c');
-    return { name: 'works', cat: CATEGORIES.some((c) => c.id === cat) ? cat : 'all' };
+    const valid = (cat || '').split(',').filter((c) => CATEGORIES.some((x) => x.id === c));
+    return { name: 'works', cat: valid.length ? valid.join(',') : 'all' };
   };
 
   function sweep(label, between) {
@@ -230,7 +260,17 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     curtainLabel.textContent = label || '';
     return new Promise((resolve) => {
       gsap
-        .timeline({ onComplete: () => ((busy = false), resolve()) })
+        .timeline({
+          onComplete: () => {
+            busy = false;
+            resolve();
+            // 전환 중에 뒤로/앞으로 가기를 눌렀다면 끝난 뒤 현재 주소로 맞춘다
+            if (pendingPop) {
+              pendingPop = false;
+              apply(parse());
+            }
+          },
+        })
         .set(curtain, { visibility: 'visible', yPercent: 100 })
         .to(curtain, { yPercent: 0, duration: 0.55, ease: 'power3.inOut' })
         .fromTo(curtainLabel, { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.3 }, '-=0.15')
@@ -307,20 +347,30 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
           b.outerHTML = `<iframe class="yt-frame" src="https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
         })
       );
-      const heroImg = page.querySelector('.d-hero-media img, .d-hero-media .type-cover');
-      if (heroImg && !reducedMotion) gsap.fromTo(heroImg, { scale: 1.12 }, { scale: 1, duration: 2.2, ease: 'expo.out' });
+      const heroMedia = page.querySelectorAll('.d-hero-media > *');
+      if (heroMedia.length && !reducedMotion) gsap.fromTo(heroMedia, { scale: 1.12 }, { scale: 1, duration: 2.2, ease: 'expo.out' });
       gsap.fromTo(page.querySelectorAll('.d-hero-text > *'), { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.08, ease: 'expo.out', delay: 0.25 });
     }
     page.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', close));
   }
 
   async function apply(route, { animate = true } = {}) {
+    if (lightbox.open) lightbox.close();
+    // 없는 프로젝트 주소는 아카이브 주소로 바로잡는다
+    if (route.missing) history.replaceState(history.state, '', '/works');
+    if (current && route.name === current.name && route.id === current.id && route.cat === current.cat) return;
     const prev = current;
     current = route.name === 'film' ? null : route;
     if (route.name === 'film') {
       if (!prev) return onClose?.();
-      if (animate) await sweep('', () => (unmount(), onClose?.()));
-      else unmount(), onClose?.();
+      const back = () => {
+        unmount();
+        onClose?.();
+        if (filmOpener?.isConnected) filmOpener.focus({ preventScroll: true });
+        filmOpener = null;
+      };
+      if (animate) await sweep('', back);
+      else back();
       return;
     }
     const label = route.name === 'detail' ? byId(route.id).title : 'WORKS';
@@ -337,16 +387,21 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     const url = new URL(href, location.origin);
     if (url.pathname + url.search === location.pathname + location.search) return;
     // depth: 필름에서 몇 단계 들어왔는지(닫기 버튼이 필름으로 바로 돌아가도록)
-    const depth = url.pathname === '/' ? 0 : current ? (history.state?.depth || 0) + 1 : 1;
+    const depth = url.pathname === '/' ? 0 : current ? (history.state?.app ? history.state.depth : 1) + 1 : 1;
+    if (!current && url.pathname !== '/') filmOpener = document.activeElement;
     if (replace) history.replaceState({ app: true, depth }, '', url.pathname + url.search);
     else history.pushState({ app: true, depth }, '', url.pathname + url.search);
     apply(parse());
   }
 
   function close() {
+    if (busy || backPending) return; // 두 번 눌러 포트폴리오 밖으로 나가지 않게
     // 필름에서 한 단계 들어왔다면 뒤로 가기, 아니면 필름으로 새로 이동
-    if (filmEntered && history.state?.depth === 1) history.back();
-    else navigate('/');
+    if (filmEntered && history.state?.depth === 1) {
+      backPending = true;
+      setTimeout(() => (backPending = false), 1500);
+      history.back();
+    } else navigate('/');
   }
 
   // 히어로 패럴랙스(리스너는 하나만)
@@ -370,12 +425,22 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     e.preventDefault();
     navigate(href);
   });
-  addEventListener('popstate', () => apply(parse()));
+  addEventListener('popstate', () => {
+    backPending = false;
+    if (busy) {
+      pendingPop = true;
+      return;
+    }
+    apply(parse());
+  });
 
   return {
     initial: parse(),
     start(route) {
-      if (route.name !== 'film') apply(route, { animate: false });
+      if (route.name === 'film') return;
+      // 바로 들어온 페이지도 깊이 1로 기록해 두면 그 안에서 이동한 뒤 닫기가 필름으로 간다
+      history.replaceState({ app: true, depth: 1 }, '', location.pathname + location.search);
+      apply(route, { animate: false });
     },
     markFilm() {
       filmEntered = true;
@@ -389,7 +454,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       return busy;
     },
     key(e) {
-      if (!current) return false;
+      if (!current) return busy; // 닫히는 커튼 동안에는 필름 단축키를 막는다
       if (e.key === 'Escape') {
         close();
         return true;
