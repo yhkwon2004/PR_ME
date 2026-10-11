@@ -388,8 +388,9 @@ export class RoboticsSet {
     ring.position.y = 0.02;
     const inner = new THREE.Mesh(new THREE.RingGeometry(1.86, 1.9, 96), glow(COLORS.cyan, 0.9));
     inner.rotation.x = -Math.PI / 2;
-    this.walkCenter = new THREE.Vector3(-1.0, 0, 1.8);
-    this.walkR = 1.9;
+    // 로봇팔과 같은 깊이(왼쪽)에서 걷게 해 가운데 구도에서 두 로봇이 한 띠에 들어오도록
+    this.walkCenter = new THREE.Vector3(-2.1, 0, -0.5);
+    this.walkR = 1.6;
     inner.position.set(this.walkCenter.x, 0.025, this.walkCenter.z);
     this.group.add(deck, ring, inner);
 

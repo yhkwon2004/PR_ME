@@ -107,6 +107,39 @@ function render(scene, i) {
       </div>
     </div>`;
   }
+  if (L === 'stage') {
+    // 중앙 무대: 제목은 위 가운데, 카드는 아래 가운데 — 가운데 띠는 3D 피사체의 자리
+    let head = '';
+    if (scene.subtitle) head += `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>`;
+    if (scene.lead) head += `<p class="lead" data-r>${esc(scene.lead)}</p>`;
+    if (scene.counters)
+      head += `<dl class="counters" data-r>${scene.counters
+        .map((c) => `<div><dd><b data-count="${c.value}">${c.value}</b></dd><dt>${esc(c.label)}</dt></div>`)
+        .join('')}</dl>`;
+    let foot = '';
+    if (scene.pillars)
+      foot += `<div class="pillars">${scene.pillars
+        .map((p) => `<article class="pillar" data-r><span class="pillar-no">${esc(p.no)}</span><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p></article>`)
+        .join('')}</div>`;
+    if (scene.highlights)
+      foot += `<ol class="highlights">${scene.highlights
+        .map((h) =>
+          h.link && byId(h.link)
+            ? `<li data-r><a href="/works/${esc(h.link)}" data-link><span class="hl-year">${esc(h.year)}</span><span class="hl-title">${esc(h.title)} <i aria-hidden="true">↗</i></span><em>${esc(h.grade)}</em></a></li>`
+            : `<li data-r><span class="hl-year">${esc(h.year)}</span><span class="hl-title">${esc(h.title)}</span><em>${esc(h.grade)}</em></li>`
+        )
+        .join('')}</ol>`;
+    if (scene.timeline)
+      foot += `<ol class="mini-timeline" data-r>${scene.timeline.map(([y, t]) => `<li><b>${esc(y)}</b><span>${esc(t)}</span></li>`).join('')}</ol>`;
+    return `<div class="stage">
+      <div class="stage-head panel-content">
+        ${kicker(scene, i)}
+        <h2 class="title${scene.titleKo ? ' title-ko' : ''}">${lines(scene.title)}</h2>
+        ${head}
+      </div>
+      <div class="stage-foot panel-content">${foot}</div>
+    </div>`;
+  }
   // split-left / split-right
   let body = '';
   if (scene.subtitle) body += `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>`;
@@ -157,6 +190,8 @@ function bindReel(el) {
   const edge = () => {
     const end = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
     track.classList.toggle('is-end', end);
+    track.classList.toggle('can-left', track.scrollLeft > 4);
+    track.classList.toggle('can-right', !end);
     if (!nav || !track.clientWidth) return;
     nav.hidden = track.scrollWidth <= track.clientWidth + 4;
     nav.querySelector('[data-reel="-1"]').disabled = track.scrollLeft < 4;
@@ -298,8 +333,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
         track.dispatchEvent(new Event('scroll'));
       }
     }
-    const col = el.querySelector('.col');
-    if (col) col.scrollTop = 0;
+    el.querySelectorAll('.col, .stage-foot').forEach((c) => (c.scrollTop = 0));
 
     if (el.dataset.scene === 'finale') runCredits(el, delay);
   }

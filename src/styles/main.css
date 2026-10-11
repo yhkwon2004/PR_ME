@@ -122,29 +122,34 @@ body.no-webgl #gl {
 .s-right {
   background: linear-gradient(270deg, rgba(5, 7, 12, 0.9) 0%, rgba(5, 7, 12, 0.66) 30%, rgba(5, 7, 12, 0) 56%);
 }
+.s-top {
+  background: linear-gradient(180deg, rgba(5, 7, 12, 0.86) 0%, rgba(5, 7, 12, 0.5) 22%, rgba(5, 7, 12, 0) 40%);
+}
 .s-bottom {
-  background: linear-gradient(0deg, rgba(5, 7, 12, 0.88) 0%, rgba(5, 7, 12, 0.35) 34%, rgba(5, 7, 12, 0) 60%);
+  background: linear-gradient(0deg, rgba(5, 7, 12, 0.9) 0%, rgba(5, 7, 12, 0.55) 30%, rgba(5, 7, 12, 0) 56%);
 }
 .s-center {
   background: radial-gradient(60% 70% at 50% 50%, rgba(5, 7, 12, 0.78), rgba(5, 7, 12, 0.35) 70%, rgba(5, 7, 12, 0.1));
 }
-body[data-scene='prologue'] .s-left,
-body[data-scene='record'] .s-left,
-body[data-scene='aerial'] .s-bottom,
-body[data-scene='ground'] .s-bottom,
-body[data-scene='robotics'] .s-bottom,
-body[data-scene='intelligence'] .s-bottom,
+/* 모든 장면은 가운데 축으로 구성 — 위(제목)와 아래(카드)만 어둡게, 가운데는 3D 피사체 */
+body[data-scene='intro'] .s-top,
 body[data-scene='intro'] .s-bottom,
+body[data-scene='prologue'] .s-top,
+body[data-scene='prologue'] .s-bottom,
+body[data-scene='aerial'] .s-top,
+body[data-scene='aerial'] .s-bottom,
+body[data-scene='ground'] .s-top,
+body[data-scene='ground'] .s-bottom,
+body[data-scene='robotics'] .s-top,
+body[data-scene='robotics'] .s-bottom,
+body[data-scene='intelligence'] .s-top,
+body[data-scene='intelligence'] .s-bottom,
+body[data-scene='loop'] .s-top,
 body[data-scene='loop'] .s-bottom,
+body[data-scene='record'] .s-top,
+body[data-scene='record'] .s-bottom,
 body[data-scene='finale'] .s-center {
   opacity: 1;
-}
-body[data-scene='loop'] .s-left,
-body[data-scene='aerial'] .s-left,
-body[data-scene='ground'] .s-left,
-body[data-scene='robotics'] .s-left,
-body[data-scene='intelligence'] .s-left {
-  opacity: 0.6;
 }
 
 /* ── 레터박스 ───────────────────────────── */
@@ -966,24 +971,151 @@ body.is-started[data-scene='intro'] .hint {
   word-break: keep-all;
 }
 
+/* 가운데 제목 뒤의 은은한 어둠 — 밝은 3D 위에서도 글이 읽히도록 */
+.stage-head,
+.loop-head {
+  isolation: isolate;
+}
+.stage-head::before,
+.loop-head::before {
+  content: '';
+  position: absolute;
+  inset: -30px -10% -40px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(50% 60% at 50% 45%, rgba(5, 7, 12, 0.7), rgba(5, 7, 12, 0) 100%);
+}
+
+/* ── 중앙 무대(프롤로그 · 기록) ───────────── */
+.stage-head {
+  position: absolute;
+  top: calc(var(--top) + 4px);
+  left: var(--pad);
+  right: var(--pad);
+  text-align: center;
+}
+.stage-head .kicker,
+.stage-head .subtitle {
+  justify-content: center;
+}
+.stage-head .title:not(.title-ko) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.28em;
+}
+.stage-head .title-ko {
+  font-size: clamp(28px, 2.6vw, 44px);
+}
+.stage-head .lead {
+  margin: 14px auto 0;
+  max-width: 56ch;
+}
+.stage-head .counters {
+  width: min(720px, 100%);
+  margin: 20px auto 0;
+  text-align: left;
+}
+.stage-foot {
+  position: absolute;
+  left: max(var(--pad), calc(50% - 580px));
+  right: max(var(--pad), calc(50% - 580px));
+  bottom: calc(var(--bottom) + 14px);
+}
+.stage .pillars {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 0;
+}
+.stage .pillar {
+  padding: 14px 18px 16px;
+  text-align: center;
+  background: rgba(6, 9, 14, 0.62);
+  backdrop-filter: blur(8px);
+}
+.stage .pillar-no {
+  position: static;
+  display: block;
+  margin-bottom: 6px;
+}
+.stage .mini-timeline {
+  margin-top: 14px;
+  text-align: center;
+}
+.stage .mini-timeline li {
+  border-left: 0;
+  border-top: 1px solid var(--line-2);
+  padding: 8px 4px 0;
+}
+.stage .highlights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 0;
+  border: 0;
+}
+.stage .highlights li,
+.stage .highlights li a {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'year grade' 'title title';
+  gap: 4px 10px;
+  align-items: baseline;
+}
+.stage .highlights li {
+  padding: 10px 14px 11px;
+  border: 1px solid var(--line);
+  background: rgba(6, 9, 14, 0.62);
+  backdrop-filter: blur(8px);
+}
+.stage .highlights li:has(a) {
+  display: block;
+  padding: 0;
+}
+.stage .highlights li a {
+  padding: 10px 14px 11px;
+}
+.stage .highlights li a:hover {
+  padding-left: 14px;
+  background: rgba(94, 242, 255, 0.06);
+}
+.stage .hl-year {
+  grid-area: year;
+}
+.stage .highlights em {
+  grid-area: grade;
+}
+.stage .hl-title {
+  grid-area: title;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 /* ── 오프닝(히어로) ───────────────────────── */
 .hero {
   position: absolute;
-  inset: var(--top) var(--pad) calc(var(--bottom) + 8px);
+  inset: var(--top) var(--pad) calc(var(--bottom) + 52px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
 }
 .hero .kicker {
-  margin-top: 6px;
+  justify-content: center;
+  margin: 0 0 16px;
 }
 .hero-title {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.24em;
   font-family: var(--display);
   font-weight: 700;
-  font-size: clamp(72px, 13.2vw, 250px);
+  font-size: clamp(64px, 10.4vw, 200px);
   line-height: 0.8;
   letter-spacing: -0.055em;
-  margin-top: auto;
 }
 .hero-title .line {
   white-space: nowrap;
@@ -1000,10 +1132,10 @@ body.is-started[data-scene='intro'] .hint {
 }
 .hero-foot {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  margin-top: 26px;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin-top: 24px;
 }
 .hero-name {
   font-family: var(--display);
@@ -1021,7 +1153,7 @@ body.is-started[data-scene='intro'] .hint {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: center;
 }
 .hero-tags li {
   display: flex;
@@ -1044,12 +1176,24 @@ body.is-started[data-scene='intro'] .hint {
 /* ── 루프 레이아웃 ───────────────────────── */
 .loop-head {
   position: absolute;
-  top: calc(var(--top) + 8px);
+  top: calc(var(--top) + 6px);
   left: var(--pad);
-  width: min(520px, 42vw);
+  right: var(--pad);
+  text-align: center;
+}
+.loop-head .kicker {
+  justify-content: center;
+}
+.loop-head .lead {
+  margin-inline: auto;
+  max-width: 60ch;
 }
 .title-loop {
-  font-size: clamp(40px, 4.8vw, 84px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.3em;
+  font-size: clamp(40px, 4.6vw, 80px);
 }
 .title-loop .line:nth-child(2) {
   color: var(--cyan);
@@ -1061,8 +1205,8 @@ body.is-started[data-scene='intro'] .hint {
 }
 .loop-grid {
   position: absolute;
-  left: var(--pad);
-  right: var(--pad);
+  left: max(var(--pad), calc(50% - 620px));
+  right: max(var(--pad), calc(50% - 620px));
   bottom: calc(var(--bottom) + 58px);
   display: flex;
   align-items: stretch;
@@ -1122,6 +1266,7 @@ body.is-started[data-scene='intro'] .hint {
   bottom: calc(var(--bottom) + 14px);
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 6px;
 }
 .tool-chips li {
@@ -1650,7 +1795,8 @@ body.is-started .cursor {
     padding: 15px 0 10px;
     font-size: 10px;
   }
-  .scrim i:not(.s-bottom):not(.s-center) {
+  .scrim i.s-left,
+  .scrim i.s-right {
     opacity: 0 !important;
   }
   .s-bottom {
@@ -1697,11 +1843,8 @@ body.is-started .cursor {
     display: none;
   }
   .hero-foot {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .hero-tags {
-    justify-content: flex-start;
+    gap: 14px;
+    margin-top: 18px;
   }
   .hero-tags li {
     padding: 6px 10px;
@@ -1773,16 +1916,69 @@ body.is-started .cursor {
   .title-end {
     font-size: clamp(30px, 8.6vw, 44px);
   }
-  .pillars {
-    gap: 5px;
+  /* 중앙 무대: 제목은 위, 카드는 아래 시트(넘치면 시트 안에서 스크롤) */
+  .stage-head {
+    top: calc(var(--top) + 2px);
+  }
+  .stage-head .lead {
+    margin-top: 10px;
+  }
+  .stage-head .counters {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
     margin-top: 14px;
   }
-  .pillar {
-    padding: 9px 14px 9px 44px;
+  .stage-head .counters dd {
+    font-size: 28px;
   }
-  .pillar-no {
-    left: 14px;
-    top: 10px;
+  .stage-head .counters dt {
+    font-size: 11px;
+  }
+  .stage-foot {
+    left: var(--pad);
+    right: var(--pad);
+    bottom: calc(var(--bottom) + 6px);
+    max-height: 40dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    padding: 10px;
+    background: rgba(6, 9, 14, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--line);
+  }
+  .stage .pillars,
+  .stage .highlights {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .stage .pillar {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    column-gap: 8px;
+    padding: 9px 12px;
+    text-align: left;
+  }
+  .stage .pillar-no {
+    grid-row: span 2;
+    margin: 2px 0 0;
+  }
+  .stage .pillar p {
+    margin-top: 2px;
+    font-size: 12px;
+  }
+  .stage .highlights li,
+  .stage .highlights li a {
+    padding: 8px 12px 9px;
+  }
+  .stage .highlights li:has(a) {
+    padding: 0;
+  }
+  .stage .hl-title {
+    white-space: normal;
+  }
+  .stage .mini-timeline {
+    text-align: left;
   }
   .boot-frame {
     padding: 28px 20px 24px;

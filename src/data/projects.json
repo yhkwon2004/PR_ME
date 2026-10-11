@@ -194,7 +194,7 @@
   "id": "airsim-driving",
   "title": "AirSim 딥러닝 자율주행",
   "titleEn": "AirSim Deep Learning Driving",
-  "year": "",
+  "year": "2026",
   "period": "",
   "category": "mobility",
   "oneLiner": "가상환경에서 딥러닝으로 학습시킨 AirSim 자율주행",
@@ -808,7 +808,9 @@
    "Requests",
    "OpenPyXL"
   ],
-  "awards": [],
+  "awards": [
+   "JST Do-Dream 챌린지 해커톤 · 최우수상"
+  ],
   "metrics": [
    {
     "value": "6개",
@@ -841,6 +843,12 @@
     "title": "6개 분석 모듈",
     "text": "분류체계·기관·특허·수명주기·해외진출·데이터 관리 모듈로 22개 기후기술 분야를 탐색합니다.",
     "image": "media/projects/climate-dashboard/01.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "Do-Dream 해커톤 최우수상",
+    "text": "기후기술 데이터 시각화 웹으로 JST Do-Dream 챌린지 해커톤에서 최우수상을 받았습니다.",
+    "image": ""
    }
   ],
   "images": [
@@ -2592,7 +2600,7 @@
   "id": "pixhawk-drone",
   "title": "Pixhawk 자율비행 드론",
   "titleEn": "Pixhawk Autonomous Drone",
-  "year": "2024",
+  "year": "2023–2024",
   "period": "",
   "category": "drone",
   "oneLiner": "Pixhawk와 Mission Planner로 만든 자율 비행 드론",
@@ -2603,7 +2611,9 @@
    "Pixhawk",
    "Mission Planner"
   ],
-  "awards": [],
+  "awards": [
+   "ROS 기반 자율주행 자동차 경진대회 · 우수상"
+  ],
   "metrics": [],
   "story": [
    {
@@ -2623,6 +2633,12 @@
     "title": "야외 현장 운용 준비",
     "text": "야외 운용 장소에서 기체와 조종 장비를 점검하고 팀 단위로 운용을 준비했습니다.",
     "image": "media/projects/pixhawk-drone/03.webp"
+   },
+   {
+    "label": "RESULT",
+    "title": "ROS 경진대회 우수상",
+    "text": "Pixhawk 자율비행 드론으로 ROS 기반 자율주행 자동차 경진대회에서 우수상을 받았습니다.",
+    "image": ""
    },
    {
     "label": "LEARNED",

@@ -5,16 +5,16 @@ const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const add = (a, x, y, z) => a.clone().add(V(x, y, z));
 const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 
-// 장면별 카메라 숏. shift는 피사체를 화면에서 옮기는 렌즈 시프트(패널 반대편에 피사체를 둔다).
+// 장면별 카메라 숏. shift는 렌즈 시프트 — 모든 장면은 가운데 축 구성이라 x는 0, y로 제목(위)과 카드(아래) 사이 띠에 피사체를 둔다.
 const SHOTS = {
-  intro: { pos: add(SETS.hangar, 0, 2.1, 6.4), target: add(SETS.hangar, 0, 1.8, 0), fov: 34, shift: [0.23, 0.13] },
-  prologue: { pos: add(SETS.hangar, 5.5, 3.4, 7.4), target: add(SETS.hangar, 0, 2.2, 0), fov: 36, shift: [0.2, 0] },
-  aerial: { pos: add(SETS.aerial, 11, 8.5, 16), target: add(SETS.aerial, 0, 3.4, 0), fov: 42, shift: [0.17, 0.17] },
-  ground: { pos: add(SETS.ground, 9.5, 6.4, 11.5), target: add(SETS.ground, -2.2, 1.2, -2.2), fov: 44, shift: [0.16, 0.17] },
-  robotics: { pos: add(SETS.robotics, -0.4, 3.9, 10.2), target: add(SETS.robotics, 0.5, 0.9, -0.4), fov: 40, shift: [0.18, 0.17] },
-  intelligence: { pos: add(SETS.core, 8, 1.4, 12.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [0.18, 0.16] },
-  loop: { pos: V(0, 44, 50), target: V(0, 1, -6), fov: 44, shift: [0, 0.1] },
-  record: { pos: add(SETS.record, -1.5, 4.2, 12.5), target: add(SETS.record, 0, 2.0, 0), fov: 40, shift: [0.2, 0] },
+  intro: { pos: add(SETS.hangar, 0, 2.1, 6.4), target: add(SETS.hangar, 0, 1.8, 0), fov: 34, shift: [0, 0.16] },
+  prologue: { pos: add(SETS.hangar, 5.5, 3.4, 7.4), target: add(SETS.hangar, 0, 2.2, 0), fov: 36, shift: [0, 0] },
+  aerial: { pos: add(SETS.aerial, 11, 8.5, 16), target: add(SETS.aerial, 0, 3.4, 0), fov: 42, shift: [0, 0.15] },
+  ground: { pos: add(SETS.ground, 9.5, 6.4, 11.5), target: add(SETS.ground, -2.2, 1.2, -2.2), fov: 44, shift: [0, 0.1] },
+  robotics: { pos: add(SETS.robotics, 0.2, 6.2, 11.8), target: add(SETS.robotics, 0.3, 0.9, -0.9), fov: 40, shift: [0, 0.17] },
+  intelligence: { pos: add(SETS.core, 11, 1.8, 17.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [0, 0.13] },
+  loop: { pos: V(0, 44, 50), target: V(0, 1, -6), fov: 44, shift: [0, 0.06] },
+  record: { pos: add(SETS.record, -1.5, 5.6, 17.5), target: add(SETS.record, 0, 2.6, 0), fov: 40, shift: [0, -0.03] },
   finale: { pos: add(SETS.hangar, 0, 7.5, 17), target: add(SETS.hangar, 0, 2.8, -4), fov: 40, shift: [0, -0.04] },
 };
 
@@ -31,7 +31,7 @@ export class Director {
     this.camPos = SHOTS.intro.pos.clone().add(V(0, -0.8, 4));
     this.camTarget = SHOTS.intro.target.clone().add(V(0, -1.2, 0));
     this.fov = 30;
-    this.shift = new THREE.Vector2(0.16, 0);
+    this.shift = new THREE.Vector2(0, 0.1);
     this.pointer = new THREE.Vector2();
     this.pointerSmooth = new THREE.Vector2();
     this.drag = new THREE.Vector2();
@@ -74,7 +74,8 @@ export class Director {
       pos.copy(target).add(back);
       fov += 8;
       const reel = this.scenes.find((x) => x.id === id)?.layout === 'reel';
-      shift.set(0, id === 'finale' ? 0.26 : reel ? 0.06 : 0.2);
+      const stage = this.scenes.find((x) => x.id === id)?.layout === 'stage';
+      shift.set(0, id === 'finale' ? 0.26 : reel ? 0.06 : stage ? 0.02 : 0.2);
     } else if (aspect < 1.3) {
       const back = pos.clone().sub(target).multiplyScalar(1.15);
       pos.copy(target).add(back);
@@ -236,7 +237,7 @@ export class Director {
     if (id !== 'robotics') robotics.lookWorld.copy(drone.pos);
 
     // 세로 화면에서는 코어 라벨이 장면 제목·수치와 겹치므로 숨긴다
-    if (core.tag) core.tag.visible = cam.aspect >= 0.85;
+    if (core.tag) core.tag.visible = cam.aspect >= 0.85 && id !== 'intelligence';
 
     drone.update(dt, t);
     hangar.update(dt, t);

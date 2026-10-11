@@ -41,20 +41,55 @@
 /* ── 필름: 이미지 릴 장면 ──────────────────── */
 .reel-head {
   position: absolute;
-  top: calc(var(--top) + 6px);
+  top: calc(var(--top) + 4px);
   left: var(--pad);
-  width: min(620px, 50vw);
+  right: var(--pad);
+  text-align: center;
+}
+.reel-head .kicker,
+.reel-head .subtitle {
+  justify-content: center;
+}
+.reel-head {
+  isolation: isolate;
+}
+.reel-head::before {
+  content: '';
+  position: absolute;
+  inset: -30px -10% -40px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(50% 60% at 50% 45%, rgba(5, 7, 12, 0.72), rgba(5, 7, 12, 0) 100%);
 }
 .reel-head .title {
-  font-size: clamp(40px, 4.6vw, 80px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.28em;
+  font-size: clamp(38px, 4.2vw, 72px);
 }
 .reel-head .subtitle {
-  margin-top: 16px;
+  margin-top: 14px;
+}
+/* 가운데 정렬된 부제는 양쪽에 같은 선을 둔다 */
+.reel-head .subtitle::after,
+.stage-head .subtitle::after {
+  content: '';
+  width: 26px;
+  height: 1px;
+  background: var(--orange);
 }
 .mini-stats {
   display: flex;
-  gap: 26px;
-  margin-top: 16px;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.mini-stats li {
+  padding: 6px 16px 7px;
+  border-radius: 10px;
+  background: rgba(5, 7, 12, 0.62);
+  backdrop-filter: blur(8px);
 }
 .mini-stats b {
   display: block;
@@ -65,22 +100,23 @@
 }
 .mini-stats span {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 10.5px;
   letter-spacing: 0.08em;
-  color: var(--muted);
+  color: var(--fg-2);
 }
 .reel {
-  --card-h: clamp(170px, 30vh, 310px);
+  --card-h: clamp(160px, 28vh, 300px);
   position: absolute;
-  left: var(--pad);
+  left: 0;
   right: 0;
   bottom: calc(var(--bottom) + 2px);
 }
 .reel-bar {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 18px;
-  padding-right: var(--pad);
+  padding: 0 var(--pad);
   margin-bottom: 12px;
   font-family: var(--mono);
   font-size: 10.5px;
@@ -98,7 +134,6 @@
   color: var(--orange);
 }
 .reel-nav {
-  margin-left: auto;
   display: flex;
   gap: 6px;
 }
@@ -129,15 +164,30 @@
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
-  padding: 2px var(--pad) 6px 0;
+  padding: 2px var(--pad) 6px;
+  scroll-padding-inline: var(--pad);
   perspective: 1400px;
   touch-action: pan-x;
+}
+/* 카드가 화면보다 적으면 가운데에, 넘치면 처음부터(자동 여백은 넘칠 때 0이 된다) */
+.reel-track > .r-card:first-child {
+  margin-left: auto;
+}
+.reel-track > .r-card:last-child {
+  margin-right: auto;
+}
+/* 더 넘길 카드가 있는 쪽만 흐리게 */
+.reel-track.can-right {
   -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 80px), transparent);
   mask-image: linear-gradient(90deg, #000 calc(100% - 80px), transparent);
 }
-.reel-track.is-end {
-  -webkit-mask-image: none;
-  mask-image: none;
+.reel-track.can-left {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 80px);
+  mask-image: linear-gradient(90deg, transparent, #000 80px);
+}
+.reel-track.can-left.can-right {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 80px, #000 calc(100% - 80px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 80px, #000 calc(100% - 80px), transparent);
 }
 .reel-track::-webkit-scrollbar {
   display: none;
@@ -1040,41 +1090,153 @@ body.page-open .title-card {
   word-break: keep-all;
 }
 
-/* 상세 페이지의 모든 구획을 같은 왼쪽 선에 맞춘다(넓은 화면에서는 1500px 틀 안) */
-.pg-detail {
-  --edge: max(var(--pad), calc(50vw - 750px));
+/* ── 가운데 축: 모든 구획을 화면 가운데에 모은다 ─────────── */
+/* 아카이브 */
+.works-head {
+  text-align: center;
 }
+.works-head .chips {
+  justify-content: center;
+}
+.works-grid {
+  --cw: calc((min(100vw, 1680px) - 2 * var(--pad) - (var(--cols) - 1) * var(--gap) - 12px) / var(--cols));
+  max-width: 1680px;
+  margin: 0 auto;
+}
+.pg-foot {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.pg-foot ul {
+  justify-content: center;
+}
+
+/* 상세: 히어로 */
 .pg-detail .d-hero-text {
-  left: var(--edge);
-  right: var(--edge);
+  left: var(--pad);
+  right: var(--pad);
+  margin: 0 auto;
+  text-align: center;
 }
-.pg-detail .d-intro,
-.pg-detail .st-row {
+.pg-detail .d-cat {
+  justify-content: center;
+}
+.pg-detail .d-one {
+  margin-inline: auto;
+}
+.pg-detail .d-scroll {
+  right: auto;
+  left: 50%;
+  bottom: 2.4vh;
+  transform: translateX(-50%);
+  writing-mode: horizontal-tb;
+  flex-direction: column;
+}
+.pg-detail .d-scroll::after {
+  height: 30px;
+}
+
+/* 상세: 요약 · 수치 · 정보 — 한 줄로 쌓아 가운데 */
+.pg-detail .d-intro {
+  grid-template-columns: minmax(0, 900px);
+  justify-content: center;
+  row-gap: 44px;
+  text-align: center;
+}
+.pg-detail .d-summary,
+.pg-detail .d-metrics,
+.pg-detail .d-facts {
+  grid-column: 1;
+  grid-row: auto;
+}
+.pg-detail .d-metrics {
+  justify-content: center;
+}
+.pg-detail .d-metrics dt {
+  margin-inline: auto;
+}
+.pg-detail .d-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0 18px;
+  border-top: 0;
+}
+.pg-detail .d-facts div {
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 16px 6px;
+  border-top: 1px solid var(--line-2);
+  border-bottom: 0;
+}
+
+/* 상세: 스토리 — 사진을 가운데에 크게, 글은 그 아래 가운데 */
+.pg-detail .st-row,
+.pg-detail .st-row:nth-child(even) {
+  grid-template-columns: minmax(0, 1120px);
+  justify-content: center;
+  gap: 26px;
   max-width: none;
   margin: 0;
-  padding-left: var(--edge);
-  padding-right: var(--edge);
+  padding: 8vh var(--pad);
+  text-align: center;
+}
+.pg-detail .st-row:nth-child(even) .st-media {
+  order: 0;
+}
+.pg-detail .st-media img {
+  max-height: 76vh;
+}
+.pg-detail .st-media:has(img:not([data-kind='photo'])) {
+  background: transparent;
+}
+.pg-detail .st-text {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.pg-detail .st-text p {
+  max-width: 46ch;
+  margin-inline: auto;
 }
 .pg-detail .st-row.no-img {
-  grid-template-columns: minmax(0, 860px);
+  grid-template-columns: minmax(0, 720px);
 }
-.pg-detail .d-h,
-.pg-detail .gal,
-.pg-detail .d-links ul,
-.pg-detail .d-next,
-.pg-detail .vid {
-  padding-left: var(--edge);
-  padding-right: var(--edge);
+
+/* 상세: 영상 · 갤러리 · 출처 · 다음 프로젝트 */
+.pg-detail .d-h {
+  justify-content: center;
 }
 .pg-detail .vid {
-  max-width: none;
-  margin: 0 0 30px;
-}
-.pg-detail .vid > * {
   max-width: 1200px;
+  margin: 0 auto 30px;
+}
+.pg-detail .gal {
+  justify-content: center;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+.pg-detail .gal::after {
+  display: none;
+}
+.pg-detail .gal-item {
+  flex: 0 0 auto;
+  width: min(100%, calc(var(--ar) * var(--row)));
 }
 .pg-detail .gal[data-n='1'] {
-  max-width: calc(760px + 2 * var(--edge));
+  --row: min(68vh, 620px);
+  max-width: 1500px;
+}
+.pg-detail .d-links ul {
+  justify-content: center;
+}
+.pg-detail .d-next {
+  max-width: 1500px;
+  margin: 0 auto;
+  text-align: center;
+}
+.pg-detail .d-next-card {
+  align-items: center;
+  text-align: center;
 }
 
 /* ── 커튼 전환 ─────────────────────────── */
@@ -1147,7 +1309,6 @@ body.page-open .title-card {
   }
   .reel {
     --card-h: clamp(150px, 25vh, 230px);
-    left: var(--pad);
     isolation: isolate;
   }
   /* 세로 화면: 바닥의 3D 글자가 카드 제목 뒤로 비치지 않도록 */
@@ -1155,8 +1316,8 @@ body.page-open .title-card {
     content: '';
     position: absolute;
     z-index: -1;
-    left: calc(-1 * var(--pad));
-    right: calc(-1 * var(--pad));
+    left: 0;
+    right: 0;
     top: 45%;
     bottom: calc(-1 * var(--bottom) - 10px);
     background: linear-gradient(180deg, rgba(5, 7, 12, 0), rgba(5, 7, 12, 0.94) 38%);
