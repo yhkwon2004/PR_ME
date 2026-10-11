@@ -565,6 +565,7 @@ body.page-open .title-card {
   bottom: 9vh;
   z-index: 2;
   max-width: 1200px;
+  text-shadow: 0 1px 14px rgba(5, 7, 12, 0.55);
 }
 .d-cat {
   display: flex;
@@ -1028,7 +1029,8 @@ body.page-open .title-card {
 }
 @media (max-width: 820px) {
   .hud-nav a {
-    width: 36px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     justify-content: center;
   }
@@ -1109,6 +1111,37 @@ body.page-open .title-card {
   .gal-item {
     margin-bottom: 8px;
   }
+  /* 가로 사진은 세로 화면에서 잘리지 않게 사진 전체 + 아래 글 */
+  .d-hero.is-land {
+    height: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px;
+  }
+  .d-hero.is-land::after {
+    display: none;
+  }
+  .d-hero.is-land .d-hero-media {
+    position: relative;
+    inset: auto;
+    aspect-ratio: var(--ar);
+    max-height: 62svh;
+  }
+  .d-hero.is-land .d-hero-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, var(--bg) 0%, rgba(5, 7, 12, 0) 34%);
+  }
+  .d-hero.is-land .d-hero-text {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin-top: -18px;
+    padding: 0 var(--pad) 6vh;
+  }
   .d-next-card {
     height: 46vh;
     min-height: 300px;
@@ -1136,5 +1169,31 @@ body.page-open .title-card {
 @media (max-width: 599px) {
   .works-grid {
     --cols: 2;
+  }
+}
+/* 터치 기기: 작은 링크의 누를 수 있는 영역을 넓힌다(모양은 그대로) */
+@media (pointer: coarse) {
+  .reel-all,
+  .pg-foot a,
+  .d-prev-link,
+  .btn-quiet {
+    position: relative;
+  }
+  .reel-all::after,
+  .pg-foot a::after,
+  .d-prev-link::after,
+  .btn-quiet::after {
+    content: '';
+    position: absolute;
+    inset: -12px -6px;
+  }
+  .pg-back {
+    padding: 12px 16px;
+  }
+  .chips button {
+    padding: 11px 15px;
+  }
+  .highlights li a {
+    padding: 12px 0;
   }
 }

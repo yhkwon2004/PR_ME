@@ -290,6 +290,7 @@ export class NeuralCore {
     tag.position.set(0, 3.6, 0);
     tag.scale.multiplyScalar(2.2);
     this.group.add(tag);
+    this.tag = tag;
 
     this.hit = new THREE.Mesh(new THREE.SphereGeometry(2.8, 16, 12), new THREE.MeshBasicMaterial({ visible: false }));
     this.hit.userData.actor = this;

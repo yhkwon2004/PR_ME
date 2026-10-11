@@ -74,7 +74,7 @@ export class Director {
       pos.copy(target).add(back);
       fov += 8;
       const reel = this.scenes.find((x) => x.id === id)?.layout === 'reel';
-      shift.set(0, id === 'finale' ? 0.12 : reel ? 0.06 : 0.2);
+      shift.set(0, id === 'finale' ? 0.26 : reel ? 0.06 : 0.2);
     } else if (aspect < 1.3) {
       const back = pos.clone().sub(target).multiplyScalar(1.15);
       pos.copy(target).add(back);
@@ -234,6 +234,9 @@ export class Director {
     this.raycaster.setFromCamera(this.pointerSmooth, cam);
     if (this.raycaster.ray.intersectPlane(this.lookPlane, robotics.lookWorld) === null) robotics.lookWorld.copy(cam.position);
     if (id !== 'robotics') robotics.lookWorld.copy(drone.pos);
+
+    // 세로 화면에서는 코어 라벨이 장면 제목·수치와 겹치므로 숨긴다
+    if (core.tag) core.tag.visible = cam.aspect >= 0.85;
 
     drone.update(dt, t);
     hangar.update(dt, t);

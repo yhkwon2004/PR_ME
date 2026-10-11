@@ -27,49 +27,63 @@ const canvas = document.getElementById('gl');
 const $ = (id) => document.getElementById(id);
 
 // ── 3D 세계 구성 ───────────────────────────────────────────
-const stage = createStage(canvas, { reducedMotion: reduced });
+// 작품 주소로 바로 들어오면 무거운 3D 무대는 필름을 열 때 만든다 — 페이지가 먼저 보이도록
+let stage = null;
 let director = null;
 let actors = null;
 let video = null;
+let worldBuilt = false;
 
-if (stage) {
-  const drone = new Drone();
-  const hangar = new HangarSet(SETS.hangar);
-  const aerial = new AerialSet(SETS.aerial);
-  const ground = new GroundSet(SETS.ground);
-  const robotics = new RoboticsSet(SETS.robotics);
-  const core = new NeuralCore(SETS.core);
-  const records = new RecordSet(SETS.record);
-  const links = new DataLinks(SETS.core, [SETS.hangar, SETS.aerial, SETS.ground, SETS.robotics, SETS.record]);
-  [hangar, aerial, ground, robotics, core, records, links].forEach((s) => stage.scene.add(s.group));
-  stage.scene.add(drone.root);
+function buildWorld() {
+  if (worldBuilt) return;
+  worldBuilt = true;
+  stage = createStage(canvas, { reducedMotion: reduced });
+  if (stage) {
+    const drone = new Drone();
+    const hangar = new HangarSet(SETS.hangar);
+    const aerial = new AerialSet(SETS.aerial);
+    const ground = new GroundSet(SETS.ground);
+    const robotics = new RoboticsSet(SETS.robotics);
+    const core = new NeuralCore(SETS.core);
+    const records = new RecordSet(SETS.record);
+    const links = new DataLinks(SETS.core, [SETS.hangar, SETS.aerial, SETS.ground, SETS.robotics, SETS.record]);
+    [hangar, aerial, ground, robotics, core, records, links].forEach((s) => stage.scene.add(s.group));
+    stage.scene.add(drone.root);
 
-  video = document.createElement('video');
-  video.src = '/media/airsim-demo.mp4';
-  video.muted = true;
-  video.loop = true;
-  video.playsInline = true;
-  video.preload = 'none';
-  video.setAttribute('aria-hidden', 'true');
-  ground.attachVideo(video, '/media/airsim-poster.webp');
+    video = document.createElement('video');
+    video.src = '/media/airsim-demo.mp4';
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.preload = 'none';
+    video.setAttribute('aria-hidden', 'true');
+    ground.attachVideo(video, '/media/airsim-poster.webp');
 
-  actors = { drone, hangar, aerial, ground, robotics, core, records, links, video };
-  director = new Director({ stage, actors, scenes, reducedMotion: reduced, onTransition });
-  director.hitTargets = [drone.hit, ground.rover.hit, robotics.dog.hit, robotics.arm.hit, core.hit];
-} else {
-  document.body.classList.add('no-webgl');
-  // WebGL이 없을 때도 장면 진행과 콘텐츠는 그대로 동작한다
-  director = {
-    index: -1,
-    trans: null,
-    go(i) {
-      if (i < 0 || i >= scenes.length || i === this.index) return false;
-      const prev = this.index;
-      this.index = i;
-      onTransition(i, prev, 0.8);
-      return true;
-    },
-  };
+    actors = { drone, hangar, aerial, ground, robotics, core, records, links, video };
+    director = new Director({ stage, actors, scenes, reducedMotion: reduced, onTransition });
+    director.hitTargets = [drone.hit, ground.rover.hit, robotics.dog.hit, robotics.arm.hit, core.hit];
+
+    // 부팅 동안 보여줄 첫 프레임: 격납고 근접
+    stage.camera.position.copy(director.camPos);
+    stage.camera.lookAt(director.camTarget);
+    drone.pos.set(SETS.hangar.x, 0.27, SETS.hangar.z);
+    drone.target.copy(drone.pos);
+    drone.faceYaw = drone.yaw = 0;
+  } else {
+    document.body.classList.add('no-webgl');
+    // WebGL이 없을 때도 장면 진행과 콘텐츠는 그대로 동작한다
+    director = {
+      index: -1,
+      trans: null,
+      go(i) {
+        if (i < 0 || i >= scenes.length || i === this.index) return false;
+        const prev = this.index;
+        this.index = i;
+        onTransition(i, prev, 0.8);
+        return true;
+      },
+    };
+  }
 }
 
 // ── UI ───────────────────────────────────────────────────
@@ -101,6 +115,7 @@ hud.setAuto(auto);
 
 // ── 작품 아카이브 · 상세 페이지 ─────────────────────────────────
 let pageCovered = false;
+let warmed = false; // 셰이더 예열 여부(페이지로 바로 들어오면 필름을 열 때 예열)
 const site = createSite({
   lightbox,
   reducedMotion: reduced,
@@ -112,6 +127,11 @@ const site = createSite({
   onClose: () => {
     pageCovered = false;
     if (!started) {
+      buildWorld();
+      if (stage && !warmed) {
+        stage.renderer.compile(stage.scene, stage.camera);
+        warmed = true;
+      }
       $('boot').hidden = false;
       start(false);
     } else if (scenes[director.index]?.id === 'ground') video?.play().catch(() => {});
@@ -256,11 +276,15 @@ async function boot() {
   const tasks = [
     () => Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]),
     () => {
-      if (stage) stage.renderer.compile(stage.scene, stage.camera);
+      // 상세 페이지로 바로 들어왔다면 페이지가 먼저 — 예열은 필름을 열 때
+      if (stage && !pageCovered) {
+        stage.renderer.compile(stage.scene, stage.camera);
+        warmed = true;
+      }
     },
     () => {
       // 셰이더 예열용 한 프레임
-      if (stage) stage.composer.render(0.016);
+      if (stage && !pageCovered) stage.composer.render(0.016);
     },
   ];
   const minTime = reduced ? 600 : 2600;
@@ -366,18 +390,11 @@ function loop(now) {
   stage.composer.render(dt);
 }
 
-if (stage) {
-  // 부팅 동안 보여줄 첫 프레임: 격납고 근접
-  stage.camera.position.copy(director.camPos);
-  stage.camera.lookAt(director.camTarget);
-  actors.drone.pos.set(SETS.hangar.x, 0.27, SETS.hangar.z);
-  actors.drone.target.copy(actors.drone.pos);
-  actors.drone.faceYaw = actors.drone.yaw = 0;
-}
 requestAnimationFrame(loop);
-boot();
-// /works 주소로 바로 들어오면 부팅 화면 없이 페이지를 연다
+// /works 주소로 바로 들어오면 부팅 화면 없이 페이지를 연다 — 3D 무대는 필름을 열 때 만든다
 site.start(site.initial);
+if (!site.open) buildWorld();
+boot();
 
 // 검증용 훅(?capture): 장면으로 즉시 이동하고 시뮬레이션을 빨리 감는다
 if (stage && new URLSearchParams(location.search).has('capture')) {

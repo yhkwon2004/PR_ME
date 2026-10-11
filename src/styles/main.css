@@ -470,10 +470,36 @@ body.is-started .hud-bottom {
   gap: 2px;
   height: 10px;
 }
+.ico-sound {
+  position: relative;
+}
 .ico-sound i {
   width: 2px;
   height: 3px;
   background: currentColor;
+}
+#btn-sound:not(.is-on) .ico-sound i:nth-child(1) {
+  height: 4px;
+}
+#btn-sound:not(.is-on) .ico-sound i:nth-child(2) {
+  height: 7px;
+}
+#btn-sound:not(.is-on) .ico-sound i:nth-child(3) {
+  height: 10px;
+}
+#btn-sound:not(.is-on) .ico-sound i:nth-child(4) {
+  height: 6px;
+}
+#btn-sound:not(.is-on) .ico-sound::after {
+  content: '';
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  top: 50%;
+  height: 1.5px;
+  background: currentColor;
+  box-shadow: 0 0 0 1px var(--bg);
+  transform: rotate(-38deg);
 }
 #btn-sound.is-on .ico-sound i {
   animation: eq 0.9s ease-in-out infinite alternate;
@@ -966,7 +992,8 @@ body.is-started[data-scene='intro'] .hint {
 }
 .hero-title .accent {
   color: var(--orange);
-  text-shadow: 0 0 60px rgba(255, 107, 26, 0.35);
+  /* 줄 상자의 overflow 클립 밖으로 번지도록 text-shadow 대신 filter */
+  filter: drop-shadow(0 0 28px rgba(255, 107, 26, 0.45));
 }
 .hero-foot {
   display: flex;
@@ -1572,15 +1599,23 @@ body.is-started .cursor {
     --pad: 14px;
   }
   .brand-sub,
-  .hud-meta,
-  .hud-nav .lbl {
+  .hud-meta {
     display: none;
+  }
+  .hud-nav .lbl {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
   .brand-mark {
     font-size: 17px;
   }
   .hud-nav button {
-    width: 36px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     justify-content: center;
   }
@@ -1589,9 +1624,15 @@ body.is-started .cursor {
   }
   .timeline button {
     justify-content: center;
-    font-size: 9px;
+    min-height: 40px;
+    padding: 15px 0 10px;
+    font-size: 10px;
+    color: var(--muted);
   }
-  .scrim i {
+  .timeline button.is-past {
+    color: var(--fg-2);
+  }
+  .scrim i:not(.s-bottom):not(.s-center) {
     opacity: 0 !important;
   }
   .s-bottom {
@@ -1624,7 +1665,14 @@ body.is-started .cursor {
   .lead {
     font-size: 13.5px;
   }
+  .hero {
+    justify-content: flex-end;
+  }
+  .hero .kicker {
+    margin: auto 0 12px;
+  }
   .hero-title {
+    margin-top: 0;
     font-size: 17.5vw;
   }
   .hint {
@@ -1694,6 +1742,15 @@ body.is-started .cursor {
     top: auto;
     bottom: calc(var(--bottom) + 18px);
     transform: translateX(-50%);
+    isolation: isolate;
+  }
+  .endcard::before {
+    content: '';
+    position: absolute;
+    inset: -48px -16px -24px;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(70% 60% at 50% 50%, rgba(5, 7, 12, 0.86), rgba(5, 7, 12, 0) 76%);
   }
   .endcard-kicker {
     margin-bottom: 14px;
@@ -1704,6 +1761,17 @@ body.is-started .cursor {
   }
   .title-end {
     font-size: clamp(30px, 8.6vw, 44px);
+  }
+  .pillars {
+    gap: 5px;
+    margin-top: 14px;
+  }
+  .pillar {
+    padding: 9px 14px 9px 44px;
+  }
+  .pillar-no {
+    left: 14px;
+    top: 10px;
   }
   .boot-frame {
     padding: 28px 20px 24px;

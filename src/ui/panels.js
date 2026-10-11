@@ -274,6 +274,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
       tl.to(cards, { autoAlpha: 1, x: 0, rotateY: 0, duration: 1.1 * D, ease: 'expo.out', stagger: 0.07 * D }, 0.35);
       const track = el.querySelector('.reel-track');
       if (track) {
+        // 가로로 넘기는 동안 빈 카드가 보이지 않게 이 장면의 썸네일은 미리 모두 받는다
+        track.querySelectorAll('img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
         track.scrollLeft = 0;
         track.dispatchEvent(new Event('scroll'));
       }

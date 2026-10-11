@@ -12,10 +12,10 @@ export const profile = {
   email: 'yhkwon2004@gmail.com',
   links: [
     { label: 'Email', value: 'yhkwon2004@gmail.com', url: 'mailto:yhkwon2004@gmail.com' },
-    { label: 'GitHub', value: 'github.com/yhkwon2004', url: 'https://github.com/yhkwon2004' },
+    { label: 'GitHub', value: 'yhkwon2004', url: 'https://github.com/yhkwon2004' },
     { label: 'Notion', value: '2026 Portfolio', url: 'https://befitting-paper-753.notion.site/2026-1-3f3faf73802f80c7acf6f7c83e9c26e2' },
     { label: 'Instagram', value: '@starring.moon', url: 'https://www.instagram.com/starring.moon/' },
-    { label: 'Blog', value: 'blog.naver.com/procmd', url: 'https://blog.naver.com/procmd' },
+    { label: 'Blog', value: 'naver/procmd', url: 'https://blog.naver.com/procmd' },
   ],
 };
 

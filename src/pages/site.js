@@ -111,10 +111,17 @@ function detailPage(p) {
     ['AWARD', p.awards.join(' / ')],
   ].filter(([, v]) => v);
   const gallery = p.images;
-  const storyImgs = new Set(p.story.map((s) => s.img?.file).filter(Boolean));
+  // 히어로 사진은 스토리에서 다시 쓰지 않고, 갤러리에는 스토리에 없던 사진만 — 같은 사진이 반복되지 않게
+  const coverFile = p.cover?.file;
+  const used = new Set(p.story.map((s) => s.img?.file).filter(Boolean));
+  const spare = gallery.filter((im) => im.file !== coverFile && !used.has(im.file));
+  const story = p.story.map((s) => (s.img && s.img.file === coverFile && p.story.length > 1 ? { ...s, img: spare.shift() || null } : s));
+  const storyImgs = new Set(story.map((s) => s.img?.file).filter(Boolean));
+  const rest = gallery.map((im, k) => ({ im, k })).filter(({ im }) => !storyImgs.has(im.file));
+  const showGallery = rest.length > 1 || (rest.length === 1 && rest[0].im.file !== coverFile);
   return `<article class="pg pg-detail" data-cat="${esc(p.category)}">
     ${bar({ href: '/works', label: 'WORKS' })}
-    <section class="d-hero">
+    <section class="d-hero${p.cover && p.cover.ratio >= 0.9 ? ' is-land' : ''}" style="--ar:${(p.cover?.ratio || 1).toFixed(3)}">
       <div class="d-hero-media">${p.cover ? img(p.cover, { eager: true, full: true }) : typeCover(p, 'is-hero')}</div>
       <div class="d-hero-text">
         <p class="d-cat"><span>${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}<span>${pad(i + 1)} / ${pad(projects.length)}</span></p>
@@ -132,8 +139,8 @@ function detailPage(p) {
     </section>
 
     ${
-      p.story.length
-        ? `<section class="d-story">${p.story
+      story.length
+        ? `<section class="d-story">${story
             .map(
               (s, k) => `<div class="st-row${s.img ? '' : ' no-img'} reveal">
                 ${s.img ? `<button type="button" class="st-media" data-gallery="${gallery.indexOf(s.img)}" aria-label="${esc(s.img.caption)} 크게 보기">${img(s.img, { sizes: '(max-width: 820px) 100vw, 58vw' })}<span class="st-cap">${esc(s.img.caption)}</span></button>` : ''}
@@ -158,11 +165,11 @@ function detailPage(p) {
     }
 
     ${
-      gallery.length > 1 || (gallery.length && !storyImgs.size)
-        ? `<section class="d-gallery reveal"><h2 class="d-h">GALLERY<sup>${gallery.length}</sup></h2>
-          <div class="gal">${gallery
+      showGallery
+        ? `<section class="d-gallery reveal"><h2 class="d-h">GALLERY<sup>${rest.length}</sup></h2>
+          <div class="gal">${rest
             .map(
-              (im, k) => `<button type="button" class="gal-item" data-gallery="${k}" style="--ar:${Math.min(1.8, Math.max(0.6, im.ratio)).toFixed(3)}" aria-label="${esc(im.caption)} 크게 보기">${img(im, { sizes: '(max-width: 820px) 50vw, 25vw' })}<span class="gal-cap">${esc(im.caption)}</span></button>`
+              ({ im, k }) => `<button type="button" class="gal-item" data-gallery="${k}" style="--ar:${Math.min(1.8, Math.max(0.6, im.ratio)).toFixed(3)}" aria-label="${esc(im.caption)} 크게 보기">${img(im, { sizes: '(max-width: 820px) 50vw, 25vw' })}<span class="gal-cap">${esc(im.caption)}</span></button>`
             )
             .join('')}</div></section>`
         : ''
@@ -348,7 +355,8 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     () => {
       const media0 = page.querySelector('.d-hero-media');
       const y = page.scrollTop;
-      if (media0 && !reducedMotion && y < innerHeight * 1.2) media0.style.transform = `translate3d(0, ${y * 0.35}px, 0)`;
+      const stacked = innerWidth <= 820 && media0?.parentElement.classList.contains('is-land');
+      if (media0 && !reducedMotion && !stacked && y < innerHeight * 1.2) media0.style.transform = `translate3d(0, ${y * 0.35}px, 0)`;
     },
     { passive: true }
   );
