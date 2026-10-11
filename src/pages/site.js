@@ -136,9 +136,7 @@ function detailPage(p) {
   const gallery = p.images;
   // 히어로 사진은 스토리에서 다시 쓰지 않고, 갤러리에는 스토리에 없던 사진만 — 같은 사진이 반복되지 않게
   const coverFile = p.cover?.file;
-  const used = new Set(p.story.map((s) => s.img?.file).filter(Boolean));
-  const spare = gallery.filter((im) => im.file !== coverFile && !used.has(im.file));
-  const story = p.story.map((s) => (s.img && s.img.file === coverFile && p.story.length > 1 ? { ...s, img: spare.shift() || null } : s));
+  const story = p.story.map((s) => (s.img && s.img.file === coverFile && p.story.length > 1 ? { ...s, img: null } : s));
   const storyImgs = new Set(story.map((s) => s.img?.file).filter(Boolean));
   const rest = gallery.map((im, k) => ({ im, k })).filter(({ im }) => !storyImgs.has(im.file) && im.file !== coverFile);
   const showGallery = rest.length > 0;

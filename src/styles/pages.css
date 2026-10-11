@@ -392,6 +392,13 @@ body.page-open .title-card {
   padding: 0 var(--pad);
   background: linear-gradient(180deg, rgba(5, 7, 12, 0.92), rgba(5, 7, 12, 0));
 }
+/* 아카이브는 카드가 막대 밑으로 지나가므로 반투명 막 + 흐림 */
+.pg-works .pg-bar {
+  background: rgba(5, 7, 12, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
 .pg-detail .pg-bar {
   position: fixed;
   left: 0;
@@ -844,24 +851,31 @@ body.page-open .title-card {
 .d-gallery {
   padding: 8vh 0 6vh;
 }
+/* 줄 맞춤 갤러리: 사진 비율대로 한 줄을 채워 아래에 빈 구멍이 생기지 않는다 */
 .gal {
-  columns: 3 280px;
-  column-gap: 12px;
+  --row: 320px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   padding: 0 var(--pad);
 }
+.gal::after {
+  content: '';
+  flex-grow: 999; /* 마지막 줄은 늘어나지 않게 */
+}
 .gal[data-n='1'] {
-  columns: 1;
   max-width: 980px;
 }
-.gal[data-n='2'] {
-  columns: 2;
+.gal[data-n='1']::after {
+  display: none;
+}
+.gal[data-n='1'] .gal-item {
+  max-width: min(100%, calc(var(--ar) * 72vh));
 }
 .gal-item {
   position: relative;
   display: block;
-  width: 100%;
-  margin-bottom: 12px;
-  break-inside: avoid;
+  flex: calc(var(--ar) * 100) 1 calc(var(--ar) * var(--row));
   overflow: hidden;
   background: #0a0d12;
   aspect-ratio: var(--ar);
@@ -1188,11 +1202,8 @@ body.page-open .title-card {
     max-height: 64vh;
   }
   .gal {
-    columns: 2 140px;
-    column-gap: 8px;
-  }
-  .gal-item {
-    margin-bottom: 8px;
+    --row: 150px;
+    gap: 8px;
   }
   /* 가로 사진은 세로 화면에서 잘리지 않게 사진 전체 + 아래 글 */
   .d-hero.is-land {
