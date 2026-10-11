@@ -85,7 +85,9 @@ function render(scene, i) {
         <div class="credits-roll">
           <p class="credits-kicker">${esc(scene.kicker)}</p>
           <p class="credits-title">PHYSICAL AI<br /><span>a portfolio film</span></p>
-          ${scene.credits.map(([r, n]) => `<div class="credit"><span>${esc(r)}</span><b>${esc(n)}</b></div>`).join('')}
+          ${scene.credits
+            .map(([r, n]) => `<div class="credit"><span>${esc(r)}</span><b>${n.split(' · ').map((x) => `<span class="nw">${esc(x)}</span>`).join(' · ')}</b></div>`)
+            .join('')}
           <p class="credits-thanks">감사합니다</p>
         </div>
       </div>
@@ -253,6 +255,12 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
     el.inert = true;
     root.appendChild(el);
     bindReel(el);
+    const sheet = el.querySelector('.stage-foot');
+    if (sheet) {
+      const end = () => sheet.classList.toggle('is-end', sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 4);
+      sheet.addEventListener('scroll', end, { passive: true });
+      addEventListener('resize', end);
+    }
     return el;
   });
 
@@ -333,7 +341,10 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
         track.dispatchEvent(new Event('scroll'));
       }
     }
-    el.querySelectorAll('.col, .stage-foot').forEach((c) => (c.scrollTop = 0));
+    el.querySelectorAll('.col, .stage-foot').forEach((c) => {
+      c.scrollTop = 0;
+      c.dispatchEvent(new Event('scroll'));
+    });
 
     if (el.dataset.scene === 'finale') runCredits(el, delay);
   }

@@ -1458,3 +1458,64 @@ body.page-open .title-card {
     padding: 12px 0;
   }
 }
+
+/* 가로로 눕힌 휴대폰(높이가 낮은 화면) */
+@media (max-height: 500px) and (orientation: landscape) {
+  /* 릴: 낮고 넓은 카드 한 줄 — 제목과 피사체를 가리지 않게 */
+  .reel {
+    --card-h: 92px;
+  }
+  .r-card {
+    width: calc(var(--card-h) * 1.35);
+  }
+  .reel .card-meta {
+    display: none;
+  }
+  .reel .card-title {
+    margin-top: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .reel-bar {
+    margin-bottom: 6px;
+  }
+  .reel-head .title {
+    font-size: 30px;
+  }
+  .reel-head .subtitle,
+  .reel-head .mini-stats {
+    display: none;
+  }
+  /* 상세 · 아카이브: 첫 화면에 제목과 사진이 함께 보이도록 */
+  .d-hero {
+    min-height: 0;
+  }
+  .d-title {
+    font-size: clamp(28px, 4.4vw, 40px);
+  }
+  .d-one {
+    display: none;
+  }
+  .pg-bar {
+    height: 56px;
+  }
+  .works-head {
+    padding: 10px var(--pad) 14px;
+  }
+  .works-title {
+    font-size: 56px;
+  }
+  .works-head .chips {
+    margin-top: 12px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: safe center;
+    scrollbar-width: none;
+  }
+  .chips button {
+    flex: none;
+  }
+}
+

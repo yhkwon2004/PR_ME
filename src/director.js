@@ -39,6 +39,12 @@ export class Director {
     this.flyover = this.makeFlyover();
     this.coreOrbit = this.makeOrbit(SETS.core, 5.4, 1.2);
     this.tmp = new THREE.Vector3();
+    this.tmp2 = new THREE.Vector3();
+    // 세로 화면 지상 장면: 넓은 트랙에서 로버를 화면 안에 두기 위한 시선 추종
+    this.follow = new THREE.Vector3();
+    this.followOff = new THREE.Vector3();
+    this.followW = 0;
+    this.coreK = 1;
     this.raycaster = new THREE.Raycaster();
     this.lookPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.9);
   }
@@ -69,13 +75,19 @@ export class Director {
     let fov = s.fov;
     let shift = new THREE.Vector2(s.shift[0], s.shift[1]);
     if (aspect < 0.85) {
-      // 세로 화면: 뒤로 물러나고, 피사체는 위쪽(패널은 아래)
-      const back = pos.clone().sub(target).multiplyScalar(id === 'loop' ? 1.25 : 1.45);
+      // 세로 화면: 뒤로 물러나 화면 폭에 피사체를 담고, 제목(위)과 시트(아래) 사이 띠에 둔다
+      if (id === 'robotics') {
+        // 걷는 개와 로봇팔의 가운데를 겨눈다
+        target.x -= 0.8;
+        pos.x -= 0.8;
+      }
+      const pull = { loop: 1.25, robotics: 1.7, record: 1.3, intro: 1.2 }[id] || 1.45;
+      const back = pos.clone().sub(target).multiplyScalar(pull);
       pos.copy(target).add(back);
       fov += 8;
       const reel = this.scenes.find((x) => x.id === id)?.layout === 'reel';
       const stage = this.scenes.find((x) => x.id === id)?.layout === 'stage';
-      shift.set(0, id === 'finale' ? 0.26 : reel ? 0.06 : stage ? 0.02 : 0.2);
+      shift.set(0, id === 'finale' ? 0.26 : id === 'record' ? 0.12 : reel ? 0.06 : stage ? 0.02 : 0.2);
     } else if (aspect < 1.3) {
       const back = pos.clone().sub(target).multiplyScalar(1.15);
       pos.copy(target).add(back);
@@ -205,9 +217,18 @@ export class Director {
       off.multiplyScalar(1 + Math.min(this.sceneTime, 40) * 0.004);
       lift += Math.min(this.sceneTime, 40) * 0.03;
     }
-    cam.position.copy(this.camTarget).add(off);
+    const followOn = id === 'ground' && !this.trans && cam.aspect < 0.85;
+    this.followW += ((followOn ? 1 : 0) - this.followW) * Math.min(1, dt * 1.2);
+    this.followOff.set(0, 0, 0);
+    if (this.followW > 0.001) {
+      ground.roverWorldPosition(this.tmp2);
+      if (this.followW < 0.02) this.follow.copy(this.tmp2);
+      else this.follow.lerp(this.tmp2, Math.min(1, dt * 2));
+      this.followOff.set(this.follow.x - this.camTarget.x, 0, this.follow.z - this.camTarget.z).multiplyScalar(0.6 * this.followW);
+    }
+    cam.position.copy(this.camTarget).add(off).add(this.followOff);
     cam.position.y = Math.max(0.6, cam.position.y + lift);
-    cam.lookAt(this.camTarget);
+    cam.lookAt(this.tmp2.copy(this.camTarget).add(this.followOff));
     if (Math.abs(cam.fov - this.fov) > 1e-3) {
       cam.fov = this.fov;
       cam.updateProjectionMatrix();
@@ -238,6 +259,11 @@ export class Director {
 
     // 세로 화면에서는 코어 라벨이 장면 제목·수치와 겹치므로 숨긴다
     if (core.tag) core.tag.visible = cam.aspect >= 0.85 && id !== 'intelligence';
+    // 세로 화면의 오프닝·엔딩: 위쪽 가장자리에 걸리는 코어를 부드럽게 접어 드론에 집중
+    const hideCore = cam.aspect < 0.85 && (id === 'intro' || id === 'finale') && !this.trans;
+    this.coreK += ((hideCore ? 0 : 1) - this.coreK) * Math.min(1, dt * 2.5);
+    core.group.scale.setScalar(Math.max(0.001, this.coreK));
+    core.group.visible = this.coreK > 0.01;
 
     drone.update(dt, t);
     hangar.update(dt, t);
