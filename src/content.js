@@ -76,7 +76,7 @@ export const scenes = [
     kicker: 'GROUND MOBILITY — 자율주행 · 차량',
     title: ['GROUND', 'MOBILITY'],
     subtitle: '시뮬레이터에서 배우고, 실차에서 검증한다',
-    projects: ['airsim-driving', 'carla-e2e', 'av-competition', 'ros2-nav2', 'baja-ev-formula', 'manual-ev', 'ev-medical', 'ai-pedal-blackbox'],
+    projects: ['airsim-driving', 'av-competition', 'ros2-nav2', 'baja-ev-formula', 'manual-ev', 'ev-medical'],
   },
   {
     id: 'robotics',
@@ -88,7 +88,7 @@ export const scenes = [
     kicker: 'EMBODIED ROBOTICS — 로봇 · 임베디드',
     title: ['EMBODIED', 'ROBOTICS'],
     subtitle: '몸을 가진 지능을 설계한다',
-    projects: ['quadruped-robot', 'vision-robot-arm', 'robot-push-hackathon', 'iot-iv-pole', 'pressure-clicker', 'growth-footrest'],
+    projects: ['quadruped-robot', 'robot-push-hackathon', 'iot-iv-pole', 'pressure-clicker'],
   },
   {
     id: 'intelligence',
@@ -102,9 +102,9 @@ export const scenes = [
     subtitle: '보고, 이해하고, 정리하는 지능',
     stats: [
       { value: '전국 2위', label: 'HUSS AI 경진대회' },
-      { value: '33.7%', label: '증거 정리 속도 향상' },
+      { value: '33.7%', label: '작성·정리 속도 향상' },
     ],
-    projects: ['huss-evidence-ai', 'legal-ai-platform', 'factline', 'worker-posture-ios', 'gan-tts', 'ai-detector', 'ai-pose-guide'],
+    projects: ['huss-evidence-ai', 'legal-ai-platform', 'factline', 'worker-posture-ios', 'gan-tts', 'ai-detector'],
   },
   {
     id: 'loop',
@@ -115,7 +115,7 @@ export const scenes = [
     kicker: 'THE LOOP — PHYSICAL AI STACK',
     title: ['SENSE.', 'THINK.', 'ACT.'],
     lead:
-      '피지컬 AI는 하나의 루프입니다. 센서가 세상을 읽고, 모델이 판단하고, 액추에이터가 움직입니다. 드론·차량·로봇에서 이 루프를 직접 닫아 왔습니다.',
+      '피지컬 AI는 하나의 루프입니다. 센서가 세상을 읽고, 모델이 판단하고, 액추에이터가 움직입니다. 드론과 차량에서 이 루프를 직접 닫아 왔고, 이제 로봇으로 넓히고 있습니다.',
     loop: [
       { key: 'SENSE', ko: '인지', items: ['Camera · Vision', 'LiDAR · GPS · IMU', '압력 · 가스 · 온도 센서', 'ADC 수액 감지'] },
       { key: 'THINK', ko: '판단', items: ['YOLO · MoveNet', 'End-to-End Driving', 'Nav2 Path Planning', 'LLM · Generative AI'] },
@@ -145,7 +145,7 @@ export const scenes = [
       { year: '2025', title: '근거기반 지역문제 해결 캠프 in 강릉', grade: '대상 · 강릉시장 표창', link: 'coffee-box' },
       { year: '2025', title: '전주 청년 창업경진대회', grade: '최우수상 · 전북중기청장 표창', link: 'coffee-box' },
       { year: '2025', title: '국가우수 이공계 장학생', grade: '선정' },
-      { year: '2024', title: '자율주행 로봇제작·스마트 모빌리티 아이디어', grade: '우수상' },
+      { year: '2024', title: '자율주행 로봇제작·스마트 모빌리티 아이디어', grade: '우수상', link: 'ev-medical' },
       { year: '2023', title: 'Ticket to the Dream 해커톤 — 로봇', grade: '최우수상', link: 'robot-push-hackathon' },
       { year: '2023', title: 'ROS 기반 자율주행 자동차 경진대회', grade: '우수상' },
     ],
@@ -173,7 +173,7 @@ export const scenes = [
       ['Education', '원광대학교 컴퓨터소프트웨어공학과 · JST 공유대학 스마트모빌리티 SW공학과'],
       ['Labs', '인공지능 LLM 연구실 · 지능형 IoT 연구실'],
       ['Crew', '자작차 동아리 메카니즘 · Re:cap · 인퓨테크'],
-      ['On Location', '익산 · 전주 · 새만금 · 강릉 · 치앙마이'],
+      ['On Location', '익산 · 전주 · 강릉 · 경주 · 치앙마이'],
       ['Built with', 'Three.js · GSAP · Vite — on Vercel'],
     ],
     end: ['다음 장면은,', '함께 만들 차례입니다.'],

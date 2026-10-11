@@ -386,16 +386,19 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (url.pathname + url.search === location.pathname + location.search) return;
     // depth: 필름에서 몇 단계 들어왔는지(닫기 버튼이 필름으로 바로 돌아가도록)
     const depth = url.pathname === '/' ? 0 : current ? (history.state?.app ? history.state.depth : 1) + 1 : 1;
-    if (!current && url.pathname !== '/') filmOpener = document.activeElement;
-    if (replace) history.replaceState({ app: true, depth }, '', url.pathname + url.search);
-    else history.pushState({ app: true, depth }, '', url.pathname + url.search);
+    // fromFilm: 바로 앞 기록이 필름일 때만 닫기에서 history.back()을 쓴다
+    const fromFilm = !current && url.pathname !== '/';
+    if (fromFilm) filmOpener = document.activeElement;
+    const state = { app: true, depth, fromFilm };
+    if (replace) history.replaceState(state, '', url.pathname + url.search);
+    else history.pushState(state, '', url.pathname + url.search);
     apply(parse());
   }
 
   function close() {
     if (busy || backPending) return; // 두 번 눌러 포트폴리오 밖으로 나가지 않게
     // 필름에서 한 단계 들어왔다면 뒤로 가기, 아니면 필름으로 새로 이동
-    if (filmEntered && history.state?.depth === 1) {
+    if (filmEntered && history.state?.fromFilm) {
       backPending = true;
       setTimeout(() => (backPending = false), 1500);
       history.back();
@@ -437,7 +440,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     start(route) {
       if (route.name === 'film') return;
       // 바로 들어온 페이지도 깊이 1로 기록해 두면 그 안에서 이동한 뒤 닫기가 필름으로 간다
-      history.replaceState({ app: true, depth: 1 }, '', location.pathname + location.search);
+      history.replaceState({ app: true, depth: 1, fromFilm: false }, '', location.pathname + location.search);
       apply(route, { animate: false });
     },
     markFilm() {
