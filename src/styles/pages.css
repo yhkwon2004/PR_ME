@@ -1505,6 +1505,9 @@ body.page-open .title-card {
   .r-card {
     width: calc(var(--card-h) * 1.35);
   }
+  .reel-track {
+    gap: 12px;
+  }
   .reel .card-meta {
     display: none;
   }
@@ -1574,10 +1577,11 @@ body.page-open .title-card {
   justify-content: center;
 }
 .w-item {
-  width: var(--cw);
+  flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols) - 0.01px);
+  min-width: 0;
 }
 .w-item.is-wide {
-  width: calc(2 * var(--cw) + var(--gap));
+  flex-basis: calc(2 * (100% - (var(--cols) - 1) * var(--gap)) / var(--cols) + var(--gap) - 0.01px);
 }
 /* 'Works' 글자만으로 가운데를 맞추고 개수는 그 옆에 */
 .works-title sup {
@@ -1591,12 +1595,21 @@ body.page-open .title-card {
 }
 
 /* 상세 히어로: 글 높이만큼 사진 자리를 비운다 */
+.pg-detail .d-hero {
+  --hb: calc(2.4vh + 84px);
+}
+.pg-detail .d-hero-text {
+  bottom: var(--hb);
+}
+.pg-detail .d-one {
+  text-wrap: balance;
+}
 .pg-detail .d-hero-media img.is-contain {
-  padding-bottom: calc(max(9vh, 2.4vh + 80px) + var(--ht, 30vh) + 28px);
+  padding-bottom: calc(var(--ht, 30vh) + var(--hb) + 28px);
 }
 @media (max-width: 820px) {
-  .pg-detail .d-hero:not(.is-land) .d-hero-media img.is-contain {
-    padding-bottom: calc(9vh + var(--ht, 30vh) + 24px);
+  .pg-detail .d-hero {
+    --hb: 9vh;
   }
 }
 /* 글자 표지(사진 없는 프로젝트): 가운데, 조금 낮은 히어로 */
@@ -1620,19 +1633,20 @@ body.page-open .title-card {
   justify-content: center;
   gap: 0 18px;
 }
-.pg-detail .d-facts div {
+.pg-detail .d-facts > div {
   flex: 0 1 calc((100% - 54px) / 4);
-  min-width: 180px;
+  min-width: 160px;
   align-content: start;
 }
-.pg-detail .d-facts[data-n='3'] div,
-.pg-detail .d-facts[data-n='5'] div,
-.pg-detail .d-facts[data-n='6'] div {
+.pg-detail .d-facts:has(> div:nth-child(5)) > div {
   flex-basis: calc((100% - 36px) / 3);
 }
-.pg-detail .d-facts[data-n='1'] div,
-.pg-detail .d-facts[data-n='2'] div {
-  flex-basis: calc((100% - 18px) / 2);
+@media (max-width: 820px) {
+  .pg-detail .d-facts > div,
+  .pg-detail .d-facts:has(> div:nth-child(5)) > div {
+    flex-basis: calc((100% - 18px) / 2);
+    min-width: 0;
+  }
 }
 
 /* 스토리: 사진은 자르지 않고 실제 크기 이하로, 설명은 사진 아래 가운데 */
@@ -1647,7 +1661,7 @@ body.page-open .title-card {
 .pg-detail .st-media img {
   width: auto;
   max-width: 100%;
-  max-height: min(62vh, 680px);
+  max-height: min(66vh, 720px);
   margin-inline: auto;
   object-fit: contain;
 }
@@ -1669,7 +1683,7 @@ body.page-open .title-card {
   top: 7%;
   left: 10%;
   width: 80%;
-  height: 56%;
+  height: 50%;
   padding: 0;
 }
 .d-next-media .type-cover b {
@@ -1678,7 +1692,6 @@ body.page-open .title-card {
 
 /* 갤러리: 스토리 열과 같은 폭, 더 큰 사진 */
 .pg-detail .gal {
-  --row: 420px;
   max-width: calc(1120px + 2 * var(--pad));
 }
 .pg-detail .vid figcaption {
@@ -1689,6 +1702,15 @@ body.page-open .title-card {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+    max-width: 640px;
+  }
+  .pg-detail .gal-item img:not([data-kind='photo']) {
+    object-fit: contain;
+  }
+  .pg-detail .gal-item:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 4px);
   }
   .pg-detail .gal[data-n='1'] {
     grid-template-columns: 1fr;
@@ -1705,7 +1727,10 @@ body.page-open .title-card {
     object-fit: cover;
   }
   .d-next-media img.is-contain {
-    height: 52%;
+    height: 46%;
+  }
+  .pg-detail .st-media img {
+    max-height: 60vh;
   }
 }
 /* 휴대폰: 출처 링크를 같은 폭의 목록으로 */

@@ -346,6 +346,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
       c.scrollTop = 0;
       c.dispatchEvent(new Event('scroll'));
     });
+    // 등장 트윈(y 이동)이 끝난 뒤 다시 재야 시트 끝 여부가 정확하다
+    tl.call(() => el.querySelectorAll('.stage-foot').forEach((c) => c.dispatchEvent(new Event('scroll'))));
 
     if (el.dataset.scene === 'finale') runCredits(el, delay);
   }

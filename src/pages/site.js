@@ -38,7 +38,8 @@ function img(im, { cls = '', eager = false, full = false, sizes = '' } = {}) {
   if (!im) return '';
   const w = im.w || 1600;
   const tw = im.w && im.h ? Math.round(im.w * Math.min(1, 720 / Math.max(im.w, im.h))) : 720;
-  return `<img class="${cls}" data-kind="${esc(im.kind || 'photo')}" src="${esc(full ? im.src : im.thumb)}" ${full ? '' : `srcset="${esc(im.thumb)} ${tw}w, ${esc(im.src)} ${w}w" sizes="${sizes || '(max-width: 820px) 100vw, 50vw'}"`} alt="${esc(im.caption)}" width="${im.w || ''}" height="${im.h || ''}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`;
+  const set = `${tw < w ? `${esc(im.thumb)} ${tw}w, ` : ''}${esc(im.src)} ${w}w`;
+  return `<img class="${cls}" data-kind="${esc(im.kind || 'photo')}" src="${esc(full ? im.src : im.thumb)}" ${full ? '' : `srcset="${set}" sizes="${sizes || '(max-width: 820px) 100vw, 50vw'}"`} alt="${esc(im.caption)}" width="${im.w || ''}" height="${im.h || ''}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`;
 }
 
 export function projectCard(p, i, { cls = 'card' } = {}) {
@@ -158,7 +159,7 @@ function detailPage(p) {
     <section class="d-intro reveal">
       <p class="d-summary">${esc(p.summary)}</p>
       ${p.metrics.length ? `<dl class="d-metrics">${p.metrics.map((m) => `<div><dd>${esc(m.value)}</dd><dt>${esc(m.label)}</dt></div>`).join('')}</dl>` : ''}
-      ${facts.length ? `<dl class="d-facts" data-n="${facts.length}">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
+      ${facts.length ? `<dl class="d-facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
     </section>
 
     ${
@@ -358,6 +359,8 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       if (heroMedia.length && !reducedMotion) gsap.fromTo(heroMedia, { scale: 1.12 }, { scale: 1, duration: 2.2, ease: 'expo.out' });
       fitHero();
       document.fonts?.ready.then(fitHero);
+      const heroText = page.querySelector('.d-hero-text');
+      if (heroText && 'ResizeObserver' in window) new ResizeObserver(fitHero).observe(heroText);
       gsap.fromTo(page.querySelectorAll('.d-hero-text > *'), { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.08, ease: 'expo.out', delay: 0.25 });
     }
     page.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', close));

@@ -16,7 +16,7 @@ function scrollableAncestor(el, dir) {
 // 가로로 스크롤 가능한 조상(프로젝트 릴)
 function scrollableX(el) {
   while (el && el !== document.body) {
-    if (el.scrollWidth > el.clientWidth + 2 && /(auto|scroll)/.test(getComputedStyle(el).overflowX)) return el;
+    if (el.scrollWidth > el.clientWidth + 4 && /(auto|scroll)/.test(getComputedStyle(el).overflowX)) return el;
     el = el.parentElement;
   }
   return null;
