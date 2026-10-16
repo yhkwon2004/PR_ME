@@ -52,6 +52,7 @@ function render(scene, i) {
       <div class="reel panel-content" data-r>
         <div class="reel-bar">
           <span class="reel-count">${pad(list.length)} PROJECTS</span>
+          ${scene.stats ? `<span class="reel-stats">${scene.stats.map((s) => `${esc(s.value)} ${esc(s.label)}`).join(' · ')}</span>` : ''}
           <a class="reel-all" href="/works?c=${esc([...new Set(list.map((p) => p.category))].join(','))}" data-link>VIEW ALL ↗</a>
           <span class="reel-nav"><button type="button" data-reel="-1" aria-label="이전 프로젝트">←</button><button type="button" data-reel="1" aria-label="다음 프로젝트">→</button></span>
         </div>

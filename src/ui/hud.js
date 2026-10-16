@@ -147,6 +147,7 @@ export function createCursor() {
   const cur = { x: pos.x, y: pos.y };
   let label = null;
   addEventListener('pointermove', (e) => {
+    document.body.classList.add('has-pointer');
     pos.x = e.clientX;
     pos.y = e.clientY;
     const interactive = e.target.closest?.('a, button, [data-media]');

@@ -605,6 +605,7 @@ body.is-started .hud-bottom {
   opacity: 0.75;
 }
 .hint {
+  pointer-events: none; /* 장식용 안내 — 아래쪽 가운데의 버튼·카드 클릭을 가로채지 않게 */
   position: fixed;
   left: 50%;
   bottom: calc(var(--bottom) + 18px);
@@ -625,6 +626,7 @@ body.is-started[data-scene='intro'] .hint {
 }
 .hint.is-gone {
   opacity: 0 !important;
+  visibility: hidden;
 }
 .hint-mouse {
   width: 16px;
@@ -1286,7 +1288,8 @@ body.is-started[data-scene='intro'] .hint {
 }
 .credits {
   position: absolute;
-  inset: var(--top) 0 calc(var(--bottom) + 64px);
+  /* 위: 가운데 SKIP 버튼 아래에서 시작 · 아래: 착륙 패드 위에서 끝 */
+  inset: calc(var(--top) + 56px) 0 calc(var(--bottom) + 20vh);
   overflow: hidden;
   -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
   mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
@@ -1352,7 +1355,7 @@ body.is-started[data-scene='intro'] .hint {
   z-index: 2;
   left: 50%;
   transform: translateX(-50%);
-  bottom: calc(var(--bottom) + 14px);
+  top: calc(var(--top) + 6px);
   min-height: 40px;
   font-family: var(--mono);
   font-size: 11px;
@@ -1519,7 +1522,7 @@ body.is-started[data-scene='intro'] .hint {
   opacity: 0;
   transition: opacity 0.4s;
 }
-body.is-started .cursor {
+body.is-started.has-pointer .cursor {
   opacity: 1;
 }
 .cursor i {
@@ -2069,6 +2072,12 @@ body.is-started .cursor {
 
 /* 가로로 눕힌 휴대폰(높이가 낮은 화면): 제목은 위, 카드는 아래, 가운데는 피사체 */
 @media (max-height: 500px) and (orientation: landscape) {
+  .endcard::before {
+    inset: 0;
+  }
+  .contact b {
+    font-size: 12px;
+  }
   :root {
     --top: 52px;
     --bottom: 46px;
@@ -2077,7 +2086,8 @@ body.is-started .cursor {
   /* 부팅 화면: 시작 버튼이 첫 화면에 보이도록 */
   #boot {
     overflow-y: auto;
-    place-items: start center;
+    place-items: safe center;
+    padding-block: 12px;
   }
   .boot-frame {
     padding: 18px 24px;
@@ -2250,19 +2260,33 @@ body.is-started .cursor {
   }
   .contact {
     margin-top: 12px;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(5, auto);
   }
   .contact li:first-child {
     grid-column: auto;
   }
   .contact a {
-    padding: 8px 10px 9px;
+    padding: 8px 8px 9px;
   }
   .endcard-actions {
     margin-top: 10px;
   }
   .credits {
     bottom: calc(var(--bottom) + 52px);
+  }
+}
+
+/* 낮은 데스크톱(1280×720 등): 수상 카드를 한 줄로 줄여 가운데 띠(3D 막대)를 넓힌다 */
+@media (max-height: 760px) and (min-width: 821px) {
+  .stage .highlights li,
+  .stage .highlights li a {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'year title grade';
+    align-items: center;
+  }
+  .stage .highlights li:not(:has(a)),
+  .stage .highlights li a {
+    padding: 7px 12px;
   }
 }
 

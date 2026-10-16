@@ -122,13 +122,25 @@
   font-size: 10.5px;
   letter-spacing: 0.14em;
 }
+.reel-count,
+.reel-all,
+.reel-stats {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(5, 7, 12, 0.66);
+  backdrop-filter: blur(6px);
+}
 .reel-count {
   color: var(--cyan);
 }
 .reel-all {
   color: var(--fg);
-  border-bottom: 1px solid var(--orange);
-  padding-bottom: 2px;
+  box-shadow: inset 0 -1px 0 var(--orange);
+}
+/* 낮은 데스크톱에서만 보이는 한 줄 수치(제목 아래 칩 대신) */
+.reel-stats {
+  display: none;
+  color: var(--fg-2);
 }
 .reel-all:hover {
   color: var(--orange);
@@ -260,6 +272,11 @@
   transform: none;
   background: var(--orange);
   color: #120600;
+}
+.card-meta > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .card-meta {
   display: flex;
@@ -1114,6 +1131,7 @@ body.page-open .title-card {
 
 /* 상세: 히어로 */
 .pg-detail .d-hero-text {
+  bottom: max(9vh, calc(2.4vh + 80px));
   left: var(--pad);
   right: var(--pad);
   margin: 0 auto;
@@ -1276,6 +1294,11 @@ body.page-open .title-card {
   }
 }
 @media (max-height: 760px) and (min-width: 821px) {
+  .reel .card-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .reel-head .title {
     font-size: clamp(36px, 4vw, 64px);
   }
@@ -1446,7 +1469,12 @@ body.page-open .title-card {
   .btn-quiet::after {
     content: '';
     position: absolute;
-    inset: -12px -6px;
+    inset: -13px -7px;
+  }
+  .pg-brand::after {
+    content: '';
+    position: absolute;
+    inset: -5px 0;
   }
   .pg-back {
     padding: 12px 16px;
@@ -1461,6 +1489,15 @@ body.page-open .title-card {
 
 /* 가로로 눕힌 휴대폰(높이가 낮은 화면) */
 @media (max-height: 500px) and (orientation: landscape) {
+  .hud-nav a {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+  .d-scroll {
+    display: none;
+  }
   /* 릴: 낮고 넓은 카드 한 줄 — 제목과 피사체를 가리지 않게 */
   .reel {
     --card-h: 92px;
@@ -1516,6 +1553,16 @@ body.page-open .title-card {
   }
   .chips button {
     flex: none;
+  }
+}
+
+/* 낮은 데스크톱: 제목 아래 수치 칩을 걷고 릴 막대 안 한 줄로 — 가운데 띠를 3D 피사체에 */
+@media (max-height: 900px) and (min-width: 821px) {
+  .reel-head .mini-stats {
+    display: none;
+  }
+  .reel-stats {
+    display: inline-block;
   }
 }
 

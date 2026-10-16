@@ -377,8 +377,8 @@ export class GroundSet {
     tag.scale.set(3.2, 0.69, 1);
     tag.position.set(-w / 2 + 1.5, -h / 2 - 0.5, 0);
     frame.add(tag);
-    frame.position.set(-3.5, 3.6, -8.6);
-    frame.rotation.y = 0.32;
+    frame.position.set(6, 2.4, -9);
+    frame.rotation.y = 0.3;
     this.group.add(frame);
     this.screen = frame;
   }

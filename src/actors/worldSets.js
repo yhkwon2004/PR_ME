@@ -34,9 +34,12 @@ export class HangarSet {
     floor.scale.setScalar(2.2);
     floor.position.set(0, 0.03, -4.6);
     this.group.add(floor);
+    this.floor = floor;
+    this.floorLevel = 1;
     this.coneLevel = 0;
   }
   update(dt, t) {
+    this.floor.material.opacity += (this.floorLevel - this.floor.material.opacity) * Math.min(1, dt * 2);
     this.markers.forEach((m, i) => m.scale.setScalar(0.6 + 0.6 * Math.max(0, Math.sin(t * 3 - i * 0.5))));
     this.cone.material.uniforms.uOpacity.value = 0.2 * this.coneLevel;
   }
@@ -132,8 +135,11 @@ export class AerialSet {
     floor.scale.setScalar(3);
     floor.position.set(0, 0.03, 10.2);
     this.group.add(floor);
+    this.floor = floor;
+    this.floorLevel = 1;
   }
   update(dt, t, droneU) {
+    this.floor.material.opacity += (this.floorLevel - this.floor.material.opacity) * Math.min(1, dt * 2);
     this.pathMat.uniforms.uTime.value = t;
     this.pathMat.uniforms.uHead.value = droneU;
     this.wpRings.forEach((r, i) => {
