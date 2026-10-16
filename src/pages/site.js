@@ -36,7 +36,9 @@ function typeCover(p, cls = '') {
 
 function img(im, { cls = '', eager = false, full = false, sizes = '' } = {}) {
   if (!im) return '';
-  return `<img class="${cls}" data-kind="${esc(im.kind || 'photo')}" src="${esc(full ? im.src : im.thumb)}" ${full ? '' : `srcset="${esc(im.thumb)} 720w, ${esc(im.src)} 1600w" sizes="${sizes || '(max-width: 820px) 100vw, 50vw'}"`} alt="${esc(im.caption)}" width="${im.w || ''}" height="${im.h || ''}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`;
+  const w = im.w || 1600;
+  const tw = im.w && im.h ? Math.round(im.w * Math.min(1, 720 / Math.max(im.w, im.h))) : 720;
+  return `<img class="${cls}" data-kind="${esc(im.kind || 'photo')}" src="${esc(full ? im.src : im.thumb)}" ${full ? '' : `srcset="${esc(im.thumb)} ${tw}w, ${esc(im.src)} ${w}w" sizes="${sizes || '(max-width: 820px) 100vw, 50vw'}"`} alt="${esc(im.caption)}" width="${im.w || ''}" height="${im.h || ''}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`;
 }
 
 export function projectCard(p, i, { cls = 'card' } = {}) {
@@ -142,13 +144,13 @@ function detailPage(p) {
   const showGallery = rest.length > 0;
   return `<article class="pg pg-detail" data-cat="${esc(p.category)}">
     ${bar({ href: '/works', label: 'WORKS' })}
-    <section class="d-hero${p.cover && p.cover.ratio >= 0.9 ? ' is-land' : ''}" style="--ar:${(p.cover?.ratio || 1).toFixed(3)}">
+    <section class="d-hero${p.cover && p.cover.ratio >= 0.9 ? ' is-land' : ''}${p.cover ? '' : ' is-type'}" style="--ar:${(p.cover?.ratio || 1).toFixed(3)}">
       <div class="d-hero-media">${p.cover ? media(p.cover, { eager: true, full: true }) : typeCover(p, 'is-hero')}</div>
       <div class="d-hero-text">
         <p class="d-cat"><span>${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}<span>${pad(i + 1)} / ${pad(projects.length)}</span></p>
         <h1 class="d-title">${esc(p.title)}</h1>
         ${p.titleEn && p.cover ? `<p class="d-en">${esc(p.titleEn)}</p>` : ''}
-        <p class="d-one">${esc(p.oneLiner)}</p>
+        ${p.cover ? `<p class="d-one">${esc(p.oneLiner)}</p>` : ''}
       </div>
       <span class="d-scroll" aria-hidden="true">SCROLL</span>
     </section>
@@ -156,7 +158,7 @@ function detailPage(p) {
     <section class="d-intro reveal">
       <p class="d-summary">${esc(p.summary)}</p>
       ${p.metrics.length ? `<dl class="d-metrics">${p.metrics.map((m) => `<div><dd>${esc(m.value)}</dd><dt>${esc(m.label)}</dt></div>`).join('')}</dl>` : ''}
-      ${facts.length ? `<dl class="d-facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
+      ${facts.length ? `<dl class="d-facts" data-n="${facts.length}">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
     </section>
 
     ${
@@ -164,7 +166,7 @@ function detailPage(p) {
         ? `<section class="d-story">${story
             .map(
               (s, k) => `<div class="st-row${s.img ? '' : ' no-img'} reveal">
-                ${s.img ? `<button type="button" class="st-media" data-gallery="${gallery.indexOf(s.img)}" aria-label="${esc(s.img.caption)} 크게 보기">${img(s.img, { sizes: '(max-width: 820px) 100vw, 58vw' })}<span class="st-cap">${esc(s.img.caption)}</span></button>` : ''}
+                ${s.img ? `<button type="button" class="st-media" data-gallery="${gallery.indexOf(s.img)}" aria-label="${esc(s.img.caption)} 크게 보기">${img(s.img, { sizes: `(max-width: 820px) 100vw, ${Math.min(1120, s.img.w || 1120)}px` })}<span class="st-cap">${esc(s.img.caption)}</span></button>` : ''}
                 <div class="st-text"><span class="st-label">${pad(k + 1)} — ${esc(s.label)}</span><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>
               </div>`
             )
@@ -229,7 +231,14 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   let pendingPop = false; // 커튼이 도는 동안 들어온 popstate
   let filmOpener = null; // 필름에서 페이지를 연 요소(닫으면 포커스를 돌려준다)
 
+  // 히어로 글 높이만큼 위쪽 사진의 자리를 비운다(제목이 두 줄이 되어도 겹치지 않게)
+  const fitHero = () => {
+    const hero = page.querySelector('.d-hero');
+    const text = page.querySelector('.d-hero-text');
+    if (hero && text) hero.style.setProperty('--ht', `${text.offsetHeight}px`);
+  };
   addEventListener('resize', () => {
+    fitHero();
     const grid = page.querySelector('.works-grid');
     if (!grid) return;
     const cols = parseInt(getComputedStyle(grid).getPropertyValue('--cols'), 10);
@@ -347,6 +356,8 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       );
       const heroMedia = page.querySelectorAll('.d-hero-media > *');
       if (heroMedia.length && !reducedMotion) gsap.fromTo(heroMedia, { scale: 1.12 }, { scale: 1, duration: 2.2, ease: 'expo.out' });
+      fitHero();
+      document.fonts?.ready.then(fitHero);
       gsap.fromTo(page.querySelectorAll('.d-hero-text > *'), { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.08, ease: 'expo.out', delay: 0.25 });
     }
     page.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', close));

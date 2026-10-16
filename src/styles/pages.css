@@ -1566,3 +1566,159 @@ body.page-open .title-card {
   }
 }
 
+/* ── 가운데 축 다듬기(페이지 리뷰 반영) ─────────── */
+/* 아카이브: 마지막 줄·필터 결과도 가운데로(줄 구성은 layoutGrid와 같다) */
+.works-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.w-item {
+  width: var(--cw);
+}
+.w-item.is-wide {
+  width: calc(2 * var(--cw) + var(--gap));
+}
+/* 'Works' 글자만으로 가운데를 맞추고 개수는 그 옆에 */
+.works-title sup {
+  position: absolute;
+}
+@media (min-width: 600px) and (max-width: 820px) {
+  .works-head .chips {
+    max-width: 440px;
+    margin-inline: auto;
+  }
+}
+
+/* 상세 히어로: 글 높이만큼 사진 자리를 비운다 */
+.pg-detail .d-hero-media img.is-contain {
+  padding-bottom: calc(max(9vh, 2.4vh + 80px) + var(--ht, 30vh) + 28px);
+}
+@media (max-width: 820px) {
+  .pg-detail .d-hero:not(.is-land) .d-hero-media img.is-contain {
+    padding-bottom: calc(9vh + var(--ht, 30vh) + 24px);
+  }
+}
+/* 글자 표지(사진 없는 프로젝트): 가운데, 조금 낮은 히어로 */
+.type-cover.is-hero {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: calc(var(--top) + 20px) var(--pad) calc(var(--ht, 30vh) + 12vh);
+}
+.d-hero.is-type {
+  height: 78svh;
+}
+.type-cover.is-hero b {
+  font-size: clamp(44px, 7.4vw, 140px);
+}
+
+/* 정보 표: 칸 수에 맞춰 가운데로 균형 있게(5개 → 3 + 2) */
+.pg-detail .d-facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 18px;
+}
+.pg-detail .d-facts div {
+  flex: 0 1 calc((100% - 54px) / 4);
+  min-width: 180px;
+  align-content: start;
+}
+.pg-detail .d-facts[data-n='3'] div,
+.pg-detail .d-facts[data-n='5'] div,
+.pg-detail .d-facts[data-n='6'] div {
+  flex-basis: calc((100% - 36px) / 3);
+}
+.pg-detail .d-facts[data-n='1'] div,
+.pg-detail .d-facts[data-n='2'] div {
+  flex-basis: calc((100% - 18px) / 2);
+}
+
+/* 스토리: 사진은 자르지 않고 실제 크기 이하로, 설명은 사진 아래 가운데 */
+.pg-detail .st-row,
+.pg-detail .st-row:nth-child(even) {
+  padding: 5vh var(--pad);
+  gap: 20px;
+}
+.pg-detail .st-media {
+  background: transparent;
+}
+.pg-detail .st-media img {
+  width: auto;
+  max-width: 100%;
+  max-height: min(62vh, 680px);
+  margin-inline: auto;
+  object-fit: contain;
+}
+.pg-detail .st-cap {
+  position: static;
+  display: block;
+  max-width: none;
+  margin-top: 10px;
+  padding: 0;
+  background: none;
+  backdrop-filter: none;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* 다음 프로젝트: 저해상도·세로 표지도 넉넉한 크기로 */
+.d-next-media img.is-contain {
+  position: absolute;
+  top: 7%;
+  left: 10%;
+  width: 80%;
+  height: 56%;
+  padding: 0;
+}
+.d-next-media .type-cover b {
+  display: none;
+}
+
+/* 갤러리: 스토리 열과 같은 폭, 더 큰 사진 */
+.pg-detail .gal {
+  --row: 420px;
+  max-width: calc(1120px + 2 * var(--pad));
+}
+.pg-detail .vid figcaption {
+  text-align: center;
+}
+@media (max-width: 820px) {
+  .pg-detail .gal {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .pg-detail .gal[data-n='1'] {
+    grid-template-columns: 1fr;
+  }
+  .pg-detail .gal-item {
+    width: auto;
+    aspect-ratio: 4 / 5;
+  }
+  .pg-detail .gal[data-n='1'] .gal-item {
+    aspect-ratio: var(--ar);
+    max-width: none;
+  }
+  .pg-detail .gal-item img {
+    object-fit: cover;
+  }
+  .d-next-media img.is-contain {
+    height: 52%;
+  }
+}
+/* 휴대폰: 출처 링크를 같은 폭의 목록으로 */
+@media (max-width: 599px) {
+  .pg-detail .d-links ul {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .pg-detail .d-links a {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
