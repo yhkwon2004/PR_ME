@@ -4,6 +4,7 @@ import '@fontsource/jetbrains-mono/600.css';
 import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import './styles/main.css';
 import './styles/pages.css';
+import './styles/premium.css';
 
 import * as THREE from 'three';
 import gsap from 'gsap';
@@ -19,10 +20,12 @@ import { createPanels } from './ui/panels.js';
 import { createHud, createCursor } from './ui/hud.js';
 import { createInput } from './ui/input.js';
 import { createLightbox } from './ui/lightbox.js';
+import { bindCardFx } from './ui/cards.js';
 import { createAudio } from './audio.js';
 import { createSite } from './pages/site.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+bindCardFx({ reducedMotion: reduced });
 const canvas = document.getElementById('gl');
 const $ = (id) => document.getElementById(id);
 

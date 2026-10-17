@@ -14,7 +14,7 @@ const SHOTS = {
   robotics: { pos: add(SETS.robotics, 0.175, 7.525, 14.975), target: add(SETS.robotics, 0.3, 0.9, -0.9), fov: 40, shift: [0, 0.18] },
   intelligence: { pos: add(SETS.core, 19.8, 3.24, 31.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [0, 0.11] },
   loop: { pos: V(0, 44, 50), target: V(0, 1, -6), fov: 44, shift: [0, -0.03] },
-  record: { pos: add(SETS.record, -1.73, 6.05, 20.13), target: add(SETS.record, 0, 2.6, 0), fov: 40, shift: [0, 0.045] },
+  record: { pos: add(SETS.record, -1.73, 6.05, 20.13), target: add(SETS.record, 0, 2.6, 0), fov: 40, shift: [0, 0.1] },
   finale: { pos: add(SETS.hangar, 0, 7.5, 17), target: add(SETS.hangar, 0, 2.8, -4), fov: 40, shift: [0, -0.085] },
 };
 
@@ -92,6 +92,9 @@ export class Director {
       const back = pos.clone().sub(target).multiplyScalar(1.15);
       pos.copy(target).add(back);
       shift.x *= 0.7;
+    } else if (id === 'record' && (innerHeight < 900 || aspect > 1.9)) {
+      // 낮은 화면: 적층 막대가 위쪽 수치 띠로 올라가지 않게
+      shift.y = 0.055;
     }
     return { pos, target, fov, shift };
   }

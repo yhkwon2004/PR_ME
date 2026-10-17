@@ -1,7 +1,9 @@
 import gsap from 'gsap';
 import { profile } from '../content.js';
 import { byId } from '../data/projects.js';
-import { projectCard } from '../pages/site.js';
+import { AWARD_REEL } from '../data/awards.js';
+import { ORGS, CREDITS } from '../data/orgs.js';
+import { projectCard, awardCard, orgMark } from '../pages/site.js';
 
 // 빈 선택자에 대한 GSAP 경고를 피한다
 const has = (t) => t && (t.length === undefined || t.length > 0);
@@ -87,7 +89,12 @@ function render(scene, i) {
           <p class="credits-kicker">${esc(scene.kicker)}</p>
           <p class="credits-title">PHYSICAL AI<br /><span>a portfolio film</span></p>
           ${scene.credits
-            .map(([r, n]) => `<div class="credit"><span>${esc(r)}</span><b>${n.split(' · ').map((x) => `<span class="nw">${esc(x)}</span>`).join(' · ')}</b></div>`)
+            .map(([r, n]) =>
+              n === null
+                ? // 영화 엔딩처럼 함께한 학교 · 상을 준 곳 · 협업 기관의 로고
+                  `<div class="credit credit-logos"><span>${esc(r)}</span><ul>${CREDITS.map((k) => `<li>${orgMark(ORGS[k])}</li>`).join('')}</ul></div>`
+                : `<div class="credit"><span>${esc(r)}</span><b>${n.split(' · ').map((x) => `<span class="nw">${esc(x)}</span>`).join(' · ')}</b></div>`
+            )
             .join('')}
           <p class="credits-thanks">감사합니다</p>
         </div>
@@ -134,13 +141,25 @@ function render(scene, i) {
         .join('')}</ol>`;
     if (scene.timeline)
       foot += `<ol class="mini-timeline" data-r>${scene.timeline.map(([y, t]) => `<li><b>${esc(y)}</b><span>${esc(t)}</span></li>`).join('')}</ol>`;
-    return `<div class="stage">
+    // 수상 릴: 프로젝트 사진 위에 상장을 얹은 카드
+    const reel = scene.awardReel
+      ? `<div class="reel aw-reel panel-content" data-r>
+        <div class="reel-bar">
+          <span class="reel-count">${pad(AWARD_REEL.length)} PROJECT AWARDS</span>
+          <a class="reel-all" href="/awards" data-link>ALL AWARDS ↗</a>
+          <span class="reel-nav"><button type="button" data-reel="-1" aria-label="이전 수상">←</button><button type="button" data-reel="1" aria-label="다음 수상">→</button></span>
+        </div>
+        <div class="reel-track">${AWARD_REEL.map(awardCard).join('')}</div>
+      </div>`
+      : '';
+    return `<div class="stage${reel ? ' has-reel' : ''}">
       <div class="stage-head panel-content">
         ${kicker(scene, i)}
         <h2 class="title${scene.titleKo ? ' title-ko' : ''}">${lines(scene.title)}</h2>
         ${head}
       </div>
-      <div class="stage-foot panel-content">${foot}</div>
+      ${foot ? `<div class="stage-foot panel-content">${foot}</div>` : ''}
+      ${reel}
     </div>`;
   }
   // split-left / split-right

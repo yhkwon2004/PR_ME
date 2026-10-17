@@ -25,6 +25,10 @@
   ],
   "rewrites": [
     {
+      "source": "/awards",
+      "destination": "/index.html"
+    },
+    {
       "source": "/works",
       "destination": "/index.html"
     },

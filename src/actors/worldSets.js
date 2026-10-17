@@ -3,6 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mats, glow, COLORS } from '../core/materials.js';
 import { makeLabel, makeFloorText } from '../core/labels.js';
 import { lightCone } from '../core/stage.js';
+import awardData from '../data/awards.json';
 
 // ── 00 격납고: 착륙 패드 + 스포트라이트 ─────────────────────────
 export class HangarSet {
@@ -333,7 +334,8 @@ export class RecordSet {
   constructor(center) {
     this.group = new THREE.Group();
     this.group.position.copy(center);
-    this.years = [['2023', 7], ['2024', 15], ['2025', 14], ['2026', 1]];
+    // 수상 아카이브(awards.json)와 같은 연도별 수 — 화면의 '수상 기록' 수치와 합이 같다
+    this.years = ['2023', '2024', '2025', '2026'].map((y) => [y, awardData.filter((a) => a.date.startsWith(y)).length]);
     this.total = this.years.reduce((s, y) => s + y[1], 0);
     const geo = new RoundedBoxGeometry(1.4, 0.13, 1.4, 2, 0.03);
     const mat = new THREE.MeshStandardMaterial({ color: 0xa9b4c0, metalness: 0.45, roughness: 0.4, emissive: new THREE.Color(COLORS.cyan), emissiveIntensity: 0.03 });
@@ -350,7 +352,7 @@ export class RecordSet {
       const cap = new THREE.Mesh(new THREE.BoxGeometry(1.44, 0.02, 1.44), glow(i === 2 ? COLORS.orange : COLORS.cyan, 3));
       cap.userData = { col: i, top: 0.12 + (count - 1) * 0.2 + 0.075 };
       this.group.add(cap);
-      const tag = makeLabel([`${count}`, `awards · ${y}`], { width: 280, height: 120, size: 44, bg: null, border: false, color: i === 2 ? '#ff8a40' : '#5ef2ff' });
+      const tag = makeLabel([`${count}`, `${count === 1 ? 'award' : 'awards'} · ${y}`], { width: 280, height: 120, size: 44, bg: null, border: false, color: i === 2 ? '#ff8a40' : '#5ef2ff' });
       tag.scale.multiplyScalar(1.7);
       tag.userData = { col: i, top: cap.userData.top + 0.7 };
       this.group.add(tag);

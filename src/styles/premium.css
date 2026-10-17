@@ -1,0 +1,1059 @@
+/* ── 프리미엄 타일 · 상장 · 기관 로고 ───────────────
+   pages.css 다음에 읽어 카드 표현을 덮어쓴다. */
+
+/* 등급 색: 대상 · 최우수상 · 우수상 · 장려상 · 그 밖 */
+[data-tier='grand'] { --tc: #f4cf73; }
+[data-tier='gold'] { --tc: #eadbb0; }
+[data-tier='silver'] { --tc: #cdd6e2; }
+[data-tier='bronze'] { --tc: #dca77f; }
+[data-tier='merit'] { --tc: #a7b8cb; }
+
+.laurel {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+/* ── 프로젝트 타일: 사진 위에 글을 얹은 시네마 플레이트 ── */
+.r-card,
+.w-card {
+  --cr: 14px;
+  position: relative;
+  display: block;
+  border-radius: var(--cr);
+  container-type: inline-size;
+  -webkit-tap-highlight-color: transparent;
+}
+.r-card:focus-visible,
+.w-card:focus-visible {
+  outline: 2px solid var(--cc, var(--cyan));
+  outline-offset: 4px;
+}
+.r-card .card-media,
+.w-card .card-media {
+  isolation: isolate;
+  border: 0;
+  border-radius: var(--cr);
+  background: #080b11;
+  box-shadow: 0 22px 44px -26px rgba(0, 0, 0, 0.95);
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.6s var(--ease), box-shadow 0.5s;
+}
+.r-card.is-tilt .card-media,
+.w-card.is-tilt .card-media {
+  transition: transform 0.12s linear, box-shadow 0.5s;
+}
+/* 머리카락 굵기의 테두리 — 사진 위에 얹어 늘 보이게 */
+.r-card .card-media::after,
+.w-card .card-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.07), transparent 28%);
+  pointer-events: none;
+  transition: border-color 0.45s;
+}
+.r-card:hover .card-media,
+.w-card:hover .card-media,
+.r-card:focus-visible .card-media,
+.w-card:focus-visible .card-media {
+  box-shadow:
+    0 28px 60px -24px color-mix(in srgb, var(--cc, var(--cyan)) 42%, transparent),
+    0 22px 44px -26px rgba(0, 0, 0, 0.95);
+}
+.r-card:hover .card-media::after,
+.w-card:hover .card-media::after,
+.r-card:focus-visible .card-media::after,
+.w-card:focus-visible .card-media::after {
+  border-color: color-mix(in srgb, var(--cc, var(--cyan)) 70%, transparent);
+}
+.r-card .card-media > img:not(.blur-fill),
+.w-card .card-media > img:not(.blur-fill) {
+  transform: scale(1.03);
+  filter: saturate(0.9) brightness(0.9);
+  transition: transform 1.2s var(--ease), filter 0.6s;
+}
+.r-card:hover .card-media > img:not(.blur-fill),
+.w-card:hover .card-media > img:not(.blur-fill),
+.r-card:focus-visible .card-media > img:not(.blur-fill),
+.w-card:focus-visible .card-media > img:not(.blur-fill) {
+  transform: scale(1.08);
+  filter: none;
+}
+/* 캡처·도표는 글 자리 위쪽에 잘리지 않게(위·아래 여백은 카드 높이 기준) */
+.r-card .card-media img.is-contain,
+.w-card .card-media img.is-contain {
+  position: absolute;
+  top: 13%;
+  left: 8%;
+  width: 84%;
+  height: 40%;
+  padding: 0;
+}
+.r-card .card-media .type-cover,
+.w-card .card-media .type-cover {
+  justify-content: flex-start;
+  padding: 44px 14px 14px;
+}
+.r-card .card-media .type-cover .tc-cat,
+.r-card .card-media .type-cover .tc-year,
+.w-card .card-media .type-cover .tc-cat,
+.w-card .card-media .type-cover .tc-year {
+  display: none;
+}
+.card-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 6, 10, 0.74) 0%,
+    rgba(4, 6, 10, 0) 30%,
+    rgba(4, 6, 10, 0) 40%,
+    rgba(4, 6, 10, 0.72) 68%,
+    rgba(4, 6, 10, 0.96) 100%
+  );
+  pointer-events: none;
+}
+/* 포인터를 따라 표면을 훑는 빛 */
+.card-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: radial-gradient(circle at var(--mx, 30%) var(--my, 0%), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 52%);
+  opacity: 0;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+.r-card:hover .card-glare,
+.w-card:hover .card-glare,
+.aw-card:hover .card-glare {
+  opacity: 1;
+}
+.card-top {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  left: 13px;
+  right: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+.card-top .card-no {
+  color: var(--cc, var(--orange));
+}
+.card-top .card-cat::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 7px 1px 0;
+  border-radius: 50%;
+  background: var(--cc, var(--cyan));
+  box-shadow: 0 0 8px var(--cc, var(--cyan));
+  vertical-align: middle;
+}
+/* 수상 배지 */
+.card-award {
+  position: absolute;
+  z-index: 3;
+  top: 9px;
+  right: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px 4px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--tc, #f4cf73);
+  background: rgba(12, 10, 6, 0.66);
+  border: 1px solid color-mix(in srgb, var(--tc, #f4cf73) 55%, transparent);
+  box-shadow: 0 0 22px -8px var(--tc, #f4cf73);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+.card-award small {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 400;
+  opacity: 0.8;
+}
+.r-card .card-top:has(+ .card-award) .card-cat,
+.w-card .card-top:has(+ .card-award) .card-cat {
+  /* 좁은 카드에서 분야 이름이 배지와 겹치지 않게 */
+  max-width: calc(100% - 118px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 아래 글: 연도 · 제목 · (넓을 때 호버하면) 한 줄 소개 */
+.card-cap {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 14px 15px 14px;
+  text-align: left;
+  pointer-events: none;
+}
+.card-cap::before {
+  content: '';
+  width: 22px;
+  height: 2px;
+  margin-bottom: 4px;
+  background: var(--cc, var(--cyan));
+  transition: width 0.5s var(--ease);
+}
+.r-card:hover .card-cap::before,
+.w-card:hover .card-cap::before {
+  width: 46px;
+}
+.r-card .card-meta,
+.w-card .card-meta {
+  display: block;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(238, 242, 247, 0.62);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.r-card .card-title,
+.w-card .card-title {
+  margin: 0;
+  font-size: clamp(13px, 7cqi, 17px);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: #fff;
+  white-space: normal;
+  word-break: keep-all;
+  text-wrap: balance;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card-line {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fg-2);
+  word-break: keep-all;
+  transition: max-height 0.55s var(--ease), opacity 0.4s;
+}
+@container (min-width: 250px) {
+  .r-card:hover .card-line,
+  .w-card:hover .card-line,
+  .r-card:focus-visible .card-line,
+  .w-card:focus-visible .card-line {
+    max-height: 3.2em;
+    opacity: 1;
+  }
+}
+@container (min-width: 340px) {
+  .card-cap {
+    padding: 18px 20px 18px;
+  }
+  .card-line {
+    font-size: 13px;
+  }
+}
+.r-card .card-open,
+.w-card .card-open {
+  top: auto;
+  bottom: 13px;
+  right: 13px;
+  z-index: 4;
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(5, 7, 12, 0.5);
+}
+.r-card:hover .card-open,
+.w-card:hover .card-open {
+  border-color: transparent;
+  background: var(--cc, var(--orange));
+  color: #05070c;
+}
+/* 터치 화면: 글자를 늘 선명하게, 호버 효과 없이 */
+@media (hover: none) {
+  .r-card .card-media > img:not(.blur-fill),
+  .w-card .card-media > img:not(.blur-fill) {
+    filter: none;
+  }
+  .r-card .card-open,
+  .w-card .card-open {
+    display: none;
+  }
+}
+
+/* 필름 릴은 장면마다 한 분야라 분야 이름은 아카이브에서만 */
+.reel .card-cat {
+  display: none;
+}
+
+/* 필름 릴 크기: 화면 높이를 따라 — 4:5 세로 플레이트 */
+.reel {
+  --card-h: clamp(170px, 30vh, 320px);
+}
+.r-card {
+  width: calc(var(--card-h) * 0.78);
+}
+.reel-track {
+  gap: 16px;
+  padding-top: 8px;
+  padding-bottom: 14px;
+}
+@media (max-height: 760px) and (min-width: 821px) {
+  .reel {
+    --card-h: clamp(150px, 28vh, 260px);
+  }
+}
+@media (max-width: 820px) {
+  .reel {
+    --card-h: clamp(160px, 26vh, 240px);
+  }
+  .reel-track {
+    gap: 12px;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .reel {
+    --card-h: 96px;
+  }
+  .r-card {
+    width: calc(var(--card-h) * 1.5);
+    --cr: 10px;
+  }
+  .reel-track {
+    gap: 10px;
+    padding-top: 4px;
+    padding-bottom: 6px;
+  }
+  .r-card .card-top,
+  .r-card .card-meta,
+  .r-card .card-line,
+  .r-card .card-open,
+  .r-card .card-cap::before,
+  .a-card .a-proj,
+  .card-award small {
+    display: none;
+  }
+  .r-card .card-cap {
+    padding: 7px 9px;
+  }
+  .r-card .card-title {
+    font-size: 11.5px;
+    line-height: 1.25;
+  }
+  .r-card .card-award {
+    top: 5px;
+    right: 5px;
+    padding: 2px 6px 2px 4px;
+    font-size: 9.5px;
+  }
+  .r-card .card-award .laurel {
+    width: 11px;
+    height: 11px;
+  }
+  .r-card .card-media img.is-contain {
+    top: 7%;
+    height: 46%;
+  }
+}
+
+/* ── 아카이브 그리드 ── */
+@media (min-width: 1600px) {
+  .works-grid {
+    --cols: 5;
+  }
+}
+.w-card .card-media {
+  height: calc(var(--cw) * 1.22);
+}
+
+/* ── 보기 전환 탭(Works · Awards) ── */
+.pg-tabs {
+  display: inline-flex;
+  gap: 4px;
+  margin-top: 26px;
+  padding: 4px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.pg-tabs a {
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  color: var(--fg-2);
+  transition: background 0.3s, color 0.3s;
+}
+.pg-tabs a sup {
+  margin-left: 6px;
+  font-size: 9px;
+  color: var(--muted);
+}
+.pg-tabs a:hover {
+  color: var(--fg);
+}
+.pg-tabs a.is-on {
+  background: var(--fg);
+  color: var(--bg);
+}
+.pg-tabs a.is-on sup {
+  color: var(--bg);
+}
+.pg-tabs + .chips {
+  margin-top: 18px;
+}
+
+/* ── 상장 한 장: 종이 ── */
+.sheet {
+  position: relative;
+  z-index: 0;
+  display: block;
+  aspect-ratio: 1132 / 1600;
+  border-radius: 4px;
+  background: #f3efe6;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 30px 50px -28px rgba(0, 0, 0, 0.95),
+    0 12px 24px -14px rgba(0, 0, 0, 0.7);
+}
+.sheet > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  filter: brightness(0.9) saturate(0.95);
+  transition: filter 0.5s;
+}
+/* 상장이 두 장이면 뒤에 한 장이 비껴 보인다 */
+.sheet.is-stack::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 4px;
+  background: #e4ded2;
+  box-shadow: 0 14px 26px -14px rgba(0, 0, 0, 0.8);
+  transform: rotate(5deg) translate(7%, 2%);
+}
+.sheet.is-photo {
+  overflow: hidden;
+  background: #0b0e14;
+}
+/* 가로 시상 사진은 자르지 않고 흐린 배경 위에 */
+.sheet.is-photo > img {
+  position: absolute;
+  inset: 0;
+  object-fit: contain;
+  filter: none;
+}
+.sheet.is-photo > img.ph-bg {
+  inset: -30px;
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  object-fit: cover;
+  filter: blur(18px) brightness(0.45) saturate(1.1);
+}
+.sheet.is-blank {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  background: linear-gradient(160deg, #141820, #0a0d13);
+  border: 1px solid color-mix(in srgb, var(--tc, #f4cf73) 35%, transparent);
+  color: var(--tc, #f4cf73);
+}
+.sheet.is-blank .laurel {
+  width: 38px;
+  height: 38px;
+}
+.sheet.is-blank b {
+  font-size: 15px;
+}
+
+/* ── 필름 '기록' 장면: 수상 릴(프로젝트 사진 위에 상장) ── */
+.aw-reel {
+  --card-h: clamp(168px, 29vh, 300px);
+}
+@media (max-height: 760px) and (min-width: 821px) {
+  .aw-reel {
+    --card-h: clamp(150px, 27vh, 250px);
+  }
+}
+@media (max-width: 820px) {
+  .aw-reel {
+    --card-h: clamp(160px, 26vh, 240px);
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .aw-reel {
+    --card-h: 96px;
+  }
+  /* 낮은 가로 화면: 상장은 오른쪽, 글은 왼쪽 */
+  .aw-reel .r-card {
+    width: calc(var(--card-h) * 1.9);
+  }
+  .aw-reel .a-card .sheet {
+    left: auto;
+    right: 9px;
+    top: 50%;
+    width: 27%;
+    transform: translateY(-50%) rotate(-3deg);
+  }
+  .aw-reel .a-card:hover .sheet {
+    transform: translateY(-50%) rotate(0deg) scale(1.04);
+  }
+  .aw-reel .a-card .card-cap {
+    padding-right: 34%;
+  }
+}
+.a-card .card-media > img.a-bg {
+  filter: brightness(0.5) saturate(0.75);
+}
+.a-card:hover .card-media > img.a-bg {
+  filter: brightness(0.62) saturate(0.9);
+}
+.a-card .sheet {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 10%;
+  width: 36%;
+  transform: translateX(-50%) rotate(-3deg);
+  transition: transform 0.7s var(--ease);
+}
+.a-card .sheet > img {
+  transform: none;
+}
+.a-card:hover .sheet,
+.a-card:focus-visible .sheet {
+  transform: translateX(-50%) translateY(-5px) rotate(0deg) scale(1.05);
+}
+.a-card:hover .sheet > img {
+  filter: none;
+}
+.a-card .card-award {
+  left: 9px;
+  right: auto;
+}
+.a-card .card-cap::before {
+  background: var(--tc, #f4cf73);
+}
+.a-card .card-title {
+  font-size: clamp(12.5px, 6.4cqi, 15.5px);
+}
+.a-proj {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--cc, var(--cyan));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.a-proj i {
+  font-style: normal;
+}
+.stage.has-reel .stage-head .counters {
+  margin-top: 14px;
+}
+/* 수치 아래로 3D 막대가 지나가도 글자가 읽히게 */
+.stage.has-reel .counters dd,
+.stage.has-reel .counters dt {
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9), 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+/* ── 수상 아카이브(/awards) ── */
+.aw-sum {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 34px;
+  margin: 28px auto 0;
+}
+.aw-sum > div {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+.aw-sum dd {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(28px, 3.4vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--tc, var(--fg));
+}
+.aw-sum dt {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+.aw-year {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 7vh var(--pad) 2vh;
+}
+.aw-y {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 0 0 34px;
+  font-family: var(--display);
+  font-size: clamp(30px, 4vw, 54px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.aw-y::before,
+.aw-y::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-2));
+}
+.aw-y::after {
+  background: linear-gradient(90deg, var(--line-2), transparent);
+}
+.aw-y sup {
+  margin-left: -10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--orange);
+  align-self: flex-start;
+}
+.aw-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 44px 26px;
+}
+.aw-cell {
+  flex: 0 0 clamp(200px, 19vw, 244px);
+  min-width: 0;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.9s var(--ease), transform 1s var(--ease);
+}
+.aw-cell.is-in {
+  opacity: 1;
+  transform: none;
+}
+.aw-card {
+  position: relative;
+  display: grid;
+  text-align: center;
+}
+.aw-sheet {
+  position: relative;
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.6s var(--ease);
+}
+.aw-card.is-tilt .aw-sheet {
+  transition: transform 0.12s linear;
+}
+.aw-sheet .card-glare {
+  border-radius: 4px;
+}
+button.aw-sheet:hover .sheet,
+button.aw-sheet:focus-visible .sheet {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--tc) 70%, transparent),
+    0 34px 60px -26px color-mix(in srgb, var(--tc) 40%, transparent),
+    0 12px 24px -14px rgba(0, 0, 0, 0.7);
+}
+button.aw-sheet:hover .sheet > img,
+button.aw-sheet:focus-visible .sheet > img {
+  filter: none;
+}
+button.aw-sheet:focus-visible {
+  outline: 2px solid var(--tc);
+  outline-offset: 6px;
+}
+.aw-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+.aw-grade {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--tc);
+}
+.aw-top time {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.aw-contest {
+  margin: 7px 0 0;
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+  text-wrap: balance;
+}
+.aw-issuer {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  word-break: keep-all;
+  text-wrap: balance;
+}
+.aw-proj {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 6px 12px 6px 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  text-align: left;
+  transition: border-color 0.35s, background 0.35s;
+}
+.aw-proj:hover,
+.aw-proj:focus-visible {
+  border-color: var(--cc, var(--cyan));
+  background: color-mix(in srgb, var(--cc, var(--cyan)) 10%, transparent);
+}
+.aw-proj-img {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #0b0e14;
+}
+.aw-proj-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.aw-proj-img.is-type {
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--cc, var(--cyan));
+  background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--cc, var(--cyan)) 32%, transparent), transparent 70%), #0b0e14;
+  border: 1px solid color-mix(in srgb, var(--cc, var(--cyan)) 30%, transparent);
+}
+.aw-proj-t {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+}
+.aw-proj-t small {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--cc, var(--cyan));
+}
+.aw-proj-t b {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.aw-proj i {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── 상세: 수상 칸 ── */
+.d-awards {
+  padding: 4vh 0 8vh;
+}
+.aw-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px 30px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad);
+}
+.aw-item {
+  flex: 0 0 clamp(190px, 20vw, 240px);
+  min-width: 0;
+  text-align: center;
+}
+.aw-item .aw-sheet {
+  transform: rotate(-1.5deg);
+}
+.aw-item:nth-child(even) .aw-sheet {
+  transform: rotate(1.5deg);
+}
+.aw-item .aw-sheet:hover,
+.aw-item .aw-sheet:focus-visible {
+  transform: translateY(-6px) rotate(0deg);
+}
+
+/* ── 상세: 함께한 기관 ── */
+.d-with {
+  grid-column: 1 / -1;
+}
+.d-with-k {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+}
+.d-with ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+.d-with li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 70px;
+  padding: 12px 22px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012));
+}
+.d-with li.is-text {
+  padding-left: 22px;
+}
+.d-with .org-logo {
+  --ls: 0.8;
+}
+.d-with-t {
+  display: grid;
+  gap: 3px;
+  text-align: left;
+}
+.d-with-t b {
+  font-size: 14px;
+  font-weight: 650;
+  word-break: keep-all;
+}
+.d-with-t small {
+  font-size: 12px;
+  color: var(--muted);
+  word-break: keep-all;
+}
+
+/* ── 기관 로고 ── */
+.org-logo {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: max(16px, calc(var(--lh) * 1px * var(--ls, 1)));
+  object-fit: contain;
+}
+.org-word {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  line-height: 1;
+  color: var(--fg);
+}
+.org-word b {
+  font-size: calc(16px * var(--ls, 1));
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.org-word small {
+  font-family: var(--mono);
+  font-size: calc(7.5px * var(--ls, 1));
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.with-wall {
+  max-width: 1280px;
+  margin: 4vh auto 0;
+  padding: 9vh var(--pad) 5vh;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+.wall {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 34px 48px;
+  margin-top: 34px;
+}
+.wall li {
+  opacity: 0.6;
+  transition: opacity 0.35s;
+}
+.wall li:hover,
+.wall li:focus-within {
+  opacity: 1;
+}
+.wall a {
+  display: block;
+}
+.wall-note {
+  margin-top: 34px;
+  font-size: 11.5px;
+  color: var(--dim);
+}
+
+/* 엔딩 크레딧의 로고 */
+.credit-logos ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 22px 28px;
+  max-width: 640px;
+  margin: 14px auto 0;
+}
+.credit-logos .org-logo {
+  --ls: 0.9;
+  opacity: 0.88;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 820px) {
+  .aw-cell {
+    flex-basis: calc(50% - 10px);
+  }
+  .aw-grid {
+    gap: 34px 16px;
+  }
+  .aw-item {
+    flex-basis: calc(50% - 12px);
+    max-width: 260px;
+  }
+  .aw-row {
+    gap: 30px 20px;
+  }
+  .aw-contest {
+    font-size: 13.5px;
+  }
+  .aw-proj {
+    padding: 5px 8px 5px 5px;
+    gap: 8px;
+  }
+  .aw-proj-img {
+    width: 34px;
+    height: 34px;
+  }
+  .aw-proj-t b {
+    font-size: 11.5px;
+  }
+  .wall {
+    gap: 24px 30px;
+  }
+  .org-logo,
+  .org-word {
+    --ls: 0.85;
+  }
+  .d-with li {
+    width: 100%;
+    max-width: 420px;
+  }
+  .credit-logos ul {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: center;
+    justify-items: center;
+    gap: 20px 26px;
+  }
+  .credit-logos .org-logo {
+    --ls: 0.72;
+  }
+  .pg-tabs a {
+    padding: 9px 15px;
+  }
+  .aw-sum {
+    gap: 12px 22px;
+  }
+}
+@media (max-width: 380px) {
+  .aw-grid {
+    gap: 30px 12px;
+  }
+  .aw-top {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .pg-tabs {
+    margin-top: 12px;
+  }
+  .credit-logos ul {
+    display: flex;
+    gap: 12px 22px;
+  }
+  .credit-logos .org-logo {
+    --ls: 0.6;
+  }
+  .aw-sum {
+    margin-top: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .r-card .card-media,
+  .w-card .card-media,
+  .aw-sheet,
+  .a-card .sheet {
+    transition: none;
+  }
+}

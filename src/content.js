@@ -2,6 +2,7 @@
 // 장면(scene) 순서가 곧 영화의 순서입니다. 3D 연출은 director.js의 SHOTS가 같은 id로 대응합니다.
 
 import projectData from './data/projects.json';
+import awardData from './data/awards.json';
 
 const M = (file) => `/media/${file}`;
 
@@ -140,22 +141,13 @@ export const scenes = [
     kicker: 'THE RECORD — 수상 · 기록',
     title: ['THE', 'RECORD'],
     counters: [
-      { value: 37, label: '수상 기록' },
+      { value: awardData.length, label: '수상 기록' }, // 수상 아카이브(/awards)와 같은 수
       { value: projectData.length, label: '프로젝트' }, // 아카이브(/works)와 같은 수
       { value: 9, label: '자격증' },
       { value: 9, label: '공식 보도' },
     ],
-    highlights: [
-      { year: '2026', title: 'HUSS AI 경진대회', grade: '전국 2위 · 우수상', link: 'huss-evidence-ai' },
-      { year: '2025', title: 'WON+UP 캡스톤디자인 — IoT 링거폴대', grade: '대상 · 총장상', link: 'iot-iv-pole' },
-      { year: '2025', title: '전북권 Drive-UP 창업캠프', grade: '대상 · 전북도지사 표창', link: 'recap-jbmotors' },
-      { year: '2025', title: '근거기반 지역문제 해결 캠프 in 강릉', grade: '대상 · 강릉시장 표창', link: 'coffee-box' },
-      { year: '2025', title: '전주 청년 창업경진대회', grade: '최우수상 · 전북중기청장 표창', link: 'coffee-box' },
-      { year: '2025', title: '국가우수 이공계 장학생', grade: '선정' },
-      { year: '2024', title: '자율주행 로봇제작·스마트 모빌리티 아이디어', grade: '우수상', link: 'ev-medical' },
-      { year: '2023', title: 'Ticket to the Dream 해커톤 — 로봇', grade: '최우수상', link: 'robot-push-hackathon' },
-      { year: '2023', title: 'ROS 기반 자율주행 자동차 경진대회 — 드론', grade: '우수상', link: 'pixhawk-drone' },
-    ],
+    // 프로젝트와 이어진 수상을 상장과 함께 릴로 보여 준다(awards.js의 AWARD_REEL)
+    awardReel: true,
   },
   {
     id: 'finale',
@@ -173,6 +165,7 @@ export const scenes = [
       ['Education', '원광대학교 컴퓨터소프트웨어공학과 · JST 공유대학 스마트모빌리티 SW공학과'],
       ['Labs', '인공지능 LLM 연구실 · 지능형 IoT 연구실'],
       ['Crew', '자작차 동아리 메카니즘 · Re:cap · 인퓨테크'],
+      ['Schools · Awarding bodies · Partners', null],
       ['On Location', '익산 · 전주 · 강릉 · 경주 · 치앙마이'],
       ['Built with', 'Three.js · GSAP · Vite — on Vercel'],
     ],

@@ -1,0 +1,417 @@
+[
+ {
+  "date": "2026",
+  "contest": "2026 HUSS 융합캠프 AI 경진대회",
+  "grade": "우수상",
+  "prize": "한국연구재단 이사장상 · 전국 2위",
+  "issuer": "HUSS 글로벌 K-컬처 사업단",
+  "project": "huss-evidence-ai",
+  "projectAward": "2026 HUSS AI 경진대회 · 우수상(한국연구재단 이사장상) · 전국 2위",
+  "certs": [],
+  "photo": "media/projects/huss-evidence-ai/01.webp"
+ },
+ {
+  "date": "2026",
+  "contest": "2026 GIST-호남권대학 창업아이디어 경진대회",
+  "grade": "장려상",
+  "issuer": "GIST",
+  "project": "legal-ai-platform",
+  "projectAward": "2026 GIST-호남권대학 창업아이디어 경진대회 · 장려상",
+  "certs": [],
+  "photo": "media/projects/legal-ai-platform/01.webp"
+ },
+ {
+  "date": "2024",
+  "contest": "미래자동차 경진대회 · 조향 및 주차 신호인식 부문",
+  "grade": "장려상",
+  "project": "airsim-driving",
+  "projectAward": "미래자동차 경진대회 · 조향 및 주차 신호인식 부문 장려상",
+  "certs": []
+ },
+ {
+  "date": "2025-12-02",
+  "contest": "제2회 전북권 지역 문제 해결 아이디어 경진대회",
+  "grade": "대상",
+  "prize": "전북특별자치도지사상 · 팀 Re:Switch",
+  "issuer": "전북특별자치도지사 · 재단법인 기빙플러스",
+  "project": "givingplus-filament",
+  "projectAward": "제2회 전북권 지역문제 해결 아이디어 경진대회 · 대상 (전북특별자치도지사상 · 재단법인 기빙플러스)",
+  "certs": [
+   "media/awards/award-2025-12-02-2.webp",
+   "media/awards/award-2025-12-02.webp"
+  ]
+ },
+ {
+  "date": "2025-11-27",
+  "contest": "WON+UP 캡스톤디자인 경진대회",
+  "grade": "대상",
+  "prize": "총장상 · 인퓨테크팀",
+  "issuer": "원광대학교 총장",
+  "project": "iot-iv-pole",
+  "projectAward": "WON+UP 캡스톤디자인 경진대회 · 대상(총장상)",
+  "certs": [],
+  "photo": "media/projects/iot-iv-pole/01.webp"
+ },
+ {
+  "date": "2025-10-31",
+  "contest": "2025년 도전! 생활혁신 아이디어 리그",
+  "grade": "최우수상",
+  "issuer": "캠틱종합기술원장",
+  "project": "kakao-fin-next",
+  "projectAward": "2025 도전! 생활혁신 아이디어 리그 · 최우수상",
+  "certs": [
+   "media/awards/award-2025-10-31.webp"
+  ]
+ },
+ {
+  "date": "2025-10-24",
+  "contest": "2025 호남제주권 대학 연합 창업경진대회 IDEA-GO-ROUND",
+  "grade": "장려상",
+  "prize": "팀 프론티어",
+  "issuer": "한국연구재단 이사장",
+  "project": "coffee-box",
+  "projectAward": "호남·제주권 대학 연합 창업경진대회 · 장려상",
+  "certs": [
+   "media/awards/award-2025-10-24.webp"
+  ]
+ },
+ {
+  "date": "2025-09-16",
+  "contest": "2025년 전주 청년 창업경진대회",
+  "grade": "최우수상",
+  "prize": "전북지방중소벤처기업청장상 · 팀 de:caffeine",
+  "issuer": "전북지방중소벤처기업청장",
+  "project": "coffee-box",
+  "projectAward": "전주 청년 창업경진대회 · 최우수상 (전북중기청장 표창)",
+  "certs": [
+   "media/awards/award-2025-09-16.webp",
+   "media/awards/award-2025-09-16-2.webp"
+  ]
+ },
+ {
+  "date": "2025-08-29",
+  "contest": "2025 근거기반 지역문제 해결 캠프 in 강릉",
+  "grade": "대상",
+  "prize": "강릉시장 표창",
+  "issuer": "강릉시장",
+  "project": "coffee-box",
+  "projectAward": "근거기반 지역문제 해결 캠프 in 강릉 · 대상 (강릉시장 표창)",
+  "certs": [
+   "media/awards/award-2025-08-29.webp"
+  ]
+ },
+ {
+  "date": "2025-08-07",
+  "contest": "2025 전북권 Drive Up 창업캠프",
+  "grade": "대상",
+  "prize": "전북특별자치도지사 표창 · 팀 Re:Cap",
+  "issuer": "전북특별자치도지사 · 전북현대모터스FC",
+  "project": "recap-jbmotors",
+  "projectAward": "2025 전북권 Drive Up 창업캠프 · 대상 (전북도지사 표창)",
+  "certs": [
+   "media/awards/award-2025-08-07.webp",
+   "media/awards/award-2025-08-07-2.webp"
+  ]
+ },
+ {
+  "date": "2025-07-18",
+  "contest": "Energy Up! 하계오픈캠퍼스 아이디어 경진대회",
+  "grade": "우수상",
+  "issuer": "전북특별자치도 RISE센터장",
+  "project": "hanok-ess",
+  "projectAward": "Energy Up! 아이디어 경진대회 · 우수상",
+  "certs": [
+   "media/awards/award-2025-07-18.webp"
+  ]
+ },
+ {
+  "date": "2025-07-04",
+  "contest": "JST 공유대학 두드림(Do-Dream) 챌린지 해커톤",
+  "grade": "최우수상",
+  "issuer": "JST 공유대학장",
+  "project": "climate-dashboard",
+  "projectAward": "JST Do-Dream 챌린지 해커톤 · 최우수상",
+  "certs": [
+   "media/awards/award-2025-07-04.webp"
+  ]
+ },
+ {
+  "date": "2025-02-14",
+  "contest": "JST 공유대학 미래수송기기 아이디어 해커톤",
+  "grade": "우수상",
+  "issuer": "전북대학교 RIS 미래수송기기사업단장",
+  "project": "ev-medical",
+  "projectAward": "미래수송기기 아이디어 해커톤 경진대회 · 우수상",
+  "certs": [
+   "media/awards/award-2025-02-14.webp"
+  ]
+ },
+ {
+  "date": "2024-12-24",
+  "contest": "2024학년도 2학기 LINC 3.0 창의대첩",
+  "grade": "최우수상",
+  "issuer": "원광대학교 LINC 3.0 사업단장",
+  "project": "moisture-dehumidifier",
+  "projectAward": "2024학년도 2학기 LINC 3.0 창의대첩 · 최우수상",
+  "certs": [
+   "media/awards/award-2024-12-24.webp"
+  ]
+ },
+ {
+  "date": "2024-12-19",
+  "contest": "제1회 전북권 지역 문제 해결 아이디어 경진대회",
+  "grade": "우수상",
+  "issuer": "기빙플러스 대표이사",
+  "project": "moisture-dehumidifier",
+  "projectAward": "제1회 전북권 지역 문제 해결 아이디어 경진대회 · 우수상",
+  "certs": [
+   "media/awards/award-2024-12-19.webp"
+  ]
+ },
+ {
+  "date": "2024-12-06",
+  "contest": "2024 G-Startup 아이디어 캠프",
+  "grade": "최우수상",
+  "prize": "팀 HIT",
+  "issuer": "국립군산대학교 창업지원단장",
+  "project": "moisture-dehumidifier",
+  "projectAward": "2024 G-Startup 아이디어 캠프 · 최우수상",
+  "certs": [
+   "media/awards/award-2024-12-06.webp"
+  ]
+ },
+ {
+  "date": "2024-12-06",
+  "contest": "2024 G-Startup 아이디어 캠프",
+  "grade": "에너지위너상",
+  "prize": "팀 HIT",
+  "issuer": "RIS 에너지신산업사업단장",
+  "project": "moisture-dehumidifier",
+  "projectAward": "2024 G-Startup 아이디어 캠프 · 에너지위너상",
+  "certs": [
+   "media/awards/award-2024-12-06-2.webp"
+  ]
+ },
+ {
+  "date": "2024-11-02",
+  "contest": "생활 속 에너지 창업 아이디어 경진대회",
+  "grade": "장려상",
+  "issuer": "RIS 에너지신산업사업단장",
+  "project": "peltier-cooler",
+  "projectAward": "생활 속 에너지 창업 아이디어 경진대회 · 장려상",
+  "certs": [
+   "media/awards/award-2024-11-02.webp"
+  ]
+ },
+ {
+  "date": "2024-09-06",
+  "contest": "2024 호남제주권 제품 제작 역량강화 캠프",
+  "grade": "우수상",
+  "issuer": "전남대학교 산학협력단장",
+  "project": "growth-footrest",
+  "projectAward": "2024 호남제주권 제품 제작 역량강화 캠프 · 우수상",
+  "certs": [
+   "media/awards/award-2024-09-06.webp"
+  ]
+ },
+ {
+  "date": "2024-08-31",
+  "contest": "자율주행 로봇제작 및 스마트 모빌리티 아이디어 경진대회",
+  "grade": "우수상",
+  "issuer": "전북대학교 공학교육혁신센터장",
+  "project": "ev-medical",
+  "projectAward": "자율주행 로봇제작 및 스마트 모빌리티 아이디어 경진대회 · 우수상",
+  "certs": [
+   "media/awards/award-2024-08-31.webp"
+  ]
+ },
+ {
+  "date": "2024-06-25",
+  "contest": "2024학년도 LINC 3.0 창의대첩",
+  "grade": "대상",
+  "issuer": "원광대학교 총장",
+  "project": "baekchul-sikhye",
+  "projectAward": "2024학년도 LINC 3.0 창의대첩 · 대상",
+  "certs": [
+   "media/awards/award-2024-06-25.webp"
+  ]
+ },
+ {
+  "date": "2023-12-20",
+  "contest": "ROS를 이용한 자율주행 자동차 경진대회",
+  "grade": "우수상",
+  "issuer": "캠틱종합기술원장",
+  "project": "pixhawk-drone",
+  "projectAward": "ROS 기반 자율주행 자동차 경진대회 · 우수상",
+  "certs": [
+   "media/awards/award-2023-12-20.webp"
+  ]
+ },
+ {
+  "date": "2023-12-10",
+  "contest": "2023 Ticket to the Dream 대학생 해커톤",
+  "grade": "최우수상",
+  "prize": "SW중심대학사업단장상 · 팀 용진은 못말려",
+  "issuer": "원광대학교 SW중심대학사업단장",
+  "project": "robot-push-hackathon",
+  "projectAward": "2023 Ticket to the Dream 대학생 해커톤 · 최우수상 (SW중심대학사업단장상)",
+  "certs": [
+   "media/awards/award-2023-12-10.webp"
+  ]
+ },
+ {
+  "date": "2023-08-31",
+  "contest": "2023 스마트헬스케어 SW비교과 경진대회",
+  "grade": "우수상",
+  "prize": "SW중심대학사업단장상",
+  "issuer": "원광대학교 SW중심대학사업단장",
+  "project": "rehab-game",
+  "projectAward": "스마트헬스케어 SW비교과 경진대회 · 우수상 (SW중심대학사업단장상)",
+  "certs": [
+   "media/awards/award-2023-08-31.webp"
+  ]
+ },
+ {
+  "date": "2025-11-13",
+  "contest": "2025 홀림 [글&영상] 공모전",
+  "grade": "장려상",
+  "issuer": "원광대학교 교무처장",
+  "certs": [
+   "media/awards/award-2025-11-13.webp"
+  ]
+ },
+ {
+  "date": "2025-06-04",
+  "contest": "제20회 학습공모전",
+  "grade": "입선",
+  "issuer": "원광대학교 교육혁신원장",
+  "certs": [
+   "media/awards/award-2025-06-04.webp"
+  ]
+ },
+ {
+  "date": "2025-05-12",
+  "contest": "2025학년도 기업분석경진대회",
+  "grade": "장려상",
+  "issuer": "원광대학교 미래인재개발처장",
+  "certs": [
+   "media/awards/award-2025-05-12.webp"
+  ]
+ },
+ {
+  "date": "2024-11-21",
+  "contest": "2024 전북권 대학 연합 내 돈예산 창업캠프",
+  "grade": "장려상",
+  "issuer": "예산군도시재생지원센터장",
+  "certs": [
+   "media/awards/award-2024-11-21.webp"
+  ]
+ },
+ {
+  "date": "2024-11-13",
+  "contest": "2024 대학생활설계 포트폴리오 경진대회",
+  "grade": "우수상",
+  "issuer": "원광대학교 미래인재개발처장",
+  "certs": [
+   "media/awards/award-2024-11-13-2.webp"
+  ]
+ },
+ {
+  "date": "2024-11-13",
+  "contest": "2024 진로교과설계 포트폴리오 경진대회",
+  "grade": "장려상",
+  "issuer": "원광대학교 미래인재개발처장",
+  "certs": [
+   "media/awards/award-2024-11-13.webp"
+  ]
+ },
+ {
+  "date": "2024-10-31",
+  "contest": "2024 WON+ 페스티벌 '나의 성장 이야기' 공모전",
+  "grade": "우수상",
+  "issuer": "원광대학교 총장",
+  "certs": [
+   "media/awards/award-2024-10-31.webp"
+  ]
+ },
+ {
+  "date": "2024-08-20",
+  "contest": "2024 Triangle+ 진로설계 전략 캠프",
+  "grade": "최우수상",
+  "issuer": "국립군산대학교 총장직무대리",
+  "certs": [
+   "media/awards/award-2024-08-20.webp"
+  ]
+ },
+ {
+  "date": "2024-06-26",
+  "contest": "제1회 공학혁신인재 아이디어 캠프",
+  "grade": "최우수상",
+  "issuer": "전북테크노파크 원장",
+  "certs": [
+   "media/awards/award-2024-06-26.webp"
+  ]
+ },
+ {
+  "date": "2024-05-31",
+  "contest": "PSST 창업 시뮬레이션 연합 캠프",
+  "grade": "최우수상",
+  "issuer": "전주대학교 LINC 3.0 사업단장",
+  "certs": [
+   "media/awards/award-2024-05-31.webp"
+  ]
+ },
+ {
+  "date": "2024-05-25",
+  "contest": "에듀카트 기반 비즈니스모델 개발 캠프",
+  "grade": "우수상",
+  "issuer": "경남지식재산센터장",
+  "certs": [
+   "media/awards/award-2024-05-25.webp"
+  ]
+ },
+ {
+  "date": "2024-01-26",
+  "contest": "2023 호남제주권 제품 제작 역량강화 캠프",
+  "grade": "우수상",
+  "prize": "팀 DUO",
+  "issuer": "전남대학교 산학협력단장",
+  "certs": [
+   "media/awards/award-2024-01-26.webp"
+  ]
+ },
+ {
+  "date": "2023-12-22",
+  "contest": "Adventure Design 경진대회",
+  "grade": "우수상",
+  "issuer": "캠틱종합기술원장",
+  "certs": [
+   "media/awards/award-2023-12-22.webp"
+  ]
+ },
+ {
+  "date": "2023-11-14",
+  "contest": "SW취업컨설팅 및 모의면접 경진대회",
+  "grade": "장려상",
+  "prize": "SW중심대학사업단장상",
+  "issuer": "원광대학교 SW중심대학사업단장",
+  "certs": [
+   "media/awards/award-2023-11-14.webp"
+  ]
+ },
+ {
+  "date": "2023-06-21",
+  "contest": "슬기로운 대학생활 영상공모전 (제3회 UCC 콘테스트)",
+  "grade": "3위",
+  "issuer": "원광대학교 총장",
+  "certs": [
+   "media/awards/award-2023-06-21.webp"
+  ]
+ },
+ {
+  "date": "2023-12-28",
+  "contest": "실전 SW창업교육 및 창업경진대회",
+  "grade": "최우수상",
+  "certs": []
+ }
+]
