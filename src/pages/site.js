@@ -54,12 +54,15 @@ function awardBadge(p) {
 }
 
 // 프로젝트 타일 — 사진 위에 글을 얹은 시네마 플레이트(필름 릴 · 아카이브 공통)
+// 릴 카드 폭(premium.css의 --card-h × 0.78, 가로 휴대폰 × 1.5)에 맞춘 sizes
+const REEL_SIZES = '(max-height: 500px) and (orientation: landscape) 190px, (max-width: 820px) 190px, 250px';
+const GRID_SIZES = '(max-width: 599px) 50vw, (max-width: 1180px) 33vw, (min-width: 1600px) 20vw, 25vw';
 export function projectCard(p, i, { cls = 'card' } = {}) {
   const c = categoryOf(p.category);
   const label = `${p.title}${p.awards.length ? ` — 수상 ${p.awards.length}건` : ''}`;
   return `<a class="${cls}" href="${p.path}" data-link data-cat="${esc(p.category)}" aria-label="${esc(label)}">
     <figure class="card-media">
-      ${p.cover ? media(p.cover, { sizes: '(max-width: 820px) 62vw, 340px', allowSmall: true }) : typeCover(p)}
+      ${p.cover ? media(p.cover, { sizes: cls === 'r-card' ? REEL_SIZES : p.wide ? GRID_SIZES.replace(/(\d+)vw/g, (m, n) => `${n * 2}vw`) : GRID_SIZES, allowSmall: true }) : typeCover(p)}
       <span class="card-shade" aria-hidden="true"></span>
       <span class="card-glare" aria-hidden="true"></span>
       <span class="card-top"><span class="card-no">${pad(i + 1)}</span><span class="card-cat">${esc(c.label)}</span></span>
@@ -75,10 +78,10 @@ export function projectCard(p, i, { cls = 'card' } = {}) {
 }
 
 // 기관 표기: 공식 로고(흰색 단색, 면적을 맞춘 높이) 또는 활자
-export function orgMark(o) {
+export function orgMark(o, { decorative = false } = {}) {
   if (o.logo) {
     const h = Math.max(16, Math.min(44, Math.sqrt(2400 / o.r)));
-    return `<img class="org-logo" src="/media/orgs/${o.logo}.webp" alt="${esc(o.name)}" style="--lh:${h.toFixed(1)}" loading="lazy" decoding="async" />`;
+    return `<img class="org-logo" src="/media/orgs/${o.logo}.webp" alt="${decorative ? '' : esc(o.name)}" style="--lh:${h.toFixed(1)}" loading="lazy" decoding="async" />`;
   }
   return `<span class="org-word" role="img" aria-label="${esc(o.name)}"><b>${esc(o.mark)}</b><small>${esc(o.en)}</small></span>`;
 }
@@ -93,7 +96,14 @@ function withWall() {
   </section>`;
 }
 
-const certCaption = (a) => esc([`${a.grade} — ${a.contest}`, a.issuer, a.date.replace(/-/g, '.')].filter(Boolean).join(' · '));
+const certCaption = (a) => [`${a.grade} — ${a.contest}`, a.issuer, a.date.replace(/-/g, '.')].filter(Boolean).join(' · ');
+// 수여자 · 상 이름 — 상 이름이 수여자 직함을 되풀이하면 빼고, 줄이 '·'로 시작하지 않게 조각마다 묶는다
+const issuerLine = (a) => {
+  const who = (a.issuer || '').split(' · ').filter(Boolean);
+  const norm = (x) => x.replace(/\s/g, '');
+  const prize = (a.prize || '').split(' · ').filter((x) => x && !who.some((w) => norm(w).endsWith(norm(x).replace(/(상|표창)$/, ''))));
+  return [...who, ...prize].map((x, k) => `<span class="nw">${k ? '· ' : ''}${esc(x)}</span>`).join(' ');
+};
 // 상장(없으면 시상 사진)을 라이트박스 목록으로
 function awardMedia(list) {
   const out = [];
@@ -108,7 +118,7 @@ function awardMedia(list) {
 // 상장 한 장: 종이처럼 — 여러 장이면 뒤에 겹쳐 보인다
 function certSheet(a, { sizes = '220px' } = {}) {
   if (a.certs.length)
-    return `<span class="sheet${a.certs.length > 1 ? ' is-stack' : ''}"><img src="${esc(a.certs[0].thumb)}" srcset="${esc(a.certs[0].thumb)} 480w, ${esc(a.certs[0].src)} 1132w" sizes="${sizes}" alt="${esc(a.contest)} 상장" width="1132" height="1600" loading="lazy" decoding="async" /></span>`;
+    return `<span class="sheet${a.certs.length > 1 ? ' is-stack' : ''}"><img src="${esc(a.certs[0].thumb)}" srcset="${esc(a.certs[0].sm)} 240w, ${esc(a.certs[0].thumb)} 480w, ${esc(a.certs[0].md)} 720w, ${esc(a.certs[0].src)} 1132w" sizes="${sizes}" alt="${esc(a.contest)} 상장" width="1132" height="1600" loading="lazy" decoding="async" /></span>`;
   if (a.photo) return `<span class="sheet is-photo"><img class="ph-bg" src="${esc(a.photo.thumb)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />${img(a.photo, { sizes })}</span>`;
   return `<span class="sheet is-blank" aria-hidden="true">${LAUREL}<b>${esc(a.grade)}</b></span>`;
 }
@@ -122,7 +132,7 @@ function awardTile(a) {
       <div class="aw-info">
         <p class="aw-top"><span class="aw-grade">${LAUREL}${esc(a.grade)}</span><time datetime="${esc(a.date)}">${esc(a.date.replace(/-/g, '.'))}</time></p>
         <h3 class="aw-contest">${esc(a.contest)}</h3>
-        ${a.issuer || a.prize ? `<p class="aw-issuer">${esc([a.issuer, a.prize].filter(Boolean).join(' · '))}</p>` : ''}
+        ${a.issuer || a.prize ? `<p class="aw-issuer">${issuerLine(a)}</p>` : ''}
         ${
           p
             ? `<a class="aw-proj" href="${p.path}" data-link data-cat="${esc(p.category)}">${p.cover ? `<span class="aw-proj-img">${img(p.cover, { sizes: '64px' })}</span>` : `<span class="aw-proj-img is-type" aria-hidden="true">${esc(categoryOf(p.category).label.slice(0, 2).toUpperCase())}</span>`}<span class="aw-proj-t"><small>PROJECT</small><b>${esc(p.title)}</b></span><i aria-hidden="true">↗</i></a>`
@@ -139,9 +149,9 @@ export function awardCard(a) {
   const bg = a.certs.length ? p.cover : a.photo || p.cover;
   return `<a class="r-card a-card" href="${p.path}" data-link data-cat="${esc(p.category)}" data-tier="${TIER_KEY[a.tier]}" aria-label="${esc(`${a.grade} — ${a.contest} · ${p.title}`)}">
     <figure class="card-media">
-      ${bg ? img(bg, { cls: 'a-bg', sizes: '(max-width: 820px) 62vw, 340px' }) : typeCover(p)}
+      ${bg ? img(bg, { cls: 'a-bg', sizes: REEL_SIZES }) : typeCover(p)}
       <span class="card-shade" aria-hidden="true"></span>
-      ${a.certs.length ? certSheet(a, { sizes: '160px' }) : ''}
+      ${a.certs.length ? certSheet(a, { sizes: '90px' }) : ''}
       <span class="card-glare" aria-hidden="true"></span>
       <span class="card-award" data-tier="${TIER_KEY[a.tier]}">${LAUREL}<b>${esc(a.grade)}</b></span>
       <figcaption class="card-cap">
@@ -171,7 +181,7 @@ function awardsPage() {
       <h1 class="works-title">Awards<sup>${pad(AWARDS.length)}</sup></h1>
       ${tabs('awards')}
       <dl class="aw-sum">
-        ${[1, 2, 3, 4].map((t) => `<div data-tier="${TIER_KEY[t]}"><dd>${count(t)}</dd><dt>${['', '대상', '최우수상', '우수상', '장려상'][t]}</dt></div>`).join('')}
+        ${[1, 2, 3, 4, 5].map((t) => `<div data-tier="${TIER_KEY[t]}"><dd>${count(t)}</dd><dt>${['', '대상', '최우수상', '우수상', '장려상', '특별상 · 입선 · 순위'][t]}</dt></div>`).join('')}
         <div><dd>${AWARDS.filter((a) => a.project).length}</dd><dt>프로젝트와 연결</dt></div>
       </dl>
     </section>
@@ -262,6 +272,12 @@ function footer() {
   </footer>`;
 }
 
+// 상세에서 쓰는 사진 목록 — 수상 칸에 상장이 있으면 프로젝트 사진 속 같은 상장 스캔은 뺀다(스토리 · 갤러리 · 라이트박스 공통)
+const isCertScan = (im) => im.kind === 'document' && /상장|증명서/.test(im.caption);
+function detailImages(p) {
+  return awardsOf(p.id).some((a) => a.certs.length) ? p.images.filter((im) => !isCertScan(im)) : p.images;
+}
+
 function detailPage(p) {
   const i = projects.indexOf(p);
   const next = projects[(i + 1) % projects.length];
@@ -277,16 +293,14 @@ function detailPage(p) {
     ['TOOLS', p.tools.join(' · ')],
     ['AWARD', awards.length ? '' : p.awards.join(' / ')],
   ].filter(([, v]) => v);
-  const gallery = p.images;
+  const gallery = detailImages(p);
   // 히어로 사진은 스토리에서 다시 쓰지 않고, 갤러리에는 스토리에 없던 사진만 — 같은 사진이 반복되지 않게
   const coverFile = p.cover?.file;
-  const story = p.story.map((s) => (s.img && s.img.file === coverFile && p.story.length > 1 ? { ...s, img: null } : s));
+  const story = p.story.map((s) =>
+    s.img && ((s.img.file === coverFile && p.story.length > 1) || !gallery.includes(s.img)) ? { ...s, img: null } : s
+  );
   const storyImgs = new Set(story.map((s) => s.img?.file).filter(Boolean));
-  // 수상 칸에 상장이 있으면 갤러리에서 같은 상장 스캔은 뺀다
-  const certShown = awards.some((a) => a.certs.length);
-  const rest = gallery
-    .map((im, k) => ({ im, k }))
-    .filter(({ im }) => !storyImgs.has(im.file) && im.file !== coverFile && !(certShown && /상장|증명서/.test(im.caption)));
+  const rest = gallery.map((im, k) => ({ im, k })).filter(({ im }) => !storyImgs.has(im.file) && im.file !== coverFile);
   const showGallery = rest.length > 0;
   return `<article class="pg pg-detail" data-cat="${esc(p.category)}">
     ${bar({ href: '/works', label: 'WORKS' })}
@@ -308,7 +322,7 @@ function detailPage(p) {
       ${
         orgs.length
           ? `<div class="d-with"><p class="d-with-k">WITH</p><ul>${orgs
-              .map((o) => `<li${o.logo ? '' : ' class="is-text"'}>${o.logo ? orgMark(o) : ''}<span class="d-with-t"><b>${esc(o.name)}</b><small>${esc(o.rel)}</small></span></li>`)
+              .map((o) => `<li${o.logo ? '' : ' class="is-text"'}>${o.logo ? orgMark(o, { decorative: true }) : ''}<span class="d-with-t"><b>${esc(o.name)}</b><small>${esc(o.rel)}</small></span></li>`)
               .join('')}</ul></div>`
           : ''
       }
@@ -319,10 +333,17 @@ function detailPage(p) {
         ? `<section class="d-awards reveal" data-media='${esc(JSON.stringify(certMedia))}'><h2 class="d-h">AWARDS<sup>${awards.length}</sup></h2><ul class="aw-row">${awards
             .map(
               (a) => `<li class="aw-item" data-tier="${TIER_KEY[a.tier]}">
-                ${a.certs.length || a.photo ? `<button type="button" class="aw-sheet" data-cert="${a.at}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기">${certSheet(a, { sizes: '(max-width: 599px) 60vw, 240px' })}</button>` : `<div class="aw-sheet">${certSheet(a)}</div>`}
+                ${
+                  a.certs.length || a.photo
+                    ? `<button type="button" class="aw-sheet" data-cert="${a.at}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기">${
+                        // 시상 사진이 이미 위의 대표 사진이면 월계관 표지로 — 같은 사진을 두 번 크게 보이지 않게
+                        !a.certs.length && a.photo.file === coverFile ? certSheet({ ...a, photo: null }) : certSheet(a, { sizes: '(max-width: 599px) 44vw, 240px' })
+                      }</button>`
+                    : `<div class="aw-sheet">${certSheet(a)}</div>`
+                }
                 <p class="aw-top"><span class="aw-grade">${LAUREL}${esc(a.grade)}</span><time datetime="${esc(a.date)}">${esc(a.date.replace(/-/g, '.'))}</time></p>
                 <h3 class="aw-contest">${esc(a.contest)}</h3>
-                ${a.issuer || a.prize ? `<p class="aw-issuer">${esc([a.issuer, a.prize].filter(Boolean).join(' · '))}</p>` : ''}
+                ${a.issuer || a.prize ? `<p class="aw-issuer">${issuerLine(a)}</p>` : ''}
               </li>`
             )
             .join('')}</ul></section>`
@@ -525,7 +546,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .chips button'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'expo.out', delay: 0.2 });
     } else {
       const p = byId(route.id);
-      const media = p.images.map((im) => ({ type: 'image', src: im.src, caption: im.caption }));
+      const media = detailImages(p).map((im) => ({ type: 'image', src: im.src, caption: im.caption }));
       page.querySelectorAll('[data-gallery]').forEach((b) =>
         b.addEventListener('click', () => lightbox.show({ media }, +b.dataset.gallery, b))
       );

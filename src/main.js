@@ -65,6 +65,11 @@ function buildWorld() {
     actors = { drone, hangar, aerial, ground, robotics, core, records, links, video };
     director = new Director({ stage, actors, scenes, reducedMotion: reduced, onTransition });
     director.hitTargets = [drone.hit, ground.rover.hit, robotics.dog.hit, robotics.arm.hit, core.hit];
+    let reframeTimer = 0;
+    addEventListener('resize', () => {
+      clearTimeout(reframeTimer);
+      reframeTimer = setTimeout(() => director.reframe(), 200);
+    });
 
     // 부팅 동안 보여줄 첫 프레임: 격납고 근접
     stage.camera.position.copy(director.camPos);

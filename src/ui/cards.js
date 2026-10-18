@@ -43,6 +43,16 @@ export function bindCardFx({ reducedMotion }) {
     },
     { passive: true }
   );
+  // 포인터는 그대로인데 페이지 · 릴이 스크롤되면 기울었던 카드를 푼다
+  document.addEventListener(
+    'scroll',
+    () => {
+      if (!card) return;
+      reset(card);
+      card = null;
+    },
+    { capture: true, passive: true }
+  );
   // 포인터가 창 밖으로 나가면 기울기를 푼다
   document.addEventListener('mouseout', (e) => {
     if (e.relatedTarget || !card) return;

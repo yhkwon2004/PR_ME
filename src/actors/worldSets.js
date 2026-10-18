@@ -337,6 +337,8 @@ export class RecordSet {
     // 수상 아카이브(awards.json)와 같은 연도별 수 — 화면의 '수상 기록' 수치와 합이 같다
     this.years = ['2023', '2024', '2025', '2026'].map((y) => [y, awardData.filter((a) => a.date.startsWith(y)).length]);
     this.total = this.years.reduce((s, y) => s + y[1], 0);
+    // 가장 높은 막대도 위쪽 수치 띠 아래에서 끝나도록 판 간격을 수에 맞춘다
+    const step = Math.min(0.2, 2.3 / Math.max(...this.years.map((y) => y[1])));
     const geo = new RoundedBoxGeometry(1.4, 0.13, 1.4, 2, 0.03);
     const mat = new THREE.MeshStandardMaterial({ color: 0xa9b4c0, metalness: 0.45, roughness: 0.4, emissive: new THREE.Color(COLORS.cyan), emissiveIntensity: 0.03 });
     this.plates = new THREE.InstancedMesh(geo, mat, this.total);
@@ -344,17 +346,17 @@ export class RecordSet {
     this.slots = [];
     this.years.forEach(([y, count], i) => {
       const x = (i - 1.5) * 2.5;
-      for (let j = 0; j < count; j++) this.slots.push({ x, y: 0.12 + j * 0.2, col: i, row: j });
+      for (let j = 0; j < count; j++) this.slots.push({ x, y: 0.12 + j * step, col: i, row: j });
       const yl = makeFloorText(y, { size: 150, color: 'rgba(232,237,244,0.75)', width: 512, height: 256 });
       yl.scale.setScalar(1.3);
       yl.position.set(x, 0.03, 1.5);
       this.group.add(yl);
       const cap = new THREE.Mesh(new THREE.BoxGeometry(1.44, 0.02, 1.44), glow(i === 2 ? COLORS.orange : COLORS.cyan, 3));
-      cap.userData = { col: i, top: 0.12 + (count - 1) * 0.2 + 0.075 };
+      cap.userData = { col: i, top: 0.12 + (count - 1) * step + 0.075 };
       this.group.add(cap);
       const tag = makeLabel([`${count}`, `${count === 1 ? 'award' : 'awards'} · ${y}`], { width: 280, height: 120, size: 44, bg: null, border: false, color: i === 2 ? '#ff8a40' : '#5ef2ff' });
       tag.scale.multiplyScalar(1.7);
-      tag.userData = { col: i, top: cap.userData.top + 0.7 };
+      tag.userData = { col: i, top: cap.userData.top + 0.5 };
       this.group.add(tag);
       (this.caps ||= []).push(cap);
       (this.tags ||= []).push(tag);

@@ -31,7 +31,10 @@ export function createLightbox() {
       img.alt = m.caption;
       media.appendChild(img);
     }
-    cap.innerHTML = `<span>${String(i + 1).padStart(2, '0')} / ${String(list.length).padStart(2, '0')}</span>${m.caption}`;
+    // 설명은 글자로만 넣는다(마크업으로 해석하지 않음)
+    const no = document.createElement('span');
+    no.textContent = `${String(i + 1).padStart(2, '0')} / ${String(list.length).padStart(2, '0')}`;
+    cap.replaceChildren(no, document.createTextNode(m.caption));
     btnPrev.hidden = btnNext.hidden = list.length < 2;
     gsap.fromTo(media, { autoAlpha: 0, scale: 0.97 }, { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'power3.out' });
   }
@@ -43,7 +46,9 @@ export function createLightbox() {
     open = true;
     box.hidden = false;
     document.body.classList.add('lightbox-open');
-    gsap.fromTo(box, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 });
+    // 보이게 한 뒤에 포커스를 옮긴다(visibility:hidden 상태에서는 포커스가 들어가지 않는다)
+    gsap.set(box, { visibility: 'visible' });
+    gsap.fromTo(box, { opacity: 0 }, { opacity: 1, duration: 0.3 });
     render();
     btnClose.focus();
   }

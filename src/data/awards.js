@@ -5,6 +5,7 @@ import { byId } from './projects.js';
 
 const src = (f) => (f.startsWith('/') ? f : `/${f}`);
 const thumb = (f) => src(f).replace(/\.webp$/, '.thumb.webp');
+const variant = (f, v) => src(f).replace(/\.webp$/, `.${v}.webp`);
 
 // 1 대상 · 2 최우수상 · 3 우수상 · 4 장려상 · 5 그 밖의 수상(순위·입선 등)
 export function tierOf(text = '') {
@@ -25,7 +26,8 @@ export const AWARDS = raw
       ...a,
       year: a.date.slice(0, 4),
       tier: tierOf(a.grade),
-      certs: (a.certs || []).map((f) => ({ src: src(f), thumb: thumb(f), w: 1132, h: 1600 })),
+      // 상장 크기별 파일: sm 240 · thumb 480 · md 720 · 원본 1132(라이트박스)
+      certs: (a.certs || []).map((f) => ({ src: src(f), sm: variant(f, 'sm'), thumb: thumb(f), md: variant(f, 'md'), w: 1132, h: 1600 })),
       project,
       photo,
     };

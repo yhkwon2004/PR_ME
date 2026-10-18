@@ -92,7 +92,7 @@ export class Director {
       const back = pos.clone().sub(target).multiplyScalar(1.15);
       pos.copy(target).add(back);
       shift.x *= 0.7;
-    } else if (id === 'record' && (innerHeight < 900 || aspect > 1.9)) {
+    } else if (id === 'record' && (innerHeight < 1000 || aspect > 1.9)) {
       // 낮은 화면: 적층 막대가 위쪽 수치 띠로 올라가지 않게
       shift.y = 0.055;
     }
@@ -121,6 +121,20 @@ export class Director {
     return true;
   }
 
+  // 창 크기가 바뀌면 지금 장면의 구도를 다시 잡는다(세로 · 낮은 화면 구도가 바로 반영되게)
+  reframe() {
+    if (this.index < 0) return;
+    if (this.trans) {
+      this.reframePending = true;
+      return;
+    }
+    const shot = this.shotFor(this.scene.id);
+    this.camPos.copy(shot.pos);
+    this.camTarget.copy(shot.target);
+    this.fov = shot.fov;
+    this.shift.copy(shot.shift);
+  }
+
   finishTransition() {
     const { to } = this.trans;
     this.camPos.copy(to.pos);
@@ -128,6 +142,10 @@ export class Director {
     this.fov = to.fov;
     this.shift.copy(to.shift);
     this.trans = null;
+    if (this.reframePending) {
+      this.reframePending = false;
+      this.reframe();
+    }
     this.stage.film.uniforms.uTransition.value = 0;
   }
 

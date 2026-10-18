@@ -459,8 +459,9 @@ body.page-open .title-card {
   padding: 0 var(--pad);
   background: linear-gradient(180deg, rgba(5, 7, 12, 0.92), rgba(5, 7, 12, 0));
 }
-/* 아카이브는 카드가 막대 밑으로 지나가므로 반투명 막 + 흐림 */
-.pg-works .pg-bar {
+/* 아카이브 · 수상 페이지는 카드와 상장이 막대 밑으로 지나가므로 반투명 막 + 흐림 */
+.pg-works .pg-bar,
+.pg-awards .pg-bar {
   background: rgba(5, 7, 12, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
