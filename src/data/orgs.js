@@ -1,8 +1,8 @@
 // 프로젝트와 함께한 기관 — 근거: 상장에 인쇄된 수여 기관(awards.json), projects.json의 팀·요약, 2026 Notion 포트폴리오,
 // yhkwon2004/portfoli의 기관 목록. 로고는 각 기관 공식 사이트의 원본 파일을 흰색 단색으로만 바꿨다(비율 유지).
-// 로고 출처: WKU image.wku.ac.kr · JBNU jbnu.ac.kr
+// 로고 출처: WKU image.wku.ac.kr · JBNU jbnu.ac.kr · KSAE ksae.org · CCEI ccei.creativekorea.or.kr
 // CAMTIC camtic.co.kr · JBFC hyundai-motorsfc.com · GIST gist.ac.kr · JNU jnu.ac.kr · COSS coss.ac.kr.
-// 공식 로고 파일이 없거나(엠블럼을 지어내지 않음) 긴 가로형이라 작게 줄이면 읽히지 않는 곳(HUSS)은 이름을 활자로 표기한다.
+// 공식 로고 파일이 없거나(엠블럼을 지어내지 않음) 긴 가로형이라 작게 줄이면 읽히지 않는 곳(HUSS · 앵커사업단)은 이름을 활자로 표기한다.
 // 표기는 이력·협업 관계를 밝히는 것이며 후원이나 보증을 뜻하지 않는다.
 
 // r: 로고 가로/세로 비율(크기를 면적 기준으로 맞출 때 쓴다)
@@ -15,6 +15,9 @@ export const ORGS = {
   camtic: { name: '캠틱종합기술원', en: 'CAMTIC', logo: 'camtic', r: 3.82, url: 'http://www.camtic.co.kr/camtic' },
   jnu: { name: '전남대학교', en: 'Chonnam National University', logo: 'jnu', r: 5.0, url: 'https://www.jnu.ac.kr/' },
   coss: { name: 'COSS 첨단분야 혁신융합대학', en: 'COSS', logo: 'coss', r: 4.47, url: 'https://coss.ac.kr/' },
+  ksae: { name: '한국자동차공학회', en: 'KSAE', logo: 'ksae', r: 6.33, url: 'https://www.ksae.org/' },
+  ccei: { name: '전북창조경제혁신센터', en: 'CCEI Jeonbuk', logo: 'ccei', r: 4.7, url: 'https://ccei.creativekorea.or.kr/jeonbuk/' },
+  anchor: { name: '원광대학교 앵커사업단', en: 'WKU ANCHOR PROJECT', mark: '앵커사업단', url: 'https://rise.wku.ac.kr/' },
   // 공식 로고 파일 없음 — 활자 표기
   jst: { name: 'JST 공유대학', en: 'JST SHARED UNIVERSITY', mark: 'JST' },
   jeonbuk: { name: '전북특별자치도', en: 'JEONBUK STATE', mark: '전북특별자치도' },
@@ -35,6 +38,7 @@ export const PROJECT_ORGS = {
   'recap-jbmotors': [
     ['jbfc', '협업 · 구단 입점 · 대상 시상'],
     ['jeonbuk', '대상 · 도지사 표창'],
+    ['anchor', '키캡 키링 제작 지원'],
     ['greenumbrella', '판매 수익 전액 기부'],
   ],
   'givingplus-filament': [
@@ -73,17 +77,23 @@ export const PROJECT_ORGS = {
     ['coss', 'Energy Up! 공동 주관(에너지신산업)'],
   ],
   'peltier-cooler': [['ris', '장려상 · 사업단장상']],
-  'iot-iv-pole': [['wku', '캡스톤디자인 대상 · 총장상']],
+  'iot-iv-pole': [
+    ['wku', '캡스톤디자인 대상 · 총장상'],
+    ['ccei', '모두의창업'],
+  ],
   'baekchul-sikhye': [['wku', 'LINC 3.0 창의대첩 대상 · 총장상']],
-  'baja-ev-formula': [['wku', '기계공학과 자작차 동아리']],
+  'baja-ev-formula': [
+    ['wku', '기계공학과 자작차 동아리'],
+    ['ksae', '자작차 제작'],
+  ],
   'rehab-game': [['swu', '우수상 · 사업단장상']],
   'robot-push-hackathon': [['swu', '최우수상 · 사업단장상']],
 };
 
 // 기관 벽: 로고가 있는 곳 먼저, 그다음 활자 표기
-export const WALL = ['wku', 'jbnu', 'jbfc', 'gist', 'camtic', 'jnu', 'coss', 'huss', 'jst', 'jeonbuk', 'gangneung', 'jbsmes', 'givingplus', 'nrf', 'motie', 'kunsan', 'ris', 'linc', 'swu', 'greenumbrella'];
+export const WALL = ['wku', 'jbnu', 'jbfc', 'gist', 'camtic', 'jnu', 'ksae', 'ccei', 'coss', 'huss', 'anchor', 'jst', 'jeonbuk', 'gangneung', 'jbsmes', 'givingplus', 'nrf', 'motie', 'kunsan', 'ris', 'linc', 'swu', 'greenumbrella'];
 
 // 엔딩 크레딧: 학업·수상·협업 근거가 데이터에 있고 작게 줄여도 읽히는 공식 로고만
-export const CREDITS = ['wku', 'jbnu', 'jbfc', 'gist', 'camtic', 'jnu'];
+export const CREDITS = ['wku', 'jbnu', 'jbfc', 'gist', 'camtic', 'jnu', 'ksae', 'ccei'];
 
 export const orgsOf = (id) => (PROJECT_ORGS[id] || []).map(([k, rel]) => ({ ...ORGS[k], id: k, rel }));

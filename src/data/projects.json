@@ -193,7 +193,7 @@
   "period": "",
   "category": "mobility",
   "oneLiner": "가상환경에서 딥러닝으로 학습시킨 AirSim 자율주행",
-  "summary": "AirSim 가상 주행 환경에서 딥러닝 모델을 학습시켜 조향과 주차 신호 인식을 다뤘습니다. 미래자동차 경진대회 조향 및 주차 신호인식 부문에서 장려상을 받았습니다.",
+  "summary": "AirSim 가상 주행 환경에서 딥러닝 모델을 학습시켜 조향과 주차 신호 인식을 다룬 개인 프로젝트입니다.",
   "role": [],
   "team": "",
   "tools": [
@@ -202,9 +202,7 @@
    "Python",
    "Keras"
   ],
-  "awards": [
-   "미래자동차 경진대회 · 조향 및 주차 신호인식 부문 장려상"
-  ],
+  "awards": [],
   "metrics": [],
   "story": [
    {
@@ -224,12 +222,6 @@
     "title": "API 제어 주행",
     "text": "학습한 Keras 모델(model-010)을 불러와 API 제어 모드로 주택가 도로와 교차로를 주행했습니다.",
     "image": "media/projects/airsim-driving/04.webp"
-   },
-   {
-    "label": "RESULT",
-    "title": "경진대회 장려상",
-    "text": "미래자동차 경진대회 조향 및 주차 신호인식 부문에서 장려상을 받았습니다.",
-    "image": "media/projects/airsim-driving/05.webp"
    }
   ],
   "images": [

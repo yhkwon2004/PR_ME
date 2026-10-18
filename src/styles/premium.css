@@ -973,12 +973,12 @@ button.aw-sheet:focus-visible {
 
 /* 엔딩 크레딧의 로고 */
 .credit-logos ul {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
   justify-content: center;
+  justify-items: center;
   align-items: center;
-  gap: 22px 28px;
-  max-width: 640px;
+  gap: 22px 30px;
   margin: 14px auto 0;
 }
 .credit-logos .org-logo {
@@ -1028,11 +1028,7 @@ button.aw-sheet:focus-visible {
     max-width: 420px;
   }
   .credit-logos ul {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    justify-content: center;
-    justify-items: center;
-    gap: 20px 26px;
+    gap: 18px 18px;
   }
   .credit-logos .org-logo {
     --ls: 0.72;
@@ -1063,8 +1059,7 @@ button.aw-sheet:focus-visible {
     margin-top: 12px;
   }
   .credit-logos ul {
-    display: flex;
-    gap: 12px 22px;
+    gap: 10px 22px;
   }
   .credit-logos .org-logo {
     --ls: 0.6;
