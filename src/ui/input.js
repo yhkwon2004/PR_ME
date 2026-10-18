@@ -1,4 +1,4 @@
-// 휠 · 스와이프 · 키보드 → 다음/이전 장면. 패널 안에서 스크롤할 여지가 있으면 스크롤을 먼저 준다.
+// 휠 · 스와이프 · 키보드 → 다음/이전(프로젝트 릴 카드, 그다음 장면). 패널 안에서 스크롤할 여지가 있으면 스크롤을 먼저 준다.
 function scrollableAncestor(el, dir) {
   while (el && el !== document.body) {
     if (el.scrollHeight > el.clientHeight + 2) {
@@ -31,7 +31,8 @@ export function createInput({ next, prev, first, last, isBlocked, onKey }) {
     const now = performance.now();
     if (now < lockUntil) return;
     const moved = dir > 0 ? next() : prev();
-    if (moved !== false) lockUntil = now + lockMs;
+    // 릴 카드 한 장은 장면 전환보다 짧게 잠근다
+    if (moved !== false) lockUntil = now + (moved === 'step' ? Math.min(lockMs, 560) : lockMs);
   };
 
   addEventListener(

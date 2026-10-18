@@ -9,11 +9,11 @@ const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) 
 const SHOTS = {
   intro: { pos: add(SETS.hangar, 0, 2.1, 6.4), target: add(SETS.hangar, 0, 1.8, 0), fov: 34, shift: [0, 0.16] },
   prologue: { pos: add(SETS.hangar, 5.5, 3.4, 7.4), target: add(SETS.hangar, 0, 2.2, 0), fov: 36, shift: [0, 0] },
-  aerial: { pos: add(SETS.aerial, 14.3, 10.03, 20.8), target: add(SETS.aerial, 0, 3.4, 0), fov: 42, shift: [0, 0.1] },
+  aerial: { pos: add(SETS.aerial, 11.15, 8.57, 16.22), target: add(SETS.aerial, 0, 3.4, 0), fov: 42, shift: [0, 0.1] },
   ground: { pos: add(SETS.ground, 15.35, 9.0, 18.35), target: add(SETS.ground, -2.2, 1.2, -2.2), fov: 44, shift: [0, 0.2] },
   robotics: { pos: add(SETS.robotics, 0.175, 7.525, 14.975), target: add(SETS.robotics, 0.3, 0.9, -0.9), fov: 40, shift: [0, 0.18] },
   intelligence: { pos: add(SETS.core, 19.8, 3.24, 31.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [0, 0.11] },
-  loop: { pos: V(0, 44, 50), target: V(0, 1, -6), fov: 44, shift: [0, -0.03] },
+  loop: { pos: V(0, 44, 50), target: V(0, 1, -6), fov: 44, shift: [0, -0.13] },
   record: { pos: add(SETS.record, -1.73, 6.05, 20.13), target: add(SETS.record, 0, 2.6, 0), fov: 40, shift: [0, 0.1] },
   finale: { pos: add(SETS.hangar, 0, 7.5, 17), target: add(SETS.hangar, 0, 2.8, -4), fov: 40, shift: [0, -0.085] },
 };
@@ -87,7 +87,7 @@ export class Director {
       fov += 8;
       const reel = this.scenes.find((x) => x.id === id)?.layout === 'reel';
       const stage = this.scenes.find((x) => x.id === id)?.layout === 'stage';
-      shift.set(0, id === 'finale' ? 0.45 : id === 'record' ? 0.12 : reel ? 0.06 : stage ? 0.02 : 0.2);
+      shift.set(0, id === 'finale' ? 0.45 : id === 'record' ? 0.12 : id === 'loop' ? -0.03 : reel ? 0.06 : stage ? 0.02 : 0.2);
     } else if (aspect < 1.3) {
       const back = pos.clone().sub(target).multiplyScalar(1.15);
       pos.copy(target).add(back);
@@ -119,6 +119,15 @@ export class Director {
     this.enterScene(id, prev);
     this.onTransition?.(index, prev, duration);
     return true;
+  }
+
+  // 3D 코어의 화면 좌표(px) — 루프 장면의 고리가 따라간다
+  coreOnScreen(out) {
+    const cam = this.stage.camera;
+    cam.updateMatrixWorld();
+    this.tmp.copy(this.a.core.group.position).project(cam);
+    out.set((this.tmp.x * 0.5 + 0.5) * innerWidth, (0.5 - this.tmp.y * 0.5) * innerHeight);
+    return out;
   }
 
   // 연도별 3D 라벨은 넉넉한 가로 화면에서만 — 좁거나 낮은 화면에선 수치 아래 글줄(연도별 수상)이 대신한다
@@ -291,7 +300,7 @@ export class Director {
     if (id !== 'robotics') robotics.lookWorld.copy(drone.pos);
 
     // 세로 화면에서는 코어 라벨이 장면 제목·수치와 겹치므로 숨긴다
-    if (core.tag) core.tag.visible = cam.aspect >= 0.85 && id !== 'intelligence';
+    if (core.tag) core.tag.visible = cam.aspect >= 0.85 && id !== 'intelligence' && id !== 'loop';
     // 오프닝·엔딩: 위쪽 가장자리·타임코드 뒤에 걸리는 코어를 부드럽게 접어 드론에 집중
     const hideCore = (id === 'intro' || id === 'finale') && !this.trans;
     this.coreK += ((hideCore ? 0 : 1) - this.coreK) * Math.min(1, dt * 2.5);

@@ -128,7 +128,7 @@ function certSheet(a, { sizes = '220px' } = {}) {
 // 수상 타일(아카이브): 상장 + 이어진 프로젝트
 function awardTile(a) {
   const p = a.project;
-  return `<li class="aw-cell">
+  return `<li class="aw-cell" data-g="${TIER_KEY[a.tier]}"${p ? ' data-p' : ''}>
     <article class="aw-card" data-tier="${TIER_KEY[a.tier]}">
       ${a.certs.length || a.photo ? `<button type="button" class="aw-sheet" data-cert="${a.at}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기">${certSheet(a, { sizes: '(max-width: 599px) 44vw, 240px' })}<span class="card-glare" aria-hidden="true"></span></button>` : `<div class="aw-sheet">${certSheet(a)}</div>`}
       <div class="aw-info">
@@ -170,10 +170,15 @@ const tabs = (on) => `<nav class="pg-tabs" aria-label="보기 전환">
     <a href="/awards" data-link class="${on === 'awards' ? 'is-on' : ''}"${on === 'awards' ? ' aria-current="page"' : ''}>Awards<sup>${AWARDS.length}</sup></a>
   </nav>`;
 
+const TIER_OF_KEY = Object.fromEntries(TIER_KEY.map((k, t) => [k, t]).filter(([k]) => k));
+
 function awardsPage() {
   const media = awardMedia(AWARDS);
   const years = [...new Set(AWARDS.map((a) => a.year))];
   const count = (t) => AWARDS.filter((a) => a.tier === t).length;
+  const grand = AWARDS.filter((a) => a.tier === 1);
+  // 등급별 수치가 곧 보기 필터 — 누르면 그 등급만 남는다
+  const sum = (g, n, label) => `<button type="button" data-g="${g}"${g in TIER_OF_KEY ? ` data-tier="${g}"` : ''} aria-pressed="${g === 'all'}"><b>${n}</b><span>${label}</span></button>`;
   return {
     media,
     html: `<div class="pg pg-awards">
@@ -182,15 +187,24 @@ function awardsPage() {
       <p class="pg-kicker">AWARD ARCHIVE — 상장과 프로젝트</p>
       <h1 class="works-title">Awards<sup>${pad(AWARDS.length)}</sup></h1>
       ${tabs('awards')}
-      <dl class="aw-sum">
-        ${[1, 2, 3, 4, 5].map((t) => `<div data-tier="${TIER_KEY[t]}"><dd>${count(t)}</dd><dt>${['', '대상', '최우수상', '우수상', '장려상', '특별상 · 입선 · 순위'][t]}</dt></div>`).join('')}
-        <div><dd>${AWARDS.filter((a) => a.project).length}</dd><dt>프로젝트와 연결</dt></div>
-      </dl>
+      <div class="aw-sum" role="group" aria-label="등급별로 보기">
+        ${sum('all', AWARDS.length, '전체')}
+        ${[1, 2, 3, 4, 5].map((t) => sum(TIER_KEY[t], count(t), ['', '대상', '최우수상', '우수상', '장려상', '그 밖의 수상'][t])).join('')}
+        ${sum('project', AWARDS.filter((a) => a.project).length, '프로젝트와 연결')}
+      </div>
     </section>
+    ${
+      grand.length
+        ? `<section class="aw-feat" aria-label="대상 수상">
+      <h2 class="aw-feat-h"><span class="aw-feat-k">GRAND PRIZE</span><b>대상</b><sup>${pad(grand.length)}</sup></h2>
+      <ul class="aw-grid aw-feat-row">${grand.map(awardTile).join('')}</ul>
+    </section>`
+        : ''
+    }
     ${years
       .map((y) => {
         const list = AWARDS.filter((a) => a.year === y);
-        return `<section class="aw-year" aria-label="${y}년 수상"><h2 class="aw-y"><span>${y}</span><sup>${pad(list.length)}</sup></h2><ul class="aw-grid">${list.map(awardTile).join('')}</ul></section>`;
+        return `<section class="aw-year" data-year="${y}" aria-label="${y}년 수상"><h2 class="aw-y"><span>${y}</span><sup>${pad(list.length)}</sup></h2><ul class="aw-grid">${list.map(awardTile).join('')}</ul></section>`;
       })
       .join('')}
     ${withWall()}
@@ -530,7 +544,30 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     page.querySelectorAll('[data-cert]').forEach((b) => b.addEventListener('click', () => lightbox.show({ media: certs }, +b.dataset.cert, b)));
 
     if (route.name === 'awards') {
-      gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .aw-sum > div'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'expo.out', delay: 0.2 });
+      const sum = page.querySelector('.aw-sum');
+      sum.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-g]');
+        if (!b) return;
+        const g = b.getAttribute('aria-pressed') === 'true' && b.dataset.g !== 'all' ? 'all' : b.dataset.g;
+        sum.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.g === g)));
+        sum.classList.toggle('is-filtered', g !== 'all');
+        const keep = (li) => g === 'all' || (g === 'project' ? li.hasAttribute('data-p') : li.dataset.g === g);
+        const shown = [];
+        page.querySelectorAll('.aw-year').forEach((sec) => {
+          const cells = [...sec.querySelectorAll('.aw-cell')];
+          cells.forEach((li) => li.classList.toggle('is-out', !keep(li)));
+          const vis = cells.filter((li) => !li.classList.contains('is-out'));
+          sec.hidden = !vis.length;
+          sec.querySelector('.aw-y sup').textContent = pad(vis.length);
+          shown.push(...vis);
+        });
+        // 대상 띠는 전체 보기에서만
+        const feat = page.querySelector('.aw-feat');
+        if (feat) feat.hidden = g !== 'all';
+        shown.forEach((li) => li.classList.add('is-in'));
+        if (!reducedMotion) gsap.fromTo(shown.slice(0, 12), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.04, ease: 'power3.out', clearProps: 'all' });
+      });
+      gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .aw-sum > button'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'expo.out', delay: 0.2 });
     } else if (route.name === 'works') {
       const grid = page.querySelector('.works-grid');
       gridCols = layoutGrid(grid);

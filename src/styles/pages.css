@@ -1459,14 +1459,12 @@ body.page-open .title-card {
 @media (pointer: coarse) {
   .reel-all,
   .pg-foot a,
-  .d-prev-link,
-  .btn-quiet {
+  .d-prev-link {
     position: relative;
   }
   .reel-all::after,
   .pg-foot a::after,
-  .d-prev-link::after,
-  .btn-quiet::after {
+  .d-prev-link::after {
     content: '';
     position: absolute;
     inset: -13px -7px;

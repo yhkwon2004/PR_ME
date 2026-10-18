@@ -141,7 +141,7 @@ const site = createSite({
         warmed = true;
       }
       $('boot').hidden = false;
-      start(false);
+      start(true);
     } else if (scenes[director.index]?.id === 'ground') video?.play().catch(() => {});
     site.markFilm();
   },
@@ -150,6 +150,9 @@ const site = createSite({
 function onTransition(i, prev, duration) {
   elapsed = 0;
   panels.go(i, prev, duration);
+  // 뒤로 돌아와 마지막 카드에서 시작하는 릴이면 자동 재생 시계도 그 자리에서
+  const r = panels.reelState();
+  if (r && r.focus > 0 && scenes[i].hold > 0) elapsed = (scenes[i].hold * r.focus) / r.count;
   hud.setScene(i, prev, duration);
   if (prev >= 0) audio.whoosh(Math.max(1.2, duration));
 }
@@ -159,9 +162,21 @@ function goTo(i) {
   return director.go(Math.max(0, Math.min(scenes.length - 1, i)));
 }
 
+// 스크롤 · 스와이프 · 화살표: 프로젝트 릴이 있으면 카드를 한 장씩 넘긴 뒤 다음 장면으로
+function stepOrGo(dir) {
+  if (!started) return false;
+  const r = panels.step(dir);
+  if (r) {
+    const s = scenes[director.index];
+    if (s.hold > 0) elapsed = (s.hold * r.focus) / r.count; // 자동 재생 시계를 초점 위치에 맞춘다
+    return 'step';
+  }
+  return goTo(director.index + dir);
+}
+
 createInput({
-  next: () => goTo(director.index + 1),
-  prev: () => goTo(director.index - 1),
+  next: () => stepOrGo(1),
+  prev: () => stepOrGo(-1),
   first: () => goTo(0),
   last: () => goTo(scenes.length - 1),
   isBlocked: () => !started || lightbox.open || hud.indexOpen || site.open || site.busy,
@@ -263,7 +278,7 @@ const bootLines = [
 async function boot() {
   const log = $('boot-log');
   const pct = $('boot-pct');
-  const bar = $('boot-bar');
+  const ring = $('boot-ring');
   const clock = $('boot-clock');
   const t0 = performance.now();
   let progress = 0;
@@ -313,8 +328,8 @@ async function boot() {
       const real = done / tasks.length;
       progress += (Math.min(time, real * 0.4 + time * 0.6) - progress) * Math.min(1, dt * 7);
       if (real === 1 && time === 1 && progress > 0.97) progress = 1;
-      pct.textContent = String(Math.round(progress * 100)).padStart(3, '0');
-      bar.style.transform = `scaleX(${progress})`;
+      pct.textContent = String(Math.round(progress * 100)).padStart(2, '0');
+      ring.style.strokeDashoffset = String(100 - progress * 100);
       const want = Math.min(bootLines.length, Math.floor(progress * bootLines.length + 0.6));
       while (shown < want) addLine(shown++);
       if (progress >= 1 || started) resolve();
@@ -327,8 +342,10 @@ async function boot() {
   // 상세 페이지에서 바로 필름을 열었다면 부팅 화면은 이미 사라졌다
   const actions = $('boot-actions');
   if (started || !actions) return;
+  $('boot').classList.add('is-ready');
+  $('boot-status').textContent = 'READY — PRESS START';
   actions.hidden = false;
-  gsap.fromTo(actions.children, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, stagger: 0.1, duration: 0.6, ease: 'power3.out' });
+  gsap.fromTo(actions.children, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, stagger: 0.12, duration: 0.7, ease: 'power3.out' });
   $('enter-sound').focus({ preventScroll: true });
 }
 
@@ -360,8 +377,8 @@ function start(withSound) {
   site.markFilm();
 }
 
+// 필름은 언제나 사운드와 함께 시작한다(사운드 버튼으로 끌 수 있다)
 $('enter-sound').addEventListener('click', () => start(true));
-$('enter-quiet').addEventListener('click', () => start(false));
 
 // ── 렌더 루프 ──────────────────────────────────────────────
 const timer = new THREE.Timer();
@@ -384,7 +401,10 @@ function loop(now) {
     const s = scenes[director.index];
     if (s) {
       const busy = director.trans || lightbox.open || hud.indexOpen || hoverHold || site.open;
-      if (auto && s.hold > 0 && !busy) elapsed += dt;
+      if (auto && s.hold > 0 && !busy) {
+        elapsed += dt;
+        panels.autoFocus(elapsed / s.hold);
+      }
       hud.setProgress(s.hold > 0 ? elapsed / s.hold : 0);
       if (auto && s.hold > 0 && elapsed >= s.hold) goTo(director.index + 1);
     }
@@ -394,10 +414,25 @@ function loop(now) {
   // 부팅 화면이 덮고 있는 동안은 렌더하지 않는다
   if (!started || frozen || pageCovered) return;
   director.update(dt, t);
+  trackLoop(dt);
   stage.dust.update(t);
   stage.film.uniforms.uTime.value = t;
   stage.adapt(dt);
   stage.composer.render(dt);
+}
+
+// 루프 장면: 고리 중심이 3D 코어를 부드럽게 따라간다
+const loopAt = new THREE.Vector2();
+const loopNow = new THREE.Vector2(-1, -1);
+function trackLoop(dt) {
+  if (scenes[director.index]?.id !== 'loop') {
+    loopNow.set(-1, -1);
+    return;
+  }
+  director.coreOnScreen(loopAt);
+  if (loopNow.x < 0) loopNow.copy(loopAt);
+  else loopNow.lerp(loopAt, Math.min(1, dt * 4));
+  panels.setLoopCenter(loopNow.x, loopNow.y);
 }
 
 requestAnimationFrame(loop);
@@ -417,6 +452,7 @@ if (stage && new URLSearchParams(location.search).has('capture')) {
       for (let k = 0; k < sec / step; k++) {
         simTime += step;
         director.update(step, simTime);
+        trackLoop(step);
       }
       stage.dust.update(simTime);
       stage.composer.render(step);

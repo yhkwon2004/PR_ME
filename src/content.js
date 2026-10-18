@@ -6,6 +6,13 @@ import awardData from './data/awards.json';
 
 const M = (file) => `/media/${file}`;
 
+// 크레딧의 수상 줄: 수상 아카이브(awards.js의 tierOf)와 같은 기준으로 센다
+function awardLine() {
+  const tier = (g) => (/대상/.test(g) ? 1 : /최우수/.test(g) ? 2 : /우수상/.test(g) ? 3 : /장려/.test(g) ? 4 : 5);
+  const n = (t) => awardData.filter((a) => tier(a.grade) === t).length;
+  return `수상 ${awardData.length}회 — 대상 ${n(1)} · 최우수상 ${n(2)} · 우수상 ${n(3)} · 장려상 ${n(4)}`;
+}
+
 export const profile = {
   name: '권용현',
   en: 'Yonghyun Kwon',
@@ -122,8 +129,7 @@ export const scenes = [
     hold: 12,
     kicker: 'THE LOOP — PHYSICAL AI STACK',
     title: ['SENSE.', 'THINK.', 'ACT.'],
-    lead:
-      '피지컬 AI는 하나의 루프입니다. 센서가 세상을 읽고, 모델이 판단하고, 액추에이터가 움직입니다. 드론과 차량에서 이 루프를 직접 닫아 왔고, 이제 로봇으로 넓히고 있습니다.',
+    lead: '센서가 읽고, 모델이 판단하고, 기계가 움직이고, 다시 만듭니다 — 드론과 차량에서 닫아 온 이 루프를 이제 로봇으로 넓힙니다.',
     loop: [
       { key: 'SENSE', ko: '인지', items: ['Camera · Vision', 'LiDAR · GPS · IMU', '압력 · 가스 · 온도 센서', 'ADC 수액 감지'] },
       { key: 'THINK', ko: '판단', items: ['YOLO · MoveNet', 'End-to-End Driving', 'Nav2 Path Planning', 'LLM · Generative AI'] },
@@ -156,18 +162,30 @@ export const scenes = [
     layout: 'finale',
     hold: 0,
     kicker: 'END CREDITS',
+    // [역할, 이름] — '§'는 구획 제목, 이름이 null이면 기관 로고 줄
     credits: [
-      ['Directed & Engineered by', '권용현 · Yonghyun Kwon'],
-      ['Aerial Unit', 'Pixhawk · Mission Planner · ROS · 드론 교관'],
-      ['Ground Unit', 'CARLA · AirSim · ROS2 Nav2 · Gazebo · BAJA / EV / Formula'],
-      ['Robotics Unit', '4족보행 로봇 · 로봇팔 · ESP32 · Altium · Fusion 360'],
-      ['Intelligence Unit', 'YOLO · MoveNet · LLM · GAN-TTS'],
+      ['Written, Directed & Engineered by', '권용현 · Yonghyun Kwon'],
+      ['§', 'Featuring'],
+      ['Aerial', 'Pixhawk 자율비행 드론 · 드론 축구'],
+      ['Ground', 'AirSim 딥러닝 자율주행 · CARLA 엔드투엔드 · 자작차 BAJA·EV·Formula'],
+      ['Robotics', '4족보행 로봇 · 비전 기반 로봇팔 · 스마트 IoT 링거폴대'],
+      ['Intelligence', '학교폭력 증거 전처리 AI · 리걸 AI 정리 플랫폼 · 작업자 자세감지 iOS 앱'],
+      ['§', 'Technical Units'],
+      ['Flight', 'Pixhawk · Mission Planner · ROS · 멀티콥터 1종 · 드론 교관'],
+      ['Driving', 'AirSim · CARLA · ROS2 Nav2 · Gazebo · Unreal Engine'],
+      ['Hardware', 'ESP32 · Arduino · Altium PCB · Fusion 360 · 3D Printing'],
+      ['Vision & AI', 'YOLO · MoveNet · LLM · GAN-TTS · Swift'],
+      ['§', 'The Record'],
+      ['Awards', awardLine()],
+      ['Certifications & Press', '자격증 9 · 공식 보도 9'],
+      ['§', 'Education & Crew'],
       ['Education', '원광대학교 컴퓨터소프트웨어공학과 · JST 공유대학 스마트모빌리티 SW공학과'],
       ['Labs', '인공지능 LLM 연구실 · 지능형 IoT 연구실'],
-      ['Crew', '자작차 동아리 메카니즘 · Re:cap · 인퓨테크'],
+      ['Crew', '메카니즘 · Re:cap · 인퓨테크 · Re:Switch · HIT · 늘솔길 · 프론티어 · de:caffeine · 고단수'],
       ['Schools · Awarding bodies · Partners', null],
       ['On Location', '익산 · 전주 · 강릉 · 경주 · 치앙마이'],
-      ['Built with', 'Three.js · GSAP · Vite — on Vercel'],
+      ['Special Thanks', '함께 만든 팀원들 · 지도해 주신 교수님들 · 끝까지 봐 주신 당신'],
+      ['Built with', 'Three.js · GSAP · Web Audio · Vite — on Vercel'],
     ],
     end: ['다음 장면은,', '함께 만들 차례입니다.'],
     endEn: 'The next scene is yours.',

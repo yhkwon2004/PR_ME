@@ -18,29 +18,36 @@
     <div class="scrim" aria-hidden="true"><i class="s-left"></i><i class="s-right"></i><i class="s-top"></i><i class="s-bottom"></i><i class="s-center"></i></div>
     <div class="letterbox" aria-hidden="true"><i class="lb-top"></i><i class="lb-bottom"></i></div>
 
-    <!-- 부팅 시퀀스 -->
-    <section id="boot" aria-label="로딩">
-      <div class="boot-frame">
-        <div class="boot-head">
-          <span>KWON/PHYSICAL-AI</span>
-          <span id="boot-clock">00:00:00:00</span>
+    <!-- 부팅 시퀀스: 필름 리더 카운트다운 → 사운드와 함께 시작 -->
+    <section id="boot" aria-label="포트폴리오 필름 시작">
+      <div class="boot-corners" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <header class="boot-top">
+        <span>KWON / PHYSICAL-AI<span class="bt-reel"> — REEL 2026</span></span>
+        <span id="boot-clock">00:00:00:00</span>
+      </header>
+      <div class="boot-center">
+        <div class="boot-leader" aria-hidden="true">
+          <svg viewBox="0 0 200 200">
+            <circle class="bl-track" cx="100" cy="100" r="92" />
+            <circle class="bl-prog" id="boot-ring" cx="100" cy="100" r="92" pathLength="100" />
+            <path class="bl-cross" d="M100 14V186M14 100H186" />
+            <circle class="bl-inner" cx="100" cy="100" r="64" />
+          </svg>
+          <span class="boot-pct"><b id="boot-pct">00</b><small>%</small></span>
         </div>
-        <ol class="boot-log" id="boot-log"></ol>
-        <div class="boot-meter">
-          <span class="boot-pct"><b id="boot-pct">000</b>%</span>
-          <span class="boot-bar"><i id="boot-bar"></i></span>
-        </div>
-        <div class="boot-title" aria-hidden="true">
-          <span>DRONE</span><span>ROBOT</span><span>MOBILITY</span><span>AI</span>
-        </div>
+        <p class="boot-kicker">A PORTFOLIO FILM</p>
+        <h1 class="boot-name"><span class="bn-ko">권용현</span><span class="bn-en">Yonghyun Kwon · Physical AI Developer</span></h1>
+        <p class="boot-title" aria-hidden="true"><span>Drone</span><i></i><span>Robot</span><i></i><span>Mobility</span><i></i><span>AI</span></p>
         <div class="boot-actions" id="boot-actions" hidden>
           <button class="btn-enter" id="enter-sound" type="button">
-            <span class="btn-enter-icon">▶</span>
-            <span><b>START FILM</b><small>사운드와 함께 보기</small></span>
+            <span class="btn-enter-icon" aria-hidden="true"></span>
+            <span><b>START FILM</b><small>사운드와 함께 재생됩니다</small></span>
           </button>
-          <button class="btn-quiet" id="enter-quiet" type="button">무음으로 시작</button>
+          <p class="boot-note">헤드폰을 권장합니다 · 스크롤로 장면을 넘길 수 있습니다</p>
         </div>
       </div>
+      <ol class="boot-log" id="boot-log" aria-hidden="true"></ol>
+      <footer class="boot-bottom" aria-hidden="true"><span id="boot-status">SYSTEMS CHECK</span><span>DRONE · ROBOT · MOBILITY · AI</span></footer>
     </section>
 
     <!-- HUD -->

@@ -63,22 +63,42 @@ function render(scene, i) {
     </div>`;
   }
   if (L === 'loop') {
+    // 3D 코어를 가운데 두른 고리 — 펄스가 장면 한 번에 한 바퀴 돌며 SENSE → THINK → ACT → BUILD를 차례로 밝힌다
+    const pos = ['tl', 'tr', 'br', 'bl'];
     return `<div class="loop">
       <div class="loop-head panel-content">
         ${kicker(scene, i)}
         <h2 class="title title-loop">${lines(scene.title)}</h2>
         <p class="lead" data-r>${esc(scene.lead)}</p>
       </div>
-      <div class="loop-grid panel-content">
+      <div class="loop-ring" aria-hidden="true" data-r>
+        <svg class="lr-svg" viewBox="0 0 200 200">
+          <circle class="lr-track" cx="100" cy="100" r="99" pathLength="360" />
+          <circle class="lr-ticks" cx="100" cy="100" r="93" pathLength="360" />
+          <circle class="lr-inner" cx="100" cy="100" r="70" />
+        </svg>
+        <span class="lr-orbit"><i class="lr-tail"></i><i class="lr-dot"></i></span>
+        <span class="lr-label">PHYSICAL&nbsp;AI · CLOSED&nbsp;LOOP</span>
+      </div>
+      <ol class="loop-nodes">
         ${scene.loop
           .map(
-            (c, j) => `<section class="loop-col" data-r>
-              <header><span class="loop-no">${pad(j + 1)}</span><h3>${esc(c.key)}</h3><span class="loop-ko">${esc(c.ko)}</span></header>
-              <ul>${c.items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
-            </section>`
+            (c, j) => `<li class="ln ln-${pos[j]}" style="--k:${j}" data-r>
+              <span class="ln-pin" aria-hidden="true"></span>
+              <section class="ln-card">
+                <header><span class="ln-no">${pad(j + 1)}</span><h3>${esc(c.key)}</h3><span class="ln-ko">${esc(c.ko)}</span></header>
+                <ul>${c.items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+              </section>
+            </li>`
           )
-          .join('<span class="loop-arrow" aria-hidden="true" data-r>→</span>')}
-      </div>
+          .join('')}
+      </ol>
+      <div class="loop-detail" data-r>${scene.loop
+        .map(
+          (c, j) =>
+            `<section class="ld" style="--k:${j}"><header><span>${pad(j + 1)}</span><b>${esc(c.key)}</b><small>${esc(c.ko)}</small></header><ul>${c.items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></section>`
+        )
+        .join('')}</div>
       <ul class="tool-chips panel-content" data-r>${scene.tools.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
     </div>`;
   }
@@ -89,14 +109,20 @@ function render(scene, i) {
           <p class="credits-kicker">${esc(scene.kicker)}</p>
           <p class="credits-title">PHYSICAL AI<br /><span>a portfolio film</span></p>
           ${scene.credits
-            .map(([r, n]) =>
-              n === null
-                ? // 영화 엔딩처럼 함께한 학교 · 상을 준 곳 · 협업 기관의 로고
-                  `<div class="credit credit-logos"><span>${esc(r)}</span><ul>${CREDITS.map((k) => `<li>${orgMark(ORGS[k])}</li>`).join('')}</ul></div>`
-                : `<div class="credit"><span>${esc(r)}</span><b>${n.split(' · ').map((x) => `<span class="nw">${esc(x)}</span>`).join(' · ')}</b></div>`
+            .map(([r, n], k) =>
+              r === '§'
+                ? `<p class="credit-sec">${esc(n)}</p>`
+                : n === null
+                  ? // 영화 엔딩처럼 함께한 학교 · 상을 준 곳 · 협업 기관의 로고
+                    `<div class="credit credit-logos"><span>${esc(r)}</span><ul>${CREDITS.map((k) => `<li>${orgMark(ORGS[k])}</li>`).join('')}</ul></div>`
+                  : `<div class="credit${k === 0 ? ' credit-lead' : ''}"><span>${esc(r)}</span><b>${n
+                      .split(' · ')
+                      .map((x, j, all) => `<span class="nw">${esc(x)}${j < all.length - 1 ? ' ·' : ''}</span>`)
+                      .join(' ')}</b></div>`
             )
             .join('')}
           <p class="credits-thanks">감사합니다</p>
+          <p class="credits-copy">© 2026 ${esc(profile.name)} · ${esc(profile.en)}</p>
         </div>
       </div>
       <button type="button" class="skip" id="skip-credits">SKIP ▸</button>
@@ -202,11 +228,76 @@ function render(scene, i) {
 }
 
 // 릴: 버튼 · 마우스 드래그로 가로 이동, 드래그 후 클릭은 무시
-function bindReel(el) {
+// 프로젝트 릴의 초점: 스크롤 · 스와이프 · 화살표로 한 장씩 넘기고, 초점이 아닌 카드는 은은하게 물러난다
+function focusReel(track, reducedMotion) {
+  const cards = () => [...track.querySelectorAll('.r-card')];
+  let focus = 0;
+  let userScroll = false;
+  const center = (c) => {
+    const t = track.getBoundingClientRect();
+    const r = c.getBoundingClientRect();
+    return track.scrollLeft + (r.left - t.left) - (t.width - r.width) / 2;
+  };
+  const set = (k, { scroll = true } = {}) => {
+    const list = cards();
+    focus = Math.max(0, Math.min(list.length - 1, k));
+    track.classList.add('is-focus');
+    list.forEach((c, j) => c.classList.toggle('is-focus', j === focus));
+    if (scroll) track.scrollTo({ left: Math.max(0, center(list[focus])), behavior: reducedMotion ? 'auto' : 'smooth' });
+  };
+  // 손으로 넘겼다면 멈춘 자리의 가운데 카드가 초점
+  const mark = () => (userScroll = true);
+  track.addEventListener('pointerdown', mark, { passive: true });
+  track.addEventListener('touchstart', mark, { passive: true });
+  track.addEventListener('wheel', (e) => Math.abs(e.deltaX) > Math.abs(e.deltaY) && mark(), { passive: true });
+  let idle = 0;
+  track.addEventListener(
+    'scroll',
+    () => {
+      clearTimeout(idle);
+      idle = setTimeout(() => {
+        if (!userScroll) return;
+        userScroll = false;
+        // 양 끝에서는 여러 카드가 같은 자리로 모이니 지금 초점에 가까운 카드를 고른다
+        const max = track.scrollWidth - track.clientWidth;
+        const gap = (c) => Math.abs(Math.max(0, Math.min(max, center(c))) - track.scrollLeft);
+        const list = cards();
+        const near = list.reduce((b, c, j) => {
+          const d = gap(c) - gap(list[b]);
+          return d < -2 || (Math.abs(d) <= 2 && Math.abs(j - focus) < Math.abs(b - focus)) ? j : b;
+        }, 0);
+        set(near, { scroll: false });
+      }, 160);
+    },
+    { passive: true }
+  );
+  return {
+    get count() {
+      return cards().length;
+    },
+    get focus() {
+      return focus;
+    },
+    set,
+    // 넘길 카드가 남았으면 넘기고 true
+    step(dir) {
+      const k = focus + dir;
+      if (k < 0 || k >= cards().length) return false;
+      set(k);
+      return true;
+    },
+  };
+}
+
+function bindReel(el, reducedMotion) {
   const track = el.querySelector('.reel-track');
   if (!track) return;
+  // 수상 릴은 그대로 가로로 넘기고, 프로젝트 릴만 한 장씩 초점을 옮긴다
+  const reel = el.querySelector('.reel:not(.aw-reel)') ? focusReel(track, reducedMotion) : null;
+  el.reel = reel;
   el.querySelectorAll('[data-reel]').forEach((b) =>
     b.addEventListener('click', () => {
+      if (reel) return reel.step(+b.dataset.reel);
       const card = track.querySelector('.r-card');
       const step = card ? card.getBoundingClientRect().width + 14 : 300;
       track.scrollBy({ left: +b.dataset.reel * step * 2, behavior: 'smooth' });
@@ -221,6 +312,13 @@ function bindReel(el) {
     track.classList.toggle('can-left', track.scrollLeft > 4);
     track.classList.toggle('can-right', !end);
     if (!nav || !track.clientWidth) return;
+    if (reel) {
+      // 초점 릴: 카드가 둘 이상이면 늘 보이고, 양 끝 카드에서 해당 버튼을 끈다
+      nav.hidden = reel.count < 2;
+      nav.querySelector('[data-reel="-1"]').disabled = reel.focus <= 0;
+      nav.querySelector('[data-reel="1"]').disabled = reel.focus >= reel.count - 1;
+      return;
+    }
     nav.hidden = track.scrollWidth <= track.clientWidth + 4;
     nav.querySelector('[data-reel="-1"]').disabled = track.scrollLeft < 4;
     nav.querySelector('[data-reel="1"]').disabled = end;
@@ -280,7 +378,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
     el.hidden = true;
     el.inert = true;
     root.appendChild(el);
-    bindReel(el);
+    bindReel(el, reducedMotion);
     const sheet = el.querySelector('.stage-foot');
     if (sheet) {
       const end = () => sheet.classList.toggle('is-end', sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 4);
@@ -333,7 +431,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
     }
   }
 
-  function show(i, delay = 0) {
+  function show(i, delay = 0, back = false) {
     const el = panels[i];
     el.hidden = false;
     el.inert = false;
@@ -363,7 +461,10 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
       if (track) {
         // 가로로 넘기는 동안 빈 카드가 보이지 않게 이 장면의 썸네일은 미리 모두 받는다
         track.querySelectorAll('img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
-        track.scrollLeft = 0;
+        // 바로 다음 장면에서 뒤로 돌아왔다면 마지막 카드부터 — 위로 스크롤하면 카드를 거꾸로 넘긴다
+        const atEnd = back && el.reel;
+        track.scrollLeft = atEnd ? track.scrollWidth : 0;
+        el.reel?.set(atEnd ? el.reel.count - 1 : 0, { scroll: false });
         track.dispatchEvent(new Event('scroll'));
       }
     }
@@ -400,22 +501,57 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
     if (reducedMotion) {
       creditsTl.add(showCard, 0.5);
     } else {
-      creditsTl.fromTo(roll, { yPercent: 0, y: () => credits.clientHeight }, { yPercent: -100, y: 0, duration: 16, ease: 'none' }).add(showCard);
+      // 크레딧 길이에 맞춰 일정한 속도로 흐른다(초당 약 70px, 최소 16초)
+      const duration = Math.max(16, (roll.offsetHeight + credits.clientHeight) / 70);
+      creditsTl.fromTo(roll, { yPercent: 0, y: () => credits.clientHeight }, { yPercent: -100, y: 0, duration, ease: 'none' }).add(showCard);
     }
     skip.onclick = showCard;
   }
 
   panels.forEach((el) => el.querySelector('#btn-replay')?.addEventListener('click', onReplay));
 
+  // 장면 넘기기 전에 지금 장면의 프로젝트 릴을 한 장씩 넘긴다 — 넘겼으면 { focus, count }
+  function step(dir) {
+    const reel = panels[current]?.reel;
+    if (!reel || !reel.step(dir)) return null;
+    panels[current].querySelector('.reel-track').dispatchEvent(new Event('scroll'));
+    return { focus: reel.focus, count: reel.count };
+  }
+  // 자동 재생: 장면 시간에 맞춰 초점이 다음 카드로 흐른다(뒤로는 돌아가지 않음)
+  function autoFocus(progress) {
+    const reel = panels[current]?.reel;
+    if (!reel || reel.count < 2) return;
+    const k = Math.min(reel.count - 1, Math.floor(progress * reel.count));
+    if (k > reel.focus) {
+      reel.set(k);
+      panels[current].querySelector('.reel-track').dispatchEvent(new Event('scroll'));
+    }
+  }
+
+  // 루프 고리의 중심 — 3D 코어의 화면 위치
+  const loopEl = panels.find((p) => p.dataset.scene === 'loop')?.querySelector('.loop');
+  function setLoopCenter(x, y) {
+    if (!loopEl) return;
+    loopEl.style.setProperty('--lx', `${x.toFixed(1)}px`);
+    loopEl.style.setProperty('--ly', `${y.toFixed(1)}px`);
+  }
+
   return {
     panels,
+    step,
+    autoFocus,
+    setLoopCenter,
+    reelState() {
+      const reel = panels[current]?.reel;
+      return reel ? { focus: reel.focus, count: reel.count } : null;
+    },
     go(i, prev, duration) {
       if (prev >= 0) hide(prev);
       current = i;
       // 다음 장면의 릴 썸네일을 미리 받아 카드가 빈 상자로 날아들지 않게
       panels[i + 1]?.querySelectorAll('.reel-track img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
       const delay = prev < 0 ? 0.9 : Math.max(0.5, duration * 0.62);
-      show(i, delay);
+      show(i, delay, prev === i + 1);
     },
     get current() {
       return panels[current];
