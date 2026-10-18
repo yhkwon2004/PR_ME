@@ -102,7 +102,9 @@ const issuerLine = (a) => {
   const who = (a.issuer || '').split(' · ').filter(Boolean);
   const norm = (x) => x.replace(/\s/g, '');
   const prize = (a.prize || '').split(' · ').filter((x) => x && !who.some((w) => norm(w).endsWith(norm(x).replace(/(상|표창)$/, ''))));
-  return [...who, ...prize].map((x, k) => `<span class="nw">${k ? '· ' : ''}${esc(x)}</span>`).join(' ');
+  const parts = [...who, ...prize];
+  // 구분점은 앞 조각 끝에 붙여, 줄이 바뀌어도 새 줄이 '·'로 시작하지 않게
+  return parts.map((x, k) => `<span class="nw">${esc(x)}${k < parts.length - 1 ? ' ·' : ''}</span>`).join(' ');
 };
 // 상장(없으면 시상 사진)을 라이트박스 목록으로
 function awardMedia(list) {
@@ -135,7 +137,7 @@ function awardTile(a) {
         ${a.issuer || a.prize ? `<p class="aw-issuer">${issuerLine(a)}</p>` : ''}
         ${
           p
-            ? `<a class="aw-proj" href="${p.path}" data-link data-cat="${esc(p.category)}">${p.cover ? `<span class="aw-proj-img">${img(p.cover, { sizes: '64px' })}</span>` : `<span class="aw-proj-img is-type" aria-hidden="true">${esc(categoryOf(p.category).label.slice(0, 2).toUpperCase())}</span>`}<span class="aw-proj-t"><small>PROJECT</small><b>${esc(p.title)}</b></span><i aria-hidden="true">↗</i></a>`
+            ? `<a class="aw-proj" href="${p.path}" data-link data-cat="${esc(p.category)}">${p.cover ? `<span class="aw-proj-img">${img(p.cover, { sizes: '64px' })}</span>` : `<span class="aw-proj-img is-type" aria-hidden="true">${esc(categoryOf(p.category).label.slice(0, 2).toUpperCase())}</span>`}<span class="aw-proj-t"><small>PROJECT</small><b>${esc(p.title).replace(/ · /g, '&nbsp;· ')}</b></span><i aria-hidden="true">↗</i></a>`
             : ''
         }
       </div>

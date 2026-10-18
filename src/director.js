@@ -93,8 +93,8 @@ export class Director {
       pos.copy(target).add(back);
       shift.x *= 0.7;
     } else if (id === 'record' && (innerHeight < 1000 || aspect > 1.9)) {
-      // 낮은 화면: 적층 막대가 위쪽 수치 띠로 올라가지 않게
-      shift.y = 0.055;
+      // 낮은 화면: 적층 막대가 위쪽 수치 띠로 올라가지 않게(가로 휴대폰은 카드 줄 뒤로 내린다)
+      shift.y = innerHeight < 500 ? -0.3 : 0.055;
     }
     return { pos, target, fov, shift };
   }
@@ -121,9 +121,16 @@ export class Director {
     return true;
   }
 
+  // 연도별 3D 라벨은 넉넉한 가로 화면에서만 — 좁거나 낮은 화면에선 수치 아래 글줄(연도별 수상)이 대신한다
+  fitRecordTags() {
+    const aspect = this.stage.camera.aspect;
+    this.a.records.showTags = aspect >= 0.85 && aspect <= 1.9 && innerHeight >= 860;
+  }
+
   // 창 크기가 바뀌면 지금 장면의 구도를 다시 잡는다(세로 · 낮은 화면 구도가 바로 반영되게)
   reframe() {
     if (this.index < 0) return;
+    this.fitRecordTags();
     if (this.trans) {
       this.reframePending = true;
       return;
@@ -163,6 +170,7 @@ export class Director {
     if (id === 'record') {
       records.reveal = 0;
       records.revealTarget = 1;
+      this.fitRecordTags();
     }
     if (id === 'ground') video.play?.().catch(() => {});
     else video.pause?.();

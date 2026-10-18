@@ -1692,9 +1692,14 @@ body.is-started.has-pointer .cursor {
   background: #000;
 }
 .lightbox figcaption {
+  max-width: min(88vw, 1280px);
+  margin-inline: auto;
   font-size: 14px;
   color: var(--fg-2);
   text-align: center;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .lightbox figcaption span {
   font-family: var(--mono);

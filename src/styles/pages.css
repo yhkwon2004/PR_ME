@@ -464,7 +464,6 @@ body.page-open .title-card {
 .pg-awards .pg-bar {
   background: rgba(5, 7, 12, 0.8);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
 }
 .pg-detail .pg-bar {

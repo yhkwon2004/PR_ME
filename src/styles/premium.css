@@ -152,7 +152,11 @@
   pointer-events: none;
 }
 .card-top .card-no {
+  padding: 2px 7px;
+  border-radius: 999px;
   color: var(--cc, var(--orange));
+  background: rgba(5, 7, 12, 0.66);
+  backdrop-filter: blur(4px);
 }
 .card-top .card-cat::before {
   content: '';
@@ -597,6 +601,43 @@
 }
 .stage.has-reel .stage-head .counters {
   margin-top: 14px;
+}
+/* 연도별 수상: 3D 라벨이 숨는 화면에서도 같은 정보가 읽히도록 */
+.rec-years {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 16px;
+  margin: 10px auto 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--fg-2);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
+}
+.rec-years > span:first-child {
+  color: var(--muted);
+}
+.rec-years b {
+  color: var(--cyan);
+  font-weight: 600;
+}
+.rec-years .nw {
+  white-space: nowrap;
+}
+/* 가로 휴대폰: 수치와 수상 릴 사이에 자리가 없어 연도별 줄은 접는다 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .rec-years {
+    display: none;
+  }
+}
+/* 수상 릴의 ←/→는 오른쪽 끝으로 — 가운데 3D 막대 위를 가리지 않게 */
+.stage.has-reel .reel-bar {
+  position: relative;
+}
+.stage.has-reel .reel-nav {
+  position: absolute;
+  right: var(--pad);
 }
 /* 수치 아래로 3D 막대가 지나가도 글자가 읽히게 */
 .stage.has-reel .counters dd,

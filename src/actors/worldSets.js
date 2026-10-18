@@ -371,6 +371,7 @@ export class RecordSet {
     this.group.add(floor);
     this.reveal = 0;
     this.revealTarget = 0;
+    this.showTags = true;
     this.dummy = new THREE.Object3D();
     this.update(0, 0);
   }
@@ -396,6 +397,7 @@ export class RecordSet {
     this.tags.forEach((tg) => {
       tg.position.set((tg.userData.col - 1.5) * 2.5, tg.userData.top * show + 0.3, 0);
       tg.material.opacity = show;
+      tg.visible = this.showTags;
     });
   }
 }

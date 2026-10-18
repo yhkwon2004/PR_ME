@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import { profile } from '../content.js';
 import { byId } from '../data/projects.js';
-import { AWARD_REEL } from '../data/awards.js';
+import { AWARDS, AWARD_REEL } from '../data/awards.js';
 import { ORGS, CREDITS } from '../data/orgs.js';
 import { projectCard, awardCard, orgMark } from '../pages/site.js';
 
@@ -126,6 +126,12 @@ function render(scene, i) {
       head += `<dl class="counters" data-r>${scene.counters
         .map((c) => `<div><dd><b data-count="${c.value}">${c.value}</b></dd><dt>${esc(c.label)}</dt></div>`)
         .join('')}</dl>`;
+    if (scene.awardReel) {
+      const years = [...new Set(AWARDS.map((a) => a.year))].sort();
+      head += `<p class="rec-years" data-r><span>연도별 수상</span>${years
+        .map((y) => `<span class="nw"><b>${y}</b> ${AWARDS.filter((a) => a.year === y).length}</span>`)
+        .join('')}</p>`;
+    }
     let foot = '';
     if (scene.pillars)
       foot += `<div class="pillars">${scene.pillars
