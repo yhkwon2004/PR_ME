@@ -110,8 +110,12 @@
 .deck .r-card.is-focus .card-media::after {
   border-color: color-mix(in srgb, var(--cc, var(--cyan)) 62%, transparent);
 }
-.deck .r-card.is-focus .card-media > img:not(.blur-fill) {
+.deck .r-card.is-focus .card-media > img:not(.blur-fill):not(.a-bg) {
   filter: none;
+}
+/* 수상 카드의 사진은 가운데에서도 어둡게 — 상장과 글이 먼저 읽히도록 */
+.deck .a-card.is-focus .card-media > img.a-bg {
+  filter: brightness(0.62) saturate(0.9);
 }
 /* 카드가 가운데에 닿을 때: 사진이 살짝 다가왔다 자리 잡고, 빛 한 줄이 표면을 훑는다 */
 .card-sweep {
@@ -119,11 +123,11 @@
   inset: 0;
   z-index: 7;
   pointer-events: none;
-  background: linear-gradient(105deg, transparent 32%, rgba(255, 255, 255, 0.1) 44%, rgba(255, 255, 255, 0.26) 50%, rgba(255, 255, 255, 0.1) 56%, transparent 68%);
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.12) 43%, rgba(255, 255, 255, 0.34) 50%, rgba(255, 255, 255, 0.12) 57%, transparent 70%);
   transform: translateX(-140%);
 }
 .r-card.is-landing .card-sweep {
-  animation: card-sweep 1.15s var(--ease) 0.12s both;
+  animation: card-sweep 1s cubic-bezier(0.3, 0.6, 0.2, 1) both;
 }
 .r-card.is-landing .card-media > img:not(.blur-fill) {
   animation: card-settle 1.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -141,7 +145,7 @@
 /* 덱 아래 막대: 장 수 · 넘김 버튼과 진행 눈금 · 전체 보기 */
 .deck-bar {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 18px;
   width: min(100% - 2 * var(--pad), 820px);
@@ -155,6 +159,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
   white-space: nowrap;
   color: var(--muted);
 }
@@ -163,6 +169,9 @@
   font-weight: 600;
 }
 .deck-label .reel-stats {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   padding: 0;
   background: none;
   backdrop-filter: none;

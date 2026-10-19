@@ -43,8 +43,8 @@ export function createInput({ next, prev, first, last, isBlocked, onKey }) {
     (e) => {
       if (isBlocked()) return;
       const horizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
-      // 트랙패드 가로 스크롤은 릴을 넘긴다
-      if (horizontal && scrollableX(e.target)) return;
+      // 트랙패드 가로 스크롤은 가로로 넘기는 것(스크롤 영역 · 카드 덱)에 맡긴다
+      if (horizontal && (scrollableX(e.target) || e.target.closest?.('.deck-stage'))) return;
       const d = horizontal ? e.deltaX : e.deltaY;
       if (scrollableAncestor(e.target, Math.sign(d))) return;
       e.preventDefault();
@@ -99,7 +99,7 @@ export function createInput({ next, prev, first, last, isBlocked, onKey }) {
       const dir = dist < 0 ? 1 : -1;
       // 세로 스와이프가 패널 스크롤이었다면 장면을 넘기지 않는다
       if (!horizontal && (couldScroll[dir] || scrollableAncestor(startEl, dir))) return;
-      if (horizontal && startEl && scrollableX(startEl)) return;
+      if (horizontal && startEl && (scrollableX(startEl) || startEl.closest?.('.deck-stage'))) return;
       fire(dir, 900);
     },
     { passive: true }

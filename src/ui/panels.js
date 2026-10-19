@@ -274,20 +274,24 @@ function deckReel(el, reducedMotion) {
   };
   const land = () => {
     const c = cards[focus];
-    c.classList.remove('is-landing');
+    cards.forEach((x) => x.classList.remove('is-landing'));
     void c.offsetWidth;
     c.classList.add('is-landing');
-    // 바닥 빛은 초점 카드의 분야 색
-    stage.style.setProperty('--fc', getComputedStyle(c).getPropertyValue('--cc') || '');
   };
   // auto: 자동 재생이 옮긴 것 · animate: 움직임으로 옮길지
   const set = (k, { animate = true, auto = false } = {}) => {
     const prev = focus;
     focus = Math.max(0, Math.min(cards.length - 1, k));
+    // 탭 순서에는 가운데 카드 하나만 — 키보드 초점이 덱 안에 있으면 새 가운데 카드로 옮긴다
+    const had = cards.includes(document.activeElement);
     cards.forEach((c, j) => {
       c.classList.toggle('is-focus', j === focus);
+      c.tabIndex = j === focus ? 0 : -1;
       c.setAttribute('aria-hidden', String(Math.abs(j - focus) > 2));
     });
+    if (had && document.activeElement !== cards[focus]) cards[focus].focus({ preventScroll: true });
+    // 바닥 빛은 초점 카드의 분야 색
+    stage.style.setProperty('--fc', getComputedStyle(cards[focus]).getPropertyValue('--cc') || '');
     place(animate);
     if (animate && focus !== prev) land();
     el.dispatchEvent(new CustomEvent('reelfocus', { detail: { focus, prev, count: cards.length, auto } }));
@@ -304,6 +308,8 @@ function deckReel(el, reducedMotion) {
     (e) => {
       const c = e.target.closest('.r-card');
       if (!c) return;
+      // Ctrl · Cmd · Shift 클릭은 브라우저 기본 동작(새 탭 등) 그대로
+      if (!dragged && (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) return;
       const k = cards.indexOf(c);
       if (dragged || k !== focus) {
         e.preventDefault();
@@ -318,6 +324,61 @@ function deckReel(el, reducedMotion) {
   stage.addEventListener('focusin', (e) => {
     const c = e.target.closest?.('.r-card');
     if (c && c.matches(':focus-visible') && cards.indexOf(c) !== focus) set(cards.indexOf(c));
+  });
+  // 덱 위의 가로 제스처(트랙패드 가로 스크롤 · 가로 스와이프 · ←/→ 키)는 카드를 넘긴다 — 세로는 장면 넘김에 맡긴다
+  let acc = 0;
+  let lockUntil = 0;
+  let idle = 0;
+  stage.addEventListener(
+    'wheel',
+    (e) => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      const now = performance.now();
+      clearTimeout(idle);
+      idle = setTimeout(() => (acc = 0), 200);
+      if (now < lockUntil) {
+        lockUntil = Math.max(lockUntil, now + 200);
+        return;
+      }
+      acc += e.deltaX;
+      if (Math.abs(acc) > 40) {
+        set(focus + Math.sign(acc));
+        acc = 0;
+        lockUntil = now + 450;
+      }
+    },
+    { passive: false }
+  );
+  let tx = null;
+  stage.addEventListener(
+    'touchstart',
+    (e) => {
+      const t = e.touches[0];
+      tx = { x: t.clientX, y: t.clientY };
+    },
+    { passive: true }
+  );
+  stage.addEventListener(
+    'touchend',
+    (e) => {
+      if (!tx) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - tx.x;
+      const dy = t.clientY - tx.y;
+      tx = null;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) set(focus - Math.sign(dx));
+    },
+    { passive: true }
+  );
+  stage.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    const dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    const k = focus + dir;
+    if (!dir || k < 0 || k >= cards.length) return;
+    e.preventDefault();
+    e.stopPropagation();
+    set(k);
   });
   // 마우스로 끌어 넘기기
   stage.addEventListener('dragstart', (e) => e.preventDefault());
@@ -339,7 +400,11 @@ function deckReel(el, reducedMotion) {
   });
   addEventListener('resize', layout);
 
+  set(0, { animate: false });
+
   return {
+    // 휠 · 세로 스와이프 · 방향키로도 한 장씩 넘길지(프로젝트 덱) — 카드가 많은 수상 덱은 장면 넘김을 막지 않는다
+    paged: !el.querySelector('.aw-reel'),
     get count() {
       return cards.length;
     },
@@ -390,8 +455,14 @@ function bindReel(el, reducedMotion, onReelFocus) {
       t.classList.toggle('is-past', j < f);
     });
     if (nav) {
-      nav.querySelector('[data-reel="-1"]').disabled = f <= 0;
-      nav.querySelector('[data-reel="1"]').disabled = f >= reel.count - 1;
+      const prev = nav.querySelector('[data-reel="-1"]');
+      const next = nav.querySelector('[data-reel="1"]');
+      // 누르던 버튼이 끝에서 꺼지면 초점을 반대쪽 버튼으로 넘겨 잃지 않게
+      const active = document.activeElement;
+      prev.disabled = f <= 0;
+      next.disabled = f >= reel.count - 1;
+      if (active === prev && prev.disabled) next.focus({ preventScroll: true });
+      if (active === next && next.disabled) prev.focus({ preventScroll: true });
     }
   };
   el.addEventListener('reelfocus', (e) => {
@@ -491,7 +562,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       // 넘기는 동안 빈 카드가 보이지 않게 이 장면의 썸네일은 미리 모두 받는다
       el.querySelectorAll('.deck-stage img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
       // 바로 다음 장면에서 뒤로 돌아왔다면 마지막 카드부터 — 위로 스크롤하면 카드를 거꾸로 넘긴다
-      el.reel.set(back ? el.reel.count - 1 : 0, { animate: false });
+      el.reel.set(back && el.reel.paged ? el.reel.count - 1 : 0, { animate: false });
       el.reel.intro(tl, 0.3);
     }
     // 루프: 고리가 드러날 때 펄스가 SENSE에서 출발한다
@@ -546,7 +617,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
   // 장면 넘기기 전에 지금 장면의 프로젝트 릴을 한 장씩 넘긴다 — 넘겼으면 { focus, count }
   function step(dir) {
     const reel = panels[current]?.reel;
-    if (!reel || !reel.step(dir)) return null;
+    if (!reel || !reel.paged || !reel.step(dir)) return null;
     return { focus: reel.focus, count: reel.count };
   }
   // 자동 재생: 장면 시간에 맞춰 초점이 다음 카드로 흐른다(뒤로는 돌아가지 않음)
