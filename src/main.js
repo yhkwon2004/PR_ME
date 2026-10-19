@@ -108,10 +108,16 @@ const panels = createPanels($('stage'), scenes, {
   onReplay: () => goTo(0),
   // 릴 초점을 손으로 옮기면(스크롤 · 스와이프 · 버튼) 자동 재생 시계를 그 카드 자리로 맞춘다
   onReelFocus: ({ focus, count }) => {
-    const s = scenes[director?.index];
-    if (s && s.hold > 0) elapsed = (s.hold * focus) / count;
+    const h = holdOf(director?.index);
+    if (h > 0) elapsed = (h * focus) / count;
   },
 });
+// 장면 길이: 카드 덱이 있으면 카드마다 1.5초는 머물도록 늘린다(수상 덱처럼 카드가 많은 장면)
+function holdOf(i) {
+  const s = scenes[i];
+  if (!(s?.hold > 0)) return 0;
+  return Math.max(s.hold, (panels.panels[i]?.reel?.count || 0) * 1.5);
+}
 const hud = createHud(scenes, {
   reducedMotion: reduced,
   onGo: (i) => goTo(i),
@@ -407,12 +413,13 @@ function loop(now) {
     const s = scenes[director.index];
     if (s) {
       const busy = director.trans || lightbox.open || hud.indexOpen || hoverHold || site.open;
-      if (auto && s.hold > 0 && !busy) {
+      const hold = holdOf(director.index);
+      if (auto && hold > 0 && !busy) {
         elapsed += dt;
-        panels.autoFocus(elapsed / s.hold);
+        panels.autoFocus(elapsed / hold);
       }
-      hud.setProgress(s.hold > 0 ? elapsed / s.hold : 0);
-      if (auto && s.hold > 0 && elapsed >= s.hold) goTo(director.index + 1);
+      hud.setProgress(hold > 0 ? elapsed / hold : 0);
+      if (auto && hold > 0 && elapsed >= hold) goTo(director.index + 1);
     }
   }
   if (!stage) return;

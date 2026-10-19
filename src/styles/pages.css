@@ -111,27 +111,12 @@
   right: 0;
   bottom: calc(var(--bottom) + 2px);
 }
-.reel-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  padding: 0 var(--pad);
-  margin-bottom: 12px;
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-}
-.reel-count,
 .reel-all,
 .reel-stats {
   padding: 4px 10px;
   border-radius: 999px;
   background: rgba(5, 7, 12, 0.66);
   backdrop-filter: blur(6px);
-}
-.reel-count {
-  color: var(--cyan);
 }
 .reel-all {
   color: var(--fg);
@@ -145,77 +130,9 @@
 .reel-all:hover {
   color: var(--orange);
 }
-.reel-nav {
-  display: flex;
-  gap: 6px;
-}
-.reel-nav button {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid var(--line-2);
-  background: rgba(5, 7, 12, 0.45);
-  backdrop-filter: blur(6px);
-  transition: border-color 0.3s, color 0.3s;
-}
-.reel-nav[hidden] {
-  display: none;
-}
-.reel-nav button:disabled {
-  opacity: 0.3;
-  pointer-events: none;
-}
-.reel-nav button:hover {
-  border-color: var(--cyan);
-  color: var(--cyan);
-}
-.reel-track {
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
-  scrollbar-width: none;
-  padding: 2px var(--pad) 6px;
-  scroll-padding-inline: var(--pad);
-  perspective: 1400px;
-  touch-action: pan-x;
-}
-/* 카드가 화면보다 적으면 가운데에, 넘치면 처음부터(자동 여백은 넘칠 때 0이 된다) */
-.reel-track > .r-card:first-child {
-  margin-left: auto;
-}
-.reel-track > .r-card:last-child {
-  margin-right: auto;
-}
-/* 더 넘길 카드가 있는 쪽만 흐리게 */
-.reel-track.can-right {
-  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 80px), transparent);
-  mask-image: linear-gradient(90deg, #000 calc(100% - 80px), transparent);
-}
-.reel-track.can-left {
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 80px);
-  mask-image: linear-gradient(90deg, transparent, #000 80px);
-}
-.reel-track.can-left.can-right {
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 80px, #000 calc(100% - 80px), transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 80px, #000 calc(100% - 80px), transparent);
-}
-.reel-track::-webkit-scrollbar {
-  display: none;
-}
-.reel-track.is-dragging {
-  scroll-snap-type: none;
-}
-.reel-track.is-dragging a {
-  pointer-events: none;
-}
 .r-card {
-  flex: none;
   width: calc(var(--card-h) * 0.8);
-  scroll-snap-align: start;
   color: var(--fg);
-  transform-style: preserve-3d;
 }
 
 /* 공통 카드 */
@@ -1346,9 +1263,6 @@ body.page-open .title-card {
     background: linear-gradient(180deg, rgba(5, 7, 12, 0), rgba(5, 7, 12, 0.94) 38%);
     pointer-events: none;
   }
-  .reel-nav {
-    display: none;
-  }
   .card-title {
     font-size: 13px;
   }
@@ -1503,9 +1417,6 @@ body.page-open .title-card {
   .r-card {
     width: calc(var(--card-h) * 1.35);
   }
-  .reel-track {
-    gap: 12px;
-  }
   .reel .card-meta {
     display: none;
   }
@@ -1515,9 +1426,6 @@ body.page-open .title-card {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  .reel-bar {
-    margin-bottom: 6px;
   }
   .reel-head .title {
     font-size: 30px;

@@ -25,6 +25,20 @@ function stats(list = []) {
     .join('')}</dl>`;
 }
 
+// 카드 덱: 가운데 무대에 카드가 겹쳐 서고, 아래 막대에 번호 · 진행 눈금 · 넘김 버튼
+function deck(cards, { count, label, noun, all, allLabel, stats = '' }) {
+  return `<div class="deck-stage" role="group" aria-roledescription="carousel" aria-label="${esc(label)}">${cards}</div>
+        <div class="deck-bar">
+          <span class="deck-label"><b>${pad(count)}</b> ${esc(label)}${stats ? `<span class="reel-stats">${stats}</span>` : ''}</span>
+          <span class="deck-nav"${count < 2 ? ' hidden' : ''}>
+            <button type="button" class="deck-btn" data-reel="-1" aria-label="이전 ${noun}">←</button>
+            <span class="deck-count" aria-hidden="true"><b class="deck-now">01</b><span class="deck-ticks">${'<i></i>'.repeat(count)}</span><span class="deck-total">${pad(count)}</span></span>
+            <button type="button" class="deck-btn" data-reel="1" aria-label="다음 ${noun}">→</button>
+          </span>
+          <a class="reel-all" href="${esc(all)}" data-link>${allLabel} <span aria-hidden="true">↗</span></a>
+        </div>`;
+}
+
 function render(scene, i) {
   const L = scene.layout;
   if (L === 'hero') {
@@ -51,14 +65,15 @@ function render(scene, i) {
         ${scene.subtitle ? `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>` : ''}
         ${scene.stats ? `<ul class="mini-stats" data-r>${scene.stats.map((s) => `<li><b>${esc(s.value)}</b><span>${esc(s.label)}</span></li>`).join('')}</ul>` : ''}
       </div>
-      <div class="reel panel-content" data-r>
-        <div class="reel-bar">
-          <span class="reel-count">${pad(list.length)} PROJECTS</span>
-          ${scene.stats ? `<span class="reel-stats">${scene.stats.map((s) => `${esc(s.value)} ${esc(s.label)}`).join(' · ')}</span>` : ''}
-          <a class="reel-all" href="/works?c=${esc([...new Set(list.map((p) => p.category))].join(','))}" data-link>VIEW ALL ↗</a>
-          <span class="reel-nav"><button type="button" data-reel="-1" aria-label="이전 프로젝트">←</button><button type="button" data-reel="1" aria-label="다음 프로젝트">→</button></span>
-        </div>
-        <div class="reel-track">${list.map((p, k) => projectCard(p, k, { cls: 'r-card' })).join('')}</div>
+      <div class="reel deck panel-content" data-r>
+        ${deck(list.map((p, k) => projectCard(p, k, { cls: 'r-card' })).join(''), {
+          count: list.length,
+          label: 'PROJECTS',
+          noun: '프로젝트',
+          all: `/works?c=${[...new Set(list.map((p) => p.category))].join(',')}`,
+          allLabel: 'VIEW ALL',
+          stats: scene.stats ? scene.stats.map((s) => `${esc(s.value)} ${esc(s.label)}`).join(' · ') : '',
+        })}
       </div>
     </div>`;
   }
@@ -175,13 +190,8 @@ function render(scene, i) {
       foot += `<ol class="mini-timeline" data-r>${scene.timeline.map(([y, t]) => `<li><b>${esc(y)}</b><span>${esc(t)}</span></li>`).join('')}</ol>`;
     // 수상 릴: 프로젝트 사진 위에 상장을 얹은 카드
     const reel = scene.awardReel
-      ? `<div class="reel aw-reel panel-content" data-r>
-        <div class="reel-bar">
-          <span class="reel-count">${pad(AWARD_REEL.length)} PROJECT AWARDS</span>
-          <a class="reel-all" href="/awards" data-link>ALL AWARDS ↗</a>
-          <span class="reel-nav"><button type="button" data-reel="-1" aria-label="이전 수상">←</button><button type="button" data-reel="1" aria-label="다음 수상">→</button></span>
-        </div>
-        <div class="reel-track">${AWARD_REEL.map(awardCard).join('')}</div>
+      ? `<div class="reel deck aw-reel panel-content" data-r>
+        ${deck(AWARD_REEL.map(awardCard).join(''), { count: AWARD_REEL.length, label: 'PROJECT AWARDS', noun: '수상', all: '/awards', allLabel: 'ALL AWARDS' })}
       </div>`
       : '';
     return `<div class="stage${reel ? ' has-reel' : ''}">
@@ -227,151 +237,168 @@ function render(scene, i) {
   </div>`;
 }
 
-// 릴: 버튼 · 마우스 드래그로 가로 이동, 드래그 후 클릭은 무시
-// 프로젝트 릴의 초점: 스크롤 · 스와이프 · 화살표로 한 장씩 넘기고, 초점이 아닌 카드는 은은하게 물러난다
-function focusReel(track, reducedMotion) {
-  const cards = () => [...track.querySelectorAll('.r-card')];
+// 덱 자리: 초점 카드(0)는 가운데 앞, 이웃(1 · 2)은 양옆 뒤로 비스듬히, 그 너머(3)는 보이지 않게
+const SLOTS = [
+  { x: 0, z: 0, r: 0, s: 1, o: 1, d: 0 },
+  { x: 0.9, z: -170, r: 38, s: 0.86, o: 1, d: 0.52 },
+  { x: 1.56, z: -330, r: 48, s: 0.74, o: 0.6, d: 0.8 },
+  { x: 2.05, z: -450, r: 54, s: 0.62, o: 0, d: 1 },
+];
+
+// 카드 덱(커버플로): 한 번에 한 장씩 가운데로 — 휠 · 스와이프 · 방향키 · 버튼 · 옆 카드 누르기 · 끌기
+function deckReel(el, reducedMotion) {
+  const stage = el.querySelector('.deck-stage');
+  const cards = [...stage.querySelectorAll('.r-card')];
+  if (!cards.length) return null;
+  // 초점이 바뀔 때 카드 표면을 훑는 빛
+  cards.forEach((c) => c.querySelector('.card-media')?.insertAdjacentHTML('beforeend', '<i class="card-sweep" aria-hidden="true"></i>'));
   let focus = 0;
-  let userScroll = false;
-  const center = (c) => {
-    const t = track.getBoundingClientRect();
-    const r = c.getBoundingClientRect();
-    return track.scrollLeft + (r.left - t.left) - (t.width - r.width) / 2;
+  let width = 0;
+
+  const slot = (j) => {
+    const off = j - focus;
+    const a = Math.min(3, Math.abs(off));
+    const sl = SLOTS[a];
+    const sign = Math.sign(off);
+    return { x: sign * sl.x * width, z: sl.z, rotationY: sign * sl.r, scale: sl.s, autoAlpha: sl.o, '--dim': sl.d, zIndex: 10 - a };
   };
-  // 초점이 바뀔 때마다 알린다 — 버튼 상태와 자동 재생 시계가 따라온다(auto: 자동 재생이 옮긴 것)
-  const set = (k, { scroll = true, auto = false } = {}) => {
-    const list = cards();
-    focus = Math.max(0, Math.min(list.length - 1, k));
-    track.classList.add('is-focus');
-    list.forEach((c, j) => c.classList.toggle('is-focus', j === focus));
-    if (scroll) track.scrollTo({ left: Math.max(0, center(list[focus])), behavior: reducedMotion ? 'auto' : 'smooth' });
-    track.dispatchEvent(new CustomEvent('reelfocus', { detail: { focus, count: list.length, auto } }));
+  const place = (animate) => {
+    cards.forEach((c, j) => {
+      const { zIndex, ...v } = slot(j);
+      // 아직 시작 전인 등장 트윈까지 걷어 내야 늦게 시작해 옛 자리로 되돌리지 않는다
+      gsap.killTweensOf(c);
+      gsap.set(c, { zIndex, xPercent: -50, transformOrigin: '50% 50%' });
+      if (animate && !reducedMotion) gsap.to(c, { ...v, duration: 0.95, ease: 'expo.out' });
+      else gsap.set(c, v);
+    });
   };
-  // 손으로 넘겼다면 멈춘 자리의 가운데 카드가 초점
-  const mark = () => (userScroll = true);
-  track.addEventListener('pointerdown', mark, { passive: true });
-  track.addEventListener('touchstart', mark, { passive: true });
-  track.addEventListener('wheel', (e) => Math.abs(e.deltaX) > Math.abs(e.deltaY) && mark(), { passive: true });
-  let idle = 0;
-  track.addEventListener(
-    'scroll',
-    () => {
-      clearTimeout(idle);
-      idle = setTimeout(() => {
-        if (!userScroll) return;
-        userScroll = false;
-        // 양 끝에서는 여러 카드가 같은 자리로 모이니 지금 초점에 가까운 카드를 고른다
-        const max = track.scrollWidth - track.clientWidth;
-        const gap = (c) => Math.abs(Math.max(0, Math.min(max, center(c))) - track.scrollLeft);
-        const list = cards();
-        const near = list.reduce((b, c, j) => {
-          const d = gap(c) - gap(list[b]);
-          return d < -2 || (Math.abs(d) <= 2 && Math.abs(j - focus) < Math.abs(b - focus)) ? j : b;
-        }, 0);
-        set(near, { scroll: false });
-      }, 160);
+  const land = () => {
+    const c = cards[focus];
+    c.classList.remove('is-landing');
+    void c.offsetWidth;
+    c.classList.add('is-landing');
+    // 바닥 빛은 초점 카드의 분야 색
+    stage.style.setProperty('--fc', getComputedStyle(c).getPropertyValue('--cc') || '');
+  };
+  // auto: 자동 재생이 옮긴 것 · animate: 움직임으로 옮길지
+  const set = (k, { animate = true, auto = false } = {}) => {
+    const prev = focus;
+    focus = Math.max(0, Math.min(cards.length - 1, k));
+    cards.forEach((c, j) => {
+      c.classList.toggle('is-focus', j === focus);
+      c.setAttribute('aria-hidden', String(Math.abs(j - focus) > 2));
+    });
+    place(animate);
+    if (animate && focus !== prev) land();
+    el.dispatchEvent(new CustomEvent('reelfocus', { detail: { focus, prev, count: cards.length, auto } }));
+  };
+  const layout = () => {
+    width = cards[0].offsetWidth;
+    if (width) place(false);
+  };
+
+  // 옆 카드를 누르면 그 카드를 가운데로, 가운데 카드를 누르면 상세로
+  let dragged = false;
+  stage.addEventListener(
+    'click',
+    (e) => {
+      const c = e.target.closest('.r-card');
+      if (!c) return;
+      const k = cards.indexOf(c);
+      if (dragged || k !== focus) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!dragged) set(k);
+      }
+      dragged = false;
     },
-    { passive: true }
+    true
   );
+  // 키보드로 옆 카드에 닿으면 그 카드를 가운데로
+  stage.addEventListener('focusin', (e) => {
+    const c = e.target.closest?.('.r-card');
+    if (c && c.matches(':focus-visible') && cards.indexOf(c) !== focus) set(cards.indexOf(c));
+  });
+  // 마우스로 끌어 넘기기
+  stage.addEventListener('dragstart', (e) => e.preventDefault());
+  let down = null;
+  stage.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    down = { x: e.clientX };
+    dragged = false;
+  });
+  addEventListener('pointerup', (e) => {
+    if (!down) return;
+    const dx = e.clientX - down.x;
+    down = null;
+    if (Math.abs(dx) < 36) return;
+    dragged = true;
+    const n = Math.max(1, Math.round(Math.abs(dx) / Math.max(60, width * 0.7)));
+    set(focus - Math.sign(dx) * n);
+    setTimeout(() => (dragged = false), 0);
+  });
+  addEventListener('resize', layout);
+
   return {
     get count() {
-      return cards().length;
+      return cards.length;
     },
     get focus() {
       return focus;
     },
     set,
+    layout,
     // 넘길 카드가 남았으면 넘기고 true
     step(dir) {
       const k = focus + dir;
-      if (k < 0 || k >= cards().length) return false;
+      if (k < 0 || k >= cards.length) return false;
       set(k);
       return true;
+    },
+    // 장면에 들어설 때: 카드가 오른쪽에서 한 장씩 날아와 제자리에 선다
+    intro(tl, at) {
+      layout();
+      if (reducedMotion) return;
+      cards.forEach((c, j) => {
+        const { zIndex, ...v } = slot(j);
+        if (!v.autoAlpha) return;
+        gsap.set(c, { x: v.x + width * 1.6, z: v.z - 260, rotationY: v.rotationY - 38, autoAlpha: 0, '--dim': 1 });
+        tl.to(c, { ...v, duration: 1.25, ease: 'expo.out' }, at + Math.abs(j - focus) * 0.09 + (j < focus ? 0.05 : 0));
+      });
+      tl.call(land, null, at + 0.5);
     },
   };
 }
 
 function bindReel(el, reducedMotion, onReelFocus) {
-  const track = el.querySelector('.reel-track');
-  if (!track) return;
-  // 수상 릴은 그대로 가로로 넘기고, 프로젝트 릴만 한 장씩 초점을 옮긴다
-  const reel = el.querySelector('.reel:not(.aw-reel)') ? focusReel(track, reducedMotion) : null;
+  const reel = el.querySelector('.deck') ? deckReel(el, reducedMotion) : null;
   el.reel = reel;
-  el.querySelectorAll('[data-reel]').forEach((b) =>
-    b.addEventListener('click', () => {
-      if (reel) return reel.step(+b.dataset.reel);
-      const card = track.querySelector('.r-card');
-      const step = card ? card.getBoundingClientRect().width + 14 : 300;
-      track.scrollBy({ left: +b.dataset.reel * step * 2, behavior: 'smooth' });
-    })
-  );
-  // 끝까지 넘기면 오른쪽 페이드를 걷어 마지막 카드를 온전히 보여 준다
-  // 넘길 것이 없으면 ←/→ 버튼을 숨기고, 양 끝에서는 해당 버튼을 끈다
-  const nav = el.querySelector('.reel-nav');
-  const edge = () => {
-    const end = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
-    track.classList.toggle('is-end', end);
-    track.classList.toggle('can-left', track.scrollLeft > 4);
-    track.classList.toggle('can-right', !end);
-    if (!nav || !track.clientWidth) return;
-    if (reel) {
-      // 초점 릴: 카드가 둘 이상이면 늘 보이고, 양 끝 카드에서 해당 버튼을 끈다
-      nav.hidden = reel.count < 2;
-      nav.querySelector('[data-reel="-1"]').disabled = reel.focus <= 0;
-      nav.querySelector('[data-reel="1"]').disabled = reel.focus >= reel.count - 1;
-      return;
+  if (!reel) return;
+  const nav = el.querySelector('.deck-nav');
+  const now = el.querySelector('.deck-now');
+  const ticks = [...el.querySelectorAll('.deck-ticks i')];
+  el.querySelectorAll('[data-reel]').forEach((b) => b.addEventListener('click', () => reel.step(+b.dataset.reel)));
+  // 번호 · 눈금 · 버튼 상태를 초점에 맞춘다
+  const sync = (dir = 0) => {
+    const f = reel.focus;
+    if (now) {
+      now.textContent = pad(f + 1);
+      if (dir && !reducedMotion) gsap.fromTo(now, { yPercent: dir * 70, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.45, ease: 'power3.out' });
     }
-    nav.hidden = track.scrollWidth <= track.clientWidth + 4;
-    nav.querySelector('[data-reel="-1"]').disabled = track.scrollLeft < 4;
-    nav.querySelector('[data-reel="1"]').disabled = end;
+    ticks.forEach((t, j) => {
+      t.classList.toggle('is-on', j === f);
+      t.classList.toggle('is-past', j < f);
+    });
+    if (nav) {
+      nav.querySelector('[data-reel="-1"]').disabled = f <= 0;
+      nav.querySelector('[data-reel="1"]').disabled = f >= reel.count - 1;
+    }
   };
-  track.addEventListener('scroll', edge, { passive: true });
-  track.addEventListener('reelfocus', (e) => {
-    edge();
+  el.addEventListener('reelfocus', (e) => {
+    sync(Math.sign(e.detail.focus - e.detail.prev));
     if (!e.detail.auto) onReelFocus?.(el, e.detail);
   });
-  addEventListener('resize', edge);
-  edge();
-  // 마우스 드래그로 넘기기 — 드래그한 뒤의 클릭은 카드를 열지 않는다
-  track.addEventListener('dragstart', (e) => e.preventDefault());
-  let down = null;
-  let moved = false;
-  const end = () => {
-    if (!down) return;
-    down = null;
-    setTimeout(() => {
-      track.classList.remove('is-dragging');
-      moved = false; // 드래그 직후의 클릭만 막고, 다음 키보드 Enter는 통과
-    }, 0);
-  };
-  track.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    down = { x: e.clientX, left: track.scrollLeft };
-    moved = false;
-  });
-  addEventListener('pointermove', (e) => {
-    if (!down) return;
-    if (!(e.buttons & 1)) return end();
-    const dx = e.clientX - down.x;
-    if (Math.abs(dx) > 5) moved = true;
-    if (moved) {
-      track.scrollLeft = down.left - dx;
-      track.classList.add('is-dragging');
-    }
-  });
-  addEventListener('pointerup', end);
-  addEventListener('pointercancel', end);
-  track.addEventListener(
-    'click',
-    (e) => {
-      if (moved && e.detail !== 0) {
-        e.preventDefault();
-        e.stopPropagation();
-        moved = false;
-      }
-    },
-    true
-  );
+  sync();
 }
 
 export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus }) {
@@ -460,20 +487,12 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     }
     if (has(reveal)) tl.to(reveal, { autoAlpha: 1, y: 0, duration: 0.8 * D, ease: 'power3.out', stagger: 0.055 * D }, heroChars.length ? 0.6 : 0.25);
     tl.add(() => countUp(el), 0.4);
-    const cards = el.querySelectorAll('.r-card');
-    if (cards.length) {
-      set(cards, { autoAlpha: 0, x: 80, rotateY: -12 });
-      tl.to(cards, { autoAlpha: 1, x: 0, rotateY: 0, duration: 1.1 * D, ease: 'expo.out', stagger: 0.07 * D }, 0.35);
-      const track = el.querySelector('.reel-track');
-      if (track) {
-        // 가로로 넘기는 동안 빈 카드가 보이지 않게 이 장면의 썸네일은 미리 모두 받는다
-        track.querySelectorAll('img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
-        // 바로 다음 장면에서 뒤로 돌아왔다면 마지막 카드부터 — 위로 스크롤하면 카드를 거꾸로 넘긴다
-        const atEnd = back && el.reel;
-        track.scrollLeft = atEnd ? track.scrollWidth : 0;
-        el.reel?.set(atEnd ? el.reel.count - 1 : 0, { scroll: false });
-        track.dispatchEvent(new Event('scroll'));
-      }
+    if (el.reel) {
+      // 넘기는 동안 빈 카드가 보이지 않게 이 장면의 썸네일은 미리 모두 받는다
+      el.querySelectorAll('.deck-stage img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
+      // 바로 다음 장면에서 뒤로 돌아왔다면 마지막 카드부터 — 위로 스크롤하면 카드를 거꾸로 넘긴다
+      el.reel.set(back ? el.reel.count - 1 : 0, { animate: false });
+      el.reel.intro(tl, 0.3);
     }
     // 루프: 고리가 드러날 때 펄스가 SENSE에서 출발한다
     const loop = el.querySelector('.loop');
@@ -562,7 +581,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       if (prev >= 0) hide(prev);
       current = i;
       // 다음 장면의 릴 썸네일을 미리 받아 카드가 빈 상자로 날아들지 않게
-      panels[i + 1]?.querySelectorAll('.reel-track img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
+      panels[i + 1]?.querySelectorAll('.deck-stage img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
       const delay = prev < 0 ? 0.9 : Math.max(0.5, duration * 0.62);
       show(i, delay, prev === i + 1);
     },

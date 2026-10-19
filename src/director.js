@@ -94,7 +94,7 @@ export class Director {
       shift.x *= 0.7;
     } else if (id === 'record' && (innerHeight < 1000 || aspect > 1.9)) {
       // 낮은 화면: 적층 막대가 위쪽 수치 띠로 올라가지 않게(가로 휴대폰은 카드 줄 뒤로 내린다)
-      shift.y = innerHeight < 500 ? -0.3 : 0.055;
+      shift.y = innerHeight < 500 ? -0.3 : 0.08;
     }
     return { pos, target, fov, shift };
   }
