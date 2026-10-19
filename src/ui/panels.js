@@ -85,7 +85,7 @@ function render(scene, i) {
           .map(
             (c, j) => `<li class="ln ln-${pos[j]}" style="--k:${j}" data-r>
               <span class="ln-pin" aria-hidden="true"></span>
-              <section class="ln-card">
+              <section class="ln-card panel-content">
                 <header><span class="ln-no">${pad(j + 1)}</span><h3>${esc(c.key)}</h3><span class="ln-ko">${esc(c.ko)}</span></header>
                 <ul>${c.items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
               </section>
@@ -93,7 +93,7 @@ function render(scene, i) {
           )
           .join('')}
       </ol>
-      <div class="loop-detail" data-r>${scene.loop
+      <div class="loop-detail panel-content" aria-hidden="true" data-r>${scene.loop
         .map(
           (c, j) =>
             `<section class="ld" style="--k:${j}"><header><span>${pad(j + 1)}</span><b>${esc(c.key)}</b><small>${esc(c.ko)}</small></header><ul>${c.items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></section>`
@@ -238,12 +238,14 @@ function focusReel(track, reducedMotion) {
     const r = c.getBoundingClientRect();
     return track.scrollLeft + (r.left - t.left) - (t.width - r.width) / 2;
   };
-  const set = (k, { scroll = true } = {}) => {
+  // 초점이 바뀔 때마다 알린다 — 버튼 상태와 자동 재생 시계가 따라온다(auto: 자동 재생이 옮긴 것)
+  const set = (k, { scroll = true, auto = false } = {}) => {
     const list = cards();
     focus = Math.max(0, Math.min(list.length - 1, k));
     track.classList.add('is-focus');
     list.forEach((c, j) => c.classList.toggle('is-focus', j === focus));
     if (scroll) track.scrollTo({ left: Math.max(0, center(list[focus])), behavior: reducedMotion ? 'auto' : 'smooth' });
+    track.dispatchEvent(new CustomEvent('reelfocus', { detail: { focus, count: list.length, auto } }));
   };
   // 손으로 넘겼다면 멈춘 자리의 가운데 카드가 초점
   const mark = () => (userScroll = true);
@@ -289,7 +291,7 @@ function focusReel(track, reducedMotion) {
   };
 }
 
-function bindReel(el, reducedMotion) {
+function bindReel(el, reducedMotion, onReelFocus) {
   const track = el.querySelector('.reel-track');
   if (!track) return;
   // 수상 릴은 그대로 가로로 넘기고, 프로젝트 릴만 한 장씩 초점을 옮긴다
@@ -324,6 +326,10 @@ function bindReel(el, reducedMotion) {
     nav.querySelector('[data-reel="1"]').disabled = end;
   };
   track.addEventListener('scroll', edge, { passive: true });
+  track.addEventListener('reelfocus', (e) => {
+    edge();
+    if (!e.detail.auto) onReelFocus?.(el, e.detail);
+  });
   addEventListener('resize', edge);
   edge();
   // 마우스 드래그로 넘기기 — 드래그한 뒤의 클릭은 카드를 열지 않는다
@@ -368,7 +374,7 @@ function bindReel(el, reducedMotion) {
   );
 }
 
-export function createPanels(root, scenes, { onReplay, reducedMotion }) {
+export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus }) {
   const panels = scenes.map((scene, i) => {
     const el = document.createElement('section');
     el.className = `panel layout-${scene.layout}`;
@@ -378,7 +384,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
     el.hidden = true;
     el.inert = true;
     root.appendChild(el);
-    bindReel(el, reducedMotion);
+    // 지금 장면의 릴에서 손으로 옮긴 초점만 자동 재생 시계에 알린다
+    bindReel(el, reducedMotion, (from, r) => from === panels[current] && onReelFocus?.(r));
     const sheet = el.querySelector('.stage-foot');
     if (sheet) {
       const end = () => sheet.classList.toggle('is-end', sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 4);
@@ -468,6 +475,13 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
         track.dispatchEvent(new Event('scroll'));
       }
     }
+    // 루프: 고리가 드러날 때 펄스가 SENSE에서 출발한다
+    const loop = el.querySelector('.loop');
+    if (loop) {
+      loop.classList.remove('is-live');
+      fitLoop();
+      tl.call(() => loop.classList.add('is-live'), null, 0.25);
+    }
     el.querySelectorAll('.col, .stage-foot').forEach((c) => {
       c.scrollTop = 0;
       c.dispatchEvent(new Event('scroll'));
@@ -514,7 +528,6 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
   function step(dir) {
     const reel = panels[current]?.reel;
     if (!reel || !reel.step(dir)) return null;
-    panels[current].querySelector('.reel-track').dispatchEvent(new Event('scroll'));
     return { focus: reel.focus, count: reel.count };
   }
   // 자동 재생: 장면 시간에 맞춰 초점이 다음 카드로 흐른다(뒤로는 돌아가지 않음)
@@ -522,14 +535,18 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
     const reel = panels[current]?.reel;
     if (!reel || reel.count < 2) return;
     const k = Math.min(reel.count - 1, Math.floor(progress * reel.count));
-    if (k > reel.focus) {
-      reel.set(k);
-      panels[current].querySelector('.reel-track').dispatchEvent(new Event('scroll'));
-    }
+    if (k > reel.focus) reel.set(k, { auto: true });
   }
 
   // 루프 고리의 중심 — 3D 코어의 화면 위치
   const loopEl = panels.find((p) => p.dataset.scene === 'loop')?.querySelector('.loop');
+  // 위 · 아래 마디 카드가 서로 겹치지 않도록 실제 카드 높이를 CSS에 알려 준다
+  function fitLoop() {
+    if (!loopEl || loopEl.parentElement.hidden) return;
+    const h = Math.max(0, ...[...loopEl.querySelectorAll('.ln-card')].map((c) => c.offsetHeight));
+    if (h) loopEl.style.setProperty('--ch', `${h}px`);
+  }
+  addEventListener('resize', fitLoop);
   function setLoopCenter(x, y) {
     if (!loopEl) return;
     loopEl.style.setProperty('--lx', `${x.toFixed(1)}px`);
@@ -541,10 +558,6 @@ export function createPanels(root, scenes, { onReplay, reducedMotion }) {
     step,
     autoFocus,
     setLoopCenter,
-    reelState() {
-      const reel = panels[current]?.reel;
-      return reel ? { focus: reel.focus, count: reel.count } : null;
-    },
     go(i, prev, duration) {
       if (prev >= 0) hide(prev);
       current = i;

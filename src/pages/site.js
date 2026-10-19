@@ -130,7 +130,7 @@ function awardTile(a) {
   const p = a.project;
   return `<li class="aw-cell" data-g="${TIER_KEY[a.tier]}"${p ? ' data-p' : ''}>
     <article class="aw-card" data-tier="${TIER_KEY[a.tier]}">
-      ${a.certs.length || a.photo ? `<button type="button" class="aw-sheet" data-cert="${a.at}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기">${certSheet(a, { sizes: '(max-width: 599px) 44vw, 240px' })}<span class="card-glare" aria-hidden="true"></span></button>` : `<div class="aw-sheet">${certSheet(a)}</div>`}
+      ${a.certs.length || a.photo ? `<button type="button" class="aw-sheet" data-cert="${a.at}" data-n="${a.certs.length || 1}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기">${certSheet(a, { sizes: '(max-width: 599px) 44vw, 240px' })}<span class="card-glare" aria-hidden="true"></span></button>` : `<div class="aw-sheet">${certSheet(a)}</div>`}
       <div class="aw-info">
         <p class="aw-top"><span class="aw-grade">${LAUREL}${esc(a.grade)}</span><time datetime="${esc(a.date)}">${esc(a.date.replace(/-/g, '.'))}</time></p>
         <h3 class="aw-contest">${esc(a.contest)}</h3>
@@ -432,6 +432,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   let busy = false;
   let observer = null;
   let gridCols = 0;
+  let revealTimer = 0;
   let backPending = false; // history.back()을 보냈고 popstate를 기다리는 중
   let pendingPop = false; // 커튼이 도는 동안 들어온 popstate
   let filmOpener = null; // 필름에서 페이지를 연 요소(닫으면 포커스를 돌려준다)
@@ -541,7 +542,18 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     page.querySelectorAll('.reveal, .w-item, .aw-cell').forEach((el) => observer.observe(el));
     // 상장 크게 보기(수상 아카이브 · 상세의 수상 칸)
     const certs = route.name === 'awards' ? pageMedia : JSON.parse(page.querySelector('.d-awards')?.dataset.media || '[]');
-    page.querySelectorAll('[data-cert]').forEach((b) => b.addEventListener('click', () => lightbox.show({ media: certs }, +b.dataset.cert, b)));
+    // 등급으로 걸러 보는 중이면 라이트박스도 보이는 수상의 상장만 넘긴다
+    const showCert = (b) => {
+      if (!page.querySelector('.aw-sum.is-filtered')) return lightbox.show({ media: certs }, +b.dataset.cert, b);
+      const media = [];
+      let at = 0;
+      page.querySelectorAll('.aw-year .aw-cell:not(.is-out) [data-cert]').forEach((x) => {
+        if (x === b) at = media.length;
+        media.push(...certs.slice(+x.dataset.cert, +x.dataset.cert + +x.dataset.n));
+      });
+      lightbox.show({ media }, at, b);
+    };
+    page.querySelectorAll('[data-cert]').forEach((b) => b.addEventListener('click', () => showCert(b)));
 
     if (route.name === 'awards') {
       const sum = page.querySelector('.aw-sum');
@@ -564,10 +576,18 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
         // 대상 띠는 전체 보기에서만
         const feat = page.querySelector('.aw-feat');
         if (feat) feat.hidden = g !== 'all';
+        // 남은 카드는 CSS 등장 전환을 처음부터 다시 — 앞쪽 몇 장은 차례로
+        shown.forEach((li, k) => {
+          li.classList.remove('is-in');
+          li.style.transitionDelay = reducedMotion ? '' : `${Math.min(k, 10) * 45}ms`;
+        });
+        void page.offsetHeight;
         shown.forEach((li) => li.classList.add('is-in'));
-        if (!reducedMotion) gsap.fromTo(shown.slice(0, 12), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.04, ease: 'power3.out', clearProps: 'all' });
+        clearTimeout(revealTimer);
+        revealTimer = setTimeout(() => shown.forEach((li) => (li.style.transitionDelay = '')), 1600);
       });
-      gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .aw-sum > button'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'expo.out', delay: 0.2 });
+      // 끝나면 인라인 값을 지워 버튼의 CSS(걸러 볼 때 흐려짐 · 호버 들림)가 다시 듣게
+      gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .aw-sum > button'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'expo.out', delay: 0.2, clearProps: 'opacity,visibility,transform' });
     } else if (route.name === 'works') {
       const grid = page.querySelector('.works-grid');
       gridCols = layoutGrid(grid);

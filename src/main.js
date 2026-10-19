@@ -106,6 +106,11 @@ let hoverHold = false;
 const panels = createPanels($('stage'), scenes, {
   reducedMotion: reduced,
   onReplay: () => goTo(0),
+  // 릴 초점을 손으로 옮기면(스크롤 · 스와이프 · 버튼) 자동 재생 시계를 그 카드 자리로 맞춘다
+  onReelFocus: ({ focus, count }) => {
+    const s = scenes[director?.index];
+    if (s && s.hold > 0) elapsed = (s.hold * focus) / count;
+  },
 });
 const hud = createHud(scenes, {
   reducedMotion: reduced,
@@ -115,7 +120,7 @@ const hud = createHud(scenes, {
     hud.setAuto(auto);
   },
   onToggleSound: () => {
-    audio.set(!audio.on);
+    audio.toggle();
     hud.setSound(audio.on);
   },
 });
@@ -149,10 +154,7 @@ const site = createSite({
 
 function onTransition(i, prev, duration) {
   elapsed = 0;
-  panels.go(i, prev, duration);
-  // 뒤로 돌아와 마지막 카드에서 시작하는 릴이면 자동 재생 시계도 그 자리에서
-  const r = panels.reelState();
-  if (r && r.focus > 0 && scenes[i].hold > 0) elapsed = (scenes[i].hold * r.focus) / r.count;
+  panels.go(i, prev, duration); // 뒤로 돌아와 마지막 카드에서 시작하는 릴이면 onReelFocus가 시계를 맞춘다
   hud.setScene(i, prev, duration);
   if (prev >= 0) audio.whoosh(Math.max(1.2, duration));
 }
@@ -165,12 +167,7 @@ function goTo(i) {
 // 스크롤 · 스와이프 · 화살표: 프로젝트 릴이 있으면 카드를 한 장씩 넘긴 뒤 다음 장면으로
 function stepOrGo(dir) {
   if (!started) return false;
-  const r = panels.step(dir);
-  if (r) {
-    const s = scenes[director.index];
-    if (s.hold > 0) elapsed = (s.hold * r.focus) / r.count; // 자동 재생 시계를 초점 위치에 맞춘다
-    return 'step';
-  }
+  if (panels.step(dir)) return 'step'; // 시계는 onReelFocus가 맞춘다
   return goTo(director.index + dir);
 }
 
@@ -199,7 +196,7 @@ createInput({
       return true;
     }
     if (k === 'm') {
-      audio.set(!audio.on);
+      audio.toggle();
       hud.setSound(audio.on);
       return true;
     }
@@ -345,8 +342,17 @@ async function boot() {
   $('boot').classList.add('is-ready');
   $('boot-status').textContent = 'READY — PRESS START';
   actions.hidden = false;
-  gsap.fromTo(actions.children, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, stagger: 0.12, duration: 0.7, ease: 'power3.out' });
-  $('enter-sound').focus({ preventScroll: true });
+  // 버튼이 보이게 된 뒤에 초점을 준다(그 사이 다른 곳을 눌렀다면 그대로 둔다)
+  gsap.fromTo(actions.children, { autoAlpha: 0, y: 14 }, {
+    autoAlpha: 1,
+    y: 0,
+    stagger: 0.12,
+    duration: 0.7,
+    ease: 'power3.out',
+    onComplete: () => {
+      if (!started && (!document.activeElement || document.activeElement === document.body)) $('enter-sound').focus({ preventScroll: true });
+    },
+  });
 }
 
 function start(withSound) {

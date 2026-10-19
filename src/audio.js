@@ -71,7 +71,7 @@ export function createAudio() {
 
     // 화음 패드: 음마다 사인 + 삼각파를 살짝 어긋나게, 따뜻한 로우패스
     const padBus = ctx.createGain();
-    padBus.gain.value = 0.028;
+    padBus.gain.value = 0.038;
     const lp = ctx.createBiquadFilter();
     lp.type = 'lowpass';
     lp.frequency.value = 900;
@@ -126,7 +126,7 @@ export function createAudio() {
       ['pointerdown', 'keydown', 'touchend'].forEach((t) => addEventListener(t, wake, { once: true, capture: true }));
     }
     master.gain.cancelScheduledValues(ctx.currentTime);
-    master.gain.setTargetAtTime(on ? 0.55 : 0, ctx.currentTime, on ? 1.2 : 0.4);
+    master.gain.setTargetAtTime(on ? 0.62 : 0, ctx.currentTime, on ? 1.2 : 0.4);
     clearInterval(chordTimer);
     // 장면이 오래 머물러도 화음이 천천히 흐른다
     if (on) chordTimer = setInterval(() => setChord(chord + 1, 4), 16000);
@@ -146,7 +146,7 @@ export function createAudio() {
     lp.frequency.exponentialRampToValueAtTime(240, t + duration);
     const g = ctx.createGain();
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.03, t + duration * 0.45);
+    g.gain.exponentialRampToValueAtTime(0.034, t + duration * 0.45);
     g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
     src.connect(lp).connect(g);
     g.connect(dry);
@@ -154,7 +154,7 @@ export function createAudio() {
     src.start(t);
     src.stop(t + duration + 0.1);
     setChord(chord + 1, 1.6);
-    bell(CHORDS[chord][2] * 2, 0.022, t + duration * 0.4);
+    bell(CHORDS[chord][2] * 2, 0.026, t + duration * 0.4);
   }
 
   // 맑은 벨: 사인 두 개(기음 + 옥타브 위 약하게), 짧은 어택과 긴 꼬리
@@ -178,16 +178,26 @@ export function createAudio() {
     g.connect(fxSend);
   }
 
+  // 소리 버튼: 켜져 있는데 브라우저가 재워 두었다면 끄지 않고 깨운다
+  function toggle() {
+    if (on && ctx && ctx.state !== 'running') {
+      ctx.resume();
+      return;
+    }
+    set(!on);
+  }
+
   // 클릭 · 호버: 지금 화음 안의 음으로 아주 작게
   function blip(freq = 1320) {
     if (!on || !ctx) return;
     const tones = CHORDS[chord].map((f) => f * 4);
     const near = tones.reduce((a, b) => (Math.abs(b - freq) < Math.abs(a - freq) ? b : a));
-    bell(near, 0.014);
+    bell(near, 0.017);
   }
 
   return {
     set,
+    toggle,
     whoosh,
     blip,
     get on() {

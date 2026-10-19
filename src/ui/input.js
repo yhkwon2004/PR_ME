@@ -26,13 +26,16 @@ export function createInput({ next, prev, first, last, isBlocked, onKey }) {
   let acc = 0;
   let lockUntil = 0;
   let idleTimer = 0;
+  let stepped = false;
 
   const fire = (dir, lockMs = 1100) => {
     const now = performance.now();
     if (now < lockUntil) return;
     const moved = dir > 0 ? next() : prev();
+    if (moved === false) return;
     // 릴 카드 한 장은 장면 전환보다 짧게 잠근다
-    if (moved !== false) lockUntil = now + (moved === 'step' ? Math.min(lockMs, 560) : lockMs);
+    stepped = moved === 'step';
+    lockUntil = now + (stepped ? Math.min(lockMs, 560) : lockMs);
   };
 
   addEventListener(
@@ -45,8 +48,11 @@ export function createInput({ next, prev, first, last, isBlocked, onKey }) {
       const d = horizontal ? e.deltaX : e.deltaY;
       if (scrollableAncestor(e.target, Math.sign(d))) return;
       e.preventDefault();
-      if (performance.now() < lockUntil) {
+      const now = performance.now();
+      if (now < lockUntil) {
         acc = 0;
+        // 카드를 넘긴 뒤 트랙패드 관성이 이어지는 동안은 잠금을 늘려, 한 번 쓸어 넘기면 한 장만 넘어가게
+        if (stepped) lockUntil = Math.max(lockUntil, now + 200);
         return;
       }
       acc += d;

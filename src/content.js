@@ -10,7 +10,8 @@ const M = (file) => `/media/${file}`;
 function awardLine() {
   const tier = (g) => (/대상/.test(g) ? 1 : /최우수/.test(g) ? 2 : /우수상/.test(g) ? 3 : /장려/.test(g) ? 4 : 5);
   const n = (t) => awardData.filter((a) => tier(a.grade) === t).length;
-  return `수상 ${awardData.length}회 — 대상 ${n(1)} · 최우수상 ${n(2)} · 우수상 ${n(3)} · 장려상 ${n(4)}`;
+  const other = n(5) ? ` · 그 밖의 수상 ${n(5)}` : '';
+  return `수상 ${awardData.length}회 — 대상 ${n(1)} · 최우수상 ${n(2)} · 우수상 ${n(3)} · 장려상 ${n(4)}${other}`;
 }
 
 export const profile = {

@@ -806,12 +806,15 @@
   color: var(--orange);
   align-self: flex-start;
 }
-.aw-grid.aw-feat-row {
-  flex-wrap: nowrap;
-  gap: 26px 22px;
-}
-.aw-feat-row .aw-cell {
-  flex: 0 1 236px;
+/* 다섯 장이 한 줄에 넉넉히 들어가는 넓은 화면에서만 한 줄로 — 그 아래는 보통 격자처럼 줄을 바꾼다 */
+@media (min-width: 1180px) {
+  .aw-grid.aw-feat-row {
+    flex-wrap: nowrap;
+    gap: 26px 22px;
+  }
+  .aw-feat-row .aw-cell {
+    flex: 0 1 236px;
+  }
 }
 .aw-feat-row .sheet {
   box-shadow:
@@ -1238,12 +1241,14 @@ button.aw-sheet:focus-visible {
   }
   /* 대상 띠는 가로로 넘긴다 */
   .aw-grid.aw-feat-row {
+    flex-wrap: nowrap;
     justify-content: flex-start;
     overflow-x: auto;
+    overflow-y: hidden;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     margin-inline: calc(var(--pad) * -1);
-    padding: 6px var(--pad) 10px;
+    padding: 16px var(--pad) 12px;
     scroll-padding-inline: var(--pad);
   }
   .aw-feat-row::-webkit-scrollbar {
