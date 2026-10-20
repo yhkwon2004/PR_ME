@@ -17,6 +17,9 @@ const FilmShader = {
     uAberration: { value: 1.0 },
     uExposure: { value: 0 },
     uRes: { value: new THREE.Vector2(1, 1) },
+    uTint: { value: new THREE.Color(0x5ef2ff) },
+    uTintAmt: { value: 0 },
+    uPulse: { value: 0 },
   },
   vertexShader: /* glsl */ `
     varying vec2 vUv;
@@ -24,8 +27,9 @@ const FilmShader = {
   `,
   fragmentShader: /* glsl */ `
     uniform sampler2D tDiffuse;
-    uniform float uTime, uTransition, uGrain, uAberration, uExposure;
+    uniform float uTime, uTransition, uGrain, uAberration, uExposure, uTintAmt, uPulse;
     uniform vec2 uRes;
+    uniform vec3 uTint;
     varying vec2 vUv;
     float rand(vec2 co){ return fract(sin(dot(co, vec2(12.9898,78.233))) * 43758.5453); }
     void main(){
@@ -45,6 +49,11 @@ const FilmShader = {
         }
         col = mix(col, acc / 6.0, clamp(uTransition * 0.85, 0.0, 1.0));
       }
+      // 카드 색 그레이드: 화면 전체를 그 색으로 살짝 물들이고, 카드가 바뀔 때 가장자리에 빛이 번진다
+      float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
+      col = mix(col, col * (0.72 + 0.56 * uTint), uTintAmt * 0.34);
+      col += uTint * uTintAmt * 0.012 * (1.0 - lum);
+      col += uTint * uPulse * 0.12 * smoothstep(0.22, 0.85, d);
       float vig = smoothstep(0.92, 0.28, d);
       col *= mix(0.55, 1.0, vig);
       float g = rand(uv * uRes * 0.5 + fract(uTime * 13.7)) - 0.5;
@@ -90,8 +99,10 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
   rim.position.set(30, 10, -40);
   scene.add(rim);
 
-  scene.add(createSky());
-  scene.add(createGround());
+  const sky = createSky();
+  const ground = createGround();
+  scene.add(sky);
+  scene.add(ground);
   const dust = createDust(isMobile ? 900 : 1800);
   scene.add(dust.points);
 
@@ -140,7 +151,28 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
     }
   }
 
-  return { renderer, scene, camera, composer, film, bloom, dust, resize, adapt, isMobile };
+  // 분위기: 카드 색(amt 0~1)으로 지평선 빛 · 바닥 격자 · 안개 · 역광을 물들인다
+  const base = {
+    horizon: new THREE.Color(COLORS.horizon),
+    glow: sky.material.uniforms.uGlow.value.clone(),
+    major: ground.material.uniforms.uMajor.value.clone(),
+    rim: rim.color.clone(),
+  };
+  const tmp = new THREE.Color();
+  function setMood(tint, amt) {
+    const su = sky.material.uniforms;
+    const gu = ground.material.uniforms;
+    tmp.copy(base.horizon).lerp(tint, 0.06 * amt);
+    su.uHorizon.value.copy(tmp);
+    gu.uFog.value.copy(tmp);
+    scene.fog.color.copy(tmp);
+    scene.background.copy(tmp);
+    su.uGlow.value.copy(base.glow).lerp(tmp.copy(tint).multiplyScalar(0.3), 0.7 * amt);
+    gu.uMajor.value.copy(base.major).lerp(tint, 0.75 * amt);
+    rim.color.copy(base.rim).lerp(tint, 0.9 * amt);
+  }
+
+  return { renderer, scene, camera, composer, film, bloom, dust, resize, adapt, setMood, isMobile };
 }
 
 function createSky() {

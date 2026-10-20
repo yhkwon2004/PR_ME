@@ -15,6 +15,12 @@
   </head>
   <body>
     <canvas id="gl" aria-hidden="true"></canvas>
+    <!-- 카드에 맞춰 바뀌는 배경: 흐린 사진 · 색 번짐 · 큰 연도 -->
+    <div class="ambient" id="ambient" aria-hidden="true">
+      <i class="amb-photo"></i><i class="amb-photo"></i>
+      <i class="amb-wash"></i>
+    </div>
+    <div class="ambient amb-type" id="amb-type" aria-hidden="true"><span class="amb-year"></span><span class="amb-year"></span></div>
     <div class="scrim" aria-hidden="true"><i class="s-left"></i><i class="s-right"></i><i class="s-top"></i><i class="s-bottom"></i><i class="s-center"></i></div>
     <div class="letterbox" aria-hidden="true"><i class="lb-top"></i><i class="lb-bottom"></i></div>
 

@@ -405,6 +405,9 @@ function deckReel(el, reducedMotion) {
   return {
     // 휠 · 세로 스와이프 · 방향키로도 한 장씩 넘길지(프로젝트 덱) — 카드가 많은 수상 덱은 장면 넘김을 막지 않는다
     paged: !el.querySelector('.aw-reel'),
+    get card() {
+      return cards[focus];
+    },
     get count() {
       return cards.length;
     },
@@ -435,7 +438,7 @@ function deckReel(el, reducedMotion) {
   };
 }
 
-function bindReel(el, reducedMotion, onReelFocus) {
+function bindReel(el, reducedMotion, onReelFocus, onCard) {
   const reel = el.querySelector('.deck') ? deckReel(el, reducedMotion) : null;
   el.reel = reel;
   if (!reel) return;
@@ -466,13 +469,15 @@ function bindReel(el, reducedMotion, onReelFocus) {
     }
   };
   el.addEventListener('reelfocus', (e) => {
-    sync(Math.sign(e.detail.focus - e.detail.prev));
+    const dir = Math.sign(e.detail.focus - e.detail.prev);
+    sync(dir);
     if (!e.detail.auto) onReelFocus?.(el, e.detail);
+    onCard?.(el, reel.card, dir);
   });
   sync();
 }
 
-export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus }) {
+export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus, onCard }) {
   const panels = scenes.map((scene, i) => {
     const el = document.createElement('section');
     el.className = `panel layout-${scene.layout}`;
@@ -483,7 +488,12 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     el.inert = true;
     root.appendChild(el);
     // 지금 장면의 릴에서 손으로 옮긴 초점만 자동 재생 시계에 알린다
-    bindReel(el, reducedMotion, (from, r) => from === panels[current] && onReelFocus?.(r));
+    bindReel(
+      el,
+      reducedMotion,
+      (from, r) => from === panels[current] && onReelFocus?.(r),
+      (from, card, dir) => from === panels[current] && onCard?.(card, dir)
+    );
     const sheet = el.querySelector('.stage-foot');
     if (sheet) {
       const end = () => sheet.classList.toggle('is-end', sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 4);

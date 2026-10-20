@@ -22,6 +22,7 @@ import { createInput } from './ui/input.js';
 import { createLightbox } from './ui/lightbox.js';
 import { bindCardFx } from './ui/cards.js';
 import { createAudio } from './audio.js';
+import { createMood } from './ui/mood.js';
 import { createSite } from './pages/site.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -96,6 +97,7 @@ function buildWorld() {
 
 // ── UI ───────────────────────────────────────────────────
 const audio = createAudio();
+const mood = createMood({ getStage: () => stage, reducedMotion: reduced });
 const lightbox = createLightbox();
 const cursor = createCursor();
 let auto = !reduced;
@@ -111,6 +113,8 @@ const panels = createPanels($('stage'), scenes, {
     const h = holdOf(director?.index);
     if (h > 0) elapsed = (h * focus) / count;
   },
+  // 덱의 가운데 카드가 바뀌면 배경 분위기도 그 카드로
+  onCard: (card, dir) => mood.set(card, dir),
 });
 // 장면 길이: 카드 덱이 있으면 카드마다 1.5초는 머물도록 늘린다(수상 덱처럼 카드가 많은 장면)
 function holdOf(i) {
@@ -160,6 +164,8 @@ const site = createSite({
 
 function onTransition(i, prev, duration) {
   elapsed = 0;
+  // 카드 덱이 없는 장면에서는 분위기를 걷는다(덱이 있으면 아래 panels.go가 첫 카드로 맞춘다)
+  if (!panels.panels[i]?.reel) mood.clear();
   panels.go(i, prev, duration); // 뒤로 돌아와 마지막 카드에서 시작하는 릴이면 onReelFocus가 시계를 맞춘다
   hud.setScene(i, prev, duration);
   if (prev >= 0) audio.whoosh(Math.max(1.2, duration));
@@ -428,6 +434,7 @@ function loop(now) {
   if (!started || frozen || pageCovered) return;
   director.update(dt, t);
   trackLoop(dt);
+  mood.update(dt);
   stage.dust.update(t);
   stage.film.uniforms.uTime.value = t;
   stage.adapt(dt);
@@ -466,6 +473,7 @@ if (stage && new URLSearchParams(location.search).has('capture')) {
         simTime += step;
         director.update(step, simTime);
         trackLoop(step);
+        mood.update(step);
       }
       stage.dust.update(simTime);
       stage.composer.render(step);
