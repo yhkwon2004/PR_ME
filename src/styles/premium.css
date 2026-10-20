@@ -142,6 +142,277 @@
     transform: scale(1.16);
   }
 }
+/* 덱의 카드는 사진이 주인공 — 글은 덱 아래 설명 줄이 맡는다(가로 휴대폰은 예외) */
+.deck .r-card .card-cap,
+.deck .r-card .card-open {
+  display: none;
+}
+.deck .card-shade {
+  background: linear-gradient(180deg, rgba(4, 6, 10, 0.55) 0%, rgba(4, 6, 10, 0) 26%, rgba(4, 6, 10, 0) 70%, rgba(4, 6, 10, 0.5) 100%);
+}
+/* 화면 캡처 · 도표도 덱에서는 카드를 꽉 채운다(전체는 상세 페이지에서) */
+.deck .r-card .card-media img.is-contain {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.deck .r-card .card-media img.blur-fill {
+  display: none;
+}
+/* 수상 카드: 상장을 크게 가운데에, 그 뒤로 프로젝트 사진 */
+.deck .a-card .sheet {
+  top: 52%;
+  width: 58%;
+  transform: translate(-50%, -50%) rotate(-3deg);
+}
+.deck .a-card:hover .sheet,
+.deck .a-card.is-focus .sheet {
+  transform: translate(-50%, -52%) rotate(0deg) scale(1.03);
+}
+/* 덱 끝의 '전체 보기' 카드: 다른 작품 네 장을 2×2로 겹쳐 놓고 큰 숫자 */
+.deck-all .card-media {
+  background: #060910;
+}
+.all-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+.all-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.6) brightness(0.55);
+  transform: none;
+}
+.deck-all .card-shade {
+  background: radial-gradient(70% 60% at 50% 50%, rgba(4, 6, 10, 0.55), rgba(4, 6, 10, 0.85));
+}
+.all-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 2px;
+  text-align: center;
+}
+.all-copy small {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--cyan);
+}
+.all-copy b {
+  font-family: var(--display);
+  font-size: clamp(44px, 24cqi, 80px);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+.all-copy span {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--fg-2);
+}
+.all-copy i {
+  margin-top: 12px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-style: normal;
+  background: var(--orange);
+  color: #120600;
+  transition: transform 0.4s var(--ease);
+}
+.deck-all:hover .all-copy i,
+.deck-all.is-focus .all-copy i {
+  transform: scale(1.1) rotate(-8deg);
+}
+/* 덱 아래 설명 줄: 분류 · 연도 · 수상 / 제목 / 한 줄 소개 / 보기 버튼 */
+.deck-info {
+  display: grid;
+  width: min(100% - 2 * var(--pad), 720px);
+  min-height: 118px;
+  margin: 34px auto 0;
+  text-align: center;
+}
+.deck-info > .di {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.di-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 12px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.di-cat {
+  color: var(--cc, var(--cyan));
+}
+.di-award,
+.di-grade {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--tc, #f4cf73);
+  letter-spacing: 0.06em;
+}
+.di-grade {
+  font-size: 12px;
+  font-weight: 600;
+}
+.di-meta .laurel {
+  width: 13px;
+  height: 13px;
+}
+.di-issuer {
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.di-title {
+  margin-top: 8px;
+  font-size: clamp(18px, 1.6vw, 24px);
+  font-weight: 650;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
+}
+.di-line {
+  margin: 6px auto 0;
+  max-width: 62ch;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--fg-2);
+  word-break: keep-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
+}
+.di-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.di-open,
+.di-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 650;
+  white-space: nowrap;
+  transition:
+    background 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    transform 0.3s var(--ease);
+}
+.di-open {
+  background: var(--fg);
+  color: #05070c;
+}
+.di-open:hover,
+.di-open:focus-visible {
+  background: var(--cc, var(--cyan));
+  transform: translateY(-1px);
+}
+.di-open span {
+  transition: transform 0.3s var(--ease);
+}
+.di-open:hover span {
+  transform: translateX(3px);
+}
+.di-ghost {
+  border: 1px solid var(--line-2);
+  background: rgba(5, 7, 12, 0.5);
+  color: var(--fg-2);
+}
+.di-ghost:hover,
+.di-ghost:focus-visible {
+  border-color: var(--fg);
+  color: var(--fg);
+}
+.di-all .di-open {
+  background: var(--orange);
+  color: #120600;
+}
+@media (max-height: 760px) and (min-width: 821px) {
+  .deck-info {
+    min-height: 84px;
+    margin-top: 26px;
+  }
+  .deck-info .di-line {
+    display: none;
+  }
+  .di-title {
+    margin-top: 6px;
+    font-size: 17px;
+    -webkit-line-clamp: 1;
+  }
+  .di-actions {
+    margin-top: 8px;
+  }
+}
+@media (max-width: 820px) {
+  .deck-info {
+    min-height: 124px;
+    margin-top: 28px;
+  }
+  .di-title {
+    font-size: 17px;
+  }
+  .di-line {
+    font-size: 12.5px;
+  }
+}
+/* 가로 휴대폰: 설명 줄 대신 카드 안의 글을 그대로 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .deck-info {
+    display: none;
+  }
+  .deck .r-card .card-cap {
+    display: block;
+  }
+  .deck .a-card .sheet {
+    top: 50%;
+    left: auto;
+    right: 9px;
+    width: 27%;
+    transform: translateY(-50%) rotate(-3deg);
+  }
+  .deck .a-card:hover .sheet,
+  .deck .a-card.is-focus .sheet {
+    transform: translateY(-50%) rotate(0deg);
+  }
+}
+
 /* 덱 아래 막대: 장 수 · 넘김 버튼과 진행 눈금 · 전체 보기 */
 .deck-bar {
   display: grid;
@@ -250,6 +521,27 @@
 .deck-ticks i.is-on {
   width: 22px;
   background: var(--cyan);
+}
+.deck-ticks i.is-all {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--orange);
+}
+.deck-ticks i.is-all.is-on {
+  width: 8px;
+  height: 8px;
+  background: var(--orange);
+}
+/* 전체 보기 링크는 막대에서도 눈에 띄게 */
+.deck-bar .reel-all {
+  background: rgba(255, 107, 26, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 107, 26, 0.5);
+}
+.deck-bar .reel-all:hover {
+  background: var(--orange);
+  color: #120600;
 }
 /* 휴대폰: 넘김은 스와이프로 — 버튼과 장 수 글자는 걷고 번호 · 눈금 · 전체 보기만 */
 @media (max-width: 820px) {
@@ -577,21 +869,27 @@
   display: none;
 }
 
-/* 덱 크기: 화면 높이를 따라 — 4:5 세로 플레이트, 가운데 한 장이 주인공이라 예전 띠보다 작게 */
+/* 덱 크기: 화면 높이를 따라 — 4:5 세로 플레이트. 덱 · 설명 · 막대를 한 덩어리로 화면 가운데 가까이 올린다 */
 .reel {
-  --card-h: clamp(170px, 28.5vh, 300px);
+  --card-h: clamp(200px, 34vh, 360px);
+  bottom: calc(var(--bottom) + 4px);
 }
 .r-card {
   width: calc(var(--card-h) * 0.78);
 }
+@media (max-height: 900px) and (min-width: 821px) {
+  .reel {
+    --card-h: clamp(180px, 33vh, 300px);
+  }
+}
 @media (max-height: 760px) and (min-width: 821px) {
   .reel {
-    --card-h: clamp(150px, 27vh, 250px);
+    --card-h: clamp(160px, 30vh, 232px);
   }
 }
 @media (max-width: 820px) {
   .reel {
-    --card-h: clamp(170px, 28vh, 260px);
+    --card-h: clamp(180px, 27vh, 250px);
   }
 }
 @media (max-height: 500px) and (orientation: landscape) {
@@ -756,16 +1054,25 @@
 
 /* ── 필름 '기록' 장면: 수상 릴(프로젝트 사진 위에 상장) ── */
 .aw-reel {
-  --card-h: clamp(170px, 28.5vh, 300px);
+  --card-h: clamp(190px, 30vh, 330px);
+}
+@media (max-height: 900px) and (min-width: 821px) {
+  .aw-reel {
+    --card-h: clamp(160px, 24vh, 240px);
+  }
+  /* 낮은 데스크톱: 연도별 줄은 3D 막대와 설명 줄이 대신한다 */
+  .stage.has-reel .rec-years {
+    display: none;
+  }
 }
 @media (max-height: 760px) and (min-width: 821px) {
   .aw-reel {
-    --card-h: clamp(150px, 27vh, 250px);
+    --card-h: clamp(150px, 25vh, 210px);
   }
 }
 @media (max-width: 820px) {
   .aw-reel {
-    --card-h: clamp(170px, 28vh, 260px);
+    --card-h: clamp(170px, 26vh, 240px);
   }
 }
 @media (max-height: 500px) and (orientation: landscape) {

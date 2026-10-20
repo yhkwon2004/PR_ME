@@ -13,6 +13,8 @@ const SHOTS = {
   ground: { pos: add(SETS.ground, 15.35, 9.0, 18.35), target: add(SETS.ground, -2.2, 1.2, -2.2), fov: 44, shift: [0, 0.2] },
   robotics: { pos: add(SETS.robotics, 0.175, 7.525, 14.975), target: add(SETS.robotics, 0.3, 0.9, -0.9), fov: 40, shift: [0, 0.18] },
   intelligence: { pos: add(SETS.core, 19.8, 3.24, 31.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [0, 0.11] },
+  // 제품 · 창업: 격납고 패드 위에 떠 있는 드론을 비스듬히 — 이륙 직전의 장면
+  build: { pos: add(SETS.hangar, -13, 9.5, 21), target: add(SETS.hangar, 1.5, 3.2, -10), fov: 40, shift: [0, 0.16] },
   loop: { pos: V(0, 44, 50), target: V(0, 1, -6), fov: 44, shift: [0, -0.13] },
   record: { pos: add(SETS.record, -1.73, 6.05, 20.13), target: add(SETS.record, 0, 2.6, 0), fov: 40, shift: [0, 0.1] },
   finale: { pos: add(SETS.hangar, 0, 7.5, 17), target: add(SETS.hangar, 0, 2.8, -4), fov: 40, shift: [0, -0.085] },
@@ -170,7 +172,7 @@ export class Director {
     const { drone, hangar, ground, records, core, links, video } = this.a;
     drone.targetThrottle = 1;
     drone.stiffness = 1.4;
-    hangar.coneLevel = id === 'intro' || id === 'finale' ? 1 : id === 'prologue' ? 0.5 : 0;
+    hangar.coneLevel = id === 'intro' || id === 'finale' ? 1 : id === 'prologue' || id === 'build' ? 0.5 : 0;
     // 바닥 글자(00 — HANGAR, 02 — AERIAL)는 전체 지도를 보는 루프 장면에서만 — 다른 장면에선 제목·버튼과 겹친다
     hangar.floorLevel = id === 'loop' ? 1 : 0;
     this.a.aerial.floorLevel = id === 'loop' ? 1 : 0;
@@ -202,6 +204,9 @@ export class Director {
         break;
       case 'intelligence':
         drone.fly(this.coreOrbit, 0.035, 0.1);
+        break;
+      case 'build':
+        drone.hold(add(SETS.hangar, 0.4, 2.9, 0), 0.6);
         break;
       case 'loop':
         drone.fly(this.flyover, 0.022, 0.0);
@@ -302,7 +307,7 @@ export class Director {
     // 세로 화면에서는 코어 라벨이 장면 제목·수치와 겹치므로 숨긴다
     if (core.tag) core.tag.visible = cam.aspect >= 0.85 && id !== 'intelligence' && id !== 'loop';
     // 오프닝·엔딩: 위쪽 가장자리·타임코드 뒤에 걸리는 코어를 부드럽게 접어 드론에 집중
-    const hideCore = (id === 'intro' || id === 'finale') && !this.trans;
+    const hideCore = (id === 'intro' || id === 'finale' || id === 'build') && !this.trans;
     this.coreK += ((hideCore ? 0 : 1) - this.coreK) * Math.min(1, dt * 2.5);
     core.group.scale.setScalar(Math.max(0.001, this.coreK));
     core.group.visible = this.coreK > 0.01;

@@ -1,9 +1,9 @@
 import gsap from 'gsap';
 import { profile } from '../content.js';
-import { byId } from '../data/projects.js';
+import { byId, projects as ALL_PROJECTS, categoryOf } from '../data/projects.js';
 import { AWARDS, AWARD_REEL } from '../data/awards.js';
 import { ORGS, CREDITS } from '../data/orgs.js';
-import { projectCard, awardCard, orgMark } from '../pages/site.js';
+import { projectCard, awardCard, orgMark, deckInfo, deckAwardInfo, deckAllCard, deckAllInfo } from '../pages/site.js';
 
 // 빈 선택자에 대한 GSAP 경고를 피한다
 const has = (t) => t && (t.length === undefined || t.length > 0);
@@ -26,17 +26,27 @@ function stats(list = []) {
 }
 
 // 카드 덱: 가운데 무대에 카드가 겹쳐 서고, 아래 막대에 번호 · 진행 눈금 · 넘김 버튼
-function deck(cards, { count, label, noun, all, allLabel, stats = '' }) {
-  return `<div class="deck-stage" role="group" aria-roledescription="carousel" aria-label="${esc(label)}">${cards}</div>
+// cards · infos: 같은 순서의 카드와 설명 — 맨 끝에는 아카이브로 이어지는 '전체 보기' 카드와 설명
+function deck(cards, { count, label, noun, all, allLabel, stats = '', infos = [], end }) {
+  const n = count + (end ? 1 : 0);
+  return `<div class="deck-stage" role="group" aria-roledescription="carousel" aria-label="${esc(label)}">${cards.join('')}${end ? end.card : ''}</div>
+        <div class="deck-info"></div>
+        ${[...infos, ...(end ? [end.info] : [])].map((h) => `<template class="deck-tpl">${h}</template>`).join('')}
         <div class="deck-bar">
           <span class="deck-label"><b>${pad(count)}</b> ${esc(label)}${stats ? `<span class="reel-stats">${stats}</span>` : ''}</span>
-          <span class="deck-nav"${count < 2 ? ' hidden' : ''}>
+          <span class="deck-nav"${n < 2 ? ' hidden' : ''}>
             <button type="button" class="deck-btn" data-reel="-1" aria-label="이전 ${noun}">←</button>
-            <span class="deck-count" aria-hidden="true"><b class="deck-now">01</b><span class="deck-ticks">${'<i></i>'.repeat(count)}</span><span class="deck-total">${pad(count)}</span></span>
+            <span class="deck-count" aria-hidden="true"><b class="deck-now">01</b><span class="deck-ticks">${'<i></i>'.repeat(count)}${end ? '<i class="is-all"></i>' : ''}</span><span class="deck-total">${pad(count)}</span></span>
             <button type="button" class="deck-btn" data-reel="1" aria-label="다음 ${noun}">→</button>
           </span>
           <a class="reel-all" href="${esc(all)}" data-link>${allLabel} <span aria-hidden="true">↗</span></a>
         </div>`;
+}
+// 덱 끝 카드에 겹쳐 보일 다른 작품 사진: 같은 분야의 남은 작품 먼저, 모자라면 다른 대표작
+function moreThumbs(list) {
+  const cats = new Set(list.map((p) => p.category));
+  const rest = ALL_PROJECTS.filter((p) => p.cover && !list.includes(p));
+  return [...rest.filter((p) => cats.has(p.category)), ...rest.filter((p) => !cats.has(p.category))].slice(0, 4).map((p) => p.cover.thumb);
 }
 
 function render(scene, i) {
@@ -66,14 +76,33 @@ function render(scene, i) {
         ${scene.stats ? `<ul class="mini-stats" data-r>${scene.stats.map((s) => `<li><b>${esc(s.value)}</b><span>${esc(s.label)}</span></li>`).join('')}</ul>` : ''}
       </div>
       <div class="reel deck panel-content" data-r>
-        ${deck(list.map((p, k) => projectCard(p, k, { cls: 'r-card' })).join(''), {
-          count: list.length,
-          label: 'PROJECTS',
-          noun: '프로젝트',
-          all: `/works?c=${[...new Set(list.map((p) => p.category))].join(',')}`,
-          allLabel: 'VIEW ALL',
-          stats: scene.stats ? scene.stats.map((s) => `${esc(s.value)} ${esc(s.label)}`).join(' · ') : '',
-        })}
+        ${(() => {
+          const cats = [...new Set(list.map((p) => p.category))];
+          const href = `/works?c=${cats.join(',')}`;
+          const field = cats.map((c) => categoryOf(c).label).join(' · ');
+          return deck(
+            list.map((p, k) => projectCard(p, k, { cls: 'r-card' })),
+            {
+              count: list.length,
+              label: 'PROJECTS',
+              noun: '프로젝트',
+              all: href,
+              allLabel: 'VIEW ALL',
+              stats: scene.stats ? scene.stats.map((s) => `${esc(s.value)} ${esc(s.label)}`).join(' · ') : '',
+              infos: list.map(deckInfo),
+              end: {
+                card: deckAllCard({ href, label: `${field} 전체 보기`, total: ALL_PROJECTS.length, unit: 'PROJECTS', thumbs: moreThumbs(list) }),
+                info: deckAllInfo({
+                  href,
+                  title: `${field} 프로젝트 전체 보기`,
+                  line: `이 장면의 ${list.length}개를 포함해 프로젝트 ${ALL_PROJECTS.length}개를 분야별로 볼 수 있습니다.`,
+                  cta: `${field} 전체 보기`,
+                  ghost: { href: '/works', label: `모든 프로젝트 ${ALL_PROJECTS.length}` },
+                }),
+              },
+            }
+          );
+        })()}
       </div>
     </div>`;
   }
@@ -191,7 +220,30 @@ function render(scene, i) {
     // 수상 릴: 프로젝트 사진 위에 상장을 얹은 카드
     const reel = scene.awardReel
       ? `<div class="reel deck aw-reel panel-content" data-r>
-        ${deck(AWARD_REEL.map(awardCard).join(''), { count: AWARD_REEL.length, label: 'PROJECT AWARDS', noun: '수상', all: '/awards', allLabel: 'ALL AWARDS' })}
+        ${deck(AWARD_REEL.map(awardCard), {
+          count: AWARD_REEL.length,
+          label: 'PROJECT AWARDS',
+          noun: '수상',
+          all: '/awards',
+          allLabel: 'ALL AWARDS',
+          infos: AWARD_REEL.map(deckAwardInfo),
+          end: {
+            card: deckAllCard({
+              href: '/awards',
+              label: `수상 ${AWARDS.length}건 상장 모두 보기`,
+              total: AWARDS.length,
+              unit: 'AWARDS',
+              thumbs: AWARDS.filter((a) => a.certs.length).slice(0, 4).map((a) => a.certs[0].thumb),
+            }),
+            info: deckAllInfo({
+              href: '/awards',
+              title: `수상 ${AWARDS.length}건 — 상장과 프로젝트`,
+              line: '대상 · 최우수상부터 장려상까지, 상장 원본과 이어진 프로젝트를 한곳에서 볼 수 있습니다.',
+              cta: '수상 아카이브 보기',
+              ghost: { href: '/works', label: `프로젝트 ${ALL_PROJECTS.length}` },
+            }),
+          },
+        })}
       </div>`
       : '';
     return `<div class="stage${reel ? ' has-reel' : ''}">
@@ -445,12 +497,27 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
   const nav = el.querySelector('.deck-nav');
   const now = el.querySelector('.deck-now');
   const ticks = [...el.querySelectorAll('.deck-ticks i')];
+  const info = el.querySelector('.deck-info');
+  const tpls = [...el.querySelectorAll('template.deck-tpl')];
+  // 덱 아래 설명: 나가는 줄은 위로 사라지고, 새 줄이 아래에서 한 줄씩 올라온다
+  const showInfo = (dir) => {
+    const tpl = tpls[reel.focus];
+    if (!info || !tpl) return;
+    const node = tpl.content.firstElementChild.cloneNode(true);
+    const old = [...info.children];
+    info.appendChild(node);
+    old.forEach((o) => {
+      if (reducedMotion || !dir) return o.remove();
+      gsap.to(o, { autoAlpha: 0, y: dir > 0 ? -12 : 12, duration: 0.26, ease: 'power2.in', onComplete: () => o.remove() });
+    });
+    if (!reducedMotion && dir) gsap.fromTo(node.children, { autoAlpha: 0, y: dir > 0 ? 16 : -16 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.05, delay: 0.12 });
+  };
   el.querySelectorAll('[data-reel]').forEach((b) => b.addEventListener('click', () => reel.step(+b.dataset.reel)));
   // 번호 · 눈금 · 버튼 상태를 초점에 맞춘다
   const sync = (dir = 0) => {
     const f = reel.focus;
     if (now) {
-      now.textContent = pad(f + 1);
+      now.textContent = reel.card?.classList.contains('deck-all') ? 'ALL' : pad(f + 1);
       if (dir && !reducedMotion) gsap.fromTo(now, { yPercent: dir * 70, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.45, ease: 'power3.out' });
     }
     ticks.forEach((t, j) => {
@@ -471,10 +538,12 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
   el.addEventListener('reelfocus', (e) => {
     const dir = Math.sign(e.detail.focus - e.detail.prev);
     sync(dir);
+    if (dir || !info.children.length) showInfo(dir);
     if (!e.detail.auto) onReelFocus?.(el, e.detail);
-    onCard?.(el, reel.card, dir);
+    onCard?.(el, reel.card, dir, reel.focus);
   });
   sync();
+  showInfo(0);
 }
 
 export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus, onCard }) {
@@ -492,7 +561,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       el,
       reducedMotion,
       (from, r) => from === panels[current] && onReelFocus?.(r),
-      (from, card, dir) => from === panels[current] && onCard?.(card, dir)
+      (from, card, dir, focus) => from === panels[current] && onCard?.(card, dir, focus)
     );
     const sheet = el.querySelector('.stage-foot');
     if (sheet) {

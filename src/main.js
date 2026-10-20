@@ -114,7 +114,11 @@ const panels = createPanels($('stage'), scenes, {
     if (h > 0) elapsed = (h * focus) / count;
   },
   // 덱의 가운데 카드가 바뀌면 배경 분위기도 그 카드로
-  onCard: (card, dir) => mood.set(card, dir),
+  // 카드를 넘길 때마다 펜타토닉 한 음
+  onCard: (card, dir, focus) => {
+    mood.set(card, dir);
+    if (dir) audio.pluck(focus, dir);
+  },
 });
 // 장면 길이: 카드 덱이 있으면 카드마다 1.5초는 머물도록 늘린다(수상 덱처럼 카드가 많은 장면)
 function holdOf(i) {

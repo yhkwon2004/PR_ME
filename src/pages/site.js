@@ -55,7 +55,7 @@ function awardBadge(p) {
 
 // 프로젝트 타일 — 사진 위에 글을 얹은 시네마 플레이트(필름 릴 · 아카이브 공통)
 // 릴 카드 폭(premium.css의 --card-h × 0.78, 가로 휴대폰 × 1.5)에 맞춘 sizes
-const REEL_SIZES = '(max-height: 500px) and (orientation: landscape) 190px, (max-width: 820px) 190px, 250px';
+const REEL_SIZES = '(max-height: 500px) and (orientation: landscape) 190px, (max-width: 820px) 210px, 290px';
 const GRID_SIZES = '(max-width: 599px) 50vw, (max-width: 1180px) 33vw, (min-width: 1600px) 20vw, 25vw';
 export function projectCard(p, i, { cls = 'card' } = {}) {
   const c = categoryOf(p.category);
@@ -143,6 +143,49 @@ function awardTile(a) {
       </div>
     </article>
   </li>`;
+}
+
+// ── 필름 카드 덱의 설명 줄(가운데 카드가 바뀔 때마다 덱 아래에서 바뀐다) ──
+export function deckInfo(p) {
+  const c = categoryOf(p.category);
+  const b = bestOf(p);
+  return `<div class="di">
+    <p class="di-meta"><span class="di-cat" data-cat="${esc(p.category)}">${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}${
+      b ? `<span class="di-award" data-tier="${b.key}">${LAUREL}${esc(b.label)}${b.count > 1 ? ` +${b.count - 1}` : ''}</span>` : ''
+    }</p>
+    <h3 class="di-title">${esc(p.title)}</h3>
+    ${p.oneLiner ? `<p class="di-line">${esc(p.oneLiner)}</p>` : ''}
+    <p class="di-actions"><a class="di-open" href="${p.path}" data-link data-cat="${esc(p.category)}">프로젝트 보기 <span aria-hidden="true">→</span></a></p>
+  </div>`;
+}
+export function deckAwardInfo(a) {
+  const p = a.project;
+  const who = (a.issuer || '').split(' · ')[0];
+  return `<div class="di" data-tier="${TIER_KEY[a.tier]}">
+    <p class="di-meta"><span class="di-grade">${LAUREL}${esc(a.grade)}</span><span>${esc(a.date.replace(/-/g, '.'))}</span>${who ? `<span class="di-issuer">${esc(who)}</span>` : ''}</p>
+    <h3 class="di-title">${esc(a.contest)}</h3>
+    <p class="di-line">${esc(p.title)}${p.oneLiner ? ` — ${esc(p.oneLiner)}` : ''}</p>
+    <p class="di-actions"><a class="di-open" href="${p.path}" data-link data-cat="${esc(p.category)}">수상 프로젝트 보기 <span aria-hidden="true">→</span></a><a class="di-ghost" href="/awards" data-link>상장 전체 보기</a></p>
+  </div>`;
+}
+// 덱의 마지막 카드: 아카이브로 이어지는 '전체 보기' — 다른 작품 사진 네 장을 겹쳐 보여 준다
+export function deckAllCard({ href, label, total, unit, thumbs }) {
+  return `<a class="r-card deck-all" href="${esc(href)}" data-link aria-label="${esc(label)}">
+    <figure class="card-media">
+      <span class="all-grid" aria-hidden="true">${thumbs.map((src) => `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" />`).join('')}</span>
+      <span class="card-shade" aria-hidden="true"></span>
+      <span class="all-copy"><small>VIEW ALL</small><b>${total}</b><span>${esc(unit)}</span><i aria-hidden="true">↗</i></span>
+      <figcaption class="card-cap"><span class="card-meta">ARCHIVE</span><h3 class="card-title">${esc(label)}</h3></figcaption>
+    </figure>
+  </a>`;
+}
+export function deckAllInfo({ href, title, line, cta, ghost }) {
+  return `<div class="di di-all">
+    <p class="di-meta"><span class="di-cat">ARCHIVE</span><span>${projects.length} PROJECTS · ${AWARDS.length} AWARDS</span></p>
+    <h3 class="di-title">${esc(title)}</h3>
+    <p class="di-line">${esc(line)}</p>
+    <p class="di-actions"><a class="di-open" href="${esc(href)}" data-link>${esc(cta)} <span aria-hidden="true">→</span></a>${ghost ? `<a class="di-ghost" href="${esc(ghost.href)}" data-link>${esc(ghost.label)}</a>` : ''}</p>
+  </div>`;
 }
 
 // 필름 '기록' 장면의 수상 카드: 프로젝트 사진 위에 상장

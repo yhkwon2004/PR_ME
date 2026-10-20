@@ -51,7 +51,7 @@ const FilmShader = {
       }
       // 카드 색 그레이드: 화면 전체를 그 색으로 살짝 물들이고, 카드가 바뀔 때 가장자리에 빛이 번진다
       float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
-      col = mix(col, col * (0.72 + 0.56 * uTint), uTintAmt * 0.34);
+      col = mix(col, col * (0.72 + 0.56 * uTint), uTintAmt * 0.2);
       col += uTint * uTintAmt * 0.012 * (1.0 - lum);
       col += uTint * uPulse * 0.12 * smoothstep(0.22, 0.85, d);
       float vig = smoothstep(0.92, 0.28, d);
@@ -162,13 +162,13 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
   function setMood(tint, amt) {
     const su = sky.material.uniforms;
     const gu = ground.material.uniforms;
-    tmp.copy(base.horizon).lerp(tint, 0.06 * amt);
+    tmp.copy(base.horizon).lerp(tint, 0.035 * amt);
     su.uHorizon.value.copy(tmp);
     gu.uFog.value.copy(tmp);
     scene.fog.color.copy(tmp);
     scene.background.copy(tmp);
-    su.uGlow.value.copy(base.glow).lerp(tmp.copy(tint).multiplyScalar(0.3), 0.7 * amt);
-    gu.uMajor.value.copy(base.major).lerp(tint, 0.75 * amt);
+    su.uGlow.value.copy(base.glow).lerp(tmp.copy(tint).multiplyScalar(0.24), 0.6 * amt);
+    gu.uMajor.value.copy(base.major).lerp(tint, 0.55 * amt);
     rim.color.copy(base.rim).lerp(tint, 0.9 * amt);
   }
 

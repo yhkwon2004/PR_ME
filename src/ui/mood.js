@@ -2,8 +2,25 @@
 // DOM(#ambient)에는 카드 사진을 크게 흐린 빛 · 색 번짐 · 큰 연도 글자를 깔고,
 // 3D에는 카드 색으로 지평선 · 바닥 격자 · 역광 · 화면 그레이드를 물들인다.
 import * as THREE from 'three';
+import { projects } from '../data/projects.js';
 
 const DEFAULT = '#5ef2ff';
+
+// 배경에 천천히 흘러가는 프로젝트 사진 세 줄 — 줄마다 다른 작품, 다른 빠르기, 엇갈린 방향
+function buildFlow(root) {
+  const covers = projects.filter((p) => p.cover).map((p) => p.cover.thumb);
+  if (!covers.length) return;
+  const flow = document.createElement('div');
+  flow.className = 'amb-flow';
+  const rows = 3;
+  for (let r = 0; r < rows; r++) {
+    const list = covers.filter((_, k) => k % rows === r);
+    const imgs = list.map((src) => `<img src="${src}" alt="" loading="lazy" decoding="async" />`).join('');
+    // 같은 줄을 두 번 이어 붙여 끊김 없이 돈다
+    flow.insertAdjacentHTML('beforeend', `<div class="amb-row" style="--dur:${150 + r * 40}s">${imgs}${imgs}</div>`);
+  }
+  root.prepend(flow);
+}
 
 // getStage: 3D 무대는 필름을 열 때 만들어지므로 매번 물어본다
 export function createMood({ getStage, reducedMotion }) {
@@ -11,6 +28,7 @@ export function createMood({ getStage, reducedMotion }) {
   const type = document.getElementById('amb-type');
   if (!root || !type) return { set() {}, clear() {}, update() {} };
   const roots = [root, type];
+  buildFlow(root);
   const layers = [...root.querySelectorAll('.amb-photo')];
   const years = [...type.querySelectorAll('.amb-year')];
   let front = 0;
