@@ -104,6 +104,12 @@ body.no-webgl #gl {
 }
 
 /* ── 분위기 배경: 덱의 가운데 카드에 맞춰 바뀐다(3D 위 · 스크림 아래) ── */
+/* 카드 색이 바뀔 때 끊기지 않고 번지도록 색 변수를 등록해 전환한다 */
+@property --amb {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #5ef2ff;
+}
 .ambient {
   --amb: #5ef2ff;
   --ay: 70vh;
@@ -113,14 +119,23 @@ body.no-webgl #gl {
   overflow: hidden;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 1.2s var(--ease);
+  transition:
+    opacity 1.2s var(--ease),
+    --amb 1.2s var(--ease);
 }
 .ambient.is-on {
   opacity: 1;
 }
-/* 사진 · 색 번짐 · 흐르는 사진은 3D 위에 '빛'으로만 더한다(어두운 부분은 장면을 가리지 않게) */
+/* 사진 · 색 번짐 · 흐르는 사진은 3D 위에 '빛'으로만 더한다(어두운 부분은 장면을 가리지 않게).
+   위쪽 제목 · 수치 띠는 비워 글이 흐려지지 않게 */
 #ambient {
   mix-blend-mode: screen;
+  -webkit-mask-image: linear-gradient(180deg, transparent 18%, #000 46%);
+  mask-image: linear-gradient(180deg, transparent 18%, #000 46%);
+}
+/* 기록 장면은 3D 막대가 연도를 보여 주므로 큰 연도 글자는 걷는다 */
+body[data-scene='record'] .amb-type {
+  opacity: 0;
 }
 /* 배경에 천천히 흘러가는 프로젝트 사진들 — 아주 옅게, 양 끝은 사라지게 */
 .amb-flow {
@@ -163,7 +178,6 @@ body.no-webgl #gl {
   inset: -12%;
   background: center / cover no-repeat;
   filter: blur(70px) saturate(1.6);
-  mix-blend-mode: screen;
   opacity: 0;
   transform: scale(1.18);
   transition:
@@ -181,8 +195,6 @@ body.no-webgl #gl {
   background:
     radial-gradient(40% 32% at 50% var(--ay), color-mix(in srgb, var(--amb) 15%, transparent), transparent 72%),
     radial-gradient(90% 60% at 50% 110%, color-mix(in srgb, var(--amb) 6%, transparent), transparent 70%);
-  mix-blend-mode: screen;
-  transition: background 1.2s var(--ease);
 }
 /* 큰 연도: 덱 뒤에 외곽선 글자로 — 스크림 위 · 장면 글 아래 */
 .amb-type {

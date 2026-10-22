@@ -39,6 +39,22 @@ export function createMood({ getStage, reducedMotion }) {
 
   const tint = new THREE.Color(DEFAULT);
   const target = new THREE.Color(DEFAULT);
+  const display = new THREE.Color();
+  let current = null;
+
+  // 연도 · 색 번짐의 높이: 덱의 레이아웃 위치(등장 트윈의 y 이동은 빼고)로 재고, 창 크기가 바뀌면 다시 잰다
+  function placeY() {
+    const s = current?.closest('.deck-stage');
+    if (!s || !s.offsetHeight) return;
+    let y = 0;
+    for (let n = s; n; n = n.offsetParent) y += n.offsetTop;
+    roots.forEach((x) => x.style.setProperty('--ay', `${Math.round(y + s.offsetHeight * 0.3)}px`));
+  }
+  let resizeT = 0;
+  addEventListener('resize', () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(placeY, 120);
+  });
   let amt = 0;
   let amtTarget = 0;
   let pulse = 0;
@@ -107,13 +123,11 @@ export function createMood({ getStage, reducedMotion }) {
       showPhoto(im ? im.currentSrc || im.src : '');
       showYear((card.querySelector('.card-meta')?.textContent.match(/\d{4}/) || [''])[0], dir);
       // 덱 높이에 맞춰 연도 글자를 덱 뒤에 둔다
-      const stageEl = card.closest('.deck-stage');
-      if (stageEl) {
-        const r = stageEl.getBoundingClientRect();
-        if (r.height) roots.forEach((x) => x.style.setProperty('--ay', `${Math.round(r.top + r.height * 0.3)}px`));
-      }
+      current = card;
+      placeY();
     },
     clear() {
+      current = null;
       amtTarget = 0;
       roots.forEach((r) => r.classList.remove('is-on'));
       showPhoto('');
@@ -128,7 +142,8 @@ export function createMood({ getStage, reducedMotion }) {
       tint.lerp(target, k);
       pulse = Math.max(0, pulse - dt * 1.4);
       const u = stage.film.uniforms;
-      u.uTint.value.copy(tint);
+      // 필름 패스는 화면 색(sRGB) 단계 — 3D 조명 · 안개는 선형 색 그대로
+      u.uTint.value.copy(display.copy(tint).convertLinearToSRGB());
       u.uTintAmt.value = amt;
       u.uPulse.value = reducedMotion ? 0 : pulse;
       stage.setMood(tint, amt);

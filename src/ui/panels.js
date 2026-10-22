@@ -331,7 +331,8 @@ function deckReel(el, reducedMotion) {
     c.classList.add('is-landing');
   };
   // auto: 자동 재생이 옮긴 것 · animate: 움직임으로 옮길지
-  const set = (k, { animate = true, auto = false } = {}) => {
+  // entry: 장면에 들어설 때 — 이전 방문의 초점과 비교한 방향을 쓰지 않는다
+  const set = (k, { animate = true, auto = false, entry = false } = {}) => {
     const prev = focus;
     focus = Math.max(0, Math.min(cards.length - 1, k));
     // 탭 순서에는 가운데 카드 하나만 — 키보드 초점이 덱 안에 있으면 새 가운데 카드로 옮긴다
@@ -346,7 +347,7 @@ function deckReel(el, reducedMotion) {
     stage.style.setProperty('--fc', getComputedStyle(cards[focus]).getPropertyValue('--cc') || '');
     place(animate);
     if (animate && focus !== prev) land();
-    el.dispatchEvent(new CustomEvent('reelfocus', { detail: { focus, prev, count: cards.length, auto } }));
+    el.dispatchEvent(new CustomEvent('reelfocus', { detail: { focus, prev, count: cards.length, auto, entry } }));
   };
   const layout = () => {
     width = cards[0].offsetWidth;
@@ -536,9 +537,9 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
     }
   };
   el.addEventListener('reelfocus', (e) => {
-    const dir = Math.sign(e.detail.focus - e.detail.prev);
+    const dir = e.detail.entry ? 0 : Math.sign(e.detail.focus - e.detail.prev);
     sync(dir);
-    if (dir || !info.children.length) showInfo(dir);
+    if (e.detail.focus !== e.detail.prev || !info.children.length) showInfo(dir);
     if (!e.detail.auto) onReelFocus?.(el, e.detail);
     onCard?.(el, reel.card, dir, reel.focus);
   });
@@ -641,7 +642,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       // 넘기는 동안 빈 카드가 보이지 않게 이 장면의 썸네일은 미리 모두 받는다
       el.querySelectorAll('.deck-stage img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
       // 바로 다음 장면에서 뒤로 돌아왔다면 마지막 카드부터 — 위로 스크롤하면 카드를 거꾸로 넘긴다
-      el.reel.set(back && el.reel.paged ? el.reel.count - 1 : 0, { animate: false });
+      el.reel.set(back && el.reel.paged ? el.reel.count - 1 : 0, { animate: false, entry: true });
       el.reel.intro(tl, 0.3);
     }
     // 루프: 고리가 드러날 때 펄스가 SENSE에서 출발한다
