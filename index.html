@@ -24,32 +24,37 @@
     <div class="scrim" aria-hidden="true"><i class="s-left"></i><i class="s-right"></i><i class="s-top"></i><i class="s-bottom"></i><i class="s-center"></i></div>
     <div class="letterbox" aria-hidden="true"><i class="lb-top"></i><i class="lb-bottom"></i></div>
 
-    <!-- 부팅 시퀀스: 필름 리더 카운트다운 → 사운드와 함께 시작 -->
+    <!-- 부팅 시퀀스: 필름 리더 — 레티클이 드론을 잡고 3 · 2 · 1 뒤 아이리스처럼 열리며 첫 장면으로 -->
     <section id="boot" aria-label="포트폴리오 필름 시작">
       <div class="boot-corners" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <header class="boot-top">
+      <i class="boot-iris" aria-hidden="true"></i>
+      <header class="boot-top" aria-hidden="true">
         <span>KWON / PHYSICAL-AI<span class="bt-reel"> — REEL 2026</span></span>
         <span id="boot-clock">00:00:00:00</span>
       </header>
       <div class="boot-center">
         <div class="boot-leader" aria-hidden="true">
           <svg viewBox="0 0 200 200">
-            <circle class="bl-track" cx="100" cy="100" r="92" />
+            <circle class="bl-ticks" cx="100" cy="100" r="98" pathLength="240" />
+            <circle class="bl-track" cx="100" cy="100" r="92" pathLength="100" />
             <circle class="bl-prog" id="boot-ring" cx="100" cy="100" r="92" pathLength="100" />
-            <path class="bl-cross" d="M100 14V186M14 100H186" />
-            <circle class="bl-inner" cx="100" cy="100" r="64" />
+            <circle class="bl-inner" cx="100" cy="100" r="70" />
+            <path class="bl-cross" d="M100 2V30M100 170V198M2 100H30M170 100H198" />
           </svg>
+          <span class="boot-lock" id="boot-lock">SCANNING</span>
           <span class="boot-pct"><b id="boot-pct">00</b><small>%</small></span>
         </div>
-        <p class="boot-kicker">A PORTFOLIO FILM</p>
-        <h1 class="boot-name"><span class="bn-ko">권용현</span><span class="bn-en">Yonghyun Kwon · Physical AI Developer</span></h1>
-        <p class="boot-title" aria-hidden="true"><span>Drone</span><i></i><span>Robot</span><i></i><span>Mobility</span><i></i><span>AI</span></p>
+        <div class="boot-copy">
+          <p class="boot-kicker">A PORTFOLIO FILM</p>
+          <h1 class="boot-name"><span class="bn-ko">권용현</span><span class="bn-en"><span>Yonghyun Kwon</span><span>Physical AI Developer</span></span></h1>
+          <p class="boot-title" aria-hidden="true"><span>Drone</span><i></i><span>Robot</span><i></i><span>Mobility</span><i></i><span>AI</span></p>
+        </div>
         <div class="boot-actions" id="boot-actions">
-          <button class="btn-enter" id="enter-sound" type="button">
+          <button class="btn-enter" id="enter-sound" type="button" aria-describedby="boot-note">
             <span class="btn-enter-icon" aria-hidden="true"></span>
-            <span><b>START NOW</b><small>곧 자동으로 시작합니다 · 누르면 소리와 함께 바로</small></span>
+            <span class="btn-enter-text"><b>START NOW</b><small>누르면 소리와 함께 바로</small></span>
           </button>
-          <p class="boot-note">헤드폰을 권장합니다 · 스크롤로 장면을 넘길 수 있습니다</p>
+          <p class="boot-note" id="boot-note">곧 자동으로 시작합니다 · 헤드폰을 권장합니다</p>
         </div>
       </div>
       <ol class="boot-log" id="boot-log" aria-hidden="true"></ol>
@@ -76,7 +81,7 @@
     </header>
 
     <main id="stage" aria-live="polite"></main>
-    <button class="sound-hint" id="sound-hint" type="button" hidden><span class="sh-ico" aria-hidden="true"><i></i><i></i><i></i></span>화면을 한 번 누르면 소리가 켜집니다</button>
+    <button class="sound-hint" id="sound-hint" type="button" aria-label="화면을 한 번 누르면 소리가 켜집니다" hidden><span class="sh-ico" aria-hidden="true"><i></i><i></i><i></i></span><span class="sh-long">화면을 한 번 누르면 소리가 켜집니다</span><span class="sh-short" aria-hidden="true">탭 → 소리</span></button>
 
     <div class="title-card" id="title-card" aria-hidden="true">
       <span class="tc-no"></span>

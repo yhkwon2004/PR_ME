@@ -110,7 +110,28 @@ let hoverHold = false;
 let booting = false;
 let bootProgress = 0;
 let bootFocusY = 0.42;
+let bootFocusX = 0.5;
+let bootFit = 0.3; // 레티클 지름 / 화면 높이 — 드론이 레티클을 알맞게 채우는 거리
+let bootPin = -1; // 검증용: 진행률을 이 값에 고정(-1이면 실제 진행)
+let leaveTl = null; // 시작할 때의 아이리스 아웃
 const bootLeader = document.querySelector('.boot-leader');
+// 레티클의 화면 위치를 재고, 부팅 화면의 어둠(가운데 빈 원)도 그 자리에 맞춘다
+function measureLeader(ease = 1) {
+  const lr = bootLeader?.getBoundingClientRect();
+  if (!lr?.height) return;
+  const cx = lr.left + lr.width / 2;
+  const cy = lr.top + lr.height / 2;
+  bootFocusX += (cx / innerWidth - bootFocusX) * ease;
+  bootFocusY += (cy / innerHeight - bootFocusY) * ease;
+  bootFit = lr.width / innerHeight;
+  const key = `${Math.round(cx)},${Math.round(cy)}`;
+  const el = document.getElementById('boot');
+  if (el && el.dataset.focus !== key) {
+    el.dataset.focus = key;
+    el.style.setProperty('--fx', `${Math.round(cx)}px`);
+    el.style.setProperty('--fy', `${Math.round(cy)}px`);
+  }
+}
 
 const panels = createPanels($('stage'), scenes, {
   reducedMotion: reduced,
@@ -297,6 +318,27 @@ const bootLines = [
   ['ARM', 'ACTUATORS', 'READY'],
 ];
 
+// 카운트다운 한 프레임: 표찰의 숫자, 초마다 다시 차는 고리, 재생 아이콘 둘레의 자동 시작 고리
+function countdown(left, total) {
+  const pct = $('boot-pct');
+  const bootEl = $('boot');
+  if (!pct || !bootEl) return;
+  if (!bootEl.classList.contains('is-counting')) {
+    bootEl.classList.add('is-counting');
+    const unit = pct.nextElementSibling;
+    if (unit) unit.hidden = true;
+  }
+  const n = Math.max(1, Math.ceil(left * (3 / total)));
+  if (pct.textContent !== String(n)) {
+    pct.textContent = String(n);
+    $('boot-status').textContent = `AUTO START — ${n}`;
+    if (!reduced) gsap.fromTo(pct, { scale: 1.35, autoAlpha: 0.3 }, { scale: 1, autoAlpha: 1, duration: 0.5, ease: 'power3.out' });
+  }
+  const frac = ((left * (3 / total)) % 1) || (left > 0 ? 1 : 0);
+  $('boot-ring').style.strokeDashoffset = String(100 - frac * 100);
+  $('boot-actions')?.style.setProperty('--auto', (1 - left / total).toFixed(3));
+}
+
 async function boot() {
   const log = $('boot-log');
   const pct = $('boot-pct');
@@ -361,6 +403,7 @@ async function boot() {
       const real = done / tasks.length;
       progress += (Math.min(time, real * 0.4 + time * 0.6) - progress) * Math.min(1, dt * 7);
       if (real === 1 && time === 1 && progress > 0.97) progress = 1;
+      if (bootPin >= 0) progress = bootPin; // 검증용 고정
       pct.textContent = String(Math.round(progress * 100)).padStart(2, '0');
       ring.style.strokeDashoffset = String(100 - progress * 100);
       bootProgress = progress;
@@ -379,25 +422,17 @@ async function boot() {
   ready = true;
   $('boot').classList.add('is-ready');
   $('boot-status').textContent = 'READY';
+  $('boot-lock').textContent = 'LOCKED';
   actions.hidden = false;
   // 필름 리더처럼 3 · 2 · 1을 세고 저절로 들어간다(누르면 바로)
   if (!CAPTURE) {
-    const unit = pct.nextElementSibling;
-    if (unit) unit.hidden = true;
     // 실제 흐른 시간으로 센다(느린 기기에서 애니메이션 시계가 늦어져도 제때 들어가도록)
     const total = reduced ? 1.2 : 3;
     const c0 = performance.now();
     const tick = () => {
       if (started) return;
       const left = Math.max(0, total - (performance.now() - c0) / 1000);
-      const n = Math.max(1, Math.ceil(left * (3 / total)));
-      if (pct.textContent !== String(n)) {
-        pct.textContent = String(n);
-        $('boot-status').textContent = `AUTO START — ${n}`;
-        if (!reduced) gsap.fromTo(pct, { scale: 1.25, autoAlpha: 0.4 }, { scale: 1, autoAlpha: 1, duration: 0.45, ease: 'power3.out' });
-      }
-      const frac = ((left * (3 / total)) % 1) || (left > 0 ? 1 : 0);
-      ring.style.strokeDashoffset = String(100 - frac * 100);
+      countdown(left, total);
       if (left <= 0) {
         if (!pageCovered) start(true);
         return;
@@ -428,15 +463,9 @@ function start(withSound) {
   audio.set(withSound);
   hud.setSound(withSound);
   document.body.classList.add('is-started');
-  const bootEl = $('boot');
-  gsap.to(bootEl, {
-    autoAlpha: 0,
-    scale: 1.04,
-    filter: 'blur(10px)',
-    duration: reduced ? 0.2 : 1.1,
-    ease: 'power2.inOut',
-    onComplete: () => bootEl.remove(),
-  });
+  leaveTl = irisOut($('boot'));
+  // 느린 기기에서 프레임이 밀려도 부팅 화면이 오래 남지 않게(멈춰 둔 검증용 재생은 그대로)
+  setTimeout(() => leaveTl?.isActive() && leaveTl.progress(1), 4000);
   if (stage) {
     gsap.to(stage.film.uniforms.uExposure, { value: 1, duration: reduced ? 0.3 : 2.4, ease: 'power2.inOut', delay: 0.2 });
     if (!wasLive) {
@@ -452,6 +481,36 @@ function start(withSound) {
   site.markFilm();
   syncSoundHint();
   setTimeout(syncSoundHint, 900);
+}
+
+// 부팅 화면 걷기: 글자가 먼저 빠지고, 레티클이 화면 끝까지 열리며(아이리스 아웃) 필름이 드러난다
+function irisOut(bootEl) {
+  if (!bootEl) return null;
+  const lr = bootLeader?.getBoundingClientRect();
+  // 움직임을 줄이는 설정 · 레티클이 없으면 짧게 사라지기만
+  if (reduced || !lr?.width) {
+    return gsap.to(bootEl, { autoAlpha: 0, duration: reduced ? 0.25 : 0.8, ease: 'power2.inOut', onComplete: () => bootEl.remove() });
+  }
+  const cx = lr.left + lr.width / 2;
+  const cy = lr.top + lr.height / 2;
+  const r0 = lr.width * 0.46; // 진행 고리의 반지름(viewBox 92/200)
+  const r1 = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy)) + 60;
+  bootEl.style.setProperty('--ix', `${cx.toFixed(1)}px`);
+  bootEl.style.setProperty('--iy', `${cy.toFixed(1)}px`);
+  bootEl.style.setProperty('--ir', `${r0.toFixed(1)}px`);
+  bootEl.classList.add('is-leaving');
+  const copy = bootEl.querySelectorAll('.boot-copy > *, .boot-actions, .boot-lock, .boot-pct');
+  const chrome = bootEl.querySelectorAll('.boot-top, .boot-bottom, .boot-log, .boot-corners');
+  const tl = gsap.timeline({ onComplete: () => bootEl.remove() });
+  tl.to(copy, { autoAlpha: 0, y: -10, filter: 'blur(4px)', duration: 0.45, stagger: 0.04, ease: 'power2.in' }, 0)
+    .to(chrome, { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, 0)
+    // 레티클 고리가 한 번 조여졌다가(숨 고르기) 화면 밖까지 열린다
+    .to(bootLeader, { scale: 0.94, duration: 0.3, ease: 'power2.out' }, 0)
+    .to(bootLeader, { autoAlpha: 0, duration: 0.25, ease: 'power1.in' }, 0.3)
+    .set(bootEl.querySelector('.boot-iris'), { opacity: 1 }, 0.3)
+    .fromTo(bootEl, { '--ir': `${r0 * 0.94}px` }, { '--ir': `${r1}px`, duration: 1.15, ease: 'power2.in' }, 0.3)
+    .to(bootEl.querySelector('.boot-iris'), { opacity: 0, duration: 0.35, ease: 'power1.in' }, 1.1);
+  return tl;
 }
 
 // 자동 진입이라 브라우저가 소리를 막아 둔 경우: 한 번 누르면 켜진다는 안내를 띄운다
@@ -510,9 +569,8 @@ function loop(now) {
   if (!started) {
     if (!booting || !director?.bootFrame) return;
     // 드론이 레티클 가운데에 오도록 — 레티클 위치를 매 프레임 재고 부드럽게 따라간다
-    const lr = bootLeader?.getBoundingClientRect();
-    if (lr?.height) bootFocusY += ((lr.top + lr.height / 2) / innerHeight - bootFocusY) * Math.min(1, dt * 6);
-    director.bootFrame(dt, t, bootProgress, bootFocusY);
+    measureLeader(Math.min(1, dt * 6));
+    director.bootFrame(dt, t, bootProgress, bootFocusY, bootFocusX, bootFit);
     const u = stage.film.uniforms;
     u.uExposure.value += (0.32 + 0.6 * bootProgress - u.uExposure.value) * Math.min(1, dt * 3);
     stage.dust.update(t);
@@ -557,17 +615,22 @@ if (stage && new URLSearchParams(location.search).has('capture')) {
     start: () => start(false),
     // 부팅 3D를 빨리 감는다(progress 0~1)
     boot(sec, progress = 1, step = 1 / 30) {
-      const lr = bootLeader?.getBoundingClientRect();
-      if (lr?.height) bootFocusY = (lr.top + lr.height / 2) / innerHeight;
+      measureLeader();
       for (let k = 0; k < sec / step; k++) {
         simTime += step;
-        director.bootFrame(step, simTime, progress, bootFocusY);
+        director.bootFrame(step, simTime, progress, bootFocusY, bootFocusX, bootFit);
       }
       stage.film.uniforms.uExposure.value = 0.32 + 0.6 * progress;
       stage.composer.render(step);
     },
     // 드론 · 카메라 위치(부팅 3D 확인용)
     probe: () => ({ drone: actors.drone.pos.toArray().map((v) => +v.toFixed(2)), cam: stage.camera.position.toArray().map((v) => +v.toFixed(2)), exposure: +stage.film.uniforms.uExposure.value.toFixed(2), booting }),
+    // 부팅 화면의 진행률을 고정(0~1) · 해제(-1)
+    bootAt: (p) => (bootPin = p),
+    // 카운트다운 화면(n = 3 · 2 · 1, 그 초의 중간)
+    bootCount: (n = 2) => countdown(n - 0.5, 3),
+    // 아이리스 아웃을 멈추고 sec초 지점을 보여 준다
+    leaveAt: (sec) => leaveTl?.pause().seek(sec),
     freeze: () => (frozen = true),
     go: (i) => director.go(i, { instant: true }),
     advance(sec, step = 1 / 30) {

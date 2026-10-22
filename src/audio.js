@@ -241,8 +241,13 @@ export function createAudio({ makeContext } = {}) {
     if (on && ctx.state === 'suspended' && ctx.resume) {
       ctx.resume();
       // 사용자 동작 없이 켜졌다면(상세 페이지에서 뒤로 가기 등) 다음 클릭 · 키 입력에 깨운다
-      const wake = () => on && ctx.resume();
-      ['pointerdown', 'keydown', 'touchend'].forEach((t) => addEventListener(t, wake, { once: true, capture: true }));
+      // SOUND 버튼 · 안내를 누른 경우는 그 버튼이 직접 처리한다(깨우기와 토글이 한 번에 겹쳐 꺼지지 않게)
+      const wake = (e) => {
+        if (e.target?.closest?.('#btn-sound, #sound-hint')) return;
+        ['pointerdown', 'keydown', 'touchend'].forEach((t) => removeEventListener(t, wake, true));
+        if (on) ctx.resume();
+      };
+      ['pointerdown', 'keydown', 'touchend'].forEach((t) => addEventListener(t, wake, true));
     }
     master.gain.cancelScheduledValues(ctx.currentTime);
     master.gain.setTargetAtTime(on ? 1 : 0, ctx.currentTime, on ? 1.4 : 0.4);

@@ -124,8 +124,9 @@ export class Director {
   }
 
   // 부팅(로딩) 중: 격납고 위에 떠 있는 드론 둘레를 천천히 돈다 — 시작하면 이 자리에서 첫 장면으로 날아간다.
-  // progress 0~1에 따라 조금씩 다가가고, focusY(화면 높이 대비)에 드론이 오도록 렌즈를 옮긴다.
-  bootFrame(dt, t, progress, focusY = 0.42) {
+  // progress 0~1에 따라 조금씩 다가가고, (focusX, focusY)(화면 대비)에 드론이 오도록 렌즈를 옮긴다.
+  // fit은 레티클 지름 / 화면 높이 — 드론이 레티클 안을 알맞게 채우는 거리로 물러선다.
+  bootFrame(dt, t, progress, focusY = 0.42, focusX = 0.5, fit = 0) {
     const { drone, hangar } = this.a;
     if (!this.booting) {
       this.booting = true;
@@ -139,12 +140,15 @@ export class Director {
     drone.target.set(SETS.hangar.x, SETS.hangar.y + 0.3 + 1.45 * lift, SETS.hangar.z);
     this.bootAngle += dt * (this.reducedMotion ? 0 : 0.14);
     const portrait = this.stage.camera.aspect < 0.85;
-    const r = (portrait ? 13 : 9.6) - progress * 1.4;
+    this.fov = portrait ? 40 : 34;
+    // 드론 폭(약 1.45)이 레티클 고리 지름(0.92 · fit)의 60%쯤 되는 거리 — 다 차면 조금 더 다가선다
+    const span = 1.45 / (0.6 * 0.92 * Math.max(0.12, fit || 0.27));
+    const fitDist = span / (2 * Math.tan(THREE.MathUtils.degToRad(this.fov / 2)));
+    const r = THREE.MathUtils.clamp(fitDist, 6, 22) + (1 - progress) * 1.6;
     const c = SETS.hangar;
     this.camTarget.set(c.x, c.y + 1.75, c.z);
     this.camPos.set(c.x + Math.sin(this.bootAngle) * r, c.y + 2.5 + progress * 0.5, c.z + Math.cos(this.bootAngle) * r);
-    this.fov = portrait ? 40 : 34;
-    this.shift.set(0, 0.5 - focusY);
+    this.shift.set(focusX - 0.5, 0.5 - focusY);
     this.update(dt, t);
   }
 
