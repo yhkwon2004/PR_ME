@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import { projects, byId, CATEGORIES, categoryOf } from '../data/projects.js';
 import { profile } from '../content.js';
-import { ORGS, WALL, orgsOf } from '../data/orgs.js';
+import { ORGS, WALL, ORG_INDEX, orgsOf, awardOrgs } from '../data/orgs.js';
 import { AWARDS, awardsOf, bestOf, TIER_KEY } from '../data/awards.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -77,22 +77,43 @@ export function projectCard(p, i, { cls = 'card' } = {}) {
   </a>`;
 }
 
-// 기관 표기: 공식 로고(흰색 단색, 면적을 맞춘 높이) 또는 활자
+// 기관 표기: 공식 로고(흰색 단색, 면적을 맞춘 높이) 또는 활자.
+// 정부 상징처럼 여러 기관이 함께 쓰는 상징은 기관 이름을 곁에 적는다(lockup)
 export function orgMark(o, { decorative = false } = {}) {
   if (o.logo) {
     const h = Math.max(16, Math.min(44, Math.sqrt(2400 / o.r)));
-    return `<img class="org-logo" src="/media/orgs/${o.logo}.webp" alt="${decorative ? '' : esc(o.name)}" style="--lh:${h.toFixed(1)}" loading="lazy" decoding="async" />`;
+    const im = `<img class="org-logo" src="/media/orgs/${o.logo}.webp" alt="${decorative || o.lockup ? '' : esc(o.name)}" style="--lh:${h.toFixed(1)}" loading="lazy" decoding="async" />`;
+    // 이름이 곁에 따로 적히는 자리(decorative)에서는 상징만
+    return o.lockup && !decorative ? `<span class="org-lockup" role="img" aria-label="${esc(o.name)}">${im}<b>${esc(o.name)}</b></span>` : im;
   }
-  return `<span class="org-word" role="img" aria-label="${esc(o.name)}"><b>${esc(o.mark)}</b><small>${esc(o.en)}</small></span>`;
+  return `<span class="org-word"${decorative ? ' aria-hidden="true"' : ` role="img" aria-label="${esc(o.name)}"`}><b>${esc(o.mark)}</b><small>${esc(o.en)}</small></span>`;
 }
 
+// 기관 × 프로젝트: 기관마다 로고 아래에 함께한 프로젝트와 받은 상 수를 붙인다
 function withWall() {
-  return `<section class="with-wall reveal" aria-label="함께한 기관">
-    <p class="pg-kicker">WITH — 학교 · 협업 기관 · 상을 준 곳</p>
-    <ul class="wall">${WALL.map((k) => ORGS[k])
-      .map((o) => `<li title="${esc(o.name)}">${o.url ? `<a href="${esc(o.url)}" target="_blank" rel="noopener">${orgMark(o)}</a>` : orgMark(o)}</li>`)
-      .join('')}</ul>
-    <p class="wall-note">학업 · 수상 · 협업 이력을 밝히는 표기이며 후원이나 보증을 뜻하지 않습니다.</p>
+  const tile = (k) => {
+    const o = ORGS[k];
+    const { projects: list, awards } = ORG_INDEX[k];
+    const seen = new Set();
+    const chips = list
+      .filter(({ id }) => byId(id) && !seen.has(id) && seen.add(id))
+      .map(({ id, rel }) => {
+        const p = byId(id);
+        return `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}" title="${esc(rel)}">${esc(p.title)}</a></li>`;
+      })
+      .join('');
+    const mark = o.url ? `<a class="ow-mark" href="${esc(o.url)}" target="_blank" rel="noopener">${orgMark(o)}</a>` : `<span class="ow-mark">${orgMark(o)}</span>`;
+    return `<li class="ow${o.logo ? '' : ' is-text'}${chips ? '' : ' is-solo'}">
+      ${mark}
+      <p class="ow-name">${esc(o.name)}${awards ? `<span class="ow-aw">수상 ${awards}</span>` : ''}</p>
+      ${chips ? `<ul class="ow-proj" aria-label="${esc(o.name)}와 함께한 프로젝트">${chips}</ul>` : ''}
+    </li>`;
+  };
+  return `<section class="with-wall reveal" aria-label="함께한 기관과 프로젝트">
+    <p class="pg-kicker">WITH — 학교 · 협업 기관 · 상을 준 곳 × 프로젝트</p>
+    <h2 class="ww-title">함께한 기관<sup>${pad(WALL.length)}</sup></h2>
+    <ul class="wall">${WALL.map(tile).join('')}</ul>
+    <p class="wall-note">로고는 기관 원본 파일 또는 상장에 인쇄된 로고를 흰색 단색으로만 바꾼 것입니다. 학업 · 수상 · 협업 이력을 밝히는 표기이며 후원이나 보증을 뜻하지 않습니다.</p>
   </section>`;
 }
 
@@ -125,6 +146,12 @@ function certSheet(a, { sizes = '220px' } = {}) {
   return `<span class="sheet is-blank" aria-hidden="true">${LAUREL}<b>${esc(a.grade)}</b></span>`;
 }
 
+// 상을 준 · 함께 연 기관의 로고(로고가 있는 곳만, 이름은 위 수여자 줄에 있다)
+function awardOrgLogos(a) {
+  const list = awardOrgs(a).map((k) => ORGS[k]).filter((o) => o.logo);
+  return list.length ? `<ul class="aw-orgs" aria-label="수여 · 주최 기관">${list.map((o) => `<li title="${esc(o.name)}">${orgMark(o)}</li>`).join('')}</ul>` : '';
+}
+
 // 수상 타일(아카이브): 상장 + 이어진 프로젝트
 function awardTile(a) {
   const p = a.project;
@@ -135,6 +162,7 @@ function awardTile(a) {
         <p class="aw-top"><span class="aw-grade">${LAUREL}${esc(a.grade)}</span><time datetime="${esc(a.date)}">${esc(a.date.replace(/-/g, '.'))}</time></p>
         <h3 class="aw-contest">${esc(a.contest)}</h3>
         ${a.issuer || a.prize ? `<p class="aw-issuer">${issuerLine(a)}</p>` : ''}
+        ${awardOrgLogos(a)}
         ${
           p
             ? `<a class="aw-proj" href="${p.path}" data-link data-cat="${esc(p.category)}">${p.cover ? `<span class="aw-proj-img">${img(p.cover, { sizes: '64px' })}</span>` : `<span class="aw-proj-img is-type" aria-hidden="true">${esc(categoryOf(p.category).label.slice(0, 2).toUpperCase())}</span>`}<span class="aw-proj-t"><small>PROJECT</small><b>${esc(p.title).replace(/ · /g, '&nbsp;· ')}</b></span><i aria-hidden="true">↗</i></a>`
@@ -146,13 +174,18 @@ function awardTile(a) {
 }
 
 // ── 필름 카드 덱의 설명 줄(가운데 카드가 바뀔 때마다 덱 아래에서 바뀐다) ──
+// 덱 설명 줄의 기관 로고(로고가 있는 곳만, 많아야 셋)
+const diOrgs = (list) => {
+  const logos = list.filter((o) => o.logo).slice(0, 3);
+  return logos.length ? `<span class="di-orgs">${logos.map((o) => `<img src="/media/orgs/${o.logo}.webp" alt="${esc(o.name)}" title="${esc(o.name)}" style="--r:${o.r}" loading="lazy" decoding="async" />`).join('')}</span>` : '';
+};
 export function deckInfo(p) {
   const c = categoryOf(p.category);
   const b = bestOf(p);
   return `<div class="di">
     <p class="di-meta"><span class="di-cat" data-cat="${esc(p.category)}">${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}${
       b ? `<span class="di-award" data-tier="${b.key}">${LAUREL}${esc(b.label)}${b.count > 1 ? ` +${b.count - 1}` : ''}</span>` : ''
-    }</p>
+    }${diOrgs(orgsOf(p.id))}</p>
     <h3 class="di-title">${esc(p.title)}</h3>
     ${p.oneLiner ? `<p class="di-line">${esc(p.oneLiner)}</p>` : ''}
     <p class="di-actions"><a class="di-open" href="${p.path}" data-link data-cat="${esc(p.category)}">프로젝트 보기 <span aria-hidden="true">→</span></a></p>
@@ -162,7 +195,7 @@ export function deckAwardInfo(a) {
   const p = a.project;
   const who = (a.issuer || '').split(' · ')[0];
   return `<div class="di" data-tier="${TIER_KEY[a.tier]}">
-    <p class="di-meta"><span class="di-grade">${LAUREL}${esc(a.grade)}</span><span>${esc(a.date.replace(/-/g, '.'))}</span>${who ? `<span class="di-issuer">${esc(who)}</span>` : ''}</p>
+    <p class="di-meta"><span class="di-grade">${LAUREL}${esc(a.grade)}</span><span>${esc(a.date.replace(/-/g, '.'))}</span>${who ? `<span class="di-issuer">${esc(who)}</span>` : ''}${diOrgs(awardOrgs(a).map((k) => ORGS[k]))}</p>
     <h3 class="di-title">${esc(a.contest)}</h3>
     <p class="di-line">${esc(p.title)}${p.oneLiner ? ` — ${esc(p.oneLiner)}` : ''}</p>
     <p class="di-actions"><a class="di-open" href="${p.path}" data-link data-cat="${esc(p.category)}">수상 프로젝트 보기 <span aria-hidden="true">→</span></a><a class="di-ghost" href="/awards" data-link>상장 전체 보기</a></p>

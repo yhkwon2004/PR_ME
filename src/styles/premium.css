@@ -265,6 +265,21 @@
 .di-cat {
   color: var(--cc, var(--cyan));
 }
+/* 덱 설명 줄의 기관 로고: 면적을 맞춘 작은 높이 */
+.di-orgs {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+}
+.di-orgs img {
+  display: block;
+  width: auto;
+  height: clamp(14px, calc(34px / sqrt(var(--r))), 26px);
+  opacity: 0.85;
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.9));
+}
 .di-award,
 .di-grade {
   display: inline-flex;
@@ -1751,24 +1766,122 @@ button.aw-sheet:focus-visible {
   border-top: 1px solid var(--line);
   text-align: center;
 }
+.ww-title {
+  margin-top: 10px;
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.ww-title sup {
+  margin-left: 6px;
+  font-family: var(--mono);
+  font-size: 0.34em;
+  color: var(--cyan);
+  vertical-align: super;
+}
 .wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+  margin-top: 34px;
+  text-align: left;
+}
+.ow {
+  display: grid;
+  grid-template-rows: 64px auto 1fr;
+  gap: 10px;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.01));
+  transition: border-color 0.35s, background 0.35s;
+}
+.ow:hover,
+.ow:focus-within {
+  border-color: rgba(94, 242, 255, 0.35);
+  background: linear-gradient(180deg, rgba(94, 242, 255, 0.07), rgba(255, 255, 255, 0.015));
+}
+.ow-mark {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  opacity: 0.86;
+  transition: opacity 0.35s;
+}
+.ow:hover .ow-mark,
+.ow:focus-within .ow-mark {
+  opacity: 1;
+}
+.ow-mark .org-logo {
+  --ls: 1.05;
+}
+.ow-mark .org-word {
+  justify-items: start;
+}
+.ow-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font-size: 13px;
+  font-weight: 650;
+  word-break: keep-all;
+}
+.ow-aw {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: #e8c66a;
+}
+.ow-proj {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px;
+}
+.ow-proj a {
+  display: inline-block;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  font-size: 11.5px;
+  line-height: 1.25;
+  color: var(--muted);
+  word-break: keep-all;
+  transition: color 0.25s, border-color 0.25s;
+}
+.ow-proj a:hover,
+.ow-proj a:focus-visible {
+  color: var(--fg);
+  border-color: rgba(94, 242, 255, 0.5);
+}
+/* 정부 상징 + 기관 이름 */
+.org-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.org-lockup b {
+  font-size: calc(13px * var(--ls, 1));
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+/* 수상 타일의 기관 로고 */
+.aw-orgs {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 34px 48px;
-  margin-top: 34px;
+  gap: 8px 14px;
+  margin: 2px 0 4px;
+  opacity: 0.72;
 }
-.wall li {
-  opacity: 0.6;
-  transition: opacity 0.35s;
-}
-.wall li:hover,
-.wall li:focus-within {
-  opacity: 1;
-}
-.wall a {
-  display: block;
+.aw-orgs .org-logo,
+.aw-orgs .org-lockup {
+  --ls: 0.5;
 }
 .wall-note {
   margin-top: 34px;
@@ -1822,7 +1935,12 @@ button.aw-sheet:focus-visible {
     font-size: 11.5px;
   }
   .wall {
-    gap: 24px 30px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+  .ow {
+    grid-template-rows: 52px auto 1fr;
+    padding: 14px 12px 12px;
   }
   .org-logo,
   .org-word {
