@@ -3,6 +3,7 @@
 
 import projectData from './data/projects.json';
 import awardData from './data/awards.json';
+import pressData from './data/press.json';
 
 const M = (file) => `/media/${file}`;
 
@@ -139,21 +140,19 @@ export const scenes = [
     projects: ['recap-jbmotors', 'givingplus-filament', 'coffee-box', 'baekchul-sikhye', 'edufarm', 'growth-footrest', 'kakao-fin-next', 'climate-dashboard', 'meal-reservation-app', 'farm-app', 'retrofit-game'],
   },
   {
-    id: 'loop',
-    code: 'LOOP',
-    label: 'Sense · Think · Act',
-    layout: 'loop',
+    id: 'press',
+    code: 'PRESS',
+    label: 'In the Press',
+    layout: 'reel',
     hold: 12,
-    kicker: 'THE LOOP — PHYSICAL AI STACK',
-    title: ['SENSE.', 'THINK.', 'ACT.'],
-    lead: '센서가 읽고, 모델이 판단하고, 기계가 움직이고, 다시 만듭니다 — 드론과 차량에서 닫아 온 이 루프를 이제 로봇으로 넓힙니다.',
-    loop: [
-      { key: 'SENSE', ko: '인지', items: ['Camera · Vision', 'LiDAR · GPS · IMU', '압력 · 가스 · 온도 센서', 'ADC 수액 감지'] },
-      { key: 'THINK', ko: '판단', items: ['YOLO · MoveNet', 'End-to-End Driving', 'Nav2 Path Planning', 'LLM · Generative AI'] },
-      { key: 'ACT', ko: '제어', items: ['Pixhawk Flight Control', 'ESP32 · Arduino F/W', 'Servo · Motor', 'Steering · Brake'] },
-      { key: 'BUILD', ko: '제작', items: ['Altium PCB', 'Fusion 360 · Inventor · CATIA', '3D Printing', '선반 · 밀링 · 용접'] },
+    press: true,
+    kicker: 'IN THE PRESS — 공식 보도',
+    title: ['IN THE', 'PRESS'],
+    subtitle: '대학과 사업단이 기사로 남긴 장면들 — 누르면 기사 원문으로',
+    stats: [
+      { value: `${pressData.length}건`, label: '공식 보도' },
+      { value: `${pressData.filter((a) => a.relation === '직접 소개').length}건`, label: '이름 · 팀 직접 소개' },
     ],
-    tools: ['Python', 'C#', 'Java', 'Swift', 'TypeScript', 'ROS · ROS2', 'Gazebo', 'CARLA', 'AirSim', 'Unreal Engine', 'Linux', 'AWS'],
   },
   {
     id: 'record',
@@ -167,7 +166,7 @@ export const scenes = [
       { value: awardData.length, label: '수상 기록' }, // 수상 아카이브(/awards)와 같은 수
       { value: projectData.length, label: '프로젝트' }, // 아카이브(/works)와 같은 수
       { value: 9, label: '자격증' },
-      { value: 9, label: '공식 보도' },
+      { value: pressData.length, label: '공식 보도' }, // 보도 장면(press.json)과 같은 수
     ],
     // 프로젝트와 이어진 수상을 상장과 함께 릴로 보여 준다(awards.js의 AWARD_REEL)
     awardReel: true,
@@ -195,12 +194,16 @@ export const scenes = [
       ['Vision & AI', 'YOLO · MoveNet · LLM · GAN-TTS · Swift'],
       ['§', 'The Record'],
       ['Awards', awardLine()],
-      ['Certifications & Press', '자격증 9 · 공식 보도 9'],
+      ['Certifications & Press', `자격증 9 · 공식 보도 ${pressData.length}`],
+      ['§', 'In the Press'],
+      ['Headlines', 'PRESS'],
       ['§', 'Education & Crew'],
       ['Education', '원광대학교 컴퓨터소프트웨어공학과 · JST 공유대학 스마트모빌리티 SW공학과'],
       ['Labs', '인공지능 LLM 연구실 · 지능형 IoT 연구실'],
       ['Crew', '메카니즘 · Re:cap · 인퓨테크 · Re:Switch · HIT · 늘솔길 · 프론티어 · de:caffeine · 고단수'],
-      ['Schools · Awarding bodies · Partners', null],
+      ['§', 'With'],
+      ['학교 · 상을 준 곳 · 함께한 기관 — 그리고 함께 만든 프로젝트', null],
+      ['§', 'Thanks'],
       ['On Location', '익산 · 전주 · 강릉 · 경주 · 치앙마이'],
       ['Special Thanks', '함께 만든 팀원들 · 지도해 주신 교수님들 · 끝까지 봐 주신 당신'],
       ['Built with', 'Three.js · GSAP · Web Audio · Vite — on Vercel'],

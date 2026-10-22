@@ -295,8 +295,8 @@ body[data-scene='intelligence'] .s-top,
 body[data-scene='intelligence'] .s-bottom,
 body[data-scene='build'] .s-top,
 body[data-scene='build'] .s-bottom,
-body[data-scene='loop'] .s-top,
-body[data-scene='loop'] .s-bottom,
+body[data-scene='press'] .s-top,
+body[data-scene='press'] .s-bottom,
 body[data-scene='record'] .s-top,
 body[data-scene='record'] .s-bottom,
 body[data-scene='finale'] .s-center {
@@ -3536,3 +3536,120 @@ body.is-started.has-pointer .cursor {
   }
 }
 
+
+/* ── 엔딩: 기관 × 프로젝트 크레딧 ─────────────────────────
+   로고(또는 이름 활자) 아래에 기관 이름, 그 아래에 함께 만든 프로젝트 — 두 줄로 쌓아 롤을 짧게 */
+.credit-with,
+.credit-press {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  row-gap: 18px;
+  text-align: center;
+}
+.credit-with > span,
+.credit-press > span {
+  justify-self: center;
+  text-align: center;
+}
+.credit-with ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 26px 34px;
+  width: 100%;
+}
+.cw {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 8px;
+}
+.cw-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+}
+.cw-mark .org-logo {
+  --ls: 1;
+  opacity: 0.92;
+}
+.cw-name {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--fg);
+  word-break: keep-all;
+}
+.cw-proj {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+  word-break: keep-all;
+}
+.cw-proj i {
+  font-style: normal;
+  color: var(--dim);
+}
+/* 보도 제목: 신문 표제처럼 매체 · 날짜 위에 굵은 제목 */
+.credit-press ol {
+  display: grid;
+  gap: 16px;
+  width: min(600px, 100%);
+}
+.credit-press li {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.credit-press small {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: #f1e3c6;
+}
+.credit-press b {
+  font-size: clamp(14px, 1.3vw, 17px);
+  font-weight: 600;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+/* 엔드 카드의 숫자 줄 */
+.end-stats {
+  display: flex;
+  justify-content: center;
+  gap: clamp(18px, 4vw, 54px);
+  margin-top: 30px;
+}
+.end-stats div {
+  display: grid;
+  gap: 4px;
+}
+.end-stats dt {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.end-stats dd {
+  font-family: var(--display);
+  font-size: clamp(26px, 3vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+@media (max-width: 600px) {
+  .credit-with ul {
+    gap: 22px 16px;
+  }
+  .cw-mark .org-logo {
+    --ls: 0.8;
+  }
+  .end-stats {
+    margin-top: 20px;
+  }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .end-stats {
+    display: none;
+  }
+}

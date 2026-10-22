@@ -2,8 +2,9 @@ import gsap from 'gsap';
 import { profile } from '../content.js';
 import { byId, projects as ALL_PROJECTS, categoryOf } from '../data/projects.js';
 import { AWARDS, AWARD_REEL } from '../data/awards.js';
-import { ORGS, CREDITS } from '../data/orgs.js';
-import { projectCard, awardCard, orgMark, deckInfo, deckAwardInfo, deckAllCard, deckAllInfo } from '../pages/site.js';
+import { ORGS, WALL, ORG_INDEX } from '../data/orgs.js';
+import { projectCard, awardCard, pressCard, orgMark, deckInfo, deckAwardInfo, deckPressInfo, deckAllCard, deckAllInfo } from '../pages/site.js';
+import { PRESS } from '../data/press.js';
 
 // 빈 선택자에 대한 GSAP 경고를 피한다
 const has = (t) => t && (t.length === undefined || t.length > 0);
@@ -39,7 +40,7 @@ function deck(cards, { count, label, noun, all, allLabel, stats = '', infos = []
             <span class="deck-count" aria-hidden="true"><b class="deck-now">01</b><span class="deck-ticks">${'<i></i>'.repeat(count)}${end ? '<i class="is-all"></i>' : ''}</span><span class="deck-total">${pad(count)}</span></span>
             <button type="button" class="deck-btn" data-reel="1" aria-label="다음 ${noun}">→</button>
           </span>
-          <a class="reel-all" href="${esc(all)}" data-link>${allLabel} <span aria-hidden="true">↗</span></a>
+          ${all ? `<a class="reel-all" href="${esc(all)}" data-link>${allLabel} <span aria-hidden="true">↗</span></a>` : ''}
         </div>`;
 }
 // 덱 끝 카드에 겹쳐 보일 다른 작품 사진: 같은 분야의 남은 작품 먼저, 모자라면 다른 대표작
@@ -47,6 +48,28 @@ function moreThumbs(list) {
   const cats = new Set(list.map((p) => p.category));
   const rest = ALL_PROJECTS.filter((p) => p.cover && !list.includes(p));
   return [...rest.filter((p) => cats.has(p.category)), ...rest.filter((p) => !cats.has(p.category))].slice(0, 4).map((p) => p.cover.thumb);
+}
+
+// 엔딩 크레딧의 'With': 기관 로고마다 함께 만든 프로젝트를 적는다(로고가 있는 곳 먼저)
+function creditWith(role) {
+  const rows = WALL.map((k) => {
+    const o = ORGS[k];
+    const seen = new Set();
+    const titles = ORG_INDEX[k].projects
+      .map(({ id }) => byId(id))
+      .filter((p) => p && !seen.has(p.id) && seen.add(p.id))
+      .map((p) => p.title);
+    return `<li class="cw${o.logo ? '' : ' is-text'}"><span class="cw-mark">${orgMark(o, { decorative: !!o.lockup })}</span><span class="cw-name">${esc(o.name)}</span>${
+      titles.length ? `<span class="cw-proj">${titles.map((t) => `<span class="nw">${esc(t)}</span>`).join('<i> · </i>')}</span>` : ''
+    }</li>`;
+  }).join('');
+  return `<div class="credit credit-with"><span>${esc(role)}</span><ul>${rows}</ul></div>`;
+}
+// 엔딩 크레딧의 보도: 기사 제목을 신문 지면처럼 — 매체 · 날짜
+function creditPress(role) {
+  return `<div class="credit credit-press"><span>${esc(role)}</span><ol>${PRESS.map(
+    (a) => `<li><small>${esc(a.publisher)} · ${esc(a.date.replace(/-/g, '.'))}</small><b>${esc(a.title)}</b></li>`
+  ).join('')}</ol></div>`;
 }
 
 function render(scene, i) {
@@ -63,6 +86,26 @@ function render(scene, i) {
           <p class="hero-lead">${esc(scene.lead)}</p>
         </div>
         <ul class="hero-tags" data-r>${scene.tags.map((t, j) => `<li><span>${pad(j + 1)}</span>${esc(t)}</li>`).join('')}</ul>
+      </div>
+    </div>`;
+  }
+  // 보도: 대학 · 기관 공식 기사를 오려 낸 지면처럼 한 장씩 — 누르면 기사 원문(새 창)
+  if (L === 'reel' && scene.press) {
+    return `<div class="reel-scene press-scene">
+      <div class="reel-head panel-content">
+        ${kicker(scene, i)}
+        <h2 class="title">${lines(scene.title)}</h2>
+        ${scene.subtitle ? `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>` : ''}
+        ${scene.stats ? `<ul class="mini-stats" data-r>${scene.stats.map((s) => `<li><b>${esc(s.value)}</b><span>${esc(s.label)}</span></li>`).join('')}</ul>` : ''}
+      </div>
+      <div class="reel deck press-reel panel-content" data-r>
+        ${deck(PRESS.map(pressCard), {
+          count: PRESS.length,
+          label: 'IN THE PRESS',
+          noun: '기사',
+          stats: scene.stats ? scene.stats.map((s) => `${esc(s.value)} ${esc(s.label)}`).join(' · ') : '',
+          infos: PRESS.map(deckPressInfo),
+        })}
       </div>
     </div>`;
   }
@@ -157,8 +200,9 @@ function render(scene, i) {
               r === '§'
                 ? `<p class="credit-sec">${esc(n)}</p>`
                 : n === null
-                  ? // 영화 엔딩처럼 함께한 학교 · 상을 준 곳 · 협업 기관의 로고
-                    `<div class="credit credit-logos"><span>${esc(r)}</span><ul>${CREDITS.map((k) => `<li>${orgMark(ORGS[k])}</li>`).join('')}</ul></div>`
+                  ? creditWith(r)
+                  : n === 'PRESS'
+                    ? creditPress(r)
                   : `<div class="credit${k === 0 ? ' credit-lead' : ''}"><span>${esc(r)}</span><b>${n
                       .split(' · ')
                       .map((x, j, all) => `<span class="nw">${esc(x)}${j < all.length - 1 ? ' ·' : ''}</span>`)
@@ -179,8 +223,15 @@ function render(scene, i) {
             (l) => `<li><a href="${esc(l.url)}" ${l.url.startsWith('mailto') ? '' : 'target="_blank" rel="noopener"'}><span>${esc(l.label)}</span><b>${esc(l.value)}</b><i aria-hidden="true">↗</i></a></li>`
           )
           .join('')}</ul>
+        <dl class="end-stats" data-r>
+          <div><dt>Projects</dt><dd>${ALL_PROJECTS.length}</dd></div>
+          <div><dt>Awards</dt><dd>${AWARDS.length}</dd></div>
+          <div><dt>Press</dt><dd>${PRESS.length}</dd></div>
+          <div><dt>With</dt><dd>${WALL.length}</dd></div>
+        </dl>
         <div class="endcard-actions" data-r>
           <a class="btn-works" href="/works" data-link>모든 프로젝트 보기 <span aria-hidden="true">↗</span></a>
+          <a class="btn-works" href="/awards" data-link>수상 기록 · 상장 <span aria-hidden="true">↗</span></a>
           <button type="button" class="btn-replay" id="btn-replay"><span aria-hidden="true">↺</span> 처음부터 다시 보기</button>
           <span class="sig">${esc(profile.name)} · ${esc(profile.en)} — ${esc(profile.role)}</span>
         </div>
@@ -729,8 +780,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     if (reducedMotion) {
       creditsTl.add(showCard, 0.5);
     } else {
-      // 크레딧 길이에 맞춰 일정한 속도로 흐른다(초당 약 70px, 최소 16초)
-      const duration = Math.max(16, (roll.offsetHeight + credits.clientHeight) / 70);
+      // 크레딧 길이에 맞춰 일정한 속도로 흐른다(초당 약 95px, 16~48초 — 기관 · 보도 목록이 길어 너무 늘어지지 않게)
+      const duration = Math.min(48, Math.max(16, (roll.offsetHeight + credits.clientHeight) / 95));
       creditsTl.fromTo(roll, { yPercent: 0, y: () => credits.clientHeight }, { yPercent: -100, y: 0, duration, ease: 'none' }).add(showCard);
     }
     skip.onclick = showCard;

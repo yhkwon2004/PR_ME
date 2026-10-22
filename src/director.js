@@ -15,7 +15,8 @@ const SHOTS = {
   intelligence: { pos: add(SETS.core, 19.8, 3.24, 31.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [0, 0.11] },
   // 제품 · 창업: 격납고 패드 위에 떠 있는 드론을 비스듬히 — 이륙 직전의 장면
   build: { pos: add(SETS.hangar, -13, 9.5, 21), target: add(SETS.hangar, 1.5, 3.2, -10), fov: 40, shift: [0.34, 0.16] },
-  loop: { pos: V(0, 44, 50), target: V(0, 1, -6), fov: 44, shift: [0, -0.13] },
+  // 보도: 데이터 링크가 켜진 세계 전체를 높이서 — 소식이 세트마다 퍼져 나가는 장면
+  press: { pos: V(0, 34, 52), target: V(0, 1, -8), fov: 44, shift: [0, 0.12] },
   record: { pos: add(SETS.record, -1.73, 6.05, 20.13), target: add(SETS.record, 0, 2.6, 0), fov: 40, shift: [0, 0.1] },
   finale: { pos: add(SETS.hangar, 0, 7.5, 17), target: add(SETS.hangar, 0, 2.8, -4), fov: 40, shift: [0, -0.085] },
 };
@@ -83,13 +84,13 @@ export class Director {
         target.x -= 0.8;
         pos.x -= 0.8;
       }
-      const pull = { loop: 1.25, robotics: 1.7, record: 1.3, intro: 1.2 }[id] || 1.45;
+      const pull = { press: 1.25, robotics: 1.7, record: 1.3, intro: 1.2 }[id] || 1.45;
       const back = pos.clone().sub(target).multiplyScalar(pull);
       pos.copy(target).add(back);
       fov += 8;
       const reel = this.scenes.find((x) => x.id === id)?.layout === 'reel';
       const stage = this.scenes.find((x) => x.id === id)?.layout === 'stage';
-      shift.set(0, id === 'finale' ? 0.45 : id === 'record' ? 0.12 : id === 'loop' ? -0.03 : reel ? 0.06 : stage ? 0.02 : 0.2);
+      shift.set(0, id === 'finale' ? 0.45 : id === 'record' ? 0.12 : reel ? 0.06 : stage ? 0.02 : 0.2);
     } else if (aspect < 1.3) {
       const back = pos.clone().sub(target).multiplyScalar(1.15);
       pos.copy(target).add(back);
@@ -202,11 +203,12 @@ export class Director {
     drone.targetThrottle = 1;
     drone.stiffness = 1.4;
     hangar.coneLevel = id === 'intro' || id === 'finale' ? 1 : id === 'prologue' || id === 'build' ? 0.5 : 0;
-    // 바닥 글자(00 — HANGAR, 02 — AERIAL)는 전체 지도를 보는 루프 장면에서만 — 다른 장면에선 제목·버튼과 겹친다
-    hangar.floorLevel = id === 'loop' ? 1 : 0;
-    this.a.aerial.floorLevel = id === 'loop' ? 1 : 0;
-    links.level = id === 'loop' ? 1 : id === 'finale' ? 0.35 : 0;
-    core.energy = id === 'intelligence' ? 1 : id === 'loop' ? 0.5 : 0.15;
+    // 바닥 글자(00 — HANGAR, 02 — AERIAL)는 카드 · 제목과 겹쳐 모든 장면에서 끈다
+    hangar.floorLevel = 0;
+    this.a.aerial.floorLevel = 0;
+    // 보도 장면: 세트를 잇는 데이터 링크가 켜져 소식이 퍼져 나가듯
+    links.level = id === 'press' ? 1 : id === 'finale' ? 0.35 : 0;
+    core.energy = id === 'intelligence' ? 1 : id === 'press' ? 0.5 : 0.15;
     if (id === 'record') {
       records.reveal = 0;
       records.revealTarget = 1;
@@ -237,7 +239,7 @@ export class Director {
       case 'build':
         drone.hold(add(SETS.hangar, 0.4, 2.9, 0), 0.6);
         break;
-      case 'loop':
+      case 'press':
         drone.fly(this.flyover, 0.022, 0.0);
         break;
       case 'record':
@@ -334,7 +336,7 @@ export class Director {
     if (id !== 'robotics') robotics.lookWorld.copy(drone.pos);
 
     // 세로 화면에서는 코어 라벨이 장면 제목·수치와 겹치므로 숨긴다
-    if (core.tag) core.tag.visible = cam.aspect >= 0.85 && id !== 'intelligence' && id !== 'loop';
+    if (core.tag) core.tag.visible = cam.aspect >= 0.85 && id !== 'intelligence' && id !== 'press';
     // 오프닝·엔딩: 위쪽 가장자리·타임코드 뒤에 걸리는 코어를 부드럽게 접어 드론에 집중
     const hideCore = (id === 'intro' || id === 'finale' || id === 'build') && !this.trans;
     this.coreK += ((hideCore ? 0 : 1) - this.coreK) * Math.min(1, dt * 2.5);

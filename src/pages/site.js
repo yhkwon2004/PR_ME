@@ -3,6 +3,7 @@ import { projects, byId, CATEGORIES, categoryOf } from '../data/projects.js';
 import { profile } from '../content.js';
 import { ORGS, WALL, ORG_INDEX, orgsOf, awardOrgs } from '../data/orgs.js';
 import { AWARDS, awardsOf, bestOf, TIER_KEY } from '../data/awards.js';
+import { pressOf } from '../data/press.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
@@ -218,6 +219,33 @@ export function deckAllInfo({ href, title, line, cta, ghost }) {
     <h3 class="di-title">${esc(title)}</h3>
     <p class="di-line">${esc(line)}</p>
     <p class="di-actions"><a class="di-open" href="${esc(href)}" data-link>${esc(cta)} <span aria-hidden="true">→</span></a>${ghost ? `<a class="di-ghost" href="${esc(ghost.href)}" data-link>${esc(ghost.label)}</a>` : ''}</p>
+  </div>`;
+}
+
+// 필름 '보도' 장면의 카드: 신문에서 오려 낸 기사처럼 — 제호 · 날짜, 사진, 제목
+export function pressCard(a, k) {
+  const cat = a.project?.category || 'product';
+  return `<a class="r-card p-card" href="${esc(a.url)}" target="_blank" rel="noopener" data-cat="${esc(cat)}" data-rel="${a.relation === '직접 소개' ? 'direct' : 'related'}" aria-label="${esc(`${a.publisher} 보도 — ${a.title} (새 창)`)}">
+    <figure class="card-media">
+      <span class="pc-mast"><b>${esc(a.publisher)}</b><span>NEWS</span></span>
+      <span class="pc-rule" aria-hidden="true"></span>
+      <span class="pc-photo"><img src="${esc(a.image.thumb)}" srcset="${esc(a.image.thumb)} 720w, ${esc(a.image.src)} ${a.image.w}w" sizes="${REEL_SIZES}" alt="${esc(a.image.alt)}" loading="lazy" decoding="async" /></span>
+      <figcaption class="pc-cap">
+        <span class="card-meta">${esc(a.date.replace(/-/g, '.'))} · ${pad(k + 1)}</span>
+        <h3 class="pc-title">${esc(a.title)}</h3>
+        <span class="pc-foot"><em>${esc(a.relation)}</em><i aria-hidden="true">기사 원문 ↗</i></span>
+      </figcaption>
+      <span class="card-glare" aria-hidden="true"></span>
+    </figure>
+  </a>`;
+}
+export function deckPressInfo(a) {
+  const p = a.project;
+  return `<div class="di di-press">
+    <p class="di-meta"><span class="di-cat">${esc(a.publisher)}</span><span>${esc(a.date.replace(/-/g, '.'))}</span><span class="di-rel" data-rel="${a.relation === '직접 소개' ? 'direct' : 'related'}">${esc(a.relation)}</span></p>
+    <h3 class="di-title">${esc(a.title)}</h3>
+    <p class="di-line">${esc(a.summary)}</p>
+    <p class="di-actions"><a class="di-open" href="${esc(a.url)}" target="_blank" rel="noopener">기사 원문 보기 <span aria-hidden="true">↗</span></a>${p ? `<a class="di-ghost" href="${p.path}" data-link>${esc(p.title)} →</a>` : ''}</p>
   </div>`;
 }
 
@@ -478,6 +506,18 @@ function detailPage(p) {
             .join('')}</div></section>`
         : ''
     }
+
+    ${(() => {
+      // 이 프로젝트를 다룬 공식 보도: 기사 사진 · 매체 · 날짜 · 제목
+      const list = pressOf(p.id);
+      return list.length
+        ? `<section class="d-press reveal"><h2 class="d-h">IN THE PRESS<sup>${pad(list.length)}</sup></h2><ul>${list
+            .map(
+              (a) => `<li><a href="${esc(a.url)}" target="_blank" rel="noopener"><span class="dp-img"><img src="${esc(a.image.thumb)}" alt="" loading="lazy" decoding="async" /></span><span class="dp-t"><small>${esc(a.publisher)} · ${esc(a.date.replace(/-/g, '.'))} · ${esc(a.relation)}</small><b>${esc(a.title)}</b></span><i aria-hidden="true">↗</i></a></li>`
+            )
+            .join('')}</ul></section>`
+        : '';
+    })()}
 
     ${
       p.links.length

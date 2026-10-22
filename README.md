@@ -25,9 +25,9 @@ npm run preview   # 빌드 결과 미리보기
 | 04 | **Embodied Robotics** | IK 트롯 보행 4족 로봇, 6축 로봇팔 | 로봇 · 임베디드 · IoT 덱 |
 | 05 | **Machine Intelligence** | 펄스가 흐르는 뉴럴 코어 | AI 프로젝트 덱(HUSS 전국 2위 등) |
 | 06 | **Build & Launch** | 격납고 위 크레인 숏 | 제품 · 창업 · 소프트웨어 덱(대상 5) |
-| 07 | **The Loop** | 코어를 따라가는 감지 → 판단 → 행동 고리 | 피지컬 AI 스택 |
+| 07 | **In the Press** | 데이터 링크가 켜진 세계 전체를 높이서 | 공식 보도 9건 — 신문에서 오려 낸 기사 카드 덱, 누르면 기사 원문 |
 | 08 | **The Record** | 연도별 수상 수만큼 쌓이는 3D 막대 | 상장 카드 덱 · 수상 · 프로젝트 · 자격증 · 보도 수치 |
-| 09 | **End Credits** | 드론이 패드로 돌아와 착륙 | 엔딩 크레딧(기관 로고) → 엔드 카드 |
+| 09 | **End Credits** | 드론이 패드로 돌아와 착륙 | 엔딩 크레딧(보도 제목 · 기관 로고 × 함께 만든 프로젝트) → 엔드 카드(숫자 · 프로젝트 · 수상 · 다시 보기) |
 
 ### 카드 덱과 분위기
 
@@ -54,6 +54,7 @@ npm run preview   # 빌드 결과 미리보기
 |---|---|
 | `src/data/projects.json` | 프로젝트 상세 데이터(제목, 한 줄 소개, 역할, 도구, 수상, 스토리, 이미지 캡션, 링크) |
 | `src/data/awards.json` | 수상 기록 `{date, contest, grade, prize, issuer, project, certs[], photo, orgs[]}` — 상장 이미지를 직접 읽어 옮긴 것 |
+| `src/data/press.json` | 공식 보도(매체 · 날짜 · 제목 · 요약 · 원문 링크 · 관련 프로젝트) — 사진은 `public/media/press/` |
 | `src/data/orgs.js` | 기관 목록 · 로고, 상장 수여자 → 기관 대응(`awardOrgs`), 프로젝트 ↔ 기관 관계, 기관별 색인 |
 | `src/content.js` | 장면 문구, 장면별 프로젝트 순서(덱), 크레딧 |
 | `public/media/projects/<id>/` | 프로젝트 사진(WebP 원본 1600px + 썸네일 720px) |
