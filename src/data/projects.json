@@ -173,11 +173,15 @@
   "metrics": [
    {
     "value": "87%",
-    "label": "\"AI 포즈 추천 앱을 쓰겠다\" (사용자 인터뷰 N=80)"
+    "label": "AI 포즈 추천 앱 사용 의향 (N=80)"
    },
    {
     "value": "92%",
-    "label": "월 3,000원 이용 의향 (즉석 사진 이용자 N=63)"
+    "label": "월 3,000원 이용 의향 (N=63)"
+   },
+   {
+    "value": "−30초",
+    "label": "첫 컷까지 시간 단축 (베타 30명)"
    },
    {
     "value": "대상",
@@ -188,79 +192,201 @@
    {
     "label": "PROBLEM",
     "title": "포즈 앞에서 얼어붙는 30초",
-    "text": "사진은 일상이 됐지만 상황에 맞는 포즈를 찾지 못해 촬영 자체가 부담이 됩니다. 20~50대 80명 인터뷰에서 87%가 AI 포즈 추천 앱을 쓰겠다고 답했습니다.",
-    "image": "media/projects/ai-pose-guide/06.webp"
+    "text": "사진은 자기표현의 수단이 됐지만, 상황에 맞는 포즈를 찾지 못해 촬영 자체가 부담이 됩니다. 인생네컷만 연 2,800만 명이 찾을 만큼 시장은 이미 큽니다.",
+    "image": "media/projects/ai-pose-guide/s03.webp"
+   },
+   {
+    "label": "RESEARCH",
+    "title": "80명에게 직접 물었다",
+    "text": "20~50대 80명 인터뷰에서 87%가 AI 포즈 추천 앱을 쓰겠다고 했고, 즉석 사진 이용자 63명 중 92%가 월 3,000원이면 쓰겠다고 답했습니다.",
+    "image": "media/projects/ai-pose-guide/s04.webp"
    },
    {
     "label": "IDEA",
-    "title": "배경에서 시작하는 4가지 입력",
-    "text": "배경 이미지 · 촬영 모드와 분위기 · 인원수(1~6명) · 추천 강도(포즈 카드 3~12장)를 받아 상황에 맞는 포즈를 고릅니다.",
-    "image": "media/projects/ai-pose-guide/02.webp"
+    "title": "찍기 전을 돕는 AI",
+    "text": "\"왜 AI는 찍은 사진만 고치고, 찍기 전에는 도와주지 않는가?\" — 배경 · 모드와 분위기 · 인원수 · 추천 강도 네 가지를 받아 촬영 직전의 30초를 채웁니다.",
+    "image": "media/projects/ai-pose-guide/s06.webp"
    },
    {
-    "label": "BUILD",
-    "title": "구도까지 추천",
-    "text": "대칭선 · 황금분할 · 소실점 · 프레이밍 같은 작가의 구도 기법을 배경에서 찾아, 포즈와 함께 서야 할 자리를 정합니다.",
-    "image": "media/projects/ai-pose-guide/03.webp"
-   },
-   {
-    "label": "BUILD",
-    "title": "인물을 분리해 학습하고 마네킹으로",
-    "text": "사진에서 인스턴스 세그멘테이션으로 인물만 떼어 내 위치 · 구도를 좌표로 만들고, 장소별 유행 패턴을 학습합니다. 결과는 3D 마네킹이 그 자리에 미리 서서 보여 줍니다.",
+    "label": "COMPOSITION",
+    "title": "포즈만이 아니라 구도까지",
+    "text": "배경에서 대칭선 · 황금분할 · 소실점 · 프레이밍을 찾아 화면 위에 그리고, 인물이 서야 할 자리를 정합니다.",
     "image": "media/projects/ai-pose-guide/04.webp"
    },
    {
-    "label": "PRODUCT",
-    "title": "부스는 빠르게, 앱은 정밀하게",
-    "text": "인생네컷 부스에는 4컷마다 다른 포즈를 마네킹 가이드로, 앱에는 라이브 카메라 위 마네킹 오버레이와 \"여기에 이렇게 서 주세요\" 코칭을 띄웁니다.",
+    "label": "BUILD",
+    "title": "인물을 분리해 학습한다",
+    "text": "사진에서 인스턴스 세그멘테이션(SOLO · Mask R-CNN · SAM)으로 인물만 떼어 내 위치 · 구도를 좌표로 만들고, 장소별 유행 패턴을 학습합니다.",
+    "image": "media/projects/ai-pose-guide/s08.webp"
+   },
+   {
+    "label": "GUIDE",
+    "title": "마네킹이 먼저 선다",
+    "text": "3D 마네킹이 그 자리에 미리 서서 \"여기에 이렇게\"를 보여 주고, 사용자는 그 자리에 서기만 하면 됩니다.",
     "image": "media/projects/ai-pose-guide/05.webp"
+   },
+   {
+    "label": "APP",
+    "title": "라이브 카메라 가이드",
+    "text": "앱에서는 라이브뷰 위에 구도선과 인원수만큼의 마네킹을 겹치고 \"표시된 자리에 서서 V포즈를 취해 주세요\"처럼 코칭합니다.",
+    "image": "media/projects/ai-pose-guide/02.webp"
+   },
+   {
+    "label": "BOOTH",
+    "title": "인생네컷 부스 4컷",
+    "text": "배경이 일정한 부스에서는 4컷마다 다른 포즈를 마네킹 가이드로 띄워 회전율을 높입니다(B2B SaaS).",
+    "image": "media/projects/ai-pose-guide/03.webp"
+   },
+   {
+    "label": "BUSINESS",
+    "title": "하나의 엔진, 세 채널",
+    "text": "B2C 앱 구독 · B2B 부스 SaaS · B2G 관광 라이선스로 확장합니다. 3년차 목표 ARR 120억(SOM).",
+    "image": "media/projects/ai-pose-guide/s12.webp"
    },
    {
     "label": "RESULT",
     "title": "아이디어 캠프 대상",
     "text": "2026년 6월 제3회 창의적 공학혁신인재 아이디어 캠프에서 6조(PicPose 팀)가 대상(원광대학교 총장상)을 받았습니다.",
-    "image": ""
+    "image": "media/projects/ai-pose-guide/06.webp"
    }
   ],
   "images": [
    {
     "file": "media/projects/ai-pose-guide/01.webp",
-    "caption": "PicPose — 배경이 골라주는 포즈, 마네킹이 알려주는 구도",
-    "kind": "document",
+    "caption": "3D 마네킹이 은행나무길 소실점 위에 먼저 서서 자리를 알려 준다",
+    "kind": "photo",
     "w": 1600,
     "h": 900
    },
    {
     "file": "media/projects/ai-pose-guide/02.webp",
-    "caption": "배경 · 모드 · 인원수 · 추천 강도 4가지 입력",
-    "kind": "document",
-    "w": 1600,
-    "h": 900
+    "caption": "앱 라이브 가이드 — \"표시된 자리에 서서 V포즈를 취해 주세요\", 2인 마네킹 오버레이",
+    "kind": "screenshot",
+    "w": 607,
+    "h": 1080
    },
    {
     "file": "media/projects/ai-pose-guide/03.webp",
-    "caption": "AI 구도 분석 — 대칭선 · 황금분할 · 소실점 · 프레이밍",
-    "kind": "document",
-    "w": 1600,
-    "h": 900
+    "caption": "인생네컷 부스 — 4컷마다 다른 2인 포즈를 마네킹 가이드로",
+    "kind": "screenshot",
+    "w": 1080,
+    "h": 1080
    },
    {
     "file": "media/projects/ai-pose-guide/04.webp",
-    "caption": "배경 인식 → 인물 분리 학습 → 포즈 마네킹 → 촬영",
-    "kind": "document",
+    "caption": "AI 구도 분석 — 대칭 · 황금분할 · 소실점 · 프레이밍을 배경 위에 표시",
+    "kind": "screenshot",
     "w": 1600,
-    "h": 900
+    "h": 881
    },
    {
     "file": "media/projects/ai-pose-guide/05.webp",
-    "caption": "인생네컷 부스(B2B) 4컷 마네킹 가이드와 앱(B2C) 라이브 오버레이",
+    "caption": "포즈 마네킹 시연 — 촬영 전, 그 자리에 미리 선 마네킹",
+    "kind": "photo",
+    "w": 808,
+    "h": 540
+   },
+   {
+    "file": "media/projects/ai-pose-guide/06.webp",
+    "caption": "촬영 결과 — 마네킹이 잡아 준 자리에 선 실제 사진",
+    "kind": "photo",
+    "w": 864,
+    "h": 540
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s01.webp",
+    "caption": "PicPose 피치덱 표지 — 배경이 골라주는 포즈, 마네킹이 알려주는 구도",
     "kind": "document",
     "w": 1600,
     "h": 900
    },
    {
-    "file": "media/projects/ai-pose-guide/06.webp",
-    "caption": "사용자 인터뷰 — 사용 의향 87% (N=80) · 월 3,000원 의향 92% (N=63)",
+    "file": "media/projects/ai-pose-guide/s02.webp",
+    "caption": "시장 — 인생네컷 연 2,800만 방문 · 셀프 포토 스튜디오 3,000억 · 상위 3사 +21.6%",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s03.webp",
+    "caption": "문제 — 자기표현 · 경험 가치 하락 · 포즈 촬영 스트레스(동료평가 논문 근거)",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s04.webp",
+    "caption": "사용자 인터뷰 — 사용 의향 87%(N=80) · 월 3,000원 의향 92%(N=63)",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s05.webp",
+    "caption": "\"왜 AI는 찍은 사진만 고치고, 찍기 전에는 도와주지 않는가?\"",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s06.webp",
+    "caption": "배경 · 모드와 분위기 · 인원수 · 추천 강도 4가지 입력",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s07.webp",
+    "caption": "포즈만이 아니라 구도까지 — 대칭선 · 황금분할 · 소실점 · 프레이밍",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s08.webp",
+    "caption": "배경 인식 → 인물 분리 학습 → 포즈 마네킹 → 촬영, 학습 파이프라인",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s09.webp",
+    "caption": "부스(B2B)는 더 빠르게, 앱(B2C)은 더 정밀하게",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s10.webp",
+    "caption": "경쟁 서비스 비교 — 랜덤 · 고정 DB 추천 대비 배경 분석 · 3D 마네킹 · 다인 구도",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s11.webp",
+    "caption": "시장 규모 — TAM $2.7B · SAM 3,000억 · SOM 120억(3년차 ARR)",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s12.webp",
+    "caption": "비즈니스 모델 — 하나의 AI 엔진, B2C 구독 · B2B 부스 SaaS · B2G 라이선스",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s13.webp",
+    "caption": "기대 효과 — 스트레스 −72% · 첫 컷까지 −30초 · 누구나 전문가급 구도",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/s14.webp",
+    "caption": "팀 — 리더 · 하드웨어 · 소프트웨어 · 디자인 · 전자 5인",
     "kind": "document",
     "w": 1600,
     "h": 900
