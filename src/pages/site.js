@@ -305,12 +305,21 @@ function awardsPage() {
     </section>`
         : ''
     }
-    ${years
+    ${
+      // 대표 상장(대상)만 먼저 — 나머지 수상은 펼쳐 보거나 등급 버튼으로 본다
+      grand.length
+        ? `<div class="aw-more"><button type="button" class="aw-more-btn" aria-expanded="false" aria-controls="aw-rest"><span>나머지 수상 ${AWARDS.length - grand.length}건 모두 보기</span><i aria-hidden="true">↓</i></button><p>대표 상장(대상 ${grand.length}건)을 먼저 보여 드립니다 · 최우수상부터 장려상까지는 펼쳐서</p></div>`
+        : ''
+    }
+    <div class="aw-rest" id="aw-rest"${grand.length ? ' hidden' : ''}>${years
       .map((y) => {
         const list = AWARDS.filter((a) => a.year === y);
-        return `<section class="aw-year" data-year="${y}" aria-label="${y}년 수상"><h2 class="aw-y"><span>${y}</span><sup>${pad(list.length)}</sup></h2><ul class="aw-grid">${list.map(awardTile).join('')}</ul></section>`;
+        // 대상은 위 대표 줄에 있으니 '전체'에서는 연도 목록에서 뺀다(등급으로 걸러 볼 때만 다시 나온다)
+        const shown = grand.length ? list.filter((a) => a.tier !== 1) : list;
+        const cells = list.map((a) => (grand.length && a.tier === 1 ? awardTile(a).replace('class="aw-cell"', 'class="aw-cell is-out"') : awardTile(a))).join('');
+        return `<section class="aw-year" data-year="${y}" aria-label="${y}년 수상"${shown.length ? '' : ' hidden'}><h2 class="aw-y"><span>${y}</span><sup>${pad(shown.length)}</sup></h2><ul class="aw-grid">${cells}</ul></section>`;
       })
-      .join('')}
+      .join('')}</div>
     ${withWall()}
     ${footer()}
   </div>`,
@@ -673,13 +682,31 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
 
     if (route.name === 'awards') {
       const sum = page.querySelector('.aw-sum');
+      const rest = page.querySelector('.aw-rest');
+      const more = page.querySelector('.aw-more-btn');
+      const openRest = (on) => {
+        if (!rest || !more) return;
+        rest.hidden = !on;
+        more.setAttribute('aria-expanded', String(on));
+        more.querySelector('span').textContent = on ? '대표 상장만 보기' : `나머지 수상 ${rest.querySelectorAll('.aw-cell').length - page.querySelectorAll('.aw-feat .aw-cell').length}건 모두 보기`;
+      };
+      more?.addEventListener('click', () => {
+        const on = rest.hidden;
+        openRest(on);
+        if (on) rest.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+      });
       sum.addEventListener('click', (e) => {
         const b = e.target.closest('button[data-g]');
         if (!b) return;
         const g = b.getAttribute('aria-pressed') === 'true' && b.dataset.g !== 'all' ? 'all' : b.dataset.g;
+        // 등급으로 걸러 볼 때는 연도별 목록을 펼친다(걸러 볼 대상이 그 안에 있다)
+        if (g !== 'all') openRest(true);
+        const moreBar = page.querySelector('.aw-more');
+        if (moreBar) moreBar.hidden = g !== 'all';
         sum.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.g === g)));
         sum.classList.toggle('is-filtered', g !== 'all');
-        const keep = (li) => g === 'all' || (g === 'project' ? li.hasAttribute('data-p') : li.dataset.g === g);
+        const hasFeat = !!page.querySelector('.aw-feat');
+        const keep = (li) => (g === 'all' ? !(hasFeat && li.dataset.g === 'grand') : g === 'project' ? li.hasAttribute('data-p') : li.dataset.g === g);
         const shown = [];
         page.querySelectorAll('.aw-year').forEach((sec) => {
           const cells = [...sec.querySelectorAll('.aw-cell')];

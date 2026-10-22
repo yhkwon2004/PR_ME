@@ -275,7 +275,7 @@ function render(scene, i) {
       ? `<div class="reel deck aw-reel panel-content" data-r>
         ${deck(AWARD_REEL.map(awardCard), {
           count: AWARD_REEL.length,
-          label: 'PROJECT AWARDS',
+          label: 'GRAND PRIZE · 대상',
           noun: '수상',
           all: '/awards',
           allLabel: 'ALL AWARDS',
@@ -291,7 +291,7 @@ function render(scene, i) {
             info: deckAllInfo({
               href: '/awards',
               title: `수상 ${AWARDS.length}건 — 상장과 프로젝트`,
-              line: '대상 · 최우수상부터 장려상까지, 상장 원본과 이어진 프로젝트를 한곳에서 볼 수 있습니다.',
+              line: `여기서는 대표 상장(대상 ${AWARD_REEL.length}건)만 — 최우수상부터 장려상까지 나머지 상장과 이어진 프로젝트는 아카이브에서 볼 수 있습니다.`,
               cta: '수상 아카이브 보기',
               ghost: { href: '/works', label: `프로젝트 ${ALL_PROJECTS.length}` },
             }),

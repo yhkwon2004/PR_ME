@@ -43,11 +43,12 @@ export function bestOf(p) {
   return { tier, label: TIER_LABEL[tier], key: TIER_KEY[tier], count: p.awards.length };
 }
 
-// 필름 속 수상 릴: 프로젝트와 이어진 수상 전부(상장이 없으면 프로젝트 사진), 높은 등급 · 최신 순.
+// 필름 속 수상 릴: 대표 상장만 — 대상(1등급)을 받은 프로젝트의 상장(없으면 시상 사진), 최신 순.
+// 나머지 수상은 수상 아카이브(/awards)에서 모두 본다.
 // 같은 날 같은 프로젝트가 받은 같은 등급의 상(예: 도지사상 + 기관장상)은 한 카드에 상장을 겹친다.
 export const AWARD_REEL = (() => {
   const merged = new Map();
-  AWARDS.filter((a) => a.project).forEach((a) => {
+  AWARDS.filter((a) => a.project && a.tier === 1).forEach((a) => {
     const k = `${a.project.id}|${a.date}|${a.tier}`;
     const m = merged.get(k);
     if (!m) merged.set(k, { ...a, certs: [...a.certs] });
