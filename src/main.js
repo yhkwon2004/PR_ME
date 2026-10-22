@@ -106,6 +106,11 @@ let auto = !reduced;
 let elapsed = 0;
 let started = false;
 let hoverHold = false;
+// 손가락이 카드 덱 위에 있는 동안은 자동 재생을 멈춘다(끌던 카드가 저절로 넘어가지 않게)
+let touchHold = false;
+addEventListener('touchstart', (e) => (touchHold = !!e.target.closest?.('.deck-stage')), { passive: true, capture: true });
+addEventListener('touchend', () => (touchHold = false), { passive: true, capture: true });
+addEventListener('touchcancel', () => (touchHold = false), { passive: true, capture: true });
 // 부팅(로딩) 중에도 3D를 그린다 — 진행률과 드론이 올 화면 높이(레티클 가운데)
 let booting = false;
 let bootProgress = 0;
@@ -552,7 +557,7 @@ function loop(now) {
     if (s) {
       // 키보드 초점이 지금 장면의 덱 안에 있으면 자동 재생을 멈춘다(마우스 호버와 같게)
       const deckFocus = !!panels.current?.querySelector('.deck :focus-visible');
-      const busy = director.trans || lightbox.open || hud.indexOpen || hoverHold || deckFocus || site.open;
+      const busy = director.trans || lightbox.open || hud.indexOpen || hoverHold || touchHold || deckFocus || site.open;
       const hold = holdOf(director.index);
       if (auto && hold > 0 && !busy) {
         elapsed += dt;

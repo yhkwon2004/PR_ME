@@ -72,7 +72,8 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
   } catch (e) {
     return null;
   }
-  const maxDpr = isMobile ? 1.5 : 1.75;
+  // 휴대폰은 화소 밀도가 높아(3x) 그대로 그리면 프레임이 떨어진다 — 1.25배로 그려 부드럽게
+  const maxDpr = isMobile ? 1.25 : 1.75;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxDpr));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -112,7 +113,8 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
   const composer = new EffectComposer(renderer, rt);
   composer.setPixelRatio(renderer.getPixelRatio());
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(size.x / 2, size.y / 2), 0.85, 0.55, 0.82);
+  const bloomDiv = isMobile ? 3 : 2;
+  const bloom = new UnrealBloomPass(new THREE.Vector2(size.x / bloomDiv, size.y / bloomDiv), 0.85, 0.55, 0.82);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
   const film = new ShaderPass(FilmShader);
@@ -126,7 +128,7 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
     camera.updateProjectionMatrix();
     renderer.setSize(w, h, false);
     composer.setSize(w, h);
-    bloom.resolution.set(w / 2, h / 2);
+    bloom.resolution.set(w / bloomDiv, h / bloomDiv);
     film.uniforms.uRes.value.set(w, h);
   }
   resize();
@@ -138,7 +140,8 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
   function adapt(dt) {
     if (dt > 1 / 38) slowFrames++;
     else slowFrames = Math.max(0, slowFrames - 0.5);
-    if (slowFrames > 90 && tier < 2) {
+    // 휴대폰은 더 일찍(약 1초) 낮춘다
+    if (slowFrames > (isMobile ? 40 : 90) && tier < 2) {
       tier++;
       slowFrames = 0;
       if (tier === 1) {

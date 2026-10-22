@@ -3513,3 +3513,26 @@ body.is-started.has-pointer .cursor {
   }
 }
 
+/* ── 휴대폰 성능: 움직이는 3D 위에서 매 프레임 다시 그려야 하는 효과를 걷어 낸다 ── */
+@media (max-width: 820px), (pointer: coarse) {
+  /* 반투명 막 뒤를 흐리는 효과(backdrop-filter)는 3D가 움직일 때마다 다시 흐려야 해서 가장 무겁다 — 짙은 바탕으로 바꾼다 */
+  *,
+  *::before,
+  *::after {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  /* 배경 분위기: 화면 합성(screen)과 큰 흐림 사진 대신 가벼운 색 번짐만 */
+  #ambient {
+    mix-blend-mode: normal;
+  }
+  .amb-photo,
+  .amb-flow {
+    display: none;
+  }
+  /* 카드 속 흐린 채움 사진(3D로 기운 카드 안의 blur)은 바탕색으로 */
+  .deck .card-media img.blur-fill {
+    display: none;
+  }
+}
+

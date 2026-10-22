@@ -5,6 +5,8 @@ import * as THREE from 'three';
 import { projects } from '../data/projects.js';
 
 const DEFAULT = '#5ef2ff';
+// 휴대폰: 흐린 사진 · 흐르는 사진 줄은 3D 위 합성이 무거워 빼고, 색 번짐 · 연도 · 3D 물들임만 남긴다
+const LITE = matchMedia('(max-width: 820px), (pointer: coarse)').matches;
 
 // 배경에 천천히 흘러가는 프로젝트 사진 세 줄 — 줄마다 다른 작품, 다른 빠르기, 엇갈린 방향
 function buildFlow(root) {
@@ -115,7 +117,7 @@ export function createMood({ getStage, reducedMotion }) {
       target.set(color);
       amtTarget = 1;
       if (dir) pulse = 1;
-      if (!flowBuilt) {
+      if (!flowBuilt && !LITE) {
         flowBuilt = true;
         buildFlow(root);
       }
@@ -124,7 +126,7 @@ export function createMood({ getStage, reducedMotion }) {
         r.classList.add('is-on');
       });
       const im = card.querySelector('.card-media img:not(.blur-fill)');
-      showPhoto(im ? im.currentSrc || im.src : '');
+      if (!LITE) showPhoto(im ? im.currentSrc || im.src : '');
       showYear((card.querySelector('.card-meta')?.textContent.match(/\d{4}/) || [''])[0], dir);
       // 덱 높이에 맞춰 연도 글자를 덱 뒤에 둔다
       current = card;

@@ -307,12 +307,17 @@ function deckReel(el, reducedMotion) {
   let focus = 0;
   let width = 0;
 
-  const slot = (j) => {
-    const off = j - focus;
+  // f: 가운데에 올 위치(끌기 중에는 소수 — 자리 사이를 이어서 보간한다)
+  const slot = (j, f = focus) => {
+    const off = j - f;
     const a = Math.min(3, Math.abs(off));
-    const sl = SLOTS[a];
+    const i = Math.floor(a);
+    const t = a - i;
+    const A = SLOTS[i];
+    const B = SLOTS[Math.min(3, i + 1)];
+    const m = (k) => A[k] + (B[k] - A[k]) * t;
     const sign = Math.sign(off);
-    return { x: sign * sl.x * width, z: sl.z, rotationY: sign * sl.r, scale: sl.s, autoAlpha: sl.o, '--dim': sl.d, zIndex: 10 - a };
+    return { x: sign * m('x') * width, z: m('z'), rotationY: sign * m('r'), scale: m('s'), autoAlpha: m('o'), '--dim': m('d'), zIndex: 10 - Math.round(a) };
   };
   const place = (animate) => {
     cards.forEach((c, j) => {
@@ -403,12 +408,37 @@ function deckReel(el, reducedMotion) {
     },
     { passive: false }
   );
+  // 터치: 손가락을 따라 덱이 함께 움직이고, 놓으면 가까운 카드(빠르게 튕기면 다음 카드)로 붙는다
   let tx = null;
   stage.addEventListener(
     'touchstart',
     (e) => {
       const t = e.touches[0];
-      tx = { x: t.clientX, y: t.clientY };
+      tx = { x: t.clientX, y: t.clientY, f0: focus, lx: t.clientX, lt: performance.now(), v: 0, axis: '' };
+    },
+    { passive: true }
+  );
+  // 끌기를 시작한 순간의 카드 기준(그 사이 자동 재생이 넘겨도 손가락 아래 덱이 튀지 않게)
+  const dragPos = (dx, f0) => Math.max(-0.35, Math.min(cards.length - 0.65, f0 - dx / Math.max(80, width * 0.9)));
+  stage.addEventListener(
+    'touchmove',
+    (e) => {
+      if (!tx || e.touches.length > 1) return;
+      const t = e.touches[0];
+      const dx = t.clientX - tx.x;
+      const dy = t.clientY - tx.y;
+      if (!tx.axis && Math.hypot(dx, dy) > 8) tx.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      if (tx.axis !== 'x' || reducedMotion) return;
+      const now = performance.now();
+      tx.v = (t.clientX - tx.lx) / Math.max(1, now - tx.lt);
+      tx.lx = t.clientX;
+      tx.lt = now;
+      const f = dragPos(dx, tx.f0);
+      cards.forEach((c, j) => {
+        const { zIndex, ...v } = slot(j, f);
+        gsap.killTweensOf(c);
+        gsap.set(c, { ...v, zIndex });
+      });
     },
     { passive: true }
   );
@@ -419,11 +449,21 @@ function deckReel(el, reducedMotion) {
       const t = e.changedTouches[0];
       const dx = t.clientX - tx.x;
       const dy = t.clientY - tx.y;
+      const { axis, v, f0 } = tx;
       tx = null;
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) set(focus - Math.sign(dx));
+      if (axis !== 'x' && !(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy))) return;
+      // 놓는 순간의 속도로 한 장 더 넘길지 정한다
+      let k = Math.round(dragPos(dx, f0) + Math.max(-0.6, Math.min(0.6, -v * 0.35)));
+      if (k === f0 && Math.abs(dx) > 40) k = f0 - Math.sign(dx);
+      if (k === focus) place(true);
+      else set(k);
     },
     { passive: true }
   );
+  stage.addEventListener('touchcancel', () => {
+    if (tx?.axis === 'x') place(true);
+    tx = null;
+  });
   stage.addEventListener('keydown', (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     const dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
