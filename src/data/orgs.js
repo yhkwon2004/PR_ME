@@ -31,6 +31,8 @@ export const ORGS = {
   linc: { name: '원광대 LINC 3.0 사업단', en: 'LINC 3.0', mark: 'LINC 3.0' },
   kunsan: { name: '국립군산대학교 창업지원단', en: 'KUNSAN NATIONAL UNIVERSITY', mark: '국립군산대학교' },
   ris: { name: 'RIS 에너지신산업사업단', en: 'JEONBUK RIS · ENERGY', mark: 'RIS' },
+  gicon: { name: '광주정보문화산업진흥원', en: 'GICON', mark: 'GICON' },
+  wkurise: { name: '원광대학교 RISE사업단', en: 'WKU RISE', mark: 'RISE' },
 };
 
 // 프로젝트별 관계 — 데이터에 근거가 있는 것만
@@ -79,8 +81,14 @@ export const PROJECT_ORGS = {
   'peltier-cooler': [['ris', '장려상 · 사업단장상']],
   'iot-iv-pole': [
     ['wku', '캡스톤디자인 대상 · 총장상'],
+    ['gicon', '글로벌 피우다 장려상 · 원장상'],
     ['ccei', '모두의창업'],
   ],
+  'ai-pose-guide': [
+    ['wku', '공학혁신인재 아이디어 캠프 대상 · 총장상'],
+    ['wkurise', '아이디어 캠프 주최'],
+  ],
+  edufarm: [['nrf', '기술창업 메이커톤 대상 · 이사장상']],
   'baekchul-sikhye': [['wku', 'LINC 3.0 창의대첩 대상 · 총장상']],
   'baja-ev-formula': [
     ['wku', '기계공학과 자작차 동아리'],
@@ -91,7 +99,7 @@ export const PROJECT_ORGS = {
 };
 
 // 기관 벽: 로고가 있는 곳 먼저, 그다음 활자 표기
-export const WALL = ['wku', 'jbnu', 'jbfc', 'gist', 'camtic', 'jnu', 'ksae', 'ccei', 'coss', 'huss', 'anchor', 'jst', 'jeonbuk', 'gangneung', 'jbsmes', 'givingplus', 'nrf', 'motie', 'kunsan', 'ris', 'linc', 'swu', 'greenumbrella'];
+export const WALL = ['wku', 'jbnu', 'jbfc', 'gist', 'camtic', 'jnu', 'ksae', 'ccei', 'coss', 'huss', 'anchor', 'jst', 'jeonbuk', 'gangneung', 'jbsmes', 'givingplus', 'nrf', 'motie', 'kunsan', 'ris', 'linc', 'swu', 'gicon', 'wkurise', 'greenumbrella'];
 
 // 엔딩 크레딧: 학업·수상·협업 근거가 데이터에 있고 작게 줄여도 읽히는 공식 로고만
 export const CREDITS = ['wku', 'jbnu', 'jbfc', 'gist', 'camtic', 'jnu', 'ksae', 'ccei'];

@@ -1,14 +1,51 @@
 [
  {
-  "date": "2026",
-  "contest": "2026 HUSS 융합캠프 AI 경진대회",
+  "date": "2026-09-04",
+  "contest": "2026 호남·제주권 기술창업 메이커톤",
+  "grade": "대상",
+  "prize": "한국연구재단 이사장상 · 팀 에듀팜",
+  "issuer": "한국연구재단 이사장",
+  "project": "edufarm",
+  "projectAward": "2026 호남·제주권 기술창업 메이커톤 · 대상(한국연구재단 이사장상)",
+  "certs": [
+   "media/awards/award-2026-09-04.webp"
+  ]
+ },
+ {
+  "date": "2026-08-19",
+  "contest": "2026 호남ICT이노베이션스퀘어 확산사업 · 호남권 글로벌 피우다 프로젝트",
+  "grade": "장려상",
+  "prize": "팀 INFUTECH · 경관급식 모니터링 IoT 장비",
+  "issuer": "(재)광주정보문화산업진흥원장",
+  "project": "iot-iv-pole",
+  "projectAward": "2026 호남권 글로벌 피우다 프로젝트 · 장려상(경관급식 모니터링 IoT 장비)",
+  "certs": [
+   "media/awards/award-2026-08-19.webp"
+  ]
+ },
+ {
+  "date": "2026-06-23",
+  "contest": "제3회 창의적 공학혁신인재 아이디어 캠프 – AI 드리퍼 로봇제작",
+  "grade": "대상",
+  "prize": "총장상 · 6조 · 포즈 추천 애플리케이션",
+  "issuer": "원광대학교 총장",
+  "project": "ai-pose-guide",
+  "projectAward": "제3회 창의적 공학혁신인재 아이디어 캠프 · 대상(총장상)",
+  "certs": [
+   "media/awards/award-2026-06-23.webp"
+  ]
+ },
+ {
+  "date": "2026-07-03",
+  "contest": "2026 HUSS 융합캠프 「Social AI Lab: 인문의 가치를 담다」 AI 경진대회",
   "grade": "우수상",
-  "prize": "한국연구재단 이사장상 · 전국 2위",
-  "issuer": "HUSS 글로벌 K-컬처 사업단",
+  "prize": "한국연구재단 이사장상 · 전국 2위 · 팀 Palette",
+  "issuer": "한국연구재단 이사장",
   "project": "huss-evidence-ai",
   "projectAward": "2026 HUSS AI 경진대회 · 우수상(한국연구재단 이사장상) · 전국 2위",
-  "certs": [],
-  "photo": "media/projects/huss-evidence-ai/01.webp"
+  "certs": [
+   "media/awards/award-2026-07-03.webp"
+  ]
  },
  {
   "date": "2026",
@@ -407,9 +444,13 @@
   ]
  },
  {
-  "date": "2023-12-28",
-  "contest": "실전 SW창업교육 및 창업경진대회",
+  "date": "2023-12-19",
+  "contest": "2023학년도 취·창업아카데미 실전 SW창업교육 및 창업경진대회",
   "grade": "최우수상",
-  "certs": []
+  "prize": "SW중심대학사업단장상",
+  "issuer": "원광대학교 SW중심대학사업단장",
+  "certs": [
+   "media/awards/award-2023-12-19.webp"
+  ]
  }
 ]

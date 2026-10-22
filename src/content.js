@@ -120,7 +120,7 @@ export const scenes = [
       { value: '전국 2위', label: 'HUSS AI 경진대회' },
       { value: '33.7%', label: '작성·정리 속도 향상' },
     ],
-    projects: ['huss-evidence-ai', 'legal-ai-platform', 'factline', 'worker-posture-ios', 'ai-detector', 'population-viz', 'gan-tts', 'personal-color-bot'],
+    projects: ['huss-evidence-ai', 'ai-pose-guide', 'legal-ai-platform', 'factline', 'worker-posture-ios', 'ai-detector', 'population-viz', 'gan-tts', 'personal-color-bot'],
   },
   {
     id: 'build',
@@ -133,10 +133,10 @@ export const scenes = [
     title: ['BUILD &', 'LAUNCH'],
     subtitle: '아이디어를 제품과 서비스로 — 만들고, 알리고, 운영한다',
     stats: [
-      { value: '대상 4', label: '창업 · 아이디어 경진' },
+      { value: '대상 5', label: '창업 · 아이디어 경진' },
       { value: 'Re:cap', label: '창업 팀 대표' },
     ],
-    projects: ['recap-jbmotors', 'givingplus-filament', 'coffee-box', 'baekchul-sikhye', 'growth-footrest', 'kakao-fin-next', 'climate-dashboard', 'meal-reservation-app', 'farm-app', 'retrofit-game'],
+    projects: ['recap-jbmotors', 'givingplus-filament', 'coffee-box', 'baekchul-sikhye', 'edufarm', 'growth-footrest', 'kakao-fin-next', 'climate-dashboard', 'meal-reservation-app', 'farm-app', 'retrofit-game'],
   },
   {
     id: 'loop',

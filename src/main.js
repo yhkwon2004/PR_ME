@@ -308,6 +308,7 @@ async function boot() {
   // 로딩 중 화면을 누르면 그 순간 오디오를 깨워 두고, 준비가 끝났다면 바로 시작
   const bootEl = $('boot');
   const poke = () => {
+    if (pageCovered) return; // 작품 · 수상 페이지가 덮고 있으면 키를 눌러도 필름을 열지 않는다
     audio.unlock();
     if (ready) start(true);
   };
@@ -420,6 +421,7 @@ async function boot() {
 
 function start(withSound) {
   if (started) return;
+  buildWorld(); // 페이지로 바로 들어왔다면 무대가 아직 없다
   started = true;
   const wasLive = booting && director?.booting;
   booting = false;
