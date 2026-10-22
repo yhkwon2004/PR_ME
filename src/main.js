@@ -26,6 +26,8 @@ import { createMood } from './ui/mood.js';
 import { createSite } from './pages/site.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// 검증용(?capture)에서는 자동 진입하지 않는다
+const CAPTURE = new URLSearchParams(location.search).has('capture');
 bindCardFx({ reducedMotion: reduced });
 const canvas = document.getElementById('gl');
 const $ = (id) => document.getElementById(id);
@@ -104,6 +106,11 @@ let auto = !reduced;
 let elapsed = 0;
 let started = false;
 let hoverHold = false;
+// 부팅(로딩) 중에도 3D를 그린다 — 진행률과 드론이 올 화면 높이(레티클 가운데)
+let booting = false;
+let bootProgress = 0;
+let bootFocusY = 0.42;
+const bootLeader = document.querySelector('.boot-leader');
 
 const panels = createPanels($('stage'), scenes, {
   reducedMotion: reduced,
@@ -136,6 +143,7 @@ const hud = createHud(scenes, {
   onToggleSound: () => {
     audio.toggle();
     hud.setSound(audio.on);
+    setTimeout(syncSoundHint, 300);
   },
 });
 hud.setAuto(auto);
@@ -214,6 +222,7 @@ createInput({
     if (k === 'm') {
       audio.toggle();
       hud.setSound(audio.on);
+      setTimeout(syncSoundHint, 300);
       return true;
     }
     return false;
@@ -294,6 +303,16 @@ async function boot() {
   const ring = $('boot-ring');
   const clock = $('boot-clock');
   const t0 = performance.now();
+  booting = true;
+  let ready = false;
+  // 로딩 중 화면을 누르면 그 순간 오디오를 깨워 두고, 준비가 끝났다면 바로 시작
+  const bootEl = $('boot');
+  const poke = () => {
+    audio.unlock();
+    if (ready) start(true);
+  };
+  bootEl.addEventListener('pointerdown', poke);
+  addEventListener('keydown', (e) => !started && booting && !e.repeat && poke(), { capture: true });
   let progress = 0;
   let shown = 0;
   const clockTimer = setInterval(() => {
@@ -343,6 +362,7 @@ async function boot() {
       if (real === 1 && time === 1 && progress > 0.97) progress = 1;
       pct.textContent = String(Math.round(progress * 100)).padStart(2, '0');
       ring.style.strokeDashoffset = String(100 - progress * 100);
+      bootProgress = progress;
       const want = Math.min(bootLines.length, Math.floor(progress * bootLines.length + 0.6));
       while (shown < want) addLine(shown++);
       if (progress >= 1 || started) resolve();
@@ -355,9 +375,36 @@ async function boot() {
   // 상세 페이지에서 바로 필름을 열었다면 부팅 화면은 이미 사라졌다
   const actions = $('boot-actions');
   if (started || !actions) return;
+  ready = true;
   $('boot').classList.add('is-ready');
-  $('boot-status').textContent = 'READY — PRESS START';
+  $('boot-status').textContent = 'READY';
   actions.hidden = false;
+  // 필름 리더처럼 3 · 2 · 1을 세고 저절로 들어간다(누르면 바로)
+  if (!CAPTURE) {
+    const unit = pct.nextElementSibling;
+    if (unit) unit.hidden = true;
+    // 실제 흐른 시간으로 센다(느린 기기에서 애니메이션 시계가 늦어져도 제때 들어가도록)
+    const total = reduced ? 1.2 : 3;
+    const c0 = performance.now();
+    const tick = () => {
+      if (started) return;
+      const left = Math.max(0, total - (performance.now() - c0) / 1000);
+      const n = Math.max(1, Math.ceil(left * (3 / total)));
+      if (pct.textContent !== String(n)) {
+        pct.textContent = String(n);
+        $('boot-status').textContent = `AUTO START — ${n}`;
+        if (!reduced) gsap.fromTo(pct, { scale: 1.25, autoAlpha: 0.4 }, { scale: 1, autoAlpha: 1, duration: 0.45, ease: 'power3.out' });
+      }
+      const frac = ((left * (3 / total)) % 1) || (left > 0 ? 1 : 0);
+      ring.style.strokeDashoffset = String(100 - frac * 100);
+      if (left <= 0) {
+        if (!pageCovered) start(true);
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    tick();
+  }
   // 버튼이 보이게 된 뒤에 초점을 준다(그 사이 다른 곳을 눌렀다면 그대로 둔다)
   gsap.fromTo(actions.children, { autoAlpha: 0, y: 14 }, {
     autoAlpha: 1,
@@ -374,6 +421,8 @@ async function boot() {
 function start(withSound) {
   if (started) return;
   started = true;
+  const wasLive = booting && director?.booting;
+  booting = false;
   audio.set(withSound);
   hud.setSound(withSound);
   document.body.classList.add('is-started');
@@ -388,8 +437,10 @@ function start(withSound) {
   });
   if (stage) {
     gsap.to(stage.film.uniforms.uExposure, { value: 1, duration: reduced ? 0.3 : 2.4, ease: 'power2.inOut', delay: 0.2 });
-    actors.drone.targetThrottle = 0;
-    setTimeout(() => (actors.drone.targetThrottle = 1), 500);
+    if (!wasLive) {
+      actors.drone.targetThrottle = 0;
+      setTimeout(() => (actors.drone.targetThrottle = 1), 500);
+    }
     setTimeout(() => {
       video.preload = 'auto';
       video.load();
@@ -397,7 +448,23 @@ function start(withSound) {
   }
   director.go(0);
   site.markFilm();
+  syncSoundHint();
+  setTimeout(syncSoundHint, 900);
 }
+
+// 자동 진입이라 브라우저가 소리를 막아 둔 경우: 한 번 누르면 켜진다는 안내를 띄운다
+const soundHint = $('sound-hint');
+function syncSoundHint() {
+  if (!soundHint) return;
+  const need = started && audio.on && !audio.running;
+  soundHint.hidden = !need;
+  document.body.classList.toggle('needs-sound', need);
+}
+audio.onState(syncSoundHint);
+soundHint?.addEventListener('click', () => {
+  audio.unlock();
+  setTimeout(syncSoundHint, 300);
+});
 
 // 필름은 언제나 사운드와 함께 시작한다(사운드 버튼으로 끌 수 있다)
 $('enter-sound').addEventListener('click', () => start(true));
@@ -436,8 +503,22 @@ function loop(now) {
   }
   if (!stage) return;
   if (pointerDirty && frame % 3 === 0) pick();
-  // 부팅 화면이 덮고 있는 동안은 렌더하지 않는다
-  if (!started || frozen || pageCovered) return;
+  if (frozen || pageCovered) return;
+  // 부팅 중: 반투명 부팅 화면 뒤로 격납고의 드론을 천천히 돌아본다(진행률만큼 밝아지고 다가간다)
+  if (!started) {
+    if (!booting || !director?.bootFrame) return;
+    // 드론이 레티클 가운데에 오도록 — 레티클 위치를 매 프레임 재고 부드럽게 따라간다
+    const lr = bootLeader?.getBoundingClientRect();
+    if (lr?.height) bootFocusY += ((lr.top + lr.height / 2) / innerHeight - bootFocusY) * Math.min(1, dt * 6);
+    director.bootFrame(dt, t, bootProgress, bootFocusY);
+    const u = stage.film.uniforms;
+    u.uExposure.value += (0.32 + 0.6 * bootProgress - u.uExposure.value) * Math.min(1, dt * 3);
+    stage.dust.update(t);
+    u.uTime.value = t;
+    stage.adapt(dt);
+    stage.composer.render(dt);
+    return;
+  }
   director.update(dt, t);
   trackLoop(dt);
   mood.update(dt);
@@ -472,6 +553,19 @@ if (stage && new URLSearchParams(location.search).has('capture')) {
   gsap.ticker.lagSmoothing(0);
   window.__film = {
     start: () => start(false),
+    // 부팅 3D를 빨리 감는다(progress 0~1)
+    boot(sec, progress = 1, step = 1 / 30) {
+      const lr = bootLeader?.getBoundingClientRect();
+      if (lr?.height) bootFocusY = (lr.top + lr.height / 2) / innerHeight;
+      for (let k = 0; k < sec / step; k++) {
+        simTime += step;
+        director.bootFrame(step, simTime, progress, bootFocusY);
+      }
+      stage.film.uniforms.uExposure.value = 0.32 + 0.6 * progress;
+      stage.composer.render(step);
+    },
+    // 드론 · 카메라 위치(부팅 3D 확인용)
+    probe: () => ({ drone: actors.drone.pos.toArray().map((v) => +v.toFixed(2)), cam: stage.camera.position.toArray().map((v) => +v.toFixed(2)), exposure: +stage.film.uniforms.uExposure.value.toFixed(2), booting }),
     freeze: () => (frozen = true),
     go: (i) => director.go(i, { instant: true }),
     advance(sec, step = 1 / 30) {

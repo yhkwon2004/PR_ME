@@ -456,8 +456,8 @@ function deckReel(el, reducedMotion) {
   set(0, { animate: false });
 
   return {
-    // 휠 · 세로 스와이프 · 방향키로도 한 장씩 넘길지(프로젝트 덱) — 카드가 많은 수상 덱은 장면 넘김을 막지 않는다
-    paged: !el.querySelector('.aw-reel'),
+    // 휠 · 세로 스와이프 · 방향키로도 한 장씩 넘긴다(수상 덱도 다른 장면처럼 끝까지 넘긴 뒤 다음 장면으로)
+    paged: true,
     get card() {
       return cards[focus];
     },

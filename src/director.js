@@ -123,6 +123,31 @@ export class Director {
     return true;
   }
 
+  // 부팅(로딩) 중: 격납고 위에 떠 있는 드론 둘레를 천천히 돈다 — 시작하면 이 자리에서 첫 장면으로 날아간다.
+  // progress 0~1에 따라 조금씩 다가가고, focusY(화면 높이 대비)에 드론이 오도록 렌즈를 옮긴다.
+  bootFrame(dt, t, progress, focusY = 0.42) {
+    const { drone, hangar } = this.a;
+    if (!this.booting) {
+      this.booting = true;
+      drone.hold(add(SETS.hangar, 0, 0.3, 0), 0);
+      drone.targetThrottle = 1;
+      hangar.coneLevel = 1;
+      this.bootAngle = -0.75;
+    }
+    // 로딩이 차오르는 만큼 드론이 패드에서 떠오른다 — 100%에서 첫 장면의 높이
+    const lift = progress * progress * (3 - 2 * progress);
+    drone.target.set(SETS.hangar.x, SETS.hangar.y + 0.3 + 1.45 * lift, SETS.hangar.z);
+    this.bootAngle += dt * (this.reducedMotion ? 0 : 0.14);
+    const portrait = this.stage.camera.aspect < 0.85;
+    const r = (portrait ? 13 : 9.6) - progress * 1.4;
+    const c = SETS.hangar;
+    this.camTarget.set(c.x, c.y + 1.75, c.z);
+    this.camPos.set(c.x + Math.sin(this.bootAngle) * r, c.y + 2.5 + progress * 0.5, c.z + Math.cos(this.bootAngle) * r);
+    this.fov = portrait ? 40 : 34;
+    this.shift.set(0, 0.5 - focusY);
+    this.update(dt, t);
+  }
+
   // 3D 코어의 화면 좌표(px) — 루프 장면의 고리가 따라간다
   coreOnScreen(out) {
     const cam = this.stage.camera;

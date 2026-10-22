@@ -47,6 +47,7 @@ export function createAudio({ makeContext } = {}) {
   let bass = null;
   let chord = 0;
   let chordTimer = 0;
+  const stateListeners = new Set();
 
   function setChord(i, glide = 3) {
     chord = ((i % CHORDS.length) + CHORDS.length) % CHORDS.length;
@@ -64,6 +65,8 @@ export function createAudio({ makeContext } = {}) {
       if (!AC) return;
       ctx = new AC();
     }
+    // 브라우저가 소리를 재우거나 깨울 때 알린다(소리 켜기 안내)
+    ctx.onstatechange = () => stateListeners.forEach((f) => f(ctx.state));
 
     // 마스터: 부드러운 컴프레서 → 귀에 거슬리는 고음을 살짝 누른다
     const comp = ctx.createDynamicsCompressor();
@@ -248,6 +251,12 @@ export function createAudio({ makeContext } = {}) {
     if (on) chordTimer = setInterval(() => setChord(chord + 1, 4.5), 15000);
   }
 
+  // 로딩 중 사용자가 화면을 누르면 그 순간에 오디오를 깨워 둔다(자동 진입 때 바로 소리가 나도록)
+  function unlock() {
+    init();
+    if (ctx && ctx.state !== 'running' && ctx.resume) ctx.resume();
+  }
+
   // 소리 버튼: 켜져 있는데 브라우저가 재워 두었다면 끄지 않고 깨운다
   function toggle() {
     if (on && ctx && ctx.state !== 'running') {
@@ -294,6 +303,14 @@ export function createAudio({ makeContext } = {}) {
   return {
     set,
     toggle,
+    unlock,
+    // 실제로 소리가 나고 있는지(켜져 있고 브라우저가 깨워 둔 상태)
+    get running() {
+      return on && !!ctx && ctx.state === 'running';
+    },
+    onState(f) {
+      stateListeners.add(f);
+    },
     whoosh,
     pluck,
     blip,
