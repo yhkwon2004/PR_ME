@@ -213,6 +213,8 @@ function render(scene, i) {
           <p class="credits-copy">© 2026 ${esc(profile.name)} · ${esc(profile.en)}</p>
         </div>
       </div>
+      <div class="credits-rail" aria-hidden="true"><i></i></div>
+      <p class="credits-hint" aria-hidden="true">스크롤 · 드래그로 넘겨 보기</p>
       <button type="button" class="skip" id="skip-credits">SKIP ▸</button>
       <div class="endcard panel-content">
         <p class="endcard-kicker" data-r>THE END — 그리고 다음 장면</p>
@@ -757,17 +759,34 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     if (el.dataset.scene === 'finale') runCredits(el, delay);
   }
 
+  // 엔딩 크레딧: 저절로 흐르다가 — 휠 · 손가락 · 방향키로 앞뒤로 넘겨 볼 수 있다(손을 떼면 2초 뒤 다시 흐른다)
+  let creditsCtl = null;
   function runCredits(el, delay) {
     const roll = el.querySelector('.credits-roll');
     const credits = el.querySelector('.credits');
     const card = el.querySelector('.endcard');
     const skip = el.querySelector('#skip-credits');
+    const thumb = el.querySelector('.credits-rail i');
+    const hint = el.querySelector('.credits-hint');
     gsap.set(card, { autoAlpha: 0 });
     gsap.set([credits, skip], { autoAlpha: 1 });
     gsap.set(card.querySelectorAll('.title .line > span'), { yPercent: 112 });
     gsap.set(card.querySelectorAll('[data-r]'), { autoAlpha: 0, y: 22 });
+    if (hint) gsap.set(hint, { autoAlpha: 1 });
+    const st = { p: 0 }; // 0: 첫 줄이 아래에서 막 들어올 때 · 1: 마지막 줄이 위로 다 지나갔을 때
+    let shown = false;
+    let resumeT = 0;
+    const travel = () => roll.offsetHeight + credits.clientHeight;
+    // 크레딧 길이에 맞춰 일정한 속도로 흐른다(초당 약 95px, 16~48초)
+    const duration = () => Math.min(48, Math.max(16, travel() / 95));
+    const apply = () => {
+      gsap.set(roll, { yPercent: 0, y: credits.clientHeight - st.p * travel() });
+      if (thumb) thumb.style.setProperty('--p', st.p.toFixed(4));
+    };
     const showCard = () => {
       if (!creditsTl) return;
+      clearTimeout(resumeT);
+      shown = true;
       creditsTl.kill();
       creditsTl = gsap.timeline();
       creditsTl
@@ -776,21 +795,121 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
         .to(card.querySelectorAll('.title .line > span'), { yPercent: 0, duration: 1.2, ease: 'expo.out', stagger: 0.12 })
         .to(card.querySelectorAll('[data-r]'), { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08 }, '-=0.8');
     };
-    creditsTl = gsap.timeline({ delay: delay * D });
-    if (reducedMotion) {
-      creditsTl.add(showCard, 0.5);
-    } else {
-      // 크레딧 길이에 맞춰 일정한 속도로 흐른다(초당 약 95px, 16~48초 — 기관 · 보도 목록이 길어 너무 늘어지지 않게)
-      const duration = Math.min(48, Math.max(16, (roll.offsetHeight + credits.clientHeight) / 95));
-      creditsTl.fromTo(roll, { yPercent: 0, y: () => credits.clientHeight }, { yPercent: -100, y: 0, duration, ease: 'none' }).add(showCard);
-    }
+    // 지금 자리에서 끝까지 흐른다
+    const flow = (wait = 0) => {
+      if (!creditsTl) return;
+      creditsTl.kill();
+      creditsTl = gsap.timeline({ delay: wait });
+      creditsTl.to(st, { p: 1, duration: Math.max(0.4, duration() * (1 - st.p)), ease: 'none', onUpdate: apply }).add(showCard);
+    };
+    // 손으로 넘기는 동안은 흐름을 멈추고, 손을 떼면 잠시 뒤 다시 흐른다
+    const hold = () => {
+      if (creditsTl) creditsTl.kill();
+      creditsTl = gsap.timeline();
+      clearTimeout(resumeT);
+      resumeT = setTimeout(() => !shown && flow(), 2200);
+      if (hint) gsap.to(hint, { autoAlpha: 0, duration: 0.4 });
+    };
+    const seek = (p, smooth = false) => {
+      hold();
+      const to = Math.max(0, Math.min(1, p));
+      if (smooth && !reducedMotion) creditsTl.to(st, { p: to, duration: 0.55, ease: 'power2.out', onUpdate: apply });
+      else {
+        st.p = to;
+        apply();
+      }
+      if (to >= 1) {
+        clearTimeout(resumeT);
+        creditsTl.add(showCard, smooth ? 0.5 : 0);
+      }
+    };
+    // 엔드 카드에서 뒤로: 크레딧 끝자락으로 돌아간다
+    const reopen = () => {
+      shown = false;
+      gsap.killTweensOf([credits, skip, card]);
+      gsap.to(card, { autoAlpha: 0, duration: 0.4 });
+      gsap.to([credits, skip], { autoAlpha: 1, duration: 0.5, delay: 0.2 });
+      st.p = 0.9;
+      apply();
+      hold();
+    };
+    creditsCtl = {
+      el,
+      // 방향키 · PageUp/Down · 크레딧 밖의 휠: 화면 높이의 40%씩. 처음에서 위로 가면 이전 장면으로(null)
+      step(dir) {
+        if (!creditsTl) return null;
+        if (shown) {
+          if (dir > 0) return null;
+          reopen();
+          return 'credits';
+        }
+        if (dir < 0 && st.p <= 0.001) return null;
+        seek(st.p + (dir * credits.clientHeight * 0.4) / travel(), true);
+        return 'credits';
+      },
+      // 크레딧 위의 휠 · 손가락: 픽셀만큼 바로
+      nudge(px) {
+        if (!creditsTl || shown) return false;
+        if (px < 0 && st.p <= 0.001) return false;
+        seek(st.p + px / travel());
+        return true;
+      },
+    };
     skip.onclick = showCard;
+    apply();
+    creditsTl = gsap.timeline({ delay: delay * D });
+    if (reducedMotion) creditsTl.add(showCard, 0.5);
+    else flow(delay * D);
+  }
+
+  // 크레딧 위에서의 휠 · 손가락은 장면 넘김 대신 크레딧을 움직인다
+  {
+    const fin = panels.find((p) => p.dataset.scene === 'finale');
+    const area = fin?.querySelector('.credits');
+    if (area) {
+      area.addEventListener(
+        'wheel',
+        (e) => {
+          if (!creditsCtl || creditsCtl.el !== fin) return;
+          const px = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY * (e.deltaMode === 1 ? 32 : 1) : 0;
+          if (!px || !creditsCtl.nudge(px)) return;
+          e.preventDefault();
+          e.stopPropagation();
+        },
+        { passive: false }
+      );
+      let ty = null;
+      area.addEventListener('touchstart', (e) => (ty = e.touches[0].clientY), { passive: true });
+      area.addEventListener(
+        'touchmove',
+        (e) => {
+          if (ty === null || !creditsCtl) return;
+          const y = e.touches[0].clientY;
+          if (creditsCtl.nudge((ty - y) * 1.4)) ty = y;
+        },
+        { passive: true }
+      );
+      // 크레딧을 끌었다면 손을 뗄 때 장면이 넘어가지 않게
+      area.addEventListener(
+        'touchend',
+        (e) => {
+          if (ty === null) return;
+          ty = null;
+          e.stopPropagation();
+        },
+        { passive: true }
+      );
+    }
   }
 
   panels.forEach((el) => el.querySelector('#btn-replay')?.addEventListener('click', onReplay));
 
   // 장면 넘기기 전에 지금 장면의 프로젝트 릴을 한 장씩 넘긴다 — 넘겼으면 { focus, count }
   function step(dir) {
+    if (creditsCtl && panels[current] === creditsCtl.el) {
+      const r = creditsCtl.step(dir);
+      if (r) return { credits: true };
+    }
     const reel = panels[current]?.reel;
     if (!reel || !reel.paged || !reel.step(dir)) return null;
     return { focus: reel.focus, count: reel.count };
