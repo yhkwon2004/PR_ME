@@ -148,49 +148,132 @@
  },
  {
   "id": "ai-pose-guide",
-  "title": "AI 포즈 · 구도 추천 앱",
-  "titleEn": "AI Pose Recommendation App",
+  "title": "PicPose — AI 포즈 · 구도 추천",
+  "titleEn": "PicPose · AI Pose Coach",
   "year": "2026",
-  "period": "",
+  "period": "2026.06",
   "category": "ai",
-  "oneLiner": "배경 · 구도 · 구도선을 읽어 어울리는 포즈를 추천하는 앱",
-  "summary": "배경·구도·구도선을 기반으로 SOLO 세그멘테이션을 활용해 포즈를 추천하는 애플리케이션입니다. 사진 촬영 때 포즈와 구도에 스트레스를 받는 사람들을 위해 배경을 인식하고 그 자리에 맞는 포즈를 제안합니다. 제3회 창의적 공학혁신인재 아이디어 캠프에서 대상(총장상)을 받았습니다.",
-  "role": [],
-  "team": "6조 · 이제인, 권용현, 정지민, 윤지원, 김민섭, 윤현규",
+  "oneLiner": "배경이 골라주는 포즈, 마네킹이 알려주는 구도",
+  "summary": "촬영 직전의 30초를 채우는 AI 포즈 추천 서비스입니다. 배경 사진 · 촬영 모드 · 인원수 · 추천 강도를 받아, 인스턴스 세그멘테이션으로 학습한 인물 배치 · 구도 패턴에서 어울리는 포즈와 구도(대칭선 · 황금분할 · 소실점 · 프레이밍)를 고르고 3D 마네킹으로 '여기에 이렇게' 미리 보여 줍니다. 인생네컷 부스(B2B)와 모바일 앱(B2C)에 같은 엔진을 씁니다. 제3회 창의적 공학혁신인재 아이디어 캠프에서 대상(원광대학교 총장상)을 받았습니다.",
+  "role": [
+   "소프트웨어 개발(SW 담당)"
+  ],
+  "team": "PicPose 5인 — 김민섭(리더 · 국립군산대) · 이제인(하드웨어 · 원광대) · 권용현(소프트웨어 · 원광대) · 정지민(디자인 · 원광대) · 윤현규(전자 · 전주대)",
   "tools": [
-   "SOLO Segmentation",
-   "Unreal Engine"
+   "Instance Segmentation (SOLO · Mask R-CNN · SAM)",
+   "포즈 · 구도 패턴 모델",
+   "3D 마네킹 가이드 · AR 오버레이",
+   "Flutter",
+   "Instagram Graph API",
+   "OpenStreetMap POI"
   ],
   "awards": [
    "제3회 창의적 공학혁신인재 아이디어 캠프 · 대상(총장상)"
   ],
-  "metrics": [],
+  "metrics": [
+   {
+    "value": "87%",
+    "label": "\"AI 포즈 추천 앱을 쓰겠다\" (사용자 인터뷰 N=80)"
+   },
+   {
+    "value": "92%",
+    "label": "월 3,000원 이용 의향 (즉석 사진 이용자 N=63)"
+   },
+   {
+    "value": "대상",
+    "label": "공학혁신인재 아이디어 캠프 · 총장상"
+   }
+  ],
   "story": [
    {
     "label": "PROBLEM",
-    "title": "포즈·구도 스트레스",
-    "text": "사진 촬영, 특히 MZ세대식 포즈와 구도 때문에 스트레스를 받는 사람들이 있습니다."
+    "title": "포즈 앞에서 얼어붙는 30초",
+    "text": "사진은 일상이 됐지만 상황에 맞는 포즈를 찾지 못해 촬영 자체가 부담이 됩니다. 20~50대 80명 인터뷰에서 87%가 AI 포즈 추천 앱을 쓰겠다고 답했습니다.",
+    "image": "media/projects/ai-pose-guide/06.webp"
    },
    {
     "label": "IDEA",
-    "title": "배경에 맞춘 포즈",
-    "text": "배경의 구도와 촬영 기법을 학습시켜, 그 자리에 맞는 포즈와 구도를 만들어 줍니다."
+    "title": "배경에서 시작하는 4가지 입력",
+    "text": "배경 이미지 · 촬영 모드와 분위기 · 인원수(1~6명) · 추천 강도(포즈 카드 3~12장)를 받아 상황에 맞는 포즈를 고릅니다.",
+    "image": "media/projects/ai-pose-guide/02.webp"
    },
    {
     "label": "BUILD",
-    "title": "SOLO 세그멘테이션 + 구도선",
-    "text": "SOLO 세그멘테이션으로 배경 영역을 나누고 구도·구도선을 읽어, 그 자리에 맞는 포즈를 추천합니다. 포즈는 언리얼 엔진 기반 마네킹으로 보여 줍니다."
+    "title": "구도까지 추천",
+    "text": "대칭선 · 황금분할 · 소실점 · 프레이밍 같은 작가의 구도 기법을 배경에서 찾아, 포즈와 함께 서야 할 자리를 정합니다.",
+    "image": "media/projects/ai-pose-guide/03.webp"
+   },
+   {
+    "label": "BUILD",
+    "title": "인물을 분리해 학습하고 마네킹으로",
+    "text": "사진에서 인스턴스 세그멘테이션으로 인물만 떼어 내 위치 · 구도를 좌표로 만들고, 장소별 유행 패턴을 학습합니다. 결과는 3D 마네킹이 그 자리에 미리 서서 보여 줍니다.",
+    "image": "media/projects/ai-pose-guide/04.webp"
+   },
+   {
+    "label": "PRODUCT",
+    "title": "부스는 빠르게, 앱은 정밀하게",
+    "text": "인생네컷 부스에는 4컷마다 다른 포즈를 마네킹 가이드로, 앱에는 라이브 카메라 위 마네킹 오버레이와 \"여기에 이렇게 서 주세요\" 코칭을 띄웁니다.",
+    "image": "media/projects/ai-pose-guide/05.webp"
    },
    {
     "label": "RESULT",
     "title": "아이디어 캠프 대상",
-    "text": "2026년 6월 제3회 창의적 공학혁신인재 아이디어 캠프에서 6조가 대상(원광대학교 총장상)을 받았습니다."
+    "text": "2026년 6월 제3회 창의적 공학혁신인재 아이디어 캠프에서 6조(PicPose 팀)가 대상(원광대학교 총장상)을 받았습니다.",
+    "image": ""
    }
   ],
-  "images": [],
-  "cover": "",
+  "images": [
+   {
+    "file": "media/projects/ai-pose-guide/01.webp",
+    "caption": "PicPose — 배경이 골라주는 포즈, 마네킹이 알려주는 구도",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/02.webp",
+    "caption": "배경 · 모드 · 인원수 · 추천 강도 4가지 입력",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/03.webp",
+    "caption": "AI 구도 분석 — 대칭선 · 황금분할 · 소실점 · 프레이밍",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/04.webp",
+    "caption": "배경 인식 → 인물 분리 학습 → 포즈 마네킹 → 촬영",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/05.webp",
+    "caption": "인생네컷 부스(B2B) 4컷 마네킹 가이드와 앱(B2C) 라이브 오버레이",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   },
+   {
+    "file": "media/projects/ai-pose-guide/06.webp",
+    "caption": "사용자 인터뷰 — 사용 의향 87% (N=80) · 월 3,000원 의향 92% (N=63)",
+    "kind": "document",
+    "w": 1600,
+    "h": 900
+   }
+  ],
+  "cover": "media/projects/ai-pose-guide/01.webp",
   "videos": [],
-  "links": []
+  "links": [
+   {
+    "label": "Instagram 게시물",
+    "url": "https://www.instagram.com/p/DacAs-0GtMY/"
+   }
+  ]
  },
  {
   "id": "airsim-driving",
