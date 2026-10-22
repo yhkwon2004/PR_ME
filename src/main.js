@@ -422,7 +422,9 @@ function loop(now) {
     hud.setTime(filmTime);
     const s = scenes[director.index];
     if (s) {
-      const busy = director.trans || lightbox.open || hud.indexOpen || hoverHold || site.open;
+      // 키보드 초점이 지금 장면의 덱 안에 있으면 자동 재생을 멈춘다(마우스 호버와 같게)
+      const deckFocus = !!panels.current?.querySelector('.deck :focus-visible');
+      const busy = director.trans || lightbox.open || hud.indexOpen || hoverHold || deckFocus || site.open;
       const hold = holdOf(director.index);
       if (auto && hold > 0 && !busy) {
         elapsed += dt;

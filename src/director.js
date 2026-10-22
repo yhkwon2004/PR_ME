@@ -14,7 +14,7 @@ const SHOTS = {
   robotics: { pos: add(SETS.robotics, 0.175, 7.525, 14.975), target: add(SETS.robotics, 0.3, 0.9, -0.9), fov: 40, shift: [0, 0.18] },
   intelligence: { pos: add(SETS.core, 19.8, 3.24, 31.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [0, 0.11] },
   // 제품 · 창업: 격납고 패드 위에 떠 있는 드론을 비스듬히 — 이륙 직전의 장면
-  build: { pos: add(SETS.hangar, -13, 9.5, 21), target: add(SETS.hangar, 1.5, 3.2, -10), fov: 40, shift: [0, 0.16] },
+  build: { pos: add(SETS.hangar, -13, 9.5, 21), target: add(SETS.hangar, 1.5, 3.2, -10), fov: 40, shift: [0.34, 0.16] },
   loop: { pos: V(0, 44, 50), target: V(0, 1, -6), fov: 44, shift: [0, -0.13] },
   record: { pos: add(SETS.record, -1.73, 6.05, 20.13), target: add(SETS.record, 0, 2.6, 0), fov: 40, shift: [0, 0.1] },
   finale: { pos: add(SETS.hangar, 0, 7.5, 17), target: add(SETS.hangar, 0, 2.8, -4), fov: 40, shift: [0, -0.085] },

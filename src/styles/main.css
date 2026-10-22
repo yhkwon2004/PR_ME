@@ -293,6 +293,8 @@ body[data-scene='robotics'] .s-top,
 body[data-scene='robotics'] .s-bottom,
 body[data-scene='intelligence'] .s-top,
 body[data-scene='intelligence'] .s-bottom,
+body[data-scene='build'] .s-top,
+body[data-scene='build'] .s-bottom,
 body[data-scene='loop'] .s-top,
 body[data-scene='loop'] .s-bottom,
 body[data-scene='record'] .s-top,
@@ -3097,3 +3099,23 @@ body.is-started.has-pointer .cursor {
   }
 }
 
+/* 장면 머리글: 번호 배지는 한 줄로, 한글은 낱말 단위로 줄바꿈 */
+.kicker-no {
+  flex: none;
+  white-space: nowrap;
+}
+.kicker-txt,
+.reel-head .subtitle {
+  word-break: keep-all;
+}
+@media (max-width: 400px) {
+  .reel-head .subtitle::before,
+  .reel-head .subtitle::after {
+    display: none;
+  }
+  .reel-head .subtitle {
+    justify-content: center;
+    text-align: center;
+    text-wrap: balance;
+  }
+}

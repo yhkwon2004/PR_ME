@@ -28,7 +28,7 @@ export function createMood({ getStage, reducedMotion }) {
   const type = document.getElementById('amb-type');
   if (!root || !type) return { set() {}, clear() {}, update() {} };
   const roots = [root, type];
-  buildFlow(root);
+  let flowBuilt = false; // 흐르는 사진은 분위기가 처음 켜질 때 만든다(상세 페이지로 바로 들어오면 받지 않게)
   const layers = [...root.querySelectorAll('.amb-photo')];
   const years = [...type.querySelectorAll('.amb-year')];
   let front = 0;
@@ -115,6 +115,10 @@ export function createMood({ getStage, reducedMotion }) {
       target.set(color);
       amtTarget = 1;
       if (dir) pulse = 1;
+      if (!flowBuilt) {
+        flowBuilt = true;
+        buildFlow(root);
+      }
       roots.forEach((r) => {
         r.style.setProperty('--amb', color);
         r.classList.add('is-on');

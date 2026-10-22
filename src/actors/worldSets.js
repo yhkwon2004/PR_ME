@@ -365,7 +365,7 @@ export class RecordSet {
     const base = new THREE.Mesh(new THREE.BoxGeometry(11.5, 0.04, 2.4), mats.pad);
     base.position.y = 0.02;
     this.group.add(base);
-    const floor = makeFloorText('07 — RECORD', { size: 120, color: 'rgba(94,242,255,0.22)' });
+    const floor = makeFloorText('08 — RECORD', { size: 120, color: 'rgba(94,242,255,0.22)' });
     floor.scale.setScalar(2);
     floor.position.set(0, 0.03, -3.4);
     this.group.add(floor);

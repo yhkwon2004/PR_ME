@@ -506,7 +506,11 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
     if (!info || !tpl) return;
     const node = tpl.content.firstElementChild.cloneNode(true);
     const old = [...info.children];
+    // 나가는 설명 안의 버튼에 키보드 초점이 있었다면 새 설명의 같은 자리로 옮긴다
+    const had = old.find((o) => o.contains(document.activeElement));
+    old.forEach((o) => (o.inert = true));
     info.appendChild(node);
+    if (had) (node.querySelector('.di-open') || node.querySelector('a'))?.focus({ preventScroll: true });
     old.forEach((o) => {
       if (reducedMotion || !dir) return o.remove();
       gsap.to(o, { autoAlpha: 0, y: dir > 0 ? -12 : 12, duration: 0.26, ease: 'power2.in', onComplete: () => o.remove() });

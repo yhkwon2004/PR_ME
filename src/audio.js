@@ -3,7 +3,7 @@
 
 const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
-// C장조의 느린 네 화음(Cmaj9 → Am9 → Fmaj9 → G6/9) — 위 네 음은 반음씩만 움직여 부드럽게 이어진다
+// C장조의 느린 네 화음(Cmaj9 → Am9 → Fmaj7 → G6) — 위 네 음은 조금씩만 움직여 부드럽게 이어진다
 const CHORDS = [
   { bass: 36, pad: [52, 55, 59, 62] }, // C2 · E3 G3 B3 D4
   { bass: 33, pad: [52, 55, 59, 60] }, // A1 · E3 G3 B3 C4
@@ -258,8 +258,11 @@ export function createAudio({ makeContext } = {}) {
   }
 
   // 장면 전환: 패드가 숨을 들이쉬듯 열렸다 닫히고, 다음 화음을 전자피아노가 천천히 펼쳐 친다
+  // 브라우저가 재워 둔 동안에는 음을 쌓지 않는다(깨어날 때 한꺼번에 울리지 않게)
+  const awake = () => on && ctx && ctx.state === 'running';
+
   function whoosh(duration = 2.5) {
-    if (!on || !ctx) return;
+    if (!awake()) return;
     const t = ctx.currentTime;
     const fq = padFilter.frequency;
     fq.cancelScheduledValues(t);
@@ -275,14 +278,14 @@ export function createAudio({ makeContext } = {}) {
 
   // 카드 한 장: 넘긴 순서대로 펜타토닉을 오르내리는 한 음
   function pluck(index = 0, dir = 1) {
-    if (!on || !ctx) return;
+    if (!awake()) return;
     const k = Math.max(0, index) % 10;
     epiano(melody(k, 5), { level: 0.2, pan: dir > 0 ? 0.2 : -0.2, decay: 2.4, wet: 0.45, echo: 0.3 });
   }
 
   // 클릭 · 호버: 지금 화음과 어울리는 높은 음을 아주 작게
   function blip(freq = 1320) {
-    if (!on || !ctx) return;
+    if (!awake()) return;
     const tones = [0, 2, 4, 7, 9].map((s) => 84 + s);
     const near = tones.reduce((a, b) => (Math.abs(hz(b) - freq) < Math.abs(hz(a) - freq) ? b : a));
     epiano(near, { level: 0.05, decay: 1.4, wet: 0.55, echo: 0.15 });
