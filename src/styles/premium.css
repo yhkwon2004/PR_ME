@@ -1826,21 +1826,6 @@ button.aw-sheet:focus-visible {
   color: var(--dim);
 }
 
-/* 엔딩 크레딧의 로고 */
-.credit-logos ul {
-  display: grid;
-  grid-template-columns: repeat(4, auto);
-  justify-content: center;
-  justify-items: center;
-  align-items: center;
-  gap: 22px 30px;
-  margin: 14px auto 0;
-}
-.credit-logos .org-logo {
-  --ls: 0.9;
-  opacity: 0.88;
-}
-
 /* ── 반응형 ── */
 @media (max-width: 820px) {
   .aw-cell {
@@ -1887,12 +1872,6 @@ button.aw-sheet:focus-visible {
     width: 100%;
     max-width: 420px;
   }
-  .credit-logos ul {
-    gap: 18px 18px;
-  }
-  .credit-logos .org-logo {
-    --ls: 0.72;
-  }
   .pg-tabs a {
     padding: 9px 15px;
   }
@@ -1927,12 +1906,6 @@ button.aw-sheet:focus-visible {
 @media (max-height: 500px) and (orientation: landscape) {
   .pg-tabs {
     margin-top: 12px;
-  }
-  .credit-logos ul {
-    gap: 10px 22px;
-  }
-  .credit-logos .org-logo {
-    --ls: 0.6;
   }
   .aw-sum {
     margin-top: 14px;

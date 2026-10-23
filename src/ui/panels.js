@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import { profile } from '../content.js';
 import { byId, projects as ALL_PROJECTS, categoryOf } from '../data/projects.js';
 import { AWARDS, AWARD_REEL } from '../data/awards.js';
-import { ORGS, WALL, ORG_INDEX } from '../data/orgs.js';
+import { ORGS, WALL } from '../data/orgs.js';
 import { projectCard, awardCard, pressCard, orgMark, deckInfo, deckAwardInfo, deckPressInfo, deckAllCard, deckAllInfo } from '../pages/site.js';
 import { PRESS } from '../data/press.js';
 
@@ -50,26 +50,31 @@ function moreThumbs(list) {
   return [...rest.filter((p) => cats.has(p.category)), ...rest.filter((p) => !cats.has(p.category))].slice(0, 4).map((p) => p.cover.thumb);
 }
 
-// 엔딩 크레딧의 'With': 기관 로고마다 함께 만든 프로젝트를 적는다(로고가 있는 곳 먼저)
-function creditWith(role) {
-  const rows = WALL.map((k) => {
-    const o = ORGS[k];
-    const seen = new Set();
-    const titles = ORG_INDEX[k].projects
-      .map(({ id }) => byId(id))
-      .filter((p) => p && !seen.has(p.id) && seen.add(p.id))
-      .map((p) => p.title);
-    return `<li class="cw${o.logo ? '' : ' is-text'}"><span class="cw-mark">${orgMark(o, { decorative: !!o.lockup })}</span><span class="cw-name">${esc(o.name)}</span>${
-      titles.length ? `<span class="cw-proj">${titles.map((t) => `<span class="nw">${esc(t)}</span>`).join('<i> · </i>')}</span>` : ''
-    }</li>`;
-  }).join('');
-  return `<div class="credit credit-with"><span>${esc(role)}</span><ul>${rows}</ul></div>`;
-}
-// 엔딩 크레딧의 보도: 기사 제목을 신문 지면처럼 — 매체 · 날짜
-function creditPress(role) {
-  return `<div class="credit credit-press"><span>${esc(role)}</span><ol>${PRESS.map(
-    (a) => `<li><small>${esc(a.publisher)} · ${esc(a.date ? a.date.replace(/-/g, '.') : a.relation)}</small><b>${esc(a.title)}</b></li>`
-  ).join('')}</ol></div>`;
+// 엔딩 크레딧의 한 비트: 가운데에 들어와 머무는 한 화면 — .cb-a는 비트가 켜질 때 --i 순서로 들어온다
+function creditBeat(c, kicker) {
+  const a = (j) => `class="cb-a" style="--i:${j}"`;
+  if (c.beat === 'lead')
+    return `<section class="cb cb-lead">
+      <p ${a(0)}><span class="cb-role">${esc(kicker)} — ${esc(c.role)}</span></p>
+      <h3 class="cb-name" aria-label="${esc(c.name)}">${[...c.name].map((ch, j) => `<i ${a(j + 1)}>${esc(ch)}</i>`).join('')}</h3>
+      <p class="cb-en" ${a(5)}>${esc(c.en)} · ${esc(profile.role)}</p>
+    </section>`;
+  if (c.beat === 'words')
+    return `<section class="cb cb-words">
+      <p ${a(0)}><span class="cb-role">${esc(c.role)}</span></p>
+      <ul>${c.words.map((w, j) => `<li ${a(j + 1)}>${esc(w)}</li>`).join('')}</ul>
+    </section>`;
+  if (c.beat === 'with')
+    return `<section class="cb cb-with">
+      <p ${a(0)}><span class="cb-role">${esc(c.role)}</span> <span class="cb-title">${esc(c.title)} <b>${WALL.length}</b></span></p>
+      <ul class="cb-logos">${WALL.map((k, j) => `<li ${a(1 + Math.floor(j / 2))}>${orgMark(ORGS[k])}</li>`).join('')}</ul>
+    </section>`;
+  return `<section class="cb cb-thanks">
+      <p ${a(0)}><span class="cb-role">${esc(c.role)}</span></p>
+      <p class="cb-line" ${a(1)}>${esc(c.line)}</p>
+      <p class="cb-big" ${a(2)}>${esc(c.big)}</p>
+      <p class="cb-copy" ${a(3)}>© 2026 ${esc(profile.name)} · ${esc(profile.en)} — Three.js · GSAP · Web Audio</p>
+    </section>`;
 }
 
 function render(scene, i) {
@@ -192,26 +197,7 @@ function render(scene, i) {
   if (L === 'finale') {
     return `<div class="finale">
       <div class="credits" aria-label="엔딩 크레딧">
-        <div class="credits-roll">
-          <p class="credits-kicker">${esc(scene.kicker)}</p>
-          <p class="credits-title">PHYSICAL AI<br /><span>a portfolio film</span></p>
-          ${scene.credits
-            .map(([r, n], k) =>
-              r === '§'
-                ? `<p class="credit-sec">${esc(n)}</p>`
-                : n === null
-                  ? creditWith(r)
-                  : n === 'PRESS'
-                    ? creditPress(r)
-                  : `<div class="credit${k === 0 ? ' credit-lead' : ''}"><span>${esc(r)}</span><b>${n
-                      .split(' · ')
-                      .map((x, j, all) => `<span class="nw">${esc(x)}${j < all.length - 1 ? ' ·' : ''}</span>`)
-                      .join(' ')}</b></div>`
-            )
-            .join('')}
-          <p class="credits-thanks">감사합니다</p>
-          <p class="credits-copy">© 2026 ${esc(profile.name)} · ${esc(profile.en)}</p>
-        </div>
+        <div class="credits-roll">${scene.credits.map((c) => creditBeat(c, scene.kicker)).join('')}</div>
       </div>
       <div class="credits-rail" aria-hidden="true"><i></i></div>
       <p class="credits-hint" aria-hidden="true">스크롤 · 드래그로 넘겨 보기</p>
@@ -938,8 +924,10 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     if (el.dataset.scene === 'finale') runCredits(el, delay);
   }
 
-  // 엔딩 크레딧: 저절로 흐르다가 — 휠 · 손가락 · 방향키로 앞뒤로 넘겨 볼 수 있다(손을 떼면 2초 뒤 다시 흐른다)
+  // 엔딩 크레딧: 네 비트가 차례로 — 비트마다 가운데로 빠르게 들어와(글자 · 로고가 순서대로 켜지고) 잠깐 머문 뒤 넘어간다.
+  // 휠 · 손가락으로 앞뒤로 넘겨 볼 수 있고(손을 떼면 2초 뒤 다시), 방향키 · 크레딧 밖 휠은 한 비트씩
   let creditsCtl = null;
+  const HOLD = { 'cb-lead': 2.1, 'cb-words': 2.2, 'cb-with': 2.6, 'cb-thanks': 2.3 }; // 비트마다 머무는 초
   function runCredits(el, delay) {
     const roll = el.querySelector('.credits-roll');
     const credits = el.querySelector('.credits');
@@ -947,20 +935,37 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     const skip = el.querySelector('#skip-credits');
     const thumb = el.querySelector('.credits-rail i');
     const hint = el.querySelector('.credits-hint');
+    const beats = [...roll.querySelectorAll('.cb')];
     gsap.set(card, { autoAlpha: 0 });
-    gsap.set([credits, skip], { autoAlpha: 1 });
+    gsap.set([credits, skip, el.querySelector('.credits-rail')].filter(Boolean), { autoAlpha: 1 });
     gsap.set(card.querySelectorAll('.title .line > span'), { yPercent: 112 });
     gsap.set(card.querySelectorAll('[data-r]'), { autoAlpha: 0, y: 22 });
     if (hint) gsap.set(hint, { autoAlpha: 1 });
-    const st = { p: 0 }; // 0: 첫 줄이 아래에서 막 들어올 때 · 1: 마지막 줄이 위로 다 지나갔을 때
+    beats.forEach((b) => b.classList.remove('is-on'));
+    const st = { p: 0 }; // 0: 첫 비트가 아래에서 막 들어올 때 · 1: 마지막 비트가 위로 다 지나갔을 때
     let shown = false;
     let resumeT = 0;
+    let active = -1;
+    let marks = []; // 비트마다 가운데에 오는 p
     const travel = () => roll.offsetHeight + credits.clientHeight;
-    // 크레딧 길이에 맞춰 일정한 속도로 흐른다(초당 약 95px, 16~48초)
-    const duration = () => Math.min(48, Math.max(16, travel() / 95));
+    // 비트 한 장 = 크레딧 창 높이(한 번에 하나씩) — 창 크기가 바뀌면 다시 잰다
+    const fit = () => {
+      if (!credits.clientHeight) return; // 장면이 숨어 있으면 재지 않는다
+      roll.style.setProperty('--ch', `${credits.clientHeight}px`);
+      const T = travel();
+      marks = beats.map((b) => (credits.clientHeight / 2 + b.offsetTop + b.offsetHeight / 2) / T);
+    };
     const apply = () => {
       gsap.set(roll, { yPercent: 0, y: credits.clientHeight - st.p * travel() });
       if (thumb) thumb.style.setProperty('--p', st.p.toFixed(4));
+      // 가운데에 가까이 온 비트를 켠다(반 칸 안)
+      const half = marks.length > 1 ? (marks[1] - marks[0]) / 2 : 0.5;
+      let k = -1;
+      marks.forEach((m, j) => Math.abs(st.p - m) < half * 0.9 && (k = j));
+      if (k !== active) {
+        active = k;
+        beats.forEach((b, j) => b.classList.toggle('is-on', j === k));
+      }
     };
     const showCard = () => {
       if (!creditsTl) return;
@@ -968,18 +973,23 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       shown = true;
       creditsTl.kill();
       creditsTl = gsap.timeline();
+      const rail = el.querySelector('.credits-rail');
       creditsTl
-        .to([credits, skip], { autoAlpha: 0, duration: 0.6 })
+        .to([credits, skip, rail, hint].filter(Boolean), { autoAlpha: 0, duration: 0.5 })
         .set(card, { autoAlpha: 1 })
-        .to(card.querySelectorAll('.title .line > span'), { yPercent: 0, duration: 1.2, ease: 'expo.out', stagger: 0.12 })
+        .to(card.querySelectorAll('.title .line > span'), { yPercent: 0, duration: 1.1, ease: 'expo.out', stagger: 0.12 })
         .to(card.querySelectorAll('[data-r]'), { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08 }, '-=0.8');
     };
-    // 지금 자리에서 끝까지 흐른다
+    // 지금 자리에서: 남은 비트마다 들어와 머물고, 마지막 비트 뒤 엔드 카드로
     const flow = (wait = 0) => {
       if (!creditsTl) return;
       creditsTl.kill();
       creditsTl = gsap.timeline({ delay: wait });
-      creditsTl.to(st, { p: 1, duration: Math.max(0.4, duration() * (1 - st.p)), ease: 'none', onUpdate: apply }).add(showCard);
+      marks.forEach((m, k) => {
+        if (m <= st.p + 0.002) return;
+        creditsTl.to(st, { p: m, duration: 0.9, ease: 'power3.inOut', onUpdate: apply }).to({}, { duration: HOLD[beats[k].classList[1]] || 2.2 });
+      });
+      creditsTl.to(st, { p: 1, duration: 0.7, ease: 'power2.in', onUpdate: apply }).add(showCard);
     };
     // 손으로 넘기는 동안은 흐름을 멈추고, 손을 떼면 잠시 뒤 다시 흐른다
     const hold = () => {
@@ -992,7 +1002,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     const seek = (p, smooth = false) => {
       hold();
       const to = Math.max(0, Math.min(1, p));
-      if (smooth && !reducedMotion) creditsTl.to(st, { p: to, duration: 0.55, ease: 'power2.out', onUpdate: apply });
+      if (smooth && !reducedMotion) creditsTl.to(st, { p: to, duration: 0.6, ease: 'power3.inOut', onUpdate: apply });
       else {
         st.p = to;
         apply();
@@ -1002,19 +1012,21 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
         creditsTl.add(showCard, smooth ? 0.5 : 0);
       }
     };
-    // 엔드 카드에서 뒤로: 크레딧 끝자락으로 돌아간다
+    // 엔드 카드에서 뒤로: 마지막 비트로 돌아간다
     const reopen = () => {
       shown = false;
-      gsap.killTweensOf([credits, skip, card]);
+      const rail = el.querySelector('.credits-rail');
+      gsap.killTweensOf([credits, skip, card, rail]);
       gsap.to(card, { autoAlpha: 0, duration: 0.4 });
-      gsap.to([credits, skip], { autoAlpha: 1, duration: 0.5, delay: 0.2 });
-      st.p = 0.9;
+      gsap.to([credits, skip, rail].filter(Boolean), { autoAlpha: 1, duration: 0.5, delay: 0.2 });
+      st.p = marks[marks.length - 1] ?? 0.9;
       apply();
       hold();
     };
     creditsCtl = {
       el,
-      // 방향키 · PageUp/Down · 크레딧 밖의 휠: 화면 높이의 40%씩. 처음에서 위로 가면 이전 장면으로(null)
+      fit: () => credits.clientHeight && (fit(), apply()),
+      // 방향키 · PageUp/Down · 크레딧 밖의 휠: 한 비트씩. 처음에서 위로 가면 이전 장면으로(null)
       step(dir) {
         if (!creditsTl) return null;
         if (shown) {
@@ -1023,7 +1035,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
           return 'credits';
         }
         if (dir < 0 && st.p <= 0.001) return null;
-        seek(st.p + (dir * credits.clientHeight * 0.4) / travel(), true);
+        const to = dir > 0 ? (marks.find((m) => m > st.p + 0.01) ?? 1) : ([...marks].reverse().find((m) => m < st.p - 0.01) ?? 0);
+        seek(to, true);
         return 'credits';
       },
       // 크레딧 위의 휠 · 손가락: 픽셀만큼 바로
@@ -1035,11 +1048,13 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       },
     };
     skip.onclick = showCard;
+    fit();
     apply();
     creditsTl = gsap.timeline({ delay: delay * D });
     if (reducedMotion) creditsTl.add(showCard, 0.5);
     else flow(delay * D);
   }
+  addEventListener('resize', () => creditsCtl?.fit());
 
   // 크레딧 위에서의 휠 · 손가락은 장면 넘김 대신 크레딧을 움직인다
   {
