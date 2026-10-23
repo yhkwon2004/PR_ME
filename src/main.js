@@ -126,6 +126,7 @@ const coarse = matchMedia('(pointer: coarse)').matches;
     () => {
       lastInput = performance.now();
       guide?.hideGhost();
+      guide?.stopHint();
     },
     { passive: true, capture: true }
   )
@@ -168,12 +169,8 @@ const panels = createPanels($('stage'), scenes, {
     const h = holdOf(director?.index);
     if (h > 0) elapsed = (h * focus) / count;
     if (!entry) takeOver();
-    // 손으로 마지막 카드까지 왔다: 다음 장면으로 넘어가는 법을 한 번 보여 준다
-    if (!entry && focus === count - 1) guide.edge(panels.current?.querySelector('.deck-btn.is-scene'));
-  },
-  // 마지막 카드의 '다음 장면' 버튼 · 소개 장면 끝의 '다음 장면' 버튼
-  onEdge: () => {
-    if (goTo(director.index + 1)) takeOver();
+    // 손으로 마지막 카드까지 왔다: 아래로 넘기면 다음 장면이라는 것을 반투명한 손끝으로 보여 준다
+    if (!entry && focus === count - 1) hintNextScene(1100);
   },
   // 덱의 가운데 카드가 바뀌면 배경 분위기도 그 카드로
   // 카드를 넘길 때마다 펜타토닉 한 음
@@ -257,6 +254,8 @@ function onTransition(i, prev, duration) {
   panels.go(i, prev, duration); // 뒤로 돌아와 마지막 카드에서 시작하는 릴이면 onReelFocus가 시계를 맞춘다
   hud.setScene(i, prev, duration);
   guide.setScene(i, !!panels.panels[i]?.reel);
+  // 덱이 없는 장면(소개): 조금 머물면 아래로 넘기는 법을 보여 준다
+  if (started && !panels.panels[i]?.reel && i > 0 && i < scenes.length - 1) hintNextScene(3200);
   // 주소에 지금 장면을 남긴다(새로 고침 · 공유해도 그 장면으로) — 작품 페이지가 열려 있을 때는 건드리지 않는다
   if (started && !site.open && location.pathname === '/') {
     const want = i > 0 ? `#${scenes[i].id}` : '';
@@ -363,7 +362,7 @@ addEventListener('pointermove', (e) => {
     cursor.setActor(null);
   }
   hoverHold = fine && !!e.target.closest?.('.panel-content, .credits');
-  if (down && director?.drag && e.pointerType === 'mouse') {
+  if (down && director?.drag && e.pointerType === 'mouse' && !document.documentElement.classList.contains('is-pulling')) {
     director.drag.set(((e.clientX - down.x) / innerWidth) * 1.4, ((e.clientY - down.y) / innerHeight) * 0.6);
   }
 });
@@ -625,7 +624,7 @@ soundHint?.addEventListener('click', () => {
 // 필름은 언제나 사운드와 함께 시작한다(사운드 버튼으로 끌 수 있다)
 $('enter-sound').addEventListener('click', () => start(true));
 
-// 넘길 카드가 남았으면 덱을 살짝 끌어 보이고, 아니면(휴대폰) 화면 아래에서 위로 미는 손끝 — 데스크톱은 다음 장면 버튼을 깜박인다
+// 넘길 카드가 남았으면 덱을 살짝 끌어 보이고(옆으로), 아니면 화면을 위로 끌어 올려 보인다(아래로 넘기면 다음 장면)
 function idleHint() {
   const reel = panels.current?.reel;
   if (reel && reel.focus < reel.count - 1 && panels.peek() > 0) {
@@ -633,16 +632,22 @@ function idleHint() {
     return true;
   }
   if (director.index >= scenes.length - 1) return false;
-  if (coarse) {
-    const y = innerHeight - parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bottom') || '54') - 120;
-    guide.ghost('y', { left: innerWidth / 2, top: y, width: 0, height: 0 });
-  } else {
-    const cue = document.querySelector('.next-cue');
-    cue?.classList.remove('is-nudge');
-    void cue?.offsetWidth;
-    cue?.classList.add('is-nudge');
-  }
-  return true;
+  return guide.sceneHint(`다음 장면 · ${scenes[director.index + 1].ko}`, reel?.card?.getBoundingClientRect());
+}
+
+// 장면 넘김 안내: 덱의 마지막 카드에 손으로 닿았을 때 · 덱이 없는 장면에 들어와 머물 때 — 장면마다 한 번
+const hintedScenes = new Set();
+let sceneHintT = 0;
+function hintNextScene(delay) {
+  clearTimeout(sceneHintT);
+  const i = director.index;
+  if (i >= scenes.length - 1 || hintedScenes.has(i)) return;
+  sceneHintT = setTimeout(() => {
+    if (director.index !== i || director.trans || site.open || lightbox.open || hud.indexOpen) return;
+    const reel = panels.current?.reel;
+    if (reel && reel.focus < reel.count - 1) return; // 넘길 카드가 남았으면 카드 안내가 먼저
+    if (guide.sceneHint(`다음 장면 · ${scenes[i + 1].ko}`, reel?.card?.getBoundingClientRect())) hintedScenes.add(i);
+  }, delay);
 }
 
 // ── 렌더 루프 ──────────────────────────────────────────────

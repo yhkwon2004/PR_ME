@@ -109,14 +109,14 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
   ghost.innerHTML = '<span class="dg-trail"></span><span class="dg-dot"></span><small class="dg-t"></small>';
   document.body.appendChild(ghost);
   let ghostT = 0;
-  function showGhost(kind, rect) {
+  function showGhost(kind, rect, text) {
     if (reducedMotion || !rect) return;
     clearTimeout(ghostT);
     ghost.hidden = false;
     ghost.className = `drag-ghost is-${kind}`;
     ghost.style.left = `${rect.left + rect.width / 2}px`;
     ghost.style.top = `${rect.top + rect.height / 2}px`;
-    ghost.querySelector('.dg-t').textContent = kind === 'x' ? (touch ? '옆으로 밀어 넘기기' : '끌어서 넘기기') : '살짝 밀어 올리면 다음';
+    ghost.querySelector('.dg-t').textContent = text || (kind === 'x' ? (touch ? '옆으로 밀어 넘기기' : '끌어서 넘기기') : touch ? '위로 밀어 다음 장면' : '스크롤 · 끌어 올려 다음 장면');
     void ghost.offsetWidth;
     ghost.classList.add('is-on');
     ghostT = setTimeout(hideGhost, 3400);
@@ -150,8 +150,10 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       armed = false;
       return;
     }
-    hideGhost();
-    if (!toast.hidden) hide();
+    if (!st.demo) {
+      hideGhost();
+      if (!toast.hidden) hide();
+    }
     pull.hidden = false;
     pull.dataset.dir = st.dir > 0 ? 'next' : 'prev';
     pull.classList.add('is-on');
@@ -159,7 +161,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
     plFill.style.strokeDashoffset = String(100 - Math.min(1, st.p) * 100);
     plArrow.textContent = st.dir > 0 ? '↑' : '↓';
     plName.textContent = st.label;
-    plSmall.textContent = st.armed ? '놓으면 이동' : st.dir > 0 ? '조금 더 밀어 올리기' : '조금 더 끌어내리기';
+    plSmall.textContent = st.demo ? '아래로 넘기면' : st.armed ? '놓으면 이동' : st.dir > 0 ? '조금 더 밀어 올리기' : '조금 더 끌어내리기';
     pull.classList.toggle('is-armed', !!st.armed);
     if (st.armed && !armed) navigator.vibrate?.(8);
     armed = !!st.armed;
@@ -168,6 +170,39 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       stageEl.classList.add('is-pulling');
       stageEl.style.translate = `0 ${(-st.dir * Math.min(1.2, st.p) * 18).toFixed(1)}px`;
     }
+  }
+
+  // ── 장면 넘김 안내: 카드 안내처럼 반투명한 손끝이 아래에서 위로 밀어 올리고(두 번),
+  //    그 손끝을 따라 화면 전체가 살짝 끌려 올라갔다 돌아온다 — 아래 표시에 다음 장면 이름이 비친다 ──
+  let demoRaf = 0;
+  function sceneHint(label, rect) {
+    if (reducedMotion || !label) return false;
+    cancelAnimationFrame(demoRaf);
+    showGhost('y', rect || { left: innerWidth / 2, top: innerHeight * 0.6, width: 0, height: 0 });
+    const t0 = performance.now();
+    const CYCLE = 1500; // 손끝 애니메이션(ghost-y) 한 번과 같은 길이
+    const ease = (x) => x * x * (3 - 2 * x);
+    const step = (now) => {
+      const t = (now - t0) / CYCLE;
+      if (t >= 2) {
+        demoRaf = 0;
+        return setPull(null);
+      }
+      const u = t % 1;
+      // 누르고(0~18%) → 끌어 올리고(18~62%) → 놓으면 제자리로(62~90%)
+      const p = u < 0.18 ? 0 : u < 0.62 ? ease((u - 0.18) / 0.44) * 0.8 : u < 0.9 ? 0.8 * (1 - ease((u - 0.62) / 0.28)) : 0;
+      setPull({ dir: 1, p, armed: false, label, demo: true });
+      demoRaf = requestAnimationFrame(step);
+    };
+    demoRaf = requestAnimationFrame(step);
+    return true;
+  }
+  function stopHint() {
+    if (!demoRaf) return;
+    cancelAnimationFrame(demoRaf);
+    demoRaf = 0;
+    setPull(null);
+    hideGhost();
   }
 
   // ── 처음 방문: 첫 장면 아래의 짧은 안내를 세 가지 사용법으로 ──
@@ -235,7 +270,6 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
   let lastAuto = null; // 매 프레임 같은 값을 다시 쓰지 않게
   let lastRing = -1;
   let deckTold = false;
-  let edgeTold = false;
   let coachTold = false;
   let takeoverTold = false;
   return {
@@ -298,18 +332,11 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       say(`지난번에 '${s.ko}' 장면까지 보셨어요`, { action: '이어 보기', onAction: () => onGo(saved.i), ms: 9000 });
     },
     say,
-    // 덱의 마지막 카드에 처음 닿았을 때(휴대폰): '다음 장면' 버튼 위에서 위로 미는 손끝을 한 번
-    edge(btn) {
-      if (!touch || edgeTold || !btn) return;
-      edgeTold = true;
-      setTimeout(() => {
-        if (!btn.isConnected || !btn.classList.contains('is-scene')) return;
-        const r = btn.getBoundingClientRect();
-        showGhost('y', { left: innerWidth / 2, top: r.top - 90, width: 0, height: 0 });
-      }, reducedMotion ? 0 : 650);
-    },
     // 끌기 안내(kind: 'x' 덱 · 'y' 장면) — rect: 손끝이 움직일 자리
     ghost: showGhost,
+    // 장면 넘김 안내(label: '다음 장면 · 로봇') — 손으로 무엇이든 하면 멈춘다
+    sceneHint,
+    stopHint,
     hideGhost,
     // 당겨 넘기기 표시: { dir, p, armed, label } · 끝나면 null
     pull: setPull,

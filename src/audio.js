@@ -1,16 +1,16 @@
-// Web Audio로 합성한 앰비언트 스코어 — 맑은 가운데 · 위 음역만으로 가볍게.
+// Web Audio로 합성한 앰비언트 스코어 — 맑고 밝게: 높은 음역의 장조 화음 · 한 옥타브 위 반짝임 · 경쾌한 오르골.
 // 낮게 깔리는 베이스 드론은 쓰지 않는다. 마스터 앞에서 180Hz 아래를 깎아(24dB/옥타브)
 // 전자피아노 · 잔향에서 생길 수 있는 낮은 웅웅거림도 막는다(휴대폰 스피커 · 이어폰 모두 거슬리지 않게).
 // 사용자가 시작 버튼을 누르기 전에는 아무 소리도 내지 않는다.
 
 const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
-// C장조의 밝은 네 화음(Cadd9 → G → Fmaj7 → C/E) — 단조 없이, 패드는 E4~E5 위에서만
+// C장조의 밝은 네 화음(Cadd9 → G → Fadd9 → C6) — 단조 없이, 패드는 A4~B5(약 440~990Hz) 위에서만
 const CHORDS = [
-  [64, 67, 72, 74], // E4 G4 C5 D5
-  [62, 67, 71, 74], // D4 G4 B4 D5
-  [64, 69, 72, 76], // E4 A4 C5 E5
-  [64, 67, 72, 76], // E4 G4 C5 E5
+  [72, 74, 76, 79], // C5 D5 E5 G5
+  [71, 74, 79, 83], // B4 D5 G5 B5
+  [69, 72, 77, 79], // A4 C5 F5 G5
+  [72, 76, 79, 81], // C5 E5 G5 A5
 ];
 // 멜로디는 C 펜타토닉(C D E G A) — 네 화음 어디에 얹어도 어울린다
 const PENTA = [0, 2, 4, 7, 9];
@@ -54,7 +54,11 @@ export function createAudio({ makeContext } = {}) {
   function setChord(i, glide = 3) {
     chord = ((i % CHORDS.length) + CHORDS.length) % CHORDS.length;
     const t = ctx.currentTime;
-    pad.forEach((v, k) => v.oscs.forEach((o) => o.frequency.setTargetAtTime(hz(CHORDS[chord][k]), t, glide)));
+    pad.forEach((v, k) => {
+      const f = hz(CHORDS[chord][k]);
+      v.oscs.forEach((o) => o.frequency.setTargetAtTime(f, t, glide));
+      v.shimmer?.frequency.setTargetAtTime(f * 2, t, glide);
+    });
   }
 
   function init() {
@@ -83,9 +87,10 @@ export function createAudio({ makeContext } = {}) {
     comp.attack.value = 0.015;
     comp.release.value = 0.3;
     const shelf = ctx.createBiquadFilter();
+    // 밝게: 5kHz 위를 살짝 올린다(쨍하지 않을 만큼)
     shelf.type = 'highshelf';
-    shelf.frequency.value = 7000;
-    shelf.gain.value = -3;
+    shelf.frequency.value = 5000;
+    shelf.gain.value = 1.5;
     master = ctx.createGain();
     master.gain.value = 0;
     hp[0].connect(hp[1]).connect(comp).connect(shelf).connect(master).connect(ctx.destination);
@@ -102,7 +107,7 @@ export function createAudio({ makeContext } = {}) {
     const verb = ctx.createConvolver();
     verb.buffer = impulse(ctx);
     const verbOut = ctx.createGain();
-    verbOut.gain.value = 0.34;
+    verbOut.gain.value = 0.3;
     verbHp.connect(verb).connect(verbOut).connect(out);
     verbSend = ctx.createGain();
     verbSend.connect(verbHp);
@@ -136,16 +141,16 @@ export function createAudio({ makeContext } = {}) {
     // 패드: 음마다 사인파 둘을 좌우로 살짝 어긋나게 — 둥글고 맑게, 로우패스가 천천히 숨 쉰다
     padFilter = ctx.createBiquadFilter();
     padFilter.type = 'lowpass';
-    padFilter.frequency.value = 2400;
-    padFilter.Q.value = 0.5;
+    padFilter.frequency.value = 3400;
+    padFilter.Q.value = 0.4;
     const lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.045;
+    lfo.frequency.value = 0.05;
     const lfoG = ctx.createGain();
-    lfoG.gain.value = 420;
+    lfoG.gain.value = 700;
     lfo.connect(lfoG).connect(padFilter.frequency);
     lfo.start();
     const padBus = ctx.createGain();
-    padBus.gain.value = 0.085;
+    padBus.gain.value = 0.08;
     padFilter.connect(padBus);
     padBus.connect(bus);
     padBus.connect(verbSend);
@@ -175,8 +180,24 @@ export function createAudio({ makeContext } = {}) {
         o.start();
         return o;
       });
+      // 반짝임: 위 두 음은 한 옥타브 위 사인을 아주 작게 — 천천히 일렁인다
+      let shimmer = null;
+      if (k >= 2) {
+        const sh = (shimmer = ctx.createOscillator());
+        sh.frequency.value = hz(m) * 2;
+        const shg = ctx.createGain();
+        shg.gain.value = 0.16;
+        const trem = ctx.createOscillator();
+        trem.frequency.value = 0.21 + k * 0.07;
+        const tg = ctx.createGain();
+        tg.gain.value = 0.08;
+        trem.connect(tg).connect(shg.gain);
+        trem.start();
+        sh.connect(shg).connect(g);
+        sh.start();
+      }
       g.connect(padFilter);
-      return { oscs, g };
+      return { oscs, g, shimmer };
     });
 
     // 장면 전환의 바람 소리: 1.5초짜리 잡음 한 토막을 미리 만들어 둔다
@@ -201,15 +222,15 @@ export function createAudio({ makeContext } = {}) {
     const mod = ctx.createOscillator();
     mod.frequency.value = f * 2;
     const idx = ctx.createGain();
-    idx.gain.setValueAtTime(f * 0.85, t);
-    idx.gain.exponentialRampToValueAtTime(f * 0.04, t + 0.7);
+    idx.gain.setValueAtTime(f * 1.05, t);
+    idx.gain.exponentialRampToValueAtTime(f * 0.05, t + 0.6);
     mod.connect(idx).connect(car.frequency);
     // 두 옥타브 위 배음을 아주 조금 — 종소리 같은 반짝임
     const bell = ctx.createOscillator();
     bell.frequency.value = f * 4;
     const bellG = ctx.createGain();
-    bellG.gain.setValueAtTime(0.05, t);
-    bellG.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+    bellG.gain.setValueAtTime(0.08, t);
+    bellG.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
     bell.connect(bellG).connect(out);
     car.connect(out);
     let node = out;
@@ -286,20 +307,23 @@ export function createAudio({ makeContext } = {}) {
     clearInterval(chordTimer);
     clearInterval(arpTimer);
     // 장면이 오래 머물러도 화음이 천천히 흐른다
-    if (on) chordTimer = setInterval(() => setChord(chord + 1, 4.5), 15000);
-    // 오르골처럼 지금 화음의 음을 위 음역에서 하나씩 — 아주 작게, 자주 쉬어 간다
-    if (on) arpTimer = setInterval(arp, 720);
+    if (on) chordTimer = setInterval(() => setChord(chord + 1, 3.5), 11000);
+    // 오르골처럼 지금 화음의 음을 위 음역에서 하나씩 — 작게, 경쾌하게 오르내린다
+    if (on) arpTimer = setInterval(arp, 540);
   }
 
   let arpTimer = 0;
   let arpStep = 0;
-  const ARP = [0, 2, 1, 3, -1, 2, -1, 1]; // 화음 음 번호(-1은 쉼)
+  const ARP = [0, 1, 2, 3, 2, 3, 1, -1, 0, 2, 3, 2, -1, 1, 3, -1]; // 화음 음 번호(-1은 쉼) — 오르내리는 두 마디
   function arp() {
     if (!awake()) return;
-    const n = ARP[arpStep++ % ARP.length];
+    const step = arpStep++ % ARP.length;
+    const n = ARP[step];
     if (n < 0) return;
     const m = CHORDS[chord][n] + 12;
-    epiano(m, { level: 0.022, pan: (n - 1.5) * 0.3, decay: 1.6, wet: 0.35, echo: 0.1 });
+    epiano(m, { level: 0.017, pan: (n - 1.5) * 0.3, decay: 1.4, wet: 0.32, echo: 0.1 });
+    // 두 마디마다 맨 위에서 한 번 반짝
+    if (step === 3) epiano(m + 12, { level: 0.009, pan: 0.4, decay: 1.2, wet: 0.5, echo: 0.2 });
   }
 
   // 로딩 중 사용자가 화면을 누르면 그 순간에 오디오를 깨워 둔다(자동 진입 때 바로 소리가 나도록)
@@ -331,15 +355,19 @@ export function createAudio({ makeContext } = {}) {
     fq.setTargetAtTime(2400, t + duration * 0.55, duration * 0.35);
     setChord(chord + 1, 1.4);
     const c = CHORDS[chord];
-    // 화음의 맨 아래 · 가운데 · 위 음을 차례로
-    [c[0], c[2], c[3]].forEach((m, k) => epiano(m, { level: 0.12 - k * 0.015, when: t + duration * 0.42 + k * 0.11, pan: (k - 1) * 0.35, decay: 2.8, wet: 0.55 }));
+    // 새 화음을 아래에서 위로 반짝이듯 훑는다(한 옥타브 위에서)
+    [c[0], c[1], c[2], c[3], c[3] + 5].forEach((m, k) =>
+      epiano(m + 12, { level: 0.085 - k * 0.01, when: t + duration * 0.4 + k * 0.075, pan: (k - 2) * 0.22, decay: 2.4, wet: 0.5 })
+    );
   }
 
   // 카드 한 장: 넘긴 순서대로 펜타토닉을 오르내리는 한 음
   function pluck(index = 0, dir = 1) {
     if (!awake()) return;
     const k = Math.max(0, index) % 10;
-    epiano(melody(k, 5), { level: 0.16, pan: dir > 0 ? 0.2 : -0.2, decay: 2.2, wet: 0.42, echo: 0.26 });
+    epiano(melody(k, 5), { level: 0.15, pan: dir > 0 ? 0.2 : -0.2, decay: 2.2, wet: 0.42, echo: 0.26 });
+    // 한 옥타브 위를 살짝 늦게 겹쳐 맑게
+    epiano(melody(k, 6), { level: 0.035, when: ctx.currentTime + 0.03, pan: dir > 0 ? 0.35 : -0.35, decay: 1.4, wet: 0.5, echo: 0.15 });
   }
 
   // 클릭 · 호버: 지금 화음과 어울리는 높은 음을 아주 작게

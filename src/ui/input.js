@@ -22,8 +22,10 @@ function scrollableX(el) {
   return null;
 }
 
-// 당겨 넘기기: 이만큼(px) 위아래로 끌면 놓는 순간 넘어간다 — 빠르게 튕기지 않아도
+// 당겨 넘기기: 이만큼(px) 위아래로 끌면 놓는 순간 넘어간다 — 빠르게 튕기지 않아도(마우스는 조금 더)
 const PULL = 46;
+const MOUSE_PULL = 64;
+const html = document.documentElement;
 
 export function createInput({ next, prev, first, last, isBlocked, onKey, onPull, pullLabel }) {
   let acc = 0;
@@ -80,7 +82,13 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
   const endPull = () => {
     if (!pull) return;
     pull = null;
+    html.classList.remove('is-pulling');
     onPull?.(null);
+  };
+  const setPull = (st) => {
+    pull = st;
+    html.classList.add('is-pulling'); // 덱 · 카메라 돌리기가 이 끌기를 가로채지 않게
+    onPull?.(st);
   };
   addEventListener(
     'touchstart',
@@ -111,12 +119,56 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
       const label = pullLabel?.(dir);
       if (!label) return endPull();
       const p = (Math.abs(dy) - 12) / (PULL - 12);
-      pull = { dir, p, armed: Math.abs(dy) >= PULL, label };
-      onPull?.(pull);
+      setPull({ dir, p, armed: Math.abs(dy) >= PULL, label });
     },
     { passive: true }
   );
   addEventListener('touchcancel', endPull, { passive: true });
+
+  // 마우스로 끌어 넘기기: 화면을 잡고 위로 끌어 올리면 다음 장면(아래로 넘기기), 끌어내리면 이전 — 손가락과 같다.
+  // 링크 · 버튼 · 위아래 막대 · 알림 · 크레딧 · 페이지에서 시작한 끌기, 스크롤할 내용이 남은 패널은 그대로 둔다
+  let md = null;
+  // 덱의 카드(링크)에서 시작한 끌기는 받는다 — 그냥 누르면 카드가 열리고, 끌었으면 클릭을 삼킨다
+  const noDrag = (el) => !!el?.closest?.('a:not(.r-card), button, input, textarea, select, label, .guide-toast, .credits, .hud-top, .hud-bottom, .index, .lightbox, .page, .sound-hint, .skip');
+  // 끈 뒤에 따라오는 클릭(카드 열기 등)은 삼킨다
+  const swallowClick = () => {
+    const stop = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+    };
+    addEventListener('click', stop, { capture: true, once: true });
+    setTimeout(() => removeEventListener('click', stop, true), 0);
+  };
+  const endMouse = () => {
+    const m = md;
+    md = null;
+    const st = pull;
+    endPull();
+    if (!m) return;
+    if (m.moved) swallowClick();
+    if (st?.armed && !isBlocked()) fire(st.dir, 900);
+  };
+  addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0 || isBlocked() || noDrag(e.target)) return;
+    md = { x: e.clientX, y: e.clientY, el: e.target, moved: false, couldScroll: { 1: !!scrollableAncestor(e.target, 1), '-1': !!scrollableAncestor(e.target, -1) } };
+  });
+  addEventListener('pointermove', (e) => {
+    if (!md || e.pointerType !== 'mouse') return;
+    if (!(e.buttons & 1)) return endMouse();
+    const dx = e.clientX - md.x;
+    const dy = e.clientY - md.y;
+    if (Math.hypot(dx, dy) > 6) md.moved = true;
+    // 덱을 옆으로 끄는 중이면 덱에 맡긴다
+    if (md.el.closest?.('.deck-stage')?.classList.contains('is-dragging')) return endPull();
+    if (Math.abs(dy) < 12 || Math.abs(dy) < Math.abs(dx) * 1.2) return endPull();
+    const dir = dy < 0 ? 1 : -1;
+    if (md.couldScroll[dir]) return endPull();
+    const label = pullLabel?.(dir);
+    if (!label) return endPull();
+    setPull({ dir, p: (Math.abs(dy) - 12) / (MOUSE_PULL - 12), armed: Math.abs(dy) >= MOUSE_PULL, label });
+  });
+  addEventListener('pointerup', (e) => e.pointerType === 'mouse' && md && endMouse());
+  addEventListener('pointercancel', () => md && endMouse());
   addEventListener(
     'touchend',
     (e) => {
