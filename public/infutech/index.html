@@ -7,7 +7,14 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="INFUTECH — 기존 링거폴대에 거는 무게센서 모듈로 입원 동물의 수액을 24시간 기록·감지하는 AIoT 솔루션, INFU RETRO 발표 자료">
 <meta name="theme-color" content="#F4EDE3">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="media/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script>
+  // phones and tablets held upright show the deck turned sideways, like a video player in landscape
+  if (matchMedia('(orientation: portrait) and (pointer: coarse)').matches) document.documentElement.classList.add('rot');
   // media/ and fonts/ are relative: served as /infutech (no slash) they would resolve from the site root
   if (/\/infutech$/.test(location.pathname)) location.replace(location.pathname + '/' + location.search + location.hash);
 </script>
@@ -19,9 +26,9 @@
   font-display: swap;
 }
 
-/* Layout: a 16:9 stage (1em = 1/96 of its width) on full-bleed slide grounds. Content slides sit on a warm
-   espresso ground with one centred headline each; the cover and the close are cream. Portrait and short
-   screens reflow every slide into a vertically scrolling card. */
+/* Layout: a 16:9 stage (1em = 1/96 of its width) on full-bleed slide grounds, the same on every screen like a
+   slide viewer. On a phone or tablet held upright the whole viewer is turned a quarter turn (html.rot) so the
+   stage uses the long side of the screen; turning the device sideways then shows it upright. */
 :root {
   /* espresso ground */
   --g1: #221913;
@@ -66,6 +73,9 @@
   color-scheme: dark;
 }
 @supports (height: 100dvh) { :root { --vh: 100dvh; } }
+html.rot { --vw: 100vh; --vh: 100vw; }
+@supports (height: 100dvh) { html.rot { --vw: 100dvh; } }
+html.rot body { position: fixed; top: 0; left: 0; width: var(--vw); height: var(--vh); transform-origin: 0 0; transform: translateX(100vw) rotate(90deg); }
 /* Content slides and the control bar run on a light linen ground; the 3 a.m. photo scene, the overlays
    (contents, notes, lightbox) and the control bar over that scene keep the dark espresso tokens above. */
 .slide:not(.photo), .chrome {
@@ -821,7 +831,7 @@ small { font-size: .8em; }
 .notes {
   position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 25;
   transform: translateX(-50%);
-  width: min(780px, calc(100vw - 32px)); max-height: 40vh; overflow-y: auto;
+  width: min(780px, calc(var(--vw) - 32px)); max-height: calc(var(--vh) * .4); overflow-y: auto;
   padding: 18px 22px; border-radius: 14px;
   background: var(--panel-2); color: var(--cream); border: 1px solid var(--line);
   box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
@@ -833,13 +843,13 @@ small { font-size: .8em; }
 
 .lightbox { display: grid; place-items: center; cursor: zoom-out; }
 .lightbox figure { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); }
-.lightbox img { max-width: min(92vw, 1400px); max-height: 82vh; width: auto; height: auto; border-radius: 8px; background: #FFFFFF; }
+.lightbox img { max-width: min(calc(var(--vw) * .92), 1400px); max-height: calc(var(--vh) * .82); width: auto; height: auto; border-radius: 8px; background: #FFFFFF; }
 .lightbox figcaption { font-size: 14px; color: var(--cream-2); text-align: center; max-width: 720px; }
 .black { position: fixed; inset: 0; z-index: 40; background: #000000; cursor: none; }
 .toast {
   position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 26;
   transform: translate(-50%, 8px); opacity: 0; pointer-events: none;
-  max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: 99px;
+  max-width: calc(var(--vw) - 32px); padding: 10px 16px; border-radius: 99px;
   background: var(--panel-2); color: var(--cream); border: 1px solid var(--line); font: 600 13px/1.4 var(--font); text-align: center;
   transition: opacity .35s, transform .35s;
 }
@@ -847,129 +857,12 @@ small { font-size: .8em; }
 .toast kbd { font: inherit; color: var(--honey); }
 .deck.hide-cursor, .deck.hide-cursor * { cursor: none !important; }
 
-/* ================= portrait & short screens: every slide becomes a scrolling card ================= */
-@media (max-aspect-ratio: 1/1), (max-height: 520px) {
-  .frame {
-    left: 0; top: 0; width: 100%; height: 100%;
-    transform: translateX(var(--dx));
-    font-size: clamp(13.5px, 3.7vw, 17px);
-    display: block; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
-    padding: calc(22px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(96px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
-  }
-  .slide:not(.light):not(.photo) .frame::before, .slide:not(.light):not(.photo) .frame::after { display: none; }
-  [data-step]:not(.in), [data-step][data-dim]:not(.in) { opacity: 1; transform: none; filter: none; }
-  .scribble path { stroke-dashoffset: 0; }
-  .h { font-size: 1.62em; }
-  .lede { font-size: 1em; }
-  .bd { margin-top: 1.3em; }
-  .ft { margin-top: 1.4em; }
-  .take { font-size: 1.1em; }
-  .g { grid-template-columns: 1fr; }
-  .ph { height: 14em; }
-  .plot { flex: none; height: 11em; }
-
-  .topline { flex-direction: column; gap: .3em; }
-  .cover-photo { position: relative; left: auto; right: auto; top: auto; bottom: auto; height: 34vh; min-height: 200px; margin: calc(-22px - env(safe-area-inset-top, 0px)) calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 1.4em calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
-  .s-cover .topline { margin-bottom: 1em; }
-  .cover-text { width: auto; }
-  .cover-ttl { font-size: 2.5em; }
-  .eyebrow { font-size: 1.05em; }
-  .cover-desc { font-size: 1em; }
-  .cover-module { left: auto; right: 16px; top: calc(max(34vh, 200px) - 6.6em); width: 7.6em; }
-  .cover-module figcaption { display: none; }
-  .s-end .frame { display: flex; flex-direction: column; }
-  .end-ttl { font-size: 3.4em; }
-  .end-sub { font-size: 1.2em; }
-  .end-module { width: 8em; height: 8em; }
-
-  .s-night .shade { background: rgba(12, 8, 6, .76); }
-  .scene { width: auto; margin: 3em 0 2em; gap: 1.1em; }
-  .scene-ttl { font-size: 2em; }
-  .scene-sub { font-size: 1.25em; }
-  .scene-src { position: static; display: block; }
-  .gaps { flex-wrap: wrap; }
-  .hook { padding: 2.5em 0 1.5em; }
-  .big { font-size: 5.4em; }
-  .big-sub { font-size: 1.3em; }
-  .watch-band { grid-template-columns: 1fr; gap: 1em; padding: 1.2em; }
-  .watch-band p { font-size: 1.1em; }
-  .dots { width: 100%; max-width: 18em; }
-  .hook2 { grid-template-columns: 1fr; }
-  .pet { height: 16em; }
-  .rate2 .num { font-size: 3em; }
-  .field { grid-template-columns: 1fr; }
-  .mosaic { height: 22em; }
-  .mosaic .ph { height: auto; }
-  .proof { grid-template-columns: 1fr; }
-  .proof .ip { padding-left: 0; border-left: 0; padding-top: .8em; border-top: 1px solid var(--line); }
-  .docpage { height: 26em; }
-  .next { flex-wrap: wrap; }
-  .next .more { margin-left: 0; }
-  .lims { grid-template-columns: 1fr; }
-  .sx { grid-template-columns: 1fr; }
-  .sx-arr { justify-self: center; transform: rotate(90deg); }
-  .sx-ph { flex: none; height: 14em; }
-  .sx-pcb { flex: none; }
-  .sx-pcb .ph { height: 9em; }
-  .proof2 { grid-template-columns: 1fr; }
-  .reg-ph, .rs-ph { flex: none; height: 12em; }
-  .lv-ph { flex: none; height: 13em; }
-  .evi { grid-template-columns: 1fr; }
-  .s-impact .ft { width: auto; }
-  .vs2 p { grid-template-columns: 1fr 5.4em; }
-  .vs2 span { grid-column: 1 / -1; }
-  .kpi .num { font-size: 2.1em; }
-  .rg { grid-template-columns: 1fr; }
-  .rg-arr { justify-self: center; transform: rotate(90deg); }
-  .rg-fork { grid-template-rows: none; }
-  .rg-verdict { flex-direction: column; align-items: flex-start; gap: .7em; }
-  .proof .paper img { height: 3.6em; }
-  .lim-grp { display: none; }
-  .needs ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6em; }
-  .sol { grid-template-columns: 1fr; }
-  .callouts.l { text-align: left; }
-  .hero { height: auto; padding: 1em 0; }
-  .hero .disc { width: 13em; }
-  .flow { grid-template-columns: 1fr; }
-  .flow .arr { justify-self: center; transform: rotate(90deg); }
-  .pp-wrap { grid-template-columns: 1fr; gap: 1.2em; }
-  .pp { height: 26em; }
-  .pf { flex-wrap: wrap; }
-  .pf-curve { width: 100%; height: 8em; }
-  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .stat .num { font-size: 3.2em; }
-  .kpi { grid-template-columns: 5.6em 1fr; }
-  .kpi .num { font-size: 2.2em; }
-  .cmp { min-width: 40em; height: auto; }
-  .edge { grid-template-columns: 1fr; }
-  .mini .num { font-size: 2.2em; }
-  .cmpbar { grid-template-columns: 5.2em 1fr; }
-  .deal .ph, .deal .doc { flex: none; height: 15em; }
-  .tiers { min-height: 20em; }
-  .road { grid-template-columns: 1fr; }
-  .impact-photo { position: relative; left: auto; right: auto; top: auto; bottom: auto; height: 30vh; min-height: 190px; border-radius: .9em; margin-top: 1.4em; }
-  .impact-photo::after { display: none; }
-  .s-impact .lab, .s-impact .h, .s-impact .bd { width: auto; }
-  .who3 li { grid-template-columns: 2.8em 1fr; }
-  .who3 .ico { width: 2.8em; height: 2.8em; grid-row: span 2; }
-  .who3 .m { text-align: left; grid-column: 2; }
-  .teams { grid-template-columns: 1fr; }
-  .members { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .avatar { width: 6em; height: 6em; }
-  .pipe { grid-template-columns: 1fr; }
-  .pipe .arr { justify-self: center; transform: rotate(90deg); }
-  .spec { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .shot .ph { flex: none; }
-
+/* small stages (phones): a slimmer control bar */
+@media (max-height: 520px), (max-width: 520px) {
   .where { display: none; }
-  .chrome { gap: 10px; padding-top: 10px; background: var(--scrim); }
+  .chrome { gap: 10px; padding-top: 18px; }
   .count { margin-right: 2px; }
-  .ctl button { width: 36px; height: 36px; }
-  .ctl .fs { display: none; }
-}
-@media (max-width: 420px) {
-  .ctl .nt { display: none; }
-  .timer .pace { display: none; }
+  .ctl button { width: 34px; height: 34px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2022,7 +1915,12 @@ small { font-size: .8em; }
   const $ = (q, r = document) => r.querySelector(q);
   const deck = $('#deck');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-  const reflow = matchMedia('(max-aspect-ratio: 1/1), (max-height: 520px)');
+  const turned = matchMedia('(orientation: portrait) and (pointer: coarse)');
+  const isRot = () => document.documentElement.classList.contains('rot');
+  // screen point -> point on the (possibly turned) viewer, and the viewer's width
+  const local = (x, y) => isRot() ? { x: y, y: innerWidth - x } : { x, y };
+  const viewW = () => isRot() ? innerHeight : innerWidth;
+  turned.addEventListener?.('change', () => { document.documentElement.classList.toggle('rot', turned.matches); setTimeout(drawCharts, 60); });
   const pad = n => String(n).padStart(2, '0');
   const mmss = sec => `${Math.floor(sec / 60)}:${pad(Math.floor(sec % 60))}`;
 
@@ -2094,9 +1992,8 @@ small { font-size: .8em; }
   // ---- navigation ----
   let cur = -1, step = 0;
   function setStep(s, n) {
-    const all = reflow.matches;
-    s._steps.forEach(el => el.classList.toggle('in', all || +el.dataset.step <= n));
-    if (!all && n > 0) s._steps.filter(el => +el.dataset.step === n).forEach(el => el.querySelectorAll('[data-count]').forEach(countUp));
+    s._steps.forEach(el => el.classList.toggle('in', +el.dataset.step <= n));
+    if (n > 0) s._steps.filter(el => +el.dataset.step === n).forEach(el => el.querySelectorAll('[data-count]').forEach(countUp));
   }
   function go(n, opts = {}) {
     n = Math.max(0, Math.min(total - 1, n));
@@ -2119,12 +2016,12 @@ small { font-size: .8em; }
   }
   function next() {
     const s = slides[cur];
-    if (!reflow.matches && step < s._max) { step++; setStep(s, step); return; }
+    if (step < s._max) { step++; setStep(s, step); return; }
     go(cur + 1);
   }
   function prev() {
     const s = slides[cur];
-    if (!reflow.matches && step > 0) { step--; setStep(s, step); return; }
+    if (step > 0) { step--; setStep(s, step); return; }
     go(cur - 1, { atEnd: true });
   }
 
@@ -2227,7 +2124,7 @@ small { font-size: .8em; }
   function toggleFs() {
     if (!document.fullscreenEnabled) return;
     const p = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-    p?.catch?.(() => {});
+    p?.then?.(() => { if (document.fullscreenElement) screen.orientation?.lock?.('landscape').catch(() => {}); }).catch(() => {});
   }
   fsBtn.addEventListener('click', toggleFs);
   document.addEventListener('fullscreenchange', () => fsBtn.setAttribute('aria-pressed', document.fullscreenElement ? 'true' : 'false'));
@@ -2260,8 +2157,8 @@ small { font-size: .8em; }
         break;
       case 'ArrowRight': case 'PageDown': next(); e.preventDefault(); break;
       case 'ArrowLeft': case 'PageUp': case 'Backspace': prev(); e.preventDefault(); break;
-      case 'ArrowDown': if (!reflow.matches) { next(); e.preventDefault(); } break;
-      case 'ArrowUp': if (!reflow.matches) { prev(); e.preventDefault(); } break;
+      case 'ArrowDown': next(); e.preventDefault(); break;
+      case 'ArrowUp': prev(); e.preventDefault(); break;
       case ' ': if (onControl) return; e.shiftKey ? prev() : next(); e.preventDefault(); break;
       case 'Home': go(0); e.preventDefault(); break;
       case 'End': go(mainCount - 1); e.preventDefault(); break;
@@ -2277,21 +2174,21 @@ small { font-size: .8em; }
 
   // ---- pointer: click or tap advances on the stage ----
   let down = null, lastType = 'mouse';
-  deck.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; lastType = e.pointerType; });
+  deck.addEventListener('pointerdown', e => { down = local(e.clientX, e.clientY); lastType = e.pointerType; });
   deck.addEventListener('click', e => {
     const z = e.target.closest('[data-zoom]');
     if (z) { openLightbox(z); return; }
-    if (reflow.matches || e.button !== 0) return;
+    if (e.button !== 0) return;
     if (e.target.closest('a, button, video, input, label, table, .tbl')) return;
-    if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6) return;
+    const p = local(e.clientX, e.clientY);
+    if (down && Math.hypot(p.x - down.x, p.y - down.y) > 6) return;
     if (!getSelection().isCollapsed) return;
-    if (lastType === 'touch' && e.clientX < innerWidth * .3) prev(); else next();
+    if (lastType === 'touch' && p.x < viewW() * .3) prev(); else next();
   });
 
   // ---- wheel (stage only): one notch, one step ----
   let wheelLock = false, wheelAcc = 0, wheelTimer;
   deck.addEventListener('wheel', e => {
-    if (reflow.matches) return;
     const scroller = e.target.closest('.tbl');
     if (scroller && scroller.scrollWidth > scroller.clientWidth && Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     e.preventDefault();
@@ -2307,13 +2204,13 @@ small { font-size: .8em; }
   deck.addEventListener('touchstart', e => {
     if (e.touches.length !== 1) { ts = null; return; }
     const t = e.touches[0];
-    ts = { x: t.clientX, y: t.clientY, at: Date.now(), inScroller: !!e.target.closest('.tbl') };
+    ts = { ...local(t.clientX, t.clientY), at: Date.now(), inScroller: !!e.target.closest('.tbl') };
   }, { passive: true });
   deck.addEventListener('touchend', e => {
     if (!ts) return;
-    const t = e.changedTouches[0], dx = t.clientX - ts.x, dy = t.clientY - ts.y, quick = Date.now() - ts.at < 900;
+    const t = e.changedTouches[0], p = local(t.clientX, t.clientY), dx = p.x - ts.x, dy = p.y - ts.y, quick = Date.now() - ts.at < 900;
     if (quick && !ts.inScroller && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) { dx < 0 ? go(cur + 1) : go(cur - 1); }
-    else if (quick && !reflow.matches && Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx) * 1.4) { dy < 0 ? next() : prev(); }
+    else if (quick && Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx) * 1.4) { dy < 0 ? next() : prev(); }
     ts = null;
   }, { passive: true });
 
@@ -2322,7 +2219,6 @@ small { font-size: .8em; }
   function wake() {
     chrome.classList.remove('idle'); deck.classList.remove('hide-cursor');
     clearTimeout(idleTimer);
-    if (reflow.matches) return;
     idleTimer = setTimeout(() => {
       if (chrome.matches(':hover') || chrome.contains(document.activeElement) || !toc.hidden) return wake();
       chrome.classList.add('idle'); deck.classList.add('hide-cursor');
@@ -2331,7 +2227,6 @@ small { font-size: .8em; }
   addEventListener('mousemove', wake, { passive: true });
   addEventListener('touchstart', wake, { passive: true });
   chrome.addEventListener('focusin', wake);
-  reflow.addEventListener?.('change', () => { const s = slides[cur]; setStep(s, step); wake(); });
 
   // ---- start ----
   function fromHash() {
@@ -2343,8 +2238,8 @@ small { font-size: .8em; }
   go(fromHash(), { quiet: true });
   timer.started = false; timer.running = false; tick();
   wake();
-  setTimeout(() => say(reflow.matches
-    ? '옆으로 밀어 넘기고, 위아래로 스크롤해 읽습니다'
+  setTimeout(() => say(matchMedia('(pointer: coarse)').matches
+    ? (isRot() ? '휴대폰을 가로로 돌려 보세요 · 탭하거나 밀어서 넘깁니다' : '탭하거나 밀어서 넘깁니다 · 왼쪽을 탭하면 이전 장')
     : '<kbd>→</kbd> · <kbd>Space</kbd> · 클릭으로 넘기기 · <kbd>N</kbd> 발표 노트 · <kbd>T</kbd> 타이머 · <kbd>O</kbd> 목차', 4200), 900);
 })();
 </script>
