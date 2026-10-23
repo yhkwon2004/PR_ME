@@ -332,28 +332,28 @@ small { font-size: .8em; }
 .lim .x span { font-size: .9em; color: var(--mute); }
 .lim .why { display: flex; align-items: flex-start; gap: .45em; padding-top: .75em; border-top: 1px dashed var(--line); font-size: .92em; line-height: 1.45; color: var(--cream-2); }
 .lim .why .ico { width: 1.05em; height: 1.05em; margin-top: .2em; color: var(--alert); stroke-width: 2.4; }
-/* small diagrams, one per card */
-.lv { flex: 1; min-height: 6.8em; display: flex; flex-direction: column; justify-content: center; gap: .55em; padding: .9em 1em; border-radius: .7em; background: var(--panel-2); }
-.lv-log { gap: .75em; }
-.lv-log p { display: grid; grid-template-columns: 3.3em 1fr 1.3em; align-items: center; gap: .6em; padding-bottom: .5em; border-bottom: 1px dashed #DACBB9; font-size: 1.15em; font-variant-numeric: tabular-nums; }
-.lv-log span { font-weight: 650; color: var(--mute); }
-.lv-log b { font-weight: 700; color: var(--cream-2); }
-.lv-log b.blank { color: #CDBDAA; }
-.lv-log .ico { width: 1.25em; height: 1.25em; color: var(--sage); stroke-width: 2; }
-.lv-log i { font-style: normal; font-weight: 850; text-align: center; color: var(--alert); }
-.rl { display: flex; align-items: center; padding: 0 .4em 1.6em; }
-.rl .pt { position: relative; width: 1.25em; height: 1.25em; flex: none; border-radius: 50%; background: var(--honey); box-shadow: 0 0 0 .28em rgba(173, 98, 41, .14); }
-.rl .gap { position: relative; flex: 1; height: .65em; margin: 0 .35em; border-radius: 99em; background: repeating-linear-gradient(135deg, rgba(208, 78, 45, .6) 0 .3em, rgba(208, 78, 45, .16) .3em .6em); }
-.rl em { position: absolute; top: calc(100% + .55em); left: 50%; transform: translateX(-50%); white-space: nowrap; font-style: normal; font-size: .88em; font-weight: 720; color: var(--mute); }
-.rl .gap em { color: var(--alert); }
-.pumps { display: flex; justify-content: center; gap: .25em; color: var(--honey); }
-.pumps .ico { width: 2.9em; height: 2.9em; stroke-width: 1.3; }
-.lv-pumps p, .lv-round p.cap2 { font-size: 1em; font-weight: 650; text-align: center; color: var(--cream-2); }
-.lv-pumps p b { color: var(--cream); }
-.lv-sens { flex-direction: row; flex-wrap: wrap; align-content: center; gap: .4em; }
-.lv-sens span { display: inline-flex; align-items: center; gap: .35em; padding: .35em .7em; border-radius: 99em; background: #FFFFFF; border: 1px dashed #D9CBBA; font-size: 1em; font-weight: 680; color: var(--cream-2); }
-.lv-sens .ico { width: 1.45em; height: 1.45em; color: var(--mute); stroke-width: 1.5; }
-.lv-sens p { flex-basis: 100%; margin-top: .3em; font-size: 1em; font-weight: 650; text-align: center; color: var(--cream-2); }
+/* a picture per card: photos for the people, drawings for the equipment */
+.lv-ph { position: relative; flex: 1; min-height: 10em; margin: 0; border-radius: .7em; overflow: hidden; background: var(--panel-2); }
+.lv-ph > img, .lv-ph > .ill { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.lv-ph > .ill { padding: .4em; }
+.ill text { font-family: var(--font); font-size: 11px; font-weight: 700; fill: #5B4B3F; }
+.ov { position: absolute; left: .6em; right: .6em; bottom: .6em; padding: .55em .75em; border-radius: .55em; background: rgba(255, 255, 255, .93); box-shadow: 0 .4em 1.2em rgba(42, 31, 24, .2); }
+.ov-dark { background: rgba(18, 13, 10, .74); box-shadow: none; }
+.ov-tag { left: auto; top: .6em; bottom: auto; font-size: .86em; font-weight: 700; color: var(--cream-2); }
+.ov-tag b { color: var(--alert); }
+.ov-log { display: grid; gap: .3em; }
+.ov-log p { display: grid; grid-template-columns: 3em 1fr 1.1em; align-items: center; gap: .5em; padding-bottom: .3em; border-bottom: 1px dashed #DACBB9; font-size: .84em; font-variant-numeric: tabular-nums; }
+.ov-log p:last-child { padding-bottom: 0; border-bottom: 0; }
+.ov-log span { font-weight: 650; color: var(--mute); }
+.ov-log b { font-weight: 700; color: var(--cream-2); }
+.ov-log b.blank { color: #CDBDAA; }
+.ov-log .ico { width: 1.1em; height: 1.1em; color: var(--sage); stroke-width: 2; }
+.ov-log i { font-style: normal; font-weight: 850; text-align: center; color: var(--alert); }
+.rl { display: flex; align-items: center; padding: 0 .3em 1.4em; }
+.rl .pt { position: relative; width: 1em; height: 1em; flex: none; border-radius: 50%; background: #E3BC8C; box-shadow: 0 0 0 .25em rgba(227, 188, 140, .22); }
+.rl .gap { position: relative; flex: 1; height: .55em; margin: 0 .3em; border-radius: 99em; background: repeating-linear-gradient(135deg, rgba(240, 120, 88, .85) 0 .3em, rgba(240, 120, 88, .25) .3em .6em); }
+.rl em { position: absolute; top: calc(100% + .5em); left: 50%; transform: translateX(-50%); white-space: nowrap; font-style: normal; font-size: .8em; font-weight: 720; color: #CFC2B3; }
+.rl .gap em { color: #F59A7C; }
 .needs { display: grid; gap: .55em; }
 .needs-l { font-size: .86em; font-weight: 760; letter-spacing: .04em; color: var(--honey); }
 .needs ul { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; }
@@ -383,9 +383,6 @@ small { font-size: .8em; }
 .th img { width: 100%; height: 100%; object-fit: cover; }
 .light-th { background: #FFFFFF; }
 .light-th img { object-fit: cover; object-position: 50% 50%; transform: scale(1.6); transform-origin: 44% 55%; }
-.spark-th svg { width: 100%; height: 100%; display: block; }
-.spark-th .rawd { fill: none; stroke: #B3A293; stroke-width: 2.2; stroke-linecap: round; }
-.spark-th .kal { fill: none; stroke: var(--honey); stroke-width: 1.6; }
 .co .k { font-size: .8em; font-weight: 750; letter-spacing: .05em; color: var(--honey); }
 .co b { display: block; margin-top: .25em; font-size: 1.2em; letter-spacing: -.015em; }
 .co span { display: block; margin-top: .3em; font-size: .9em; color: var(--cream-2); line-height: 1.5; }
@@ -420,13 +417,8 @@ small { font-size: .8em; }
 .sx-pair li { display: inline-flex; align-items: center; gap: .4em; padding: .35em .8em; border-radius: 99em; background: rgba(173, 98, 41, .1); color: var(--honey); font-size: .86em; font-weight: 750; }
 .sx-pair li .ico { width: 1.3em; height: 1.3em; }
 .sx-pair .plus { color: var(--mute); font-weight: 700; }
-.sx-sig { display: grid; gap: .25em; padding: .55em .8em; border-radius: .6em; background: var(--panel-2); }
-.sx-sig p { display: grid; grid-template-columns: 4.3em 1fr; align-items: center; gap: .6em; height: 2.4em; }
-.sx-sig span { font-size: .76em; font-weight: 700; color: var(--mute); }
-.sx-sig svg { width: 100%; height: 100%; display: block; overflow: visible; }
-.sx-sig polyline { fill: none; stroke-width: 1.5; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-.sx-sig .gy { stroke: var(--sage); }
-.sx-sig .dv { stroke: var(--honey); }
+.sx-fig { margin: 0; padding: .35em .4em .2em; border-radius: .6em; background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
+.sx-fig img { width: 100%; height: auto; }
 .sx-out { font-size: 1.02em; font-weight: 720; line-height: 1.45; }
 .sx-out em { font-weight: 800; }
 .sx-pcb { flex: 1; min-height: 0; display: grid; grid-template-rows: 1fr 1fr; gap: .5em; }
@@ -453,36 +445,8 @@ small { font-size: .8em; }
 .chap button[aria-current="true"] { background: var(--panel-2); border-color: var(--honey); }
 
 /* ================= 8 data (simulation) ================= */
-.sims { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: .8em; }
-.sim { display: flex; flex-direction: column; gap: .5em; padding: 1em .95em .9em; }
-.sim-h { display: flex; justify-content: space-between; align-items: center; gap: .5em; }
-.sim-h b { font-size: .98em; letter-spacing: -.01em; }
-.sim-h .chip { font-size: .7em; padding: .25em .7em; }
-.sim svg { width: 100%; height: auto; flex: 1; min-height: 0; overflow: visible; }
-.sim svg text { font-family: var(--font); font-size: 10.5px; fill: var(--mute); font-variant-numeric: tabular-nums; }
-.sim svg .grid { stroke: #EFE7DC; stroke-width: 1; }
-.sim svg .axis { stroke: #D9CDBE; stroke-width: 1; }
-.sim svg .rawd { fill: none; stroke: #A39282; stroke-width: 2.6; stroke-linecap: round; opacity: .5; }
-.sim svg .kal { fill: none; stroke: var(--honey); stroke-width: 1.8; stroke-linejoin: round; }
-.sim svg .exp { fill: none; stroke: var(--cream-2); stroke-width: 1.1; stroke-dasharray: 4 3; opacity: .7; }
-.sim svg .thr { stroke: var(--alert); stroke-width: 1; stroke-dasharray: 3 3; }
-.sim svg .sc { fill: none; stroke: var(--cream); stroke-width: 1.4; stroke-linejoin: round; }
-.sim svg .sca { fill: rgba(208, 78, 45, .2); }
-.sim svg .band { fill: rgba(173, 98, 41, .06); }
-.sim svg .band.al { fill: rgba(208, 78, 45, .07); }
-.sim svg .mark { stroke: var(--alert); stroke-width: 1.2; }
-.sim svg .mark-t { fill: var(--alert); font-weight: 700; font-size: 11px; }
-.sim svg .thr-t { fill: var(--alert); font-size: 10px; }
-.sim svg .ttl { fill: var(--cream-2); font-weight: 650; font-size: 10px; }
-.sim-f { display: grid; grid-template-columns: 1fr 1fr; gap: .4em; padding-top: .55em; border-top: 1px solid var(--line); font-size: .78em; color: var(--mute); }
-.sim-f b { display: block; font-size: 1.35em; color: var(--cream); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
-.sim-f .al b { color: var(--alert); }
-.legend { display: flex; flex-wrap: wrap; justify-content: center; gap: .5em 1.8em; font-size: .82em; color: var(--cream-2); }
-.legend span { display: inline-flex; align-items: center; gap: .55em; }
-.legend i { display: inline-block; width: 1.8em; height: 0; border-top: 2px solid var(--honey); }
-.legend i.d { width: .5em; height: .5em; border: 0; border-radius: 50%; background: #A39282; }
-.legend i.e { border-top: 2px dashed var(--cream-2); }
-.legend i.t { border-top: 2px dashed var(--alert); }
+.simfig { flex: 1; min-height: 0; display: grid; place-items: center; padding: .7em .9em; }
+.simfig img { width: 100%; height: 100%; object-fit: contain; }
 
 /* ================= 9 results ================= */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; flex: 1.25; min-height: 0; }
@@ -897,7 +861,6 @@ small { font-size: .8em; }
   .field { grid-template-columns: 1fr; }
   .mosaic { height: 22em; }
   .mosaic .ph { height: auto; }
-  .sim svg { max-height: 24em; }
   .proof { grid-template-columns: 1fr; }
   .proof .ip { padding-left: 0; border-left: 0; padding-top: .8em; border-top: 1px solid var(--line); }
   .docpage { height: 26em; }
@@ -912,6 +875,7 @@ small { font-size: .8em; }
   .proof2 { grid-template-columns: 1fr; }
   .fan2 { height: 9em; width: 12em; }
   .reg-ph, .rs-ph { flex: none; height: 12em; }
+  .lv-ph { flex: none; height: 13em; }
   .evi { grid-template-columns: 1fr; }
   .s-impact .ft { width: auto; }
   .vs2 p { grid-template-columns: 1fr 5.4em; }
@@ -930,8 +894,8 @@ small { font-size: .8em; }
   .hero .disc { width: 13em; }
   .flow { grid-template-columns: 1fr; }
   .flow .arr { justify-self: center; transform: rotate(90deg); }
-  .sims { grid-template-columns: 1fr; }
-  .sim svg { flex: none; }
+  .simfig { overflow-x: auto; place-items: start; }
+  .simfig img { width: 62em; max-width: none; height: auto; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stat .num { font-size: 3.2em; }
   .kpi { grid-template-columns: 5.6em 1fr; }
@@ -1132,41 +1096,90 @@ small { font-size: .8em; }
         <div class="card lim b">
           <p class="tag">사람 · 기록</p>
           <h3>수기 투약 기록</h3>
-          <div class="lv lv-log" aria-hidden="true">
-            <p><span>22:00</span><b>120 mL</b><svg class="ico"><use href="#i-check"/></svg></p>
-            <p><span>01:00</span><b class="blank">—</b><i>?</i></p>
-            <p><span>04:00</span><b class="blank">—</b><i>?</i></p>
-          </div>
+          <figure class="lv-ph">
+            <img src="media/nurse-record.webp" alt="입원실 수액 옆에서 클립보드에 투약을 손으로 적는 모습" data-zoom decoding="async" style="object-position: 50% 70%">
+            <div class="ov ov-log" aria-hidden="true">
+              <p><span>22:00</span><b>120 mL</b><svg class="ico"><use href="#i-check"/></svg></p>
+              <p><span>01:00</span><b class="blank">—</b><i>?</i></p>
+              <p><span>04:00</span><b class="blank">—</b><i>?</i></p>
+            </div>
+          </figure>
           <p class="x"><b>19.5%</b><span>기록이 없을 때 분쟁 해결률</span></p>
           <p class="why"><svg class="ico"><use href="#i-x"/></svg>빈칸 · 사후 기록은 분쟁 근거가 못 됨</p>
         </div>
         <div class="card lim b">
           <p class="tag">사람 · 확인</p>
           <h3>정기 순회 확인</h3>
-          <div class="lv lv-round" aria-hidden="true">
-            <div class="rl"><i class="pt"><em>순회</em></i><i class="gap"><em>못 봄</em></i><i class="pt"><em>순회</em></i><i class="gap"><em>못 봄</em></i><i class="pt"><em>순회</em></i></div>
-            <p class="cap2">순회 사이는 아무도 보지 않는 시간</p>
-          </div>
+          <figure class="lv-ph">
+            <img src="media/scene-night.webp" alt="불 꺼진 새벽 입원실, 링거를 단 채 케이지에서 잠든 강아지" data-zoom decoding="async" style="object-position: 78% 50%">
+            <div class="ov ov-dark" aria-hidden="true">
+              <div class="rl"><i class="pt"><em>순회</em></i><i class="gap"><em>못 봄</em></i><i class="pt"><em>순회</em></i><i class="gap"><em>못 봄</em></i><i class="pt"><em>순회</em></i></div>
+            </div>
+          </figure>
           <p class="x"><b>71.8%</b><span>수의사 1명이 지키는 동물병원</span></p>
           <p class="why"><svg class="ico"><use href="#i-x"/></svg>그 사이의 빠짐 · 막힘 · 소진을 놓침</p>
         </div>
         <div class="card lim b">
           <p class="tag">장비 · 펌프</p>
           <h3>동물용 인퓨전펌프</h3>
-          <div class="lv lv-pumps" aria-hidden="true">
-            <div class="pumps"><svg class="ico"><use href="#i-pump"/></svg><svg class="ico"><use href="#i-pump"/></svg><svg class="ico"><use href="#i-pump"/></svg><svg class="ico"><use href="#i-pump"/></svg><svg class="ico"><use href="#i-pump"/></svg></div>
-            <p>입원장 5대 = <b>550만 원</b></p>
-          </div>
+          <figure class="lv-ph">
+            <svg class="ill" viewBox="0 0 300 190" preserveAspectRatio="xMidYMid meet" role="img" aria-label="링거폴대에 클램프로 고정한 인퓨전펌프 그림">
+              <rect width="300" height="190" fill="#F6EFE5"/>
+              <rect x="94" y="8" width="5" height="182" rx="2.5" fill="#BDAE9F"/>
+              <path d="M60 14H134" stroke="#BDAE9F" stroke-width="4" stroke-linecap="round"/>
+              <path d="M60 14v8" stroke="#BDAE9F" stroke-width="2"/>
+              <rect x="42" y="22" width="36" height="50" rx="8" fill="#FFFFFF" stroke="#CDBFAF" stroke-width="1.5"/>
+              <rect x="46" y="40" width="28" height="28" rx="5" fill="rgba(173,98,41,.18)"/>
+              <rect x="56" y="72" width="8" height="8" fill="#E6DBCD"/>
+              <rect x="55" y="82" width="10" height="15" rx="3" fill="#FFFFFF" stroke="#CDBFAF" stroke-width="1.2"/>
+              <path d="M60 97v12q0 12 12 12h48" fill="none" stroke="#CDBFAF" stroke-width="2"/>
+              <rect x="92" y="112" width="20" height="16" rx="3" fill="#8C7C6F"/>
+              <rect x="108" y="80" width="136" height="86" rx="12" fill="#FFFFFF" stroke="#CDBFAF" stroke-width="1.5"/>
+              <rect x="108" y="150" width="136" height="16" rx="0" fill="#EFE5D8"/>
+              <rect x="120" y="92" width="72" height="34" rx="5" fill="#2A1F18"/>
+              <text x="156" y="114" text-anchor="middle" style="fill:#F2C792;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums">120 mL/h</text>
+              <circle cx="210" cy="98" r="5" fill="#E2D6C7"/><circle cx="226" cy="98" r="5" fill="#E2D6C7"/>
+              <circle cx="210" cy="114" r="5" fill="#E2D6C7"/><circle cx="226" cy="114" r="5" fill="#E2D6C7"/>
+              <rect x="120" y="132" width="40" height="12" rx="6" fill="#4C8744"/>
+              <rect x="166" y="132" width="26" height="12" rx="6" fill="#D04E2D"/>
+              <path d="M226 166v24" stroke="#CDBFAF" stroke-width="2"/>
+            </svg>
+            <p class="ov ov-tag">입원장 5대 = <b>550만 원</b></p>
+          </figure>
           <p class="x"><b>110만 원</b><span>대당 판매가</span></p>
           <p class="why"><svg class="ico"><use href="#i-x"/></svg>입원장마다 두기엔 비싼 별도 장비</p>
         </div>
         <div class="card lim b">
           <p class="tag">장비 · 스마트 폴대</p>
           <h3>다중 센서 스마트 폴대</h3>
-          <div class="lv lv-sens" aria-hidden="true">
-            <span><svg class="ico"><use href="#i-scale"/></svg>무게</span><span><svg class="ico"><use href="#i-gyro"/></svg>자이로</span><span><svg class="ico"><use href="#i-move"/></svg>가속도</span><span><svg class="ico"><use href="#i-eye"/></svg>광학</span>
-            <p>흔들림을 센서 수로 잡는 구조</p>
-          </div>
+          <figure class="lv-ph">
+            <svg class="ill" viewBox="0 0 300 190" preserveAspectRatio="xMidYMid meet" role="img" aria-label="무게 · 자이로 · 가속도 · 광학 센서와 제어부를 단 스마트 폴대 그림">
+              <rect width="300" height="190" fill="#F6EFE5"/>
+              <rect x="147" y="12" width="6" height="160" rx="3" fill="#BDAE9F"/>
+              <path d="M118 14H182" stroke="#BDAE9F" stroke-width="4" stroke-linecap="round"/>
+              <path d="M110 184l40-12 40 12" fill="none" stroke="#BDAE9F" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="110" cy="185" r="3.5" fill="#8C7C6F"/><circle cx="190" cy="185" r="3.5" fill="#8C7C6F"/>
+              <rect x="122" y="16" width="14" height="8" rx="2" fill="#AD6229"/>
+              <rect x="111" y="26" width="36" height="46" rx="8" fill="#FFFFFF" stroke="#CDBFAF" stroke-width="1.5"/>
+              <rect x="115" y="42" width="28" height="27" rx="5" fill="rgba(173,98,41,.18)"/>
+              <rect x="124" y="72" width="10" height="16" rx="3" fill="#FFFFFF" stroke="#CDBFAF" stroke-width="1.2"/>
+              <rect x="120" y="76" width="4" height="9" rx="1.5" fill="#AD6229"/>
+              <path d="M129 88v86" stroke="#CDBFAF" stroke-width="2"/>
+              <rect x="143" y="98" width="14" height="14" rx="3" fill="#AD6229"/>
+              <rect x="143" y="122" width="14" height="14" rx="3" fill="#AD6229"/>
+              <rect x="138" y="148" width="24" height="16" rx="3" fill="#8C7C6F"/>
+              <g stroke="#AD6229" stroke-width="1.2" fill="none">
+                <path d="M136 20H196"/><path d="M120 80H90"/><path d="M157 105H196"/><path d="M143 129H90"/><path d="M162 156H196"/>
+              </g>
+              <g>
+                <rect x="196" y="11" width="52" height="18" rx="9" fill="#FFFFFF" stroke="#E2BF98"/><text x="222" y="24" text-anchor="middle">무게</text>
+                <rect x="38" y="71" width="52" height="18" rx="9" fill="#FFFFFF" stroke="#E2BF98"/><text x="64" y="84" text-anchor="middle">광학</text>
+                <rect x="196" y="96" width="58" height="18" rx="9" fill="#FFFFFF" stroke="#E2BF98"/><text x="225" y="109" text-anchor="middle">자이로</text>
+                <rect x="32" y="120" width="58" height="18" rx="9" fill="#FFFFFF" stroke="#E2BF98"/><text x="61" y="133" text-anchor="middle">가속도</text>
+                <rect x="196" y="147" width="74" height="18" rx="9" fill="#FFFFFF" stroke="#E2BF98"/><text x="233" y="160" text-anchor="middle">제어 · 통신</text>
+              </g>
+            </svg>
+          </figure>
           <p class="x"><b>100만 원+</b><span>제작비</span></p>
           <p class="why"><svg class="ico"><use href="#i-x"/></svg>센서를 더할수록 비싸지고, 폴대째 바꿔야 함</p>
         </div>
@@ -1181,7 +1194,7 @@ small { font-size: .8em; }
         </ul>
       </div>
     </div>
-    <div class="ft"><p class="src b">출처: 한국소비자원(2026.9) · 수의미래연구소 집계(농식품부 자료, 2025.6 — 전국 동물병원 5,312곳 중 1인 병원 3,815곳) · SW Medi 동물용 인퓨전펌프 판매가(2025) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 기록지 · 순회 그림은 이해를 돕는 예시</p></div>
+    <div class="ft"><p class="src b">출처: 한국소비자원(2026.9) · 수의미래연구소 집계(농식품부 자료, 2025.6 — 전국 동물병원 5,312곳 중 1인 병원 3,815곳) · SW Medi 동물용 인퓨전펌프 판매가(2025) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 기록지 · 순회 표시와 장비 그림은 이해를 돕는 예시</p></div>
   </div>
   <div class="note" hidden><p>지금 병원은 사람과 장비로 이 공백을 메우려 합니다. 기록은 손으로 남기다 보니 빈칸과 사후 기록이 생기고, 기록이 없으면 분쟁 해결률은 19.5%에 그칩니다. 확인은 순회로 하지만, 전국 동물병원 열 곳 중 일곱 곳은 수의사 한 명이 지켜 순회와 순회 사이를 볼 사람이 없습니다.</p><p>장비로 풀려면 대당 110만 원 펌프를 입원장마다 들여야 하고, 스마트 폴대는 흔들림을 잡으려 자이로 · 가속도 센서를 더하느라 제작비만 100만 원을 넘습니다. 그래서 필요한 건 각각에 대한 답, 자동으로 남는 기록, 24시간 감지, 부담 없는 가격, 그리고 기존 폴대 그대로 쓰는 센서 하나입니다.</p></div>
 </section>
@@ -1224,7 +1237,7 @@ small { font-size: .8em; }
         </div>
         <div class="hero b"><div class="disc"><img src="media/module.webp" alt="INFU RETRO 실물 모듈 — 로드셀과 자체 PCB가 든 하우징, 아래에 수액백 후크" data-zoom></div></div>
         <div class="callouts">
-          <div class="card co b"><figure class="th spark-th" id="spark-filter" aria-label="흔들리는 원신호와 칼만필터 출력"></figure><div><p class="k">FILTER</p><b>칼만필터 흔들림 보정</b><span>움직임 · 폴대 이동 노이즈 제거</span></div></div>
+          <div class="card co b"><figure class="th"><img src="media/fig-filter.webp" alt="흔들리는 원신호(점)와 칼만필터 출력(선) — Python 그래프" data-zoom></figure><div><p class="k">FILTER</p><b>칼만필터 흔들림 보정</b><span>움직임 · 폴대 이동 노이즈 제거</span></div></div>
           <div class="card co b"><figure class="th light-th"><img src="media/cnn-curve.webp" alt="CNN 학습 곡선 — 손실 감소와 검증 정확도 수렴" data-zoom></figure><div><p class="k">AI</p><b>CNN 이상 판별</b><span>신호 패턴 분류 · 정확도 97.3%</span></div></div>
         </div>
       </div>
@@ -1261,8 +1274,8 @@ small { font-size: .8em; }
           <p class="sx-k">학습 단계<small>개발 장비에서만</small></p>
           <ul class="sx-pair"><li><svg class="ico"><use href="#i-scale"/></svg>무게센서</li><li class="plus">+</li><li><svg class="ico"><use href="#i-gyro"/></svg>자이로</li></ul>
           <figure class="ph sx-ph"><img src="media/field-bag.webp" alt="실제 수액백을 건 폴대에서 흔들림 데이터를 모으는 팀원" data-zoom decoding="async"><figcaption class="cap">모의 병실 · 실제 수액으로 데이터 수집</figcaption></figure>
-          <div class="sx-sig" id="sx-sig" role="img" aria-label="폴대가 흔들릴 때 자이로 신호와 무게 편차가 함께 움직이는 모습"></div>
-          <p class="sx-out">흔들림 ↔ 무게 편차를 학습 → <em>칼만필터 · CNN 보정</em></p>
+          <figure class="sx-fig"><img src="media/fig-gyro.webp" alt="학습 장비 신호 그래프 — 자이로 각속도, 같은 시각의 무게 편차(r = 0.95), 자이로로 보정한 뒤의 잔차(RMS 2.1 g → 0.5 g)" data-zoom></figure>
+          <p class="sx-out">흔들림 ↔ 무게 편차 학습 → 편차 <em>2.1 g → 0.5 g</em></p>
         </div>
         <svg class="ico sx-arr b" aria-hidden="true"><use href="#i-arrow"/></svg>
         <div class="card hi sx-prod b">
@@ -1278,7 +1291,7 @@ small { font-size: .8em; }
         </div>
       </div>
     </div>
-    <div class="ft"><p class="src b">※ 기존 스마트 폴대 제작비는 INFUTECH 시장조사 기준 · 자이로는 개발 · 학습 장비에만 달고 제품에는 넣지 않습니다 · 신호 그림은 흔들림 구간 모의 데이터</p></div>
+    <div class="ft"><p class="src b">※ 기존 스마트 폴대 제작비는 INFUTECH 시장조사 기준 · 자이로는 개발 · 학습 장비에만 달고 제품에는 넣지 않습니다 · 그래프는 Python(NumPy · Matplotlib)으로 계산한 학습 장비 모의 신호(20 Hz)</p></div>
   </div>
   <div class="note" hidden><p>핵심 기술입니다. 기존 스마트 폴대는 흔들림을 잡으려고 자이로, 가속도 같은 센서를 여러 개 넣습니다. 그래서 제작비만 100만 원을 넘기는 구성이 대부분입니다.</p><p>저희는 반대로 갔습니다. 학습할 때만 무게센서와 자이로를 함께 달아, 폴대가 흔들릴 때 무게가 얼마나 틀어지는지를 데이터로 모았고, 그 편차를 칼만필터와 CNN이 스스로 보정하도록 학습시켰습니다.</p><p>그래서 제품에는 무게센서 하나만 들어갑니다. 대당 원가 8만 원, 판별 정확도 97.3%입니다.</p></div>
 </section>
@@ -1316,10 +1329,9 @@ small { font-size: .8em; }
     <p class="lab b">Demo <span>상황별 판별 데이터</span></p>
     <h2 class="h b">흔들림은 걸러내고, <mark>진짜 이상</mark>만 알립니다</h2>
     <div class="bd">
-      <div class="sims" id="sims"></div>
-      <p class="legend b"><span><i class="d"></i>원신호 (1초 측정)</span><span><i></i>칼만필터</span><span><i class="e"></i>정상 유속 기대 추세</span><span><i class="t"></i>이상 점수 임계값 0.6</span></p>
+      <figure class="card simfig b"><img src="media/fig-sim.webp" alt="다섯 가지 입원 상황의 무게 신호와 이상 점수 그래프 — 정상 투여 최고 0.13 알림 없음, 이송 중 흔들림 최고 0.39 알림 없음, 유속 저하 최고 0.99 알림 31:07, 줄 빠짐 최고 0.98 알림 30:01, 공기 유입 · 역류 최고 0.89 알림 30:01" data-zoom></figure>
     </div>
-    <div class="ft"><p class="src b">※ 500 mL 수액 모의 신호 시뮬레이션 · 30분 시점에 상황 발생 · 위: 무게(g) · 아래: 이상 점수 · 기대 추세는 투여 초기 5분 감소량으로 산출</p></div>
+    <div class="ft"><p class="src b">※ Python(NumPy · Matplotlib)으로 계산 · 작도 — 500 mL 수액 모의 신호, 1초 측정 · 30분 시점에 상황 발생 · 기대 추세는 투여 초기 5분 감소량의 최소제곱 직선 · 코드 scripts/infutech-figures.py</p></div>
   </div>
   <div class="note" hidden><p>다섯 가지 입원 상황을 같은 조건으로 돌린 결과입니다. 위는 무게, 아래는 이상 점수입니다.</p><p>정상 투여와 이송 중 흔들림에서는 원신호가 크게 흔들려도 점수가 임계값 아래에 머뭅니다. 유속 저하, 줄 빠짐, 공기 유입이나 역류에서는 점수가 0.6을 넘는 순간 알림이 갑니다.</p></div>
 </section>
@@ -1925,58 +1937,6 @@ small { font-size: .8em; }
 <p class="sr" id="live" aria-live="polite"></p>
 
 <script>
-/* 500 mL 수액 모의 신호 — 1 Hz 무게 → 칼만필터(흔들림 게이팅) → 초기 5분 기대 추세 → 이상 점수.
-   이상 점수 곡선은 CNN 판별기의 응답을 상황별로 모사한 값이다. */
-function simulate(kind, seed) {
-  let s = seed >>> 0;
-  const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const gauss = () => { let u = 0; while (!u) u = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rnd()); };
-  const N = 3600, W0 = 520, q0 = 290 / 3600, T = 1800;
-  let w = W0; const ph = rnd() * 6, raw = [];
-  for (let t = 0; t < N; t++) {
-    let q = q0;
-    if (kind === 'drop' && t >= T) q = q0 * (1 - 0.62 * Math.min(1, (t - T) / 60));
-    if (kind === 'line' && t >= T) q = t < T + 150 ? q0 * 6 : q0 * 0.2;
-    if (kind === 'air' && t >= T && t < T + 120) q = -q0 * 0.5;
-    w -= q;
-    let m = w + gauss() * 1.4;
-    if (kind === 'shake' && t >= 720 && t < 1320) {
-      const env = Math.sin(Math.PI * (t - 720) / 600);
-      m += env * (24 * Math.sin(2 * Math.PI * 0.43 * t + ph) + gauss() * 10);
-      if (rnd() < 0.012) m += (rnd() - 0.5) * 110;
-    }
-    if (kind === 'line' && t >= T && t < T + 25) m += gauss() * 16;
-    raw.push(m);
-  }
-  let x0 = raw[0], x1 = -q0, P00 = 25, P01 = 0, P11 = 1e-4, run = 0, sgn = 0;
-  const Qw = 0.004, Qv = 4e-6, R0 = 1.96, kw = [];
-  for (let t = 0; t < N; t++) {
-    x0 += x1; P00 += 2 * P01 + P11 + Qw; P01 += P11; P11 += Qv;
-    const inn = raw[t] - x0, z = Math.abs(inn) / Math.sqrt(P00 + R0);
-    const sg = Math.sign(inn); run = z > 2 && sg === sgn ? run + 1 : z > 2 ? 1 : 0; sgn = sg;
-    const R = z > 3 && run < 6 ? R0 * (z / 3) ** 4 : R0, S = P00 + R, K0 = P00 / S, K1 = P01 / S;
-    x0 += K0 * inn; x1 += K1 * inn;
-    const n00 = (1 - K0) * P00, n01 = (1 - K0) * P01, n11 = P11 - K1 * P01;
-    P00 = n00; P01 = n01; P11 = n11; kw.push(x0);
-  }
-  let sx = 0, sy = 0, sxx = 0, sxy = 0, n = 0;
-  for (let t = 30; t <= 300; t++) { sx += t; sy += kw[t]; sxx += t * t; sxy += t * kw[t]; n++; }
-  const rate = (n * sxy - sx * sy) / (n * sxx - sx * sx), b = (sy - rate * sx) / n;
-  const exp = kw.map((_, t) => b + rate * t);
-  const score = []; let e = 0.06;
-  for (let t = 0; t < N; t++) {
-    let tgt = 0.07;
-    if (kind === 'shake' && t >= 720 && t < 1320) tgt += 0.27 * Math.sin(Math.PI * (t - 720) / 600) ** 1.5;
-    if (kind === 'drop' && t >= T + 15) tgt = 0.07 + 0.86 * (1 - Math.exp(-(t - T - 15) / 35));
-    if (kind === 'line' && t >= T) tgt = 0.93;
-    if (kind === 'air' && t >= T) tgt = t < T + 120 ? 0.84 : 0.08;
-    const tau = (kind === 'line' || kind === 'air') && t >= T && t < T + 120 ? 1.6 : 18;
-    e += (tgt - e) / tau;
-    score.push(Math.max(0.01, Math.min(0.99, e + gauss() * 0.018)));
-  }
-  return { raw, kw, exp, score };
-}
-
 (() => {
   const SECTIONS = ['표지', '문제 배경', '기존 시스템의 한계', '아이디어 소개', '시연', '시장분석', '차별점', '제품 원가', 'MOU 체결 현황', '시장 진입 전략', '기대효과', '팀 소개', '마무리', '부록'];
   const APPX = 13;
@@ -1987,55 +1947,6 @@ function simulate(kind, seed) {
   const pad = n => String(n).padStart(2, '0');
   const mmss = sec => `${Math.floor(sec / 60)}:${pad(Math.floor(sec % 60))}`;
 
-  // ---- simulation panels ----
-  const CASES = [
-    ['normal', 11, '① 정상 투여'],
-    ['shake', 23, '② 이송 중 흔들림'],
-    ['drop', 37, '③ 유속 저하'],
-    ['line', 41, '④ 줄 빠짐'],
-    ['air', 53, '⑤ 공기 유입 · 역류'],
-  ];
-  const X0 = 30, X1 = 252, WY0 = 18, WY1 = 262, SY0 = 298, SY1 = 384;
-  const xs = t => X0 + (t / 3600) * (X1 - X0);
-  const wy = g => WY1 - ((g - 200) / 360) * (WY1 - WY0);
-  const sy = v => SY1 - v * (SY1 - SY0);
-  const f1 = v => v.toFixed(1);
-  $('#sims').innerHTML = CASES.map(([kind, seed, name]) => {
-    const r = simulate(kind, seed);
-    const alertAt = r.score.findIndex(v => v >= 0.6);
-    const peak = Math.max(...r.score);
-    let dots = '';
-    for (let t = 0; t < 3600; t += 10) dots += `M${f1(xs(t))} ${f1(wy(r.raw[t]))}h0`;
-    const line = (arr, map, stepT) => { let p = ''; for (let t = 0; t < 3600; t += stepT) p += `${f1(xs(t))},${f1(map(arr[t]))} `; return p.trim(); };
-    const scoreLine = line(r.score, sy, 5);
-    const over = []; for (let t = 0; t < 3600; t += 5) if (r.score[t] >= 0.6) over.push(t);
-    let area = '';
-    if (over.length) {
-      const a = over[0], z = over[over.length - 1];
-      area = `<path class="sca" d="M${f1(xs(a))} ${sy(0.6)} ${over.map(t => `L${f1(xs(t))} ${f1(sy(r.score[t]))}`).join(' ')} L${f1(xs(z))} ${sy(0.6)}Z"/>`;
-    }
-    const band = kind === 'shake' ? `<rect class="band" x="${xs(720)}" y="${WY0}" width="${xs(1320) - xs(720)}" height="${SY1 - WY0}"/><text class="ttl" x="${(xs(720) + xs(1320)) / 2}" y="${WY1 - 6}" text-anchor="middle">흔들림</text>`
-      : kind === 'normal' ? '' : `<rect class="band al" x="${xs(1800)}" y="${WY0}" width="${(kind === 'air' ? xs(1920) : X1) - xs(1800)}" height="${SY1 - WY0}"/>`;
-    const mark = alertAt < 0 ? '' : `<line class="mark" x1="${f1(xs(alertAt))}" x2="${f1(xs(alertAt))}" y1="${WY0}" y2="${SY1}"/><text class="mark-t" x="${f1(xs(alertAt) + 4)}" y="${WY1 + 17}">알림 ${mmss(alertAt)}</text>`;
-    const grid = [200, 300, 400, 500].map(g => `<line class="grid" x1="${X0}" x2="${X1}" y1="${f1(wy(g))}" y2="${f1(wy(g))}"/><text x="${X0 - 4}" y="${f1(wy(g) + 3)}" text-anchor="end">${g}</text>`).join('');
-    const xt = [0, 20, 40, 60].map(m => `<text x="${f1(xs(m * 60))}" y="${SY1 + 15}" text-anchor="middle">${m}${m === 60 ? '분' : ''}</text>`).join('');
-    const verdict = alertAt >= 0 ? '<span class="chip al">알림</span>' : kind === 'shake' ? '<span class="chip okl">보정 후 정상</span>' : '<span class="chip ok">정상</span>';
-    const svg = `<svg viewBox="0 0 260 402" role="img" aria-label="${name}: 최고 이상 점수 ${peak.toFixed(2)}, ${alertAt < 0 ? '알림 없음' : '알림 ' + mmss(alertAt)}">
-      ${band}${grid}<text class="ttl" x="${X0}" y="${WY0 - 5}">무게 (g)</text><text class="ttl" x="${X0}" y="${SY0 - 8}">이상 점수</text>
-      <path class="rawd" d="${dots}"/>
-      <polyline class="exp" points="${line(r.exp, wy, 60)}"/>
-      <polyline class="kal" points="${line(r.kw, wy, 10)}"/>
-      <line class="axis" x1="${X0}" x2="${X1}" y1="${SY1}" y2="${SY1}"/>
-      <line class="grid" x1="${X0}" x2="${X1}" y1="${sy(1)}" y2="${sy(1)}"/>
-      <line class="thr" x1="${X0}" x2="${X1}" y1="${sy(0.6)}" y2="${sy(0.6)}"/>
-      <text x="${X0 - 4}" y="${sy(0) + 3}" text-anchor="end">0</text><text class="thr-t" x="${X0 - 4}" y="${sy(0.6) + 3}" text-anchor="end">0.6</text><text x="${X0 - 4}" y="${sy(1) + 3}" text-anchor="end">1</text>
-      ${area}<polyline class="sc" points="${scoreLine}"/>${mark}${xt}
-    </svg>`;
-    return `<figure class="card sim b">
-      <figcaption class="sim-h"><b>${name}</b>${verdict}</figcaption>${svg}
-      <div class="sim-f"><p>최고 점수<b>${peak.toFixed(2)}</b></p><p class="${alertAt >= 0 ? 'al' : ''}">알림<b>${alertAt < 0 ? '없음' : mmss(alertAt)}</b></p></div>
-    </figure>`;
-  }).join('');
 
   // ---- slides, steps, sections ----
   const slides = [...deck.querySelectorAll('.slide')];
@@ -2046,35 +1957,6 @@ function simulate(kind, seed) {
     if (f) f.dataset.pg = si === APPX ? `APPENDIX A${k - mainCount + 1}` : `${pad(k + 1)} / ${mainCount}`;
     if (lab && si > 0 && si < 12) lab.insertAdjacentHTML('afterbegin', `<i class="secn">${pad(si)}</i>`);
   });
-  {
-    const r = simulate('shake', 23), el = document.getElementById('spark-filter');
-    if (el) {
-      const t0 = 660, t1 = 1380, vals = r.raw.slice(t0, t1);
-      const lo = Math.min(...vals), hi = Math.max(...vals);
-      const X = t => ((t - t0) / (t1 - t0)) * 120, Y = v => 4 + (1 - (v - lo) / (hi - lo)) * 52;
-      let d = '', k = '';
-      for (let t = t0; t < t1; t += 6) d += `M${X(t).toFixed(1)} ${Y(r.raw[t]).toFixed(1)}h0`;
-      for (let t = t0; t < t1; t += 6) k += `${X(t).toFixed(1)},${Y(r.kw[t]).toFixed(1)} `;
-      el.innerHTML = `<svg viewBox="0 0 120 60" preserveAspectRatio="none" aria-hidden="true"><path class="rawd" d="${d}"/><polyline class="kal" points="${k.trim()}"/></svg>`;
-    }
-  }
-  {
-    const el = document.getElementById('sx-sig');
-    if (el) {
-      // 12 s at 20 Hz on the training rig: two pushes on the pole; the load cell's deviation follows the gyro rate
-      let g = 2654435769; const rn = () => ((g = (g * 1664525 + 1013904223) >>> 0) / 4294967296 - 0.5);
-      const N = 240, f = 1.15, gy = [], dev = [];
-      const env = t => Math.exp(-((t - 3) ** 2) / 1.6) + 0.7 * Math.exp(-((t - 8.2) ** 2) / 1.1);
-      for (let k = 0; k < N; k++) {
-        const t = k / 20;
-        gy.push(env(t) * Math.sin(2 * Math.PI * f * t) + rn() * 0.08);
-        dev.push(0.85 * env(t - 0.1) * Math.sin(2 * Math.PI * f * (t - 0.1)) + rn() * 0.16);
-      }
-      const pts = arr => { const m = Math.max(...arr.map(Math.abs)); return arr.map((v, k) => `${(k / (N - 1) * 200).toFixed(1)},${(20 - v / m * 17).toFixed(1)}`).join(' '); };
-      el.innerHTML = `<p><span>자이로</span><svg viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true"><polyline class="gy" points="${pts(gy)}"/></svg></p>`
-        + `<p><span>무게 편차</span><svg viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true"><polyline class="dv" points="${pts(dev)}"/></svg></p>`;
-    }
-  }
   slides.forEach(s => {
     s.querySelectorAll('.b').forEach((el, i) => el.style.setProperty('--i', i));
     s.querySelectorAll('.plot').forEach(p => [...p.children].forEach((c, j) => c.firstElementChild?.style.setProperty('--j', j)));
