@@ -28,23 +28,23 @@
   "rewrites": [
     {
       "source": "/about",
-      "destination": "/index.html"
+      "destination": "/"
     },
     {
       "source": "/awards",
-      "destination": "/index.html"
+      "destination": "/"
     },
     {
       "source": "/skills",
-      "destination": "/index.html"
+      "destination": "/"
     },
     {
       "source": "/works",
-      "destination": "/index.html"
+      "destination": "/"
     },
     {
       "source": "/works/:path*",
-      "destination": "/index.html"
+      "destination": "/"
     }
   ]
 }

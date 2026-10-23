@@ -142,7 +142,7 @@ npm run preview   # 빌드 결과 미리보기
 ## 배포
 
 Vercel에서 Vite 프로젝트로 자동 인식됩니다(`vercel.json` 포함). 저장소를 연결하면 푸시마다 배포됩니다.
-현재 배포: https://kwon-physical-ai.vercel.app (`/about`, `/works`, `/awards`, `/skills`, `/works/<id>`는 빌드가 미리 쓴 같은 앱의 HTML을 `cleanUrls`로 확장자 없이 내어 주고, 그 밖의 `/works/…`는 `rewrites`로 SPA에 연결). 배포 주소가 바뀌면 `SITE_URL` 환경 변수로 링크 미리보기 · sitemap의 절대 주소를 바꿉니다.
+현재 배포: https://kwon-physical-ai.vercel.app (`/about`, `/works`, `/awards`, `/skills`, `/works/<id>`는 빌드가 미리 쓴 같은 앱의 HTML을 `cleanUrls`로 확장자 없이 내어 주고, 그 밖의 `/works/…`는 `rewrites`로 SPA(`/`)에 연결 — `cleanUrls`에서는 `/index.html`이 아니라 `/`로 보내야 합니다). 배포 주소가 바뀌면 `SITE_URL` 환경 변수로 링크 미리보기 · sitemap의 절대 주소를 바꿉니다.
 
 ## 출처
 
