@@ -7,12 +7,13 @@ import './styles/pages.css';
 import './styles/premium.css';
 import './styles/skills.css';
 import './styles/guide.css';
-import './styles/decks.css';
+import './styles/perf.css';
 
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { scenes, profile } from './content.js';
 import { createStage } from './core/stage.js';
+import { createPerf } from './core/perf.js';
 import { SETS } from './core/layout.js';
 import { Drone } from './actors/drone.js';
 import { GroundSet } from './actors/groundSet.js';
@@ -39,6 +40,7 @@ const $ = (id) => document.getElementById(id);
 // ── 3D 세계 구성 ───────────────────────────────────────────
 // 작품 주소로 바로 들어오면 무거운 3D 무대는 필름을 열 때 만든다 — 페이지가 먼저 보이도록
 let stage = null;
+let perf = null; // 성능 단계(core/perf.js) — 3D 무대와 함께 만든다
 let director = null;
 let actors = null;
 let video = null;
@@ -49,6 +51,7 @@ function buildWorld() {
   worldBuilt = true;
   stage = createStage(canvas, { reducedMotion: reduced });
   if (stage) {
+    perf = createPerf(stage.renderer.getContext(), { onChange: (lv, q) => stage.setQuality(q) });
     const drone = new Drone();
     const hangar = new HangarSet(SETS.hangar);
     const aerial = new AerialSet(SETS.aerial);
@@ -586,7 +589,8 @@ function irisOut(bootEl) {
   const copy = bootEl.querySelectorAll('.boot-copy > *, .boot-actions, .boot-lock, .boot-pct');
   const chrome = bootEl.querySelectorAll('.boot-top, .boot-bottom, .boot-log, .boot-corners');
   const tl = gsap.timeline({ onComplete: () => bootEl.remove() });
-  tl.to(copy, { autoAlpha: 0, y: -10, filter: 'blur(4px)', duration: 0.45, stagger: 0.04, ease: 'power2.in' }, 0)
+  const lite = document.documentElement.classList.contains('q-lite'); // 저사양: 흐림 없이
+  tl.to(copy, { autoAlpha: 0, y: -10, ...(lite ? {} : { filter: 'blur(4px)' }), duration: 0.45, stagger: 0.04, ease: 'power2.in' }, 0)
     .to(chrome, { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, 0)
     // 레티클 고리가 한 번 조여졌다가(숨 고르기) 화면 밖까지 열린다
     .to(bootLeader, { scale: 0.94, duration: 0.3, ease: 'power2.out' }, 0)
@@ -641,6 +645,8 @@ let filmTime = 0;
 let frame = 0;
 let simTime = 0;
 let frozen = false;
+let acc3d = 0; // 3D를 건너뛴 프레임의 시간
+let last3d = 0;
 function loop(now) {
   requestAnimationFrame(loop);
   timer.update(now);
@@ -676,28 +682,36 @@ function loop(now) {
   }
   if (!stage) return;
   if (pointerDirty && frame % 3 === 0) pick();
-  if (frozen || pageCovered) return;
+  const drawing = !(frozen || pageCovered) && (started || (booting && !!director?.bootFrame));
+  perf.frame(now, drawing && !document.hidden);
+  if (!drawing) return;
+  // 3D 프레임 수 제한: 보통은 초당 60(120Hz 화면에서도 3D는 60이면 충분), 최소 단계는 30,
+  // 장면을 거의 가리는 창(라이트박스 · 인덱스)이 열리면 20 — 건너뛴 시간은 모아 다음 3D 프레임에 한 번에 넘긴다
+  // (카드 · 글자 같은 화면 움직임은 그대로 매 프레임)
+  acc3d += dt;
+  const cap = lightbox.open || hud.indexOpen ? 20 : perf.settings.fps;
+  if (now - last3d < 1000 / cap - 4) return;
+  last3d = now;
+  const d3 = Math.min(acc3d, 0.1);
+  acc3d = 0;
   // 부팅 중: 반투명 부팅 화면 뒤로 격납고의 드론을 천천히 돌아본다(진행률만큼 밝아지고 다가간다)
   if (!started) {
-    if (!booting || !director?.bootFrame) return;
     // 드론이 레티클 가운데에 오도록 — 레티클 위치를 매 프레임 재고 부드럽게 따라간다
-    measureLeader(Math.min(1, dt * 6));
-    director.bootFrame(dt, t, bootProgress, bootFocusY, bootFocusX, bootFit);
+    measureLeader(Math.min(1, d3 * 6));
+    director.bootFrame(d3, t, bootProgress, bootFocusY, bootFocusX, bootFit);
     const u = stage.film.uniforms;
-    u.uExposure.value += (0.32 + 0.6 * bootProgress - u.uExposure.value) * Math.min(1, dt * 3);
+    u.uExposure.value += (0.32 + 0.6 * bootProgress - u.uExposure.value) * Math.min(1, d3 * 3);
     stage.dust.update(t);
     u.uTime.value = t;
-    stage.adapt(dt);
-    stage.composer.render(dt);
+    stage.composer.render(d3);
     return;
   }
-  director.update(dt, t);
-  trackLoop(dt);
-  mood.update(dt);
+  director.update(d3, t);
+  trackLoop(d3);
+  mood.update(d3);
   stage.dust.update(t);
   stage.film.uniforms.uTime.value = t;
-  stage.adapt(dt);
-  stage.composer.render(dt);
+  stage.composer.render(d3);
 }
 
 // 루프 장면: 고리 중심이 3D 코어를 부드럽게 따라간다

@@ -56,7 +56,6 @@
   --cw: calc(var(--card-h) * 0.78);
 }
 .deck .r-card {
-  --dim: 0;
   width: var(--cw);
 }
 .deck-stage {
@@ -85,19 +84,19 @@
   filter: blur(8px);
   pointer-events: none;
 }
-/* 물러난 카드는 어둡게(GSAP이 --dim을 움직인다) */
-.deck .r-card .card-media::before {
-  content: '';
+/* 물러난 카드는 어둡게 — 덱이 이 막의 불투명도만 바꾼다(다시 칠하지 않고 합성만) */
+.card-dim {
   position: absolute;
   inset: 0;
   z-index: 6;
   border-radius: inherit;
-  background: rgba(3, 5, 9, calc(var(--dim) * 0.68));
+  background: rgba(3, 5, 9, 0.68);
+  opacity: 0;
   pointer-events: none;
   transition: background 0.35s;
 }
-.deck .r-card:not(.is-focus):hover .card-media::before {
-  background: rgba(3, 5, 9, calc(var(--dim) * 0.35));
+.deck .r-card:not(.is-focus):hover .card-dim {
+  background: rgba(3, 5, 9, 0.35);
 }
 .deck .r-card:not(.is-focus) {
   cursor: pointer;

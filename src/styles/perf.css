@@ -1,0 +1,70 @@
+/* ── 성능 단계(core/perf.js) ─────────────────────────────
+   기기를 보고, 그리고 실제 프레임을 재며 정한 단계에 맞춰 화면 효과도 덜어 낸다.
+   <html data-q="0~4"> · q-lite(보통 이하) · q-low(낮음 이하). 3D 쪽(해상도 · 블룸 · 먼지 · 프레임 수)은 stage.setQuality */
+
+/* 보통 이하: 휴대폰 규칙(main.css 끝)과 같게 — 움직이는 3D 위에서 매 프레임 다시 그려야 하는 효과를 걷는다 */
+html.q-lite *,
+html.q-lite *::before,
+html.q-lite *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html.q-lite #ambient {
+  mix-blend-mode: normal;
+}
+html.q-lite .amb-photo,
+html.q-lite .amb-flow,
+html.q-lite .deck .card-media img.blur-fill {
+  display: none;
+}
+/* 뒤 흐림이 빠진 만큼 얇은 반투명 버튼 · 칩은 조금 더 짙게(글자가 3D에 묻히지 않게) */
+html.q-lite .hud-nav button,
+html.q-lite .hero-tags li,
+html.q-lite .pg-back,
+html.q-lite .pg-close {
+  background-color: rgba(5, 7, 12, 0.66);
+}
+html.q-lite .deck-btn {
+  background-color: rgba(5, 7, 12, 0.72);
+}
+/* 부팅 글자: 흐림 없이 떠오르기만 */
+html.q-lite .boot-kicker,
+html.q-lite .boot-name,
+html.q-lite .bn-en,
+html.q-lite .boot-title {
+  animation-name: boot-rise-lite;
+}
+@keyframes boot-rise-lite {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* 낮음 이하: 칠하기가 많은 효과(필터 · 큰 색 그림자 · 표면을 훑는 빛 · 사진 확대)를 걷는다 */
+html.q-low .card-sweep {
+  display: none;
+}
+html.q-low .r-card .card-media img,
+html.q-low .w-card .card-media img {
+  filter: none !important;
+}
+html.q-low .r-card.is-landing .card-media > img {
+  animation: none;
+}
+html.q-low .r-card .card-media,
+html.q-low .w-card .card-media {
+  transition:
+    transform 0.4s var(--ease),
+    opacity 0.6s var(--ease);
+}
+html.q-low .deck .r-card.is-focus .card-media {
+  box-shadow: 0 22px 44px -26px rgba(0, 0, 0, 0.95);
+}
+html.q-low .deck-stage::before {
+  filter: none;
+  opacity: 0.6;
+}
+html.q-low .amb-year {
+  transition-duration: 0.4s;
+}

@@ -74,7 +74,6 @@ export const scenes = [
     layout: 'reel',
     hold: 11,
     category: 'drone',
-    view: 'osd', // FPV 고글 화면
     kicker: 'AERIAL AUTONOMY — 드론',
     title: ['AERIAL', 'AUTONOMY'],
     subtitle: '조종에서 교육, 그리고 자율비행까지',
@@ -91,7 +90,6 @@ export const scenes = [
     layout: 'reel',
     hold: 12,
     category: 'mobility',
-    view: 'battery', // 배터리 팩 — 넘길수록 충전
     kicker: 'GROUND MOBILITY — 자율주행 · 차량',
     title: ['GROUND', 'MOBILITY'],
     subtitle: '시뮬레이터에서 배우고, 실차에서 검증한다',
@@ -104,7 +102,6 @@ export const scenes = [
     layout: 'reel',
     hold: 11,
     category: 'robotics',
-    view: 'belt', // 컨베이어와 그리퍼
     kicker: 'EMBODIED ROBOTICS — 휴머노이드 · 매니퓰레이터 · 4족 · IoT',
     title: ['EMBODIED', 'ROBOTICS'],
     subtitle: '몸을 가진 지능을 설계한다 — 보행 · 조작 로봇에서 센서 · 회로까지',
@@ -117,7 +114,6 @@ export const scenes = [
     layout: 'reel',
     hold: 12,
     category: 'ai',
-    view: 'scan', // 비전 스캔 더미
     kicker: 'MACHINE INTELLIGENCE — AI',
     title: ['MACHINE', 'INTELLIGENCE'],
     subtitle: '보고, 이해하고, 정리하는 지능',
@@ -134,7 +130,6 @@ export const scenes = [
     layout: 'reel',
     hold: 12,
     category: 'product',
-    view: 'cd', // CD 플레이어
     kicker: 'BUILD & LAUNCH — 제품 · 창업 · 소프트웨어',
     title: ['BUILD &', 'LAUNCH'],
     subtitle: '아이디어를 제품과 서비스로 — 만들고, 알리고, 운영한다',
@@ -151,7 +146,6 @@ export const scenes = [
     layout: 'reel',
     hold: 12,
     press: true,
-    view: 'fan', // 신문 부채
     kicker: 'IN THE PRESS — 공식 보도',
     title: ['IN THE', 'PRESS'],
     subtitle: '대학과 사업단이 기사로 남긴 장면들 — 누르면 기사 원문으로',

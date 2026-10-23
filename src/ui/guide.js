@@ -232,6 +232,8 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
   }
 
   let current = -1;
+  let lastAuto = null; // 매 프레임 같은 값을 다시 쓰지 않게
+  let lastRing = -1;
   let deckTold = false;
   let coachTold = false;
   let takeoverTold = false;
@@ -272,8 +274,9 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
     },
     // 자동 재생 남은 시간(0~1) — 끄면 고리를 비운다
     setProgress(p, autoOn) {
-      next.classList.toggle('is-manual', !autoOn);
-      ncFill.style.strokeDashoffset = String(100 - Math.min(1, Math.max(0, p)) * 100);
+      if (autoOn !== lastAuto) next.classList.toggle('is-manual', !(lastAuto = autoOn));
+      const v = Math.round(100 - Math.min(1, Math.max(0, p)) * 100);
+      if (v !== lastRing) ncFill.style.strokeDashoffset = String((lastRing = v));
     },
     // 손으로 넘기기 시작하면 자동 재생을 멈춘 이유를 한 번만 알린다
     takeover() {

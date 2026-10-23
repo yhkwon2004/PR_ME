@@ -51,6 +51,11 @@ export class Director {
     this.coreK = 1;
     this.raycaster = new THREE.Raycaster();
     this.lookPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.9);
+    // 화면 밖 세트 판정(카메라 시야 · 세트를 감싸는 구)
+    this.frustum = new THREE.Frustum();
+    this.viewProj = new THREE.Matrix4();
+    this.sphere = new THREE.Sphere();
+    this.lazyAcc = {};
   }
 
   get scene() {
@@ -347,12 +352,29 @@ export class Director {
     core.group.visible = this.coreK > 0.01;
 
     drone.update(dt, t);
-    hangar.update(dt, t);
-    aerial.update(dt, t, drone.mode === 'path' && drone.path === aerial.curve ? drone.pathU : 0);
-    ground.update(dt, t, id === 'ground' || (this.trans && this.scenes[this.index]?.id === 'ground'));
-    robotics.update(dt, t, id === 'robotics');
-    core.update(dt, t, this.pointerSmooth);
-    records.update(dt, t);
+    // 화면 밖 세트는 0.25초에 한 번, 모아 둔 시간으로 움직인다 — 보이지 않는 로봇 관절 · 센서 계산을 아낀다
+    cam.updateMatrixWorld();
+    this.frustum.setFromProjectionMatrix(this.viewProj.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse));
+    const pathU = drone.mode === 'path' && drone.path === aerial.curve ? drone.pathU : 0;
+    const groundOn = id === 'ground' || (this.trans && this.scenes[this.index]?.id === 'ground');
+    this.lazy('hangar', hangar, 12, dt, (d) => hangar.update(d, t));
+    this.lazy('aerial', aerial, 18, dt, (d) => aerial.update(d, t, pathU));
+    this.lazy('ground', ground, 16, dt, (d) => ground.update(d, t, groundOn));
+    this.lazy('robotics', robotics, 12, dt, (d) => robotics.update(d, t, id === 'robotics'));
+    this.lazy('core', core, 6, dt, (d) => core.update(d, t, this.pointerSmooth));
+    this.lazy('records', records, 12, dt, (d) => records.update(d, t));
     links.update(dt, t);
+  }
+
+  // set: 세트(group) · r: 세트를 감싸는 반지름 — 시야에 걸리면 매 프레임, 아니면 0.25초마다
+  lazy(key, set, r, dt, fn) {
+    const acc = (this.lazyAcc[key] || 0) + dt;
+    const seen = this.frustum.intersectsSphere(this.sphere.set(set.group.position, r));
+    if (!seen && acc < 0.25) {
+      this.lazyAcc[key] = acc;
+      return;
+    }
+    this.lazyAcc[key] = 0;
+    fn(Math.min(acc, 0.25));
   }
 }

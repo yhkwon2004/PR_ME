@@ -113,8 +113,11 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
   const composer = new EffectComposer(renderer, rt);
   composer.setPixelRatio(renderer.getPixelRatio());
   composer.addPass(new RenderPass(scene, camera));
-  const bloomDiv = isMobile ? 3 : 2;
-  const bloom = new UnrealBloomPass(new THREE.Vector2(size.x / bloomDiv, size.y / bloomDiv), 0.85, 0.55, 0.82);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(size.x / 2, size.y / 2), 0.85, 0.55, 0.82);
+  // 블룸 버퍼 크기 배율(성능 단계) — 블룸은 받은 크기의 절반부터 다섯 단계로 흐리므로, 받는 크기를 줄이면 그만큼 가볍다
+  let bloomScale = isMobile ? 0.6 : 1;
+  const bloomSetSize = bloom.setSize.bind(bloom);
+  bloom.setSize = (w, h) => bloomSetSize(Math.max(64, Math.round(w * bloomScale)), Math.max(64, Math.round(h * bloomScale)));
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
   const film = new ShaderPass(FilmShader);
@@ -128,30 +131,28 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
     camera.updateProjectionMatrix();
     renderer.setSize(w, h, false);
     composer.setSize(w, h);
-    bloom.resolution.set(w / bloomDiv, h / bloomDiv);
     film.uniforms.uRes.value.set(w, h);
   }
   resize();
   window.addEventListener('resize', resize);
 
-  // 프레임 저하 시 화질 단계적 하향
-  let slowFrames = 0;
-  let tier = 0;
-  function adapt(dt) {
-    if (dt > 1 / 38) slowFrames++;
-    else slowFrames = Math.max(0, slowFrames - 0.5);
-    // 휴대폰은 더 일찍(약 1초) 낮춘다
-    if (slowFrames > (isMobile ? 40 : 90) && tier < 2) {
-      tier++;
-      slowFrames = 0;
-      if (tier === 1) {
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
-        composer.setPixelRatio(renderer.getPixelRatio());
-        resize();
-      } else {
-        bloom.enabled = false;
-      }
-    }
+  // 성능 단계(perf.js)에 맞춘 화질: 화소 밀도 · 안티에일리어싱 · 블룸 · 먼지
+  const dustCount = dust.points.geometry.getAttribute('position').count;
+  function setQuality(q) {
+    const dpr = Math.min(window.devicePixelRatio || 1, q.dpr);
+    renderer.setPixelRatio(dpr);
+    composer.setPixelRatio(dpr);
+    // 다중 샘플 수가 바뀌면 버퍼를 새로 만든다(다음 그리기에서)
+    [composer.renderTarget1, composer.renderTarget2].forEach((t) => {
+      if (t.samples === q.samples) return;
+      t.samples = q.samples;
+      t.dispose();
+    });
+    bloom.enabled = q.bloom > 0;
+    if (q.bloom > 0) bloomScale = q.bloom;
+    dust.points.visible = q.dust > 0;
+    dust.points.geometry.setDrawRange(0, Math.floor(dustCount * q.dust));
+    resize();
   }
 
   // 분위기: 카드 색(amt 0~1)으로 지평선 빛 · 바닥 격자 · 안개 · 역광을 물들인다
@@ -175,7 +176,7 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
     rim.color.copy(base.rim).lerp(tint, 0.9 * amt);
   }
 
-  return { renderer, scene, camera, composer, film, bloom, dust, resize, adapt, setMood, isMobile };
+  return { renderer, scene, camera, composer, film, bloom, dust, resize, setQuality, setMood, isMobile };
 }
 
 function createSky() {

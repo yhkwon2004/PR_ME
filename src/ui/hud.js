@@ -101,8 +101,16 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
     setScene.t = setTimeout(() => document.body.classList.remove('is-moving'), Math.max(300, duration * 1000 * 0.85));
   }
 
+  let lastP = -1;
+  let lastFill = null;
   function setProgress(p) {
-    if (active >= 0 && fills[active]) fills[active].style.transform = `scaleX(${Math.min(1, p)})`;
+    const f = active >= 0 ? fills[active] : null;
+    if (!f) return;
+    const v = Math.round(Math.min(1, p) * 1000) / 1000;
+    if (f === lastFill && v === lastP) return;
+    lastFill = f;
+    lastP = v;
+    f.style.transform = `scaleX(${v})`;
   }
 
   function setAuto(on) {
@@ -116,12 +124,17 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
   }
 
   // 24fps 타임코드
+  // 타임코드는 화면에 보일 때(데스크톱), 글자가 바뀔 때만 쓴다
+  let lastTc = '';
+  const tcShown = matchMedia('(min-width: 1181px) and (min-height: 501px)'); // 좁은 화면 · 가로 휴대폰에서는 타임코드를 숨긴다(main.css)
   function setTime(sec) {
+    if (!tcShown.matches) return;
     const f = Math.floor((sec % 1) * 24);
     const s = Math.floor(sec) % 60;
     const m = Math.floor(sec / 60) % 60;
     const h = Math.floor(sec / 3600);
-    tcLbl.textContent = `TC ${pad(h)}:${pad(m)}:${pad(s)}:${pad(f)}`;
+    const tc = `TC ${pad(h)}:${pad(m)}:${pad(s)}:${pad(f)}`;
+    if (tc !== lastTc) tcLbl.textContent = lastTc = tc;
   }
 
   return {
@@ -147,6 +160,8 @@ export function createCursor() {
   const pos = { x: innerWidth / 2, y: innerHeight / 2 };
   const cur = { x: pos.x, y: pos.y };
   let label = null;
+  let tipX = NaN;
+  let tipY = NaN;
   addEventListener('pointermove', (e) => {
     document.body.classList.add('has-pointer');
     pos.x = e.clientX;
@@ -167,11 +182,19 @@ export function createCursor() {
         tip.querySelector('small').textContent = info.sub;
       }
     },
+    // 커서가 멈춰 있으면 쓰지 않는다
     tick() {
-      cur.x += (pos.x - cur.x) * 0.22;
-      cur.y += (pos.y - cur.y) * 0.22;
-      if (fine) cursor.style.transform = `translate3d(${cur.x}px, ${cur.y}px, 0)`;
-      tip.style.transform = `translate3d(${pos.x + 22}px, ${pos.y + 18}px, 0)`;
+      const dx = pos.x - cur.x;
+      const dy = pos.y - cur.y;
+      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && pos.x === tipX && pos.y === tipY) return;
+      cur.x += dx * 0.22;
+      cur.y += dy * 0.22;
+      if (fine) cursor.style.transform = `translate3d(${cur.x.toFixed(1)}px, ${cur.y.toFixed(1)}px, 0)`;
+      if (pos.x !== tipX || pos.y !== tipY) {
+        tipX = pos.x;
+        tipY = pos.y;
+        tip.style.transform = `translate3d(${pos.x + 22}px, ${pos.y + 18}px, 0)`;
+      }
     },
   };
 }
