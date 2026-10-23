@@ -22,7 +22,10 @@ function scrollableX(el) {
   return null;
 }
 
-export function createInput({ next, prev, first, last, isBlocked, onKey }) {
+// 당겨 넘기기: 이만큼(px) 위아래로 끌면 놓는 순간 넘어간다 — 빠르게 튕기지 않아도
+const PULL = 46;
+
+export function createInput({ next, prev, first, last, isBlocked, onKey, onPull, pullLabel }) {
   let acc = 0;
   let lockUntil = 0;
   let idleTimer = 0;
@@ -71,6 +74,14 @@ export function createInput({ next, prev, first, last, isBlocked, onKey }) {
   let st = 0;
   let startEl = null;
   let couldScroll = { 1: false, '-1': false };
+  let pull = null; // 지금 끄는 중인 당겨 넘기기 { dir, p, armed, label }
+  // 손가락을 댄 곳이 알림 · 크레딧처럼 자기 몫의 끌기가 있는 곳이면 당겨 넘기기를 쓰지 않는다
+  const ownsDrag = (el) => !!el?.closest?.('.guide-toast, .credits');
+  const endPull = () => {
+    if (!pull) return;
+    pull = null;
+    onPull?.(null);
+  };
   addEventListener(
     'touchstart',
     (e) => {
@@ -81,21 +92,46 @@ export function createInput({ next, prev, first, last, isBlocked, onKey }) {
       startEl = e.target;
       // 손가락을 대는 순간 패널이 더 스크롤될 수 있었는지 기억한다
       couldScroll = { 1: !!scrollableAncestor(startEl, 1), '-1': !!scrollableAncestor(startEl, -1) };
+      endPull();
     },
     { passive: true }
   );
+  // 위아래로 끄는 동안: 끈 만큼 다음 · 이전 표시가 차오른다
+  addEventListener(
+    'touchmove',
+    (e) => {
+      if (e.touches.length > 1 || isBlocked() || ownsDrag(startEl)) return endPull();
+      const t = e.touches[0];
+      const dx = t.clientX - sx;
+      const dy = t.clientY - sy;
+      if (Math.abs(dy) < 12 || Math.abs(dy) < Math.abs(dx) * 1.2) return endPull();
+      const dir = dy < 0 ? 1 : -1;
+      // 패널을 스크롤하던 손가락이면 표시하지 않는다
+      if (couldScroll[dir] || scrollableAncestor(startEl, dir)) return endPull();
+      const label = pullLabel?.(dir);
+      if (!label) return endPull();
+      const p = (Math.abs(dy) - 12) / (PULL - 12);
+      pull = { dir, p, armed: Math.abs(dy) >= PULL, label };
+      onPull?.(pull);
+    },
+    { passive: true }
+  );
+  addEventListener('touchcancel', endPull, { passive: true });
   addEventListener(
     'touchend',
     (e) => {
+      const armed = pull?.armed;
+      endPull();
       if (isBlocked()) return;
       const t = e.changedTouches[0];
       const dx = t.clientX - sx;
       const dy = t.clientY - sy;
       const dt = performance.now() - st;
-      if (dt > 700) return;
+      // 다 당겨 놓았으면 천천히 끌었어도 넘긴다
+      if (dt > 700 && !armed) return;
       const horizontal = Math.abs(dx) > Math.abs(dy);
       const dist = horizontal ? dx : dy;
-      if (Math.abs(dist) < 55) return;
+      if (Math.abs(dist) < (horizontal ? 55 : PULL)) return;
       const dir = dist < 0 ? 1 : -1;
       // 세로 스와이프가 패널 스크롤이었다면 장면을 넘기지 않는다
       if (!horizontal && (couldScroll[dir] || scrollableAncestor(startEl, dir))) return;

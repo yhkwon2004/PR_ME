@@ -1,0 +1,1049 @@
+/* ── 카드 덱 보기 방식: 장면마다 다른 무대 ───────────────
+   osd(FPV 고글) · battery(배터리 팩) · belt(컨베이어와 그리퍼) · scan(비전 스캔) · cd(CD 플레이어) · fan(신문 부채)
+   카드의 자리는 deckViews.js가 움직이고, 여기서는 무대 장식과 카드 겉모습만 */
+
+/* 무대 장식은 카드와 같은 층에서 z-index로 앞뒤를 정한다 */
+.dv-chrome {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* 끌거나 미리 보기 중에는 장식이 손가락을 바로 따라오게 */
+.deck-stage.is-dragging * {
+  transition-duration: 0s !important;
+}
+
+/* ───────── 트로피 진열(수상) ───────── */
+.tr-beam {
+  position: absolute;
+  left: 50%;
+  top: -22%;
+  z-index: 0;
+  width: calc(var(--cw) * 1.7);
+  height: 130%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(244, 207, 115, 0.3), rgba(244, 207, 115, 0.08) 60%, rgba(244, 207, 115, 0) 92%);
+  clip-path: polygon(43% 0, 57% 0, 100% 100%, 0 100%);
+  filter: blur(3px);
+  animation: tr-breathe 4.5s ease-in-out infinite alternate;
+}
+.tr-base {
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  z-index: 0;
+  width: calc(var(--cw) * 1.4);
+  height: 30px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(244, 207, 115, 0.5), rgba(244, 207, 115, 0.12) 60%, transparent);
+}
+.trophy.is-lit .tr-beam {
+  animation:
+    tr-flash 0.9s ease-out,
+    tr-breathe 4.5s ease-in-out 0.9s infinite alternate;
+}
+@keyframes tr-breathe {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes tr-flash {
+  from {
+    opacity: 0.2;
+  }
+  35% {
+    opacity: 1;
+    filter: blur(1px) brightness(1.5);
+  }
+}
+
+/* ───────── FPV 고글 화면(공중) ───────── */
+.deck[data-view='osd'] {
+  --cw: calc(var(--card-h) * 1.3);
+}
+.deck[data-view='osd'] .r-card {
+  --cr: 6px;
+}
+.deck[data-view='osd'] .r-card .card-top {
+  display: none;
+}
+.deck[data-view='osd'] .r-card .card-award {
+  top: auto;
+  bottom: 30px;
+}
+/* 영상처럼: 가로 주사선과 가장자리 어둠 */
+.deck[data-view='osd'] .r-card .card-media::after {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.45));
+}
+.osd {
+  --ow: calc(var(--cw) + 26px);
+  --oh: calc(var(--card-h) + 26px);
+  z-index: 40;
+  color: #eaffff;
+  font-family: var(--mono);
+  text-shadow:
+    0 0 2px #000,
+    0 0 8px rgba(0, 0, 0, 0.9);
+}
+.osd-c {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(94, 242, 255, 0.85);
+  filter: drop-shadow(0 0 6px rgba(94, 242, 255, 0.5));
+  transition: transform 0.5s var(--ease);
+}
+.osd-c.tl,
+.osd-c.bl {
+  left: calc(50% - var(--ow) / 2);
+}
+.osd-c.tr,
+.osd-c.br {
+  left: calc(50% + var(--ow) / 2 - 20px);
+}
+.osd-c.tl,
+.osd-c.tr {
+  top: -13px;
+  border-bottom: 0;
+}
+.osd-c.bl,
+.osd-c.br {
+  top: calc(var(--card-h) + 13px - 20px);
+  border-top: 0;
+}
+.osd-c.tl,
+.osd-c.bl {
+  border-right: 0;
+}
+.osd-c.tr,
+.osd-c.br {
+  border-left: 0;
+}
+/* 카드가 바뀔 때 모서리가 잠깐 벌어졌다 다시 잡힌다 */
+.osd.is-bank .osd-c.tl {
+  animation: osd-lock-tl 0.8s var(--ease);
+}
+.osd.is-bank .osd-c.tr {
+  animation: osd-lock-tr 0.8s var(--ease);
+}
+.osd.is-bank .osd-c.bl {
+  animation: osd-lock-bl 0.8s var(--ease);
+}
+.osd.is-bank .osd-c.br {
+  animation: osd-lock-br 0.8s var(--ease);
+}
+@keyframes osd-lock-tl {
+  40% {
+    transform: translate(-8px, -8px);
+  }
+}
+@keyframes osd-lock-tr {
+  40% {
+    transform: translate(8px, -8px);
+  }
+}
+@keyframes osd-lock-bl {
+  40% {
+    transform: translate(-8px, 8px);
+  }
+}
+@keyframes osd-lock-br {
+  40% {
+    transform: translate(8px, 8px);
+  }
+}
+.osd-top,
+.osd-bot {
+  position: absolute;
+  left: calc(50% - var(--cw) / 2 + 12px);
+  right: calc(50% - var(--cw) / 2 + 12px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1;
+}
+.osd-top {
+  top: 11px;
+}
+.osd-bot {
+  top: calc(var(--card-h) - 22px);
+}
+.osd-top b,
+.osd-bot b {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.osd-rec {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.osd-rec i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff3b3b;
+  box-shadow: 0 0 8px #ff3b3b;
+  animation: osd-blink 1.2s steps(2, jump-none) infinite;
+}
+@keyframes osd-blink {
+  50% {
+    opacity: 0.15;
+  }
+}
+/* 방위 눈금: 카드를 넘기면 기수가 돌아간 만큼 흐른다 */
+.osd-tape {
+  position: relative;
+  flex: 1;
+  max-width: 46%;
+  height: 12px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
+}
+.osd-tape i {
+  position: absolute;
+  inset: 3px 0 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(234, 255, 255, 0.9) 0 1px, transparent 1px 42px),
+    repeating-linear-gradient(90deg, rgba(234, 255, 255, 0.5) 0 1px, transparent 1px 10.5px);
+  background-size:
+    100% 9px,
+    100% 5px;
+  background-repeat: repeat-x;
+  background-position-x: calc(var(--hd, 0) * -1px);
+  transition: background-position 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.osd-tape::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  border: 4px solid transparent;
+  border-top-color: var(--cyan);
+  transform: translateX(-50%);
+}
+/* 수평선: 가운데가 빈 두 줄 — 넘길 때 기체가 기울듯 */
+.osd-hz {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--card-h) / 2);
+  width: calc(var(--cw) * 0.62);
+  height: 0;
+  transform: translateX(-50%);
+}
+.osd-hz::before,
+.osd-hz::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  width: 36%;
+  height: 2px;
+  background: rgba(234, 255, 255, 0.78);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+}
+.osd-hz::before {
+  left: 0;
+  border-right: 2px solid rgba(234, 255, 255, 0.78);
+}
+.osd-hz::after {
+  right: 0;
+}
+.osd-hz i {
+  position: absolute;
+  left: 50%;
+  top: -18px;
+  width: 1px;
+  height: 36px;
+  background: linear-gradient(transparent, rgba(234, 255, 255, 0.35), transparent);
+}
+.osd.is-bank .osd-hz {
+  animation: osd-bank 1.1s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+@keyframes osd-bank {
+  30% {
+    transform: translateX(-50%) translateY(6px) rotate(-7deg);
+  }
+  65% {
+    transform: translateX(-50%) rotate(2deg);
+  }
+}
+.osd-cross {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--card-h) / 2);
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  border: 1.5px solid rgba(94, 242, 255, 0.9);
+  border-radius: 50%;
+}
+.osd-bat {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid rgba(234, 255, 255, 0.8);
+  border-radius: 2px;
+}
+.osd-bat i {
+  width: 4px;
+  height: 7px;
+  background: #3dff9a;
+}
+.osd-bat i:last-child {
+  background: rgba(61, 255, 154, 0.3);
+}
+.osd-link {
+  color: var(--cyan);
+}
+
+/* ───────── 배터리 팩(지상) ───────── */
+.deck[data-view='battery'] .deck-stage::before {
+  display: none;
+}
+.deck[data-view='battery'] .deck-stage > .r-card {
+  clip-path: inset(0 calc(var(--clip, 0) * 1px) round 12px);
+}
+.deck[data-view='battery'] .r-card .card-top {
+  transition: opacity 0.4s;
+}
+.deck[data-view='battery'] .r-card:not(.is-focus) .card-top,
+.deck[data-view='battery'] .r-card:not(.is-focus) .card-award {
+  opacity: 0;
+}
+.bat {
+  z-index: 0;
+}
+.bat-case {
+  position: absolute;
+  left: 50%;
+  top: -12px;
+  width: calc(var(--cw) + 2 * var(--side, 3) * (var(--cell, 30px) + var(--gap, 6px)) + 2 * var(--gap, 6px) + 18px);
+  height: calc(var(--card-h) + 24px);
+  transform: translateX(-50%);
+  border: 2px solid rgba(232, 237, 244, 0.34);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 30%),
+    linear-gradient(180deg, rgba(10, 14, 20, 0.62), rgba(5, 8, 12, 0.82));
+  box-shadow:
+    inset 0 0 0 5px rgba(5, 8, 12, 0.55),
+    inset 0 0 0 6px rgba(232, 237, 244, 0.07),
+    0 34px 60px -30px rgba(0, 0, 0, 0.95);
+  transition:
+    border-color 0.6s,
+    box-shadow 0.6s;
+}
+.bat-tip {
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  width: 10px;
+  height: 30%;
+  transform: translateY(-50%);
+  border: 2px solid rgba(232, 237, 244, 0.34);
+  border-left: 0;
+  border-radius: 0 7px 7px 0;
+  background: rgba(10, 14, 20, 0.8);
+}
+.bat.is-charging .bat-case {
+  animation: bat-pulse 0.9s ease-out;
+}
+@keyframes bat-pulse {
+  25% {
+    border-color: rgba(61, 255, 154, 0.85);
+    box-shadow:
+      inset 0 0 0 5px rgba(5, 8, 12, 0.55),
+      inset 0 0 26px rgba(61, 255, 154, 0.22),
+      0 0 30px -6px rgba(61, 255, 154, 0.5);
+  }
+}
+.bat.is-full .bat-case,
+.bat.is-full .bat-tip {
+  border-color: rgba(61, 255, 154, 0.7);
+}
+/* 충전 표시: 케이스 위 */
+.bat-read {
+  position: absolute;
+  left: 50%;
+  top: -46px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  color: var(--fg);
+}
+.bat-bolt {
+  color: #3dff9a;
+  text-shadow: 0 0 10px rgba(61, 255, 154, 0.8);
+}
+.bat.is-charging .bat-bolt {
+  animation: bat-bolt 0.9s steps(4, jump-none);
+}
+@keyframes bat-bolt {
+  50% {
+    opacity: 0.2;
+  }
+}
+.bat-pc {
+  min-width: 4ch;
+  font-weight: 700;
+}
+.bat-bar {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+}
+.bat-bar i {
+  width: 9px;
+  height: 7px;
+  border-radius: 1.5px;
+  background: rgba(232, 237, 244, 0.12);
+  transition: background 0.5s;
+}
+.bat-bar i.is-on {
+  background: linear-gradient(180deg, #7dffbf, #2ed98a);
+  box-shadow: 0 0 6px rgba(61, 255, 154, 0.5);
+}
+.bat-cell {
+  font-size: 9.5px;
+  color: var(--muted);
+}
+/* 셀 겉모습: 원통처럼 음영 · 위에 + 단자 · 아래 번호. 지나온 셀은 충전된 초록, 남은 셀은 비어 어둡게 */
+.cell-skin {
+  display: none;
+}
+.deck[data-view='battery'] .cell-skin {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 8;
+  display: block;
+  width: var(--cell, 30px);
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.2) 30%, rgba(255, 255, 255, 0.04) 52%, rgba(0, 0, 0, 0.45));
+  opacity: clamp(0, calc(var(--clip, 0) / var(--cmax, 1) * 1.4 - 0.4), 1);
+  pointer-events: none;
+  transition: background 0.5s;
+}
+.deck[data-view='battery'] .r-card.is-empty .cell-skin {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.55), rgba(255, 255, 255, 0.14) 30%, rgba(255, 255, 255, 0.02) 52%, rgba(0, 0, 0, 0.5)),
+    rgba(6, 9, 13, 0.6);
+}
+.deck[data-view='battery'] .r-card.is-charged .cell-skin {
+  background:
+    linear-gradient(0deg, rgba(61, 255, 154, 0.28), transparent 40%, rgba(61, 255, 154, 0.18) 80%, transparent),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.45), rgba(125, 255, 191, 0.42) 30%, rgba(61, 255, 154, 0.12) 52%, rgba(0, 0, 0, 0.4));
+  background-size:
+    100% 220%,
+    100% 100%;
+  box-shadow: inset 0 0 0 1px rgba(61, 255, 154, 0.55);
+  animation: cell-flow 2.4s linear infinite;
+}
+@keyframes cell-flow {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      0 -220%,
+      0 0;
+  }
+}
+.cell-cap {
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 44%;
+  height: 5px;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  background: rgba(232, 237, 244, 0.7);
+}
+.cell-skin b {
+  position: absolute;
+  left: 50%;
+  bottom: 9px;
+  transform: translateX(-50%);
+  writing-mode: vertical-rl;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: rgba(238, 242, 247, 0.85);
+}
+
+/* ───────── 컨베이어와 그리퍼(로봇) ───────── */
+.deck[data-view='belt'] .deck-stage::before {
+  display: none;
+}
+.deck[data-view='belt'] .r-card:not(.is-focus) .card-top,
+.deck[data-view='belt'] .r-card:not(.is-focus) .card-award {
+  opacity: 0;
+}
+/* 벨트 면: 카드처럼 뒤로 누운 판 — 줄무늬가 카드와 같은 속도로 흐른다 */
+/* 벨트는 카드 뒤, 그리퍼는 카드 앞 */
+.belt-band {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: calc(var(--card-h) * 0.66);
+  transform-origin: 50% 100%;
+  transform: rotateX(66deg);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.09) 0 2px, transparent 2px 30px),
+    linear-gradient(180deg, #0b0f15, #151b24 60%, #0d1118);
+  background-position-x: var(--bx, 0px), 0;
+  border-top: 2px solid rgba(255, 107, 26, 0.45);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  transition: background-position 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.belt-band i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 12px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px 12px),
+    linear-gradient(180deg, #2a3140, #0b0e14);
+  border-top: 1px solid rgba(255, 107, 26, 0.6);
+}
+/* 그리퍼: 가운데 카드의 윗변을 두 손가락으로 집는다 — 카드가 바뀔 때 벌어지며 들렸다 다시 집는다 */
+.grip {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--card-h) * -0.05);
+  z-index: 40;
+  width: calc(var(--cw) * 0.56);
+  height: 0;
+  transform: translateX(-50%);
+  transition: transform 0.4s var(--ease);
+}
+.grip.is-open {
+  transform: translate(-50%, -12px);
+}
+.grip-arm {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  width: 8px;
+  height: 36px;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(90deg, #2c3340, #8c97aa 45%, #2c3340);
+}
+.grip-arm::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  width: 16px;
+  height: 16px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #c3ccd9, #4a5363 60%, #232934);
+  box-shadow: 0 0 0 2px rgba(255, 107, 26, 0.7);
+}
+.grip-palm {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  height: 11px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #a3adbd, #4b5466 55%, #2a303b);
+  box-shadow:
+    inset 0 -2px 0 rgba(255, 107, 26, 0.75),
+    0 6px 14px -6px rgba(0, 0, 0, 0.9);
+}
+.grip-f {
+  position: absolute;
+  bottom: -20px;
+  width: 9px;
+  height: 30px;
+  border-radius: 2px 2px 4px 4px;
+  background: linear-gradient(90deg, #3a4250, #9aa5b8 50%, #3a4250);
+  box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.9);
+  transition: transform 0.35s var(--ease);
+}
+.grip-f.l {
+  left: 4px;
+}
+.grip-f.r {
+  right: 4px;
+}
+.grip.is-open .grip-f.l {
+  transform: translateX(-10px) rotate(-6deg);
+}
+.grip.is-open .grip-f.r {
+  transform: translateX(10px) rotate(6deg);
+}
+.grip-tag {
+  position: absolute;
+  left: calc(100% + 10px);
+  bottom: 5px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+  color: var(--orange);
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
+}
+
+/* ───────── 비전 스캔 더미(AI) ───────── */
+.scan {
+  z-index: 40;
+}
+.scan-tag {
+  position: absolute;
+  left: calc(50% - var(--cw) / 2);
+  top: -30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+  color: #d6b4ff;
+}
+.scan-tag i {
+  width: 7px;
+  height: 11px;
+  background: #d6b4ff;
+  animation: osd-blink 1s steps(2, jump-none) infinite;
+}
+.scan-tag b {
+  font-weight: 600;
+}
+.scan-tag small {
+  font-size: 10px;
+  color: var(--muted);
+}
+.scan-fx {
+  display: none;
+}
+.deck[data-view='scan'] .scan-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: block;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.deck[data-view='scan'] .r-card.is-focus .scan-fx {
+  opacity: 1;
+}
+.deck[data-view='scan'] .r-card .card-top {
+  display: none;
+}
+.sf-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(214, 180, 255, 0.55) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+  opacity: 0.4;
+  -webkit-mask-image: radial-gradient(70% 60% at 50% 50%, #000, transparent);
+  mask-image: radial-gradient(70% 60% at 50% 50%, #000, transparent);
+}
+.sf-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 28%;
+  background: linear-gradient(180deg, transparent, rgba(196, 139, 255, 0.05) 40%, rgba(196, 139, 255, 0.32) 94%, rgba(236, 220, 255, 0.95) 100%);
+  transform: translateY(-110%);
+}
+.deck[data-view='scan'] .r-card.is-focus .sf-line {
+  animation: sf-scan 3.2s cubic-bezier(0.5, 0, 0.5, 1) 0.4s infinite;
+}
+@keyframes sf-scan {
+  0% {
+    transform: translateY(-110%);
+  }
+  55%,
+  100% {
+    transform: translateY(380%);
+  }
+}
+/* 인식 상자: 네 모서리 꺾쇠와 이름표 */
+.sf-box {
+  --k: #d6b4ff;
+  position: absolute;
+  inset: 18% 13% 22%;
+  background:
+    linear-gradient(var(--k), var(--k)) 0 0 / 16px 2px,
+    linear-gradient(var(--k), var(--k)) 0 0 / 2px 16px,
+    linear-gradient(var(--k), var(--k)) 100% 0 / 16px 2px,
+    linear-gradient(var(--k), var(--k)) 100% 0 / 2px 16px,
+    linear-gradient(var(--k), var(--k)) 0 100% / 16px 2px,
+    linear-gradient(var(--k), var(--k)) 0 100% / 2px 16px,
+    linear-gradient(var(--k), var(--k)) 100% 100% / 16px 2px,
+    linear-gradient(var(--k), var(--k)) 100% 100% / 2px 16px;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 0 0 1px rgba(214, 180, 255, 0.22);
+  filter: drop-shadow(0 0 4px rgba(196, 139, 255, 0.7));
+}
+.sf-box b {
+  position: absolute;
+  left: 0;
+  top: -19px;
+  padding: 3px 7px;
+  border-radius: 2px;
+  background: rgba(196, 139, 255, 0.92);
+  color: #14061f;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.deck[data-view='scan'] .r-card.is-landing .sf-box {
+  animation: sf-lock 0.75s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes sf-lock {
+  from {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.97);
+  }
+}
+
+/* ───────── CD 플레이어(제품 · 창업) ───────── */
+.deck[data-view='cd'] {
+  --cw: calc(var(--card-h) * 0.96);
+}
+.deck[data-view='cd'] .r-card {
+  --cr: 5px;
+}
+.deck[data-view='cd'] .r-card .card-top {
+  display: none;
+}
+.deck[data-view='cd'] .deck-stage::before {
+  left: calc(50% + var(--cw) * 0.05);
+}
+.cd-disc,
+.cd-case {
+  display: none;
+}
+.deck[data-view='cd'] .cd-disc {
+  position: absolute;
+  z-index: -1;
+  top: 4%;
+  left: 4%;
+  display: block;
+  width: 92%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.deck[data-view='cd'] .r-card.is-focus .cd-disc {
+  transform: translateX(46%);
+  transition-delay: 0.22s;
+  /* 밖으로 나온 디스크를 눌러도 그 프로젝트로(뒤의 케이스 등이 대신 눌리지 않게) */
+  pointer-events: auto;
+  cursor: pointer;
+}
+.cd-spin {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: radial-gradient(circle, #dfe6ee, #9aa6b4);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 22px 44px -18px rgba(0, 0, 0, 0.95);
+  animation: cd-spin 4.8s linear infinite;
+  animation-play-state: paused;
+}
+.deck[data-view='cd'] .r-card.is-focus .cd-spin {
+  animation-play-state: running;
+}
+@keyframes cd-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.cd-spin img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.95) brightness(0.92);
+}
+.cd-type {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 26%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--cc, #ffcf5a) 50%, #0b0f15), #0b0f15);
+  font-family: var(--display);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  text-align: center;
+  color: #fff;
+}
+/* 바깥 테 · 가운데 투명 허브와 구멍 */
+.cd-spin::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.4),
+    inset 0 0 0 6px rgba(0, 0, 0, 0.22);
+}
+.cd-hub {
+  position: absolute;
+  inset: 34%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #05070c 0 21%, rgba(225, 232, 240, 0.9) 22% 29%, rgba(255, 255, 255, 0.28) 30% 62%, rgba(200, 210, 222, 0.7) 63% 67%, transparent 68%);
+}
+/* 무지갯빛: 빛은 그대로, 디스크만 돈다 */
+.cd-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 20deg,
+    transparent 0deg,
+    rgba(255, 120, 220, 0.3) 40deg,
+    rgba(120, 255, 255, 0.32) 70deg,
+    transparent 110deg,
+    transparent 200deg,
+    rgba(255, 230, 120, 0.26) 240deg,
+    rgba(140, 160, 255, 0.3) 272deg,
+    transparent 320deg
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+/* 케이스: 왼쪽 경첩과 비스듬한 반사 */
+.deck[data-view='cd'] .cd-case {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: block;
+  border-radius: inherit;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.05) 22%, transparent 23%, transparent 62%, rgba(255, 255, 255, 0.07) 63%, transparent 76%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+  pointer-events: none;
+}
+.cd-hinge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 9%;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 4px),
+    linear-gradient(90deg, rgba(8, 10, 14, 0.9), rgba(46, 52, 64, 0.75) 62%, rgba(255, 255, 255, 0.22) 64%, rgba(8, 10, 14, 0.6));
+}
+/* 플레이어 창: 트랙 번호 · 이퀄라이저 · 연도 */
+.cd {
+  z-index: 40;
+}
+.cd-lcd {
+  position: absolute;
+  left: calc(50% - var(--cw) * 0.7);
+  top: -36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 11px;
+  border: 1px solid rgba(255, 207, 90, 0.35);
+  border-radius: 6px;
+  background: rgba(10, 12, 8, 0.82);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  color: #ffcf5a;
+  text-shadow: 0 0 6px rgba(255, 207, 90, 0.55);
+}
+.cd-lcd b {
+  font-weight: 600;
+}
+.cd-lcd small {
+  font-size: 10px;
+  color: rgba(255, 207, 90, 0.6);
+}
+.cd-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.cd-eq i {
+  width: 3px;
+  height: 100%;
+  background: #ffcf5a;
+  transform-origin: 50% 100%;
+  animation: cd-eq 0.8s ease-in-out infinite alternate;
+}
+.cd-eq i:nth-child(2) {
+  animation-duration: 0.55s;
+}
+.cd-eq i:nth-child(3) {
+  animation-duration: 0.95s;
+}
+.cd-eq i:nth-child(4) {
+  animation-duration: 0.65s;
+}
+.cd-eq i:nth-child(5) {
+  animation-duration: 0.75s;
+}
+@keyframes cd-eq {
+  from {
+    transform: scaleY(0.2);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* ───────── 신문 부채(보도) ───────── */
+.fan {
+  z-index: 40;
+}
+.fan-pin {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--card-h) * -0.04 - 6px);
+  width: 20px;
+  height: 20px;
+  transform: translateX(-50%);
+}
+.fan-pin i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff9b8a, #e5341f 45%, #8a1306);
+  box-shadow:
+    0 6px 10px -3px rgba(0, 0, 0, 0.7),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.3);
+}
+.fan-pin::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 70%;
+  width: 2px;
+  height: 10px;
+  transform: translateX(-50%);
+  background: linear-gradient(#c9d0da, #6b7380);
+  z-index: -1;
+}
+.fan.is-pinning .fan-pin {
+  animation: pin-drop 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.3) 0.25s both;
+}
+@keyframes pin-drop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -26px) scale(1.5);
+  }
+}
+
+/* ───────── 휴대폰 ───────── */
+@media (max-width: 820px) {
+  .deck[data-view='osd'] {
+    --cw: min(calc(var(--card-h) * 1.25), calc(100vw - 64px));
+  }
+  .bat-read {
+    top: -40px;
+    gap: 8px;
+    font-size: 10px;
+  }
+  .bat-bar i {
+    width: 7px;
+  }
+  .bat-cell {
+    display: none;
+  }
+  .deck[data-view='cd'] {
+    --cw: calc(var(--card-h) * 0.9);
+  }
+  .grip-arm {
+    height: 30px;
+  }
+}
+/* 가로 휴대폰: 덱이 낮아 장식 글은 접고 형태만 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .deck[data-view='osd'] {
+    --cw: calc(var(--card-h) * 1.7);
+  }
+  .deck[data-view='cd'] {
+    --cw: calc(var(--card-h) * 1.1);
+  }
+  .osd-top,
+  .osd-bot,
+  .osd-hz,
+  .bat-read,
+  .grip-tag,
+  .scan-tag,
+  .cd-lcd,
+  .sf-box b {
+    display: none;
+  }
+  .grip-arm {
+    height: 22px;
+  }
+  .cell-cap,
+  .cell-skin b {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tr-beam,
+  .cd-spin,
+  .cd-eq i,
+  .sf-line,
+  .osd-rec i,
+  .scan-tag i,
+  .deck[data-view='battery'] .r-card.is-charged .cell-skin {
+    animation: none !important;
+  }
+  .osd.is-bank *,
+  .bat.is-charging *,
+  .fan.is-pinning * {
+    animation: none !important;
+  }
+}

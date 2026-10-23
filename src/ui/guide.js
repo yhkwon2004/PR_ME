@@ -23,7 +23,7 @@ const store = {
 const KEY_SEEN = 'kwon:guide-seen';
 const KEY_LAST = 'kwon:last-scene';
 
-export function createGuide(scenes, { profile, onNext, onGo, onAuto, reducedMotion }) {
+export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, reducedMotion }) {
   const touch = matchMedia('(pointer: coarse)').matches;
   const last = scenes.length - 1;
   const hudBottom = document.getElementById('hud-bottom');
@@ -54,6 +54,8 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, reducedMoti
     toast.classList.remove('is-on');
     void toast.offsetWidth;
     toast.classList.add('is-on');
+    document.body.classList.add('has-toast');
+    toast.style.setProperty('--ms', `${ms}ms`);
     toast.querySelector('.gt-act')?.addEventListener('click', () => {
       hide();
       onAction?.();
@@ -64,7 +66,108 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, reducedMoti
   function hide() {
     clearTimeout(toastT);
     toast.classList.remove('is-on');
+    document.body.classList.remove('has-toast');
     toastT = setTimeout(() => (toast.hidden = true), 400);
+  }
+  // 휴대폰: 알림을 옆이나 아래로 밀어 닫는다
+  {
+    let t0 = null;
+    toast.addEventListener('touchstart', (e) => (t0 = { x: e.touches[0].clientX, y: e.touches[0].clientY }), { passive: true });
+    toast.addEventListener(
+      'touchmove',
+      (e) => {
+        if (!t0) return;
+        const dx = e.touches[0].clientX - t0.x;
+        const dy = Math.max(0, e.touches[0].clientY - t0.y);
+        toast.style.translate = `${dx}px ${dy}px`;
+        toast.style.opacity = String(Math.max(0.2, 1 - Math.hypot(dx, dy) / 160));
+      },
+      { passive: true }
+    );
+    toast.addEventListener(
+      'touchend',
+      (e) => {
+        if (!t0) return;
+        const dx = e.changedTouches[0].clientX - t0.x;
+        const dy = e.changedTouches[0].clientY - t0.y;
+        t0 = null;
+        toast.style.translate = '';
+        toast.style.opacity = '';
+        // 알림을 민 손가락이 장면까지 넘기지 않게
+        e.stopPropagation();
+        if (Math.abs(dx) > 60 || dy > 36) hide();
+      },
+      { passive: true }
+    );
+  }
+
+  // ── 끌기 안내: 반투명한 손끝이 화면을 살짝 밀어 보인다(덱은 옆으로, 장면은 위로) ──
+  const ghost = document.createElement('div');
+  ghost.className = 'drag-ghost';
+  ghost.setAttribute('aria-hidden', 'true');
+  ghost.hidden = true;
+  ghost.innerHTML = '<span class="dg-trail"></span><span class="dg-dot"></span><small class="dg-t"></small>';
+  document.body.appendChild(ghost);
+  let ghostT = 0;
+  function showGhost(kind, rect) {
+    if (reducedMotion || !rect) return;
+    clearTimeout(ghostT);
+    ghost.hidden = false;
+    ghost.className = `drag-ghost is-${kind}`;
+    ghost.style.left = `${rect.left + rect.width / 2}px`;
+    ghost.style.top = `${rect.top + rect.height / 2}px`;
+    ghost.querySelector('.dg-t').textContent = kind === 'x' ? (touch ? '옆으로 밀어 넘기기' : '끌어서 넘기기') : '살짝 밀어 올리면 다음';
+    void ghost.offsetWidth;
+    ghost.classList.add('is-on');
+    ghostT = setTimeout(hideGhost, 3400);
+  }
+  function hideGhost() {
+    clearTimeout(ghostT);
+    ghost.classList.remove('is-on');
+    ghostT = setTimeout(() => (ghost.hidden = true), 300);
+  }
+
+  // ── 당겨 넘기기: 위아래로 끄는 만큼 다음 · 이전 표시가 차오르고, 다 차면 놓는 순간 넘어간다 ──
+  const pull = document.createElement('div');
+  pull.className = 'pull-cue';
+  pull.setAttribute('aria-hidden', 'true');
+  pull.hidden = true;
+  pull.innerHTML = `<span class="pl-ring"><svg viewBox="0 0 36 36"><circle class="pl-track" cx="18" cy="18" r="15" /><circle class="pl-fill" cx="18" cy="18" r="15" pathLength="100" /></svg><i>↑</i></span><span class="pl-t"><small></small><b></b></span>`;
+  document.body.appendChild(pull);
+  const plFill = pull.querySelector('.pl-fill');
+  const plArrow = pull.querySelector('.pl-ring i');
+  const plSmall = pull.querySelector('.pl-t small');
+  const plName = pull.querySelector('.pl-t b');
+  const stageEl = document.getElementById('stage');
+  let armed = false;
+  function setPull(st) {
+    if (!st || !st.label) {
+      pull.classList.remove('is-on', 'is-armed');
+      if (stageEl) {
+        stageEl.classList.remove('is-pulling');
+        stageEl.style.translate = '';
+      }
+      armed = false;
+      return;
+    }
+    hideGhost();
+    if (!toast.hidden) hide();
+    pull.hidden = false;
+    pull.dataset.dir = st.dir > 0 ? 'next' : 'prev';
+    pull.classList.add('is-on');
+    pull.style.setProperty('--p', Math.min(1, st.p).toFixed(3));
+    plFill.style.strokeDashoffset = String(100 - Math.min(1, st.p) * 100);
+    plArrow.textContent = st.dir > 0 ? '↑' : '↓';
+    plName.textContent = st.label;
+    plSmall.textContent = st.armed ? '놓으면 이동' : st.dir > 0 ? '조금 더 밀어 올리기' : '조금 더 끌어내리기';
+    pull.classList.toggle('is-armed', !!st.armed);
+    if (st.armed && !armed) navigator.vibrate?.(8);
+    armed = !!st.armed;
+    // 화면 전체가 손가락을 따라 살짝 끌려온다(고무줄처럼)
+    if (stageEl && !reducedMotion) {
+      stageEl.classList.add('is-pulling');
+      stageEl.style.translate = `0 ${(-st.dir * Math.min(1.2, st.p) * 18).toFixed(1)}px`;
+    }
   }
 
   // ── 처음 방문: 첫 장면 아래의 짧은 안내를 세 가지 사용법으로 ──
@@ -160,6 +263,9 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, reducedMoti
           if (current !== i) return;
           document.body.classList.add('deck-cue');
           setTimeout(() => document.body.classList.remove('deck-cue'), 4200);
+          // 덱이 살짝 끌려갔다 돌아오는 동안 반투명한 손끝이 같은 방향으로 민다
+          const rect = onPeek?.();
+          if (rect) showGhost('x', rect);
           say(touch ? '카드를 옆으로 넘기거나 탭하면 프로젝트를 볼 수 있어요' : '카드를 옆으로 넘기거나(← → · 휠) 눌러서 프로젝트를 볼 수 있어요', { ms: 4800 });
         }, reducedMotion ? 400 : 2200);
       }
@@ -188,6 +294,11 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, reducedMoti
       say(`지난번에 SC ${pad(saved.i)} · ${s.label}까지 보셨어요`, { action: '이어 보기', onAction: () => onGo(saved.i), ms: 9000 });
     },
     say,
+    // 끌기 안내(kind: 'x' 덱 · 'y' 장면) — rect: 손끝이 움직일 자리
+    ghost: showGhost,
+    hideGhost,
+    // 당겨 넘기기 표시: { dir, p, armed, label } · 끝나면 null
+    pull: setPull,
     get firstVisit() {
       return firstVisit;
     },

@@ -7,6 +7,7 @@ import './styles/pages.css';
 import './styles/premium.css';
 import './styles/skills.css';
 import './styles/guide.css';
+import './styles/decks.css';
 
 import * as THREE from 'three';
 import gsap from 'gsap';
@@ -111,6 +112,20 @@ let started = false;
 let hoverHold = false;
 // 손가락이 카드 덱 위에 있는 동안은 자동 재생을 멈춘다(끌던 카드가 저절로 넘어가지 않게)
 let touchHold = false;
+// 끌기 안내: 손으로 보는 중(자동 재생 꺼짐)에 한동안 아무 입력이 없으면 넘기는 법을 반투명한 손끝으로 보여 준다
+let lastInput = performance.now();
+let hintsLeft = 4;
+const coarse = matchMedia('(pointer: coarse)').matches;
+['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach((t) =>
+  addEventListener(
+    t,
+    () => {
+      lastInput = performance.now();
+      guide?.hideGhost();
+    },
+    { passive: true, capture: true }
+  )
+);
 addEventListener('touchstart', (e) => (touchHold = !!e.target.closest?.('.deck-stage')), { passive: true, capture: true });
 addEventListener('touchend', () => (touchHold = false), { passive: true, capture: true });
 addEventListener('touchcancel', () => (touchHold = false), { passive: true, capture: true });
@@ -182,6 +197,8 @@ hud.setAuto(auto);
 const guide = createGuide(scenes, {
   profile,
   reducedMotion: reduced,
+  // 덱을 살짝 끌어 보이고, 손끝 안내가 설 자리(가운데 카드)를 돌려준다 — 다음 카드 쪽으로 움직였을 때만
+  onPeek: () => (panels.peek() > 0 ? panels.current?.reel?.card?.getBoundingClientRect() : null),
   onNext: () => goTo(director.index + 1),
   onGo: (i) => goTo(i),
   onAuto: () => {
@@ -250,7 +267,22 @@ function stepOrGo(dir) {
   return goTo(director.index + dir);
 }
 
+const pad2 = (n) => String(n).padStart(2, '0');
 createInput({
+  // 위아래로 끄는 동안 무엇으로 넘어갈지(다음 카드 · 다음 장면) — 넘어갈 것이 없으면 null
+  pullLabel: (dir) => {
+    if (!started) return null;
+    const i = director.index;
+    if (scenes[i]?.layout === 'finale') return null;
+    const reel = panels.panels[i]?.reel;
+    if (reel?.paged) {
+      const k = reel.focus + dir;
+      if (k >= 0 && k < reel.count) return `${dir > 0 ? '다음' : '이전'} 카드 · ${pad2(k + 1)}/${pad2(reel.count)}`;
+    }
+    const j = i + dir;
+    return j >= 0 && j < scenes.length ? `${pad2(j)} ${scenes[j].code}` : null;
+  },
+  onPull: (st) => guide.pull(st),
   next: () => {
     const r = stepOrGo(1);
     if (r) takeOver();
@@ -582,6 +614,26 @@ soundHint?.addEventListener('click', () => {
 // 필름은 언제나 사운드와 함께 시작한다(사운드 버튼으로 끌 수 있다)
 $('enter-sound').addEventListener('click', () => start(true));
 
+// 넘길 카드가 남았으면 덱을 살짝 끌어 보이고, 아니면(휴대폰) 화면 아래에서 위로 미는 손끝 — 데스크톱은 다음 장면 버튼을 깜박인다
+function idleHint() {
+  const reel = panels.current?.reel;
+  if (reel && reel.focus < reel.count - 1 && panels.peek() > 0) {
+    guide.ghost('x', reel.card.getBoundingClientRect());
+    return true;
+  }
+  if (director.index >= scenes.length - 1) return false;
+  if (coarse) {
+    const y = innerHeight - parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bottom') || '54') - 120;
+    guide.ghost('y', { left: innerWidth / 2, top: y, width: 0, height: 0 });
+  } else {
+    const cue = document.querySelector('.next-cue');
+    cue?.classList.remove('is-nudge');
+    void cue?.offsetWidth;
+    cue?.classList.add('is-nudge');
+  }
+  return true;
+}
+
 // ── 렌더 루프 ──────────────────────────────────────────────
 const timer = new THREE.Timer();
 timer.connect(document);
@@ -613,6 +665,13 @@ function loop(now) {
       hud.setProgress(hold > 0 ? elapsed / hold : 0);
       guide.setProgress(hold > 0 ? elapsed / hold : 0, auto && hold > 0);
       if (auto && hold > 0 && elapsed >= hold) goTo(director.index + 1);
+      // 끌기 안내(보여 줄 때마다 다음 안내까지 더 오래 기다린다)
+      const idleMs = performance.now() - lastInput;
+      if (busy || auto) lastInput = Math.max(lastInput, performance.now() - 1000);
+      else if (hintsLeft > 0 && idleMs > (coarse ? 7000 : 10000) * (5 - hintsLeft) && s.layout !== 'finale') {
+        lastInput = performance.now();
+        if (idleHint()) hintsLeft--;
+      }
     }
   }
   if (!stage) return;

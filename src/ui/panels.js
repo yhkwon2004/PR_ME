@@ -5,6 +5,7 @@ import { AWARDS, AWARD_REEL } from '../data/awards.js';
 import { ORGS, WALL, ORG_INDEX } from '../data/orgs.js';
 import { projectCard, awardCard, pressCard, orgMark, deckInfo, deckAwardInfo, deckPressInfo, deckAllCard, deckAllInfo } from '../pages/site.js';
 import { PRESS } from '../data/press.js';
+import { VIEWS, chromeOf } from './deckViews.js';
 
 // 빈 선택자에 대한 GSAP 경고를 피한다
 const has = (t) => t && (t.length === undefined || t.length > 0);
@@ -28,9 +29,10 @@ function stats(list = []) {
 
 // 카드 덱: 가운데 무대에 카드가 겹쳐 서고, 아래 막대에 번호 · 진행 눈금 · 넘김 버튼
 // cards · infos: 같은 순서의 카드와 설명 — 맨 끝에는 아카이브로 이어지는 '전체 보기' 카드와 설명
-function deck(cards, { count, label, noun, all, allLabel, stats = '', infos = [], end }) {
+// view: 덱 보기 방식(deckViews.js) — 장면마다 다른 무대
+function deck(cards, { count, label, noun, all, allLabel, stats = '', infos = [], end, view = 'cover' }) {
   const n = count + (end ? 1 : 0);
-  return `<div class="deck-stage" role="group" aria-roledescription="carousel" aria-label="${esc(label)}">${cards.join('')}${end ? end.card : ''}</div>
+  return `<div class="deck-stage" data-view="${view}" role="group" aria-roledescription="carousel" aria-label="${esc(label)}">${cards.join('')}${end ? end.card : ''}${chromeOf(view, n)}</div>
         <div class="deck-info"></div>
         ${[...infos, ...(end ? [end.info] : [])].map((h) => `<template class="deck-tpl">${h}</template>`).join('')}
         <div class="deck-bar">
@@ -98,8 +100,9 @@ function render(scene, i) {
         ${scene.subtitle ? `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>` : ''}
         ${scene.stats ? `<ul class="mini-stats" data-r>${scene.stats.map((s) => `<li><b>${esc(s.value)}</b><span>${esc(s.label)}</span></li>`).join('')}</ul>` : ''}
       </div>
-      <div class="reel deck press-reel panel-content" data-r>
+      <div class="reel deck press-reel panel-content" data-view="${scene.view || 'cover'}" data-r>
         ${deck(PRESS.map(pressCard), {
+          view: scene.view,
           count: PRESS.length,
           label: 'IN THE PRESS',
           noun: '기사',
@@ -118,7 +121,7 @@ function render(scene, i) {
         ${scene.subtitle ? `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>` : ''}
         ${scene.stats ? `<ul class="mini-stats" data-r>${scene.stats.map((s) => `<li><b>${esc(s.value)}</b><span>${esc(s.label)}</span></li>`).join('')}</ul>` : ''}
       </div>
-      <div class="reel deck panel-content" data-r>
+      <div class="reel deck panel-content" data-view="${scene.view || 'cover'}" data-r>
         ${(() => {
           const cats = [...new Set(list.map((p) => p.category))];
           const href = `/works?c=${cats.join(',')}`;
@@ -126,6 +129,7 @@ function render(scene, i) {
           return deck(
             list.map((p, k) => projectCard(p, k, { cls: 'r-card' })),
             {
+              view: scene.view,
               count: list.length,
               label: 'PROJECTS',
               noun: '프로젝트',
@@ -273,8 +277,9 @@ function render(scene, i) {
       foot += `<ol class="mini-timeline" data-r>${scene.timeline.map(([y, t]) => `<li><b>${esc(y)}</b><span>${esc(t)}</span></li>`).join('')}</ol>`;
     // 수상 릴: 프로젝트 사진 위에 상장을 얹은 카드
     const reel = scene.awardReel
-      ? `<div class="reel deck aw-reel panel-content" data-r>
+      ? `<div class="reel deck aw-reel panel-content" data-view="trophy" data-r>
         ${deck(AWARD_REEL.map(awardCard), {
+          view: 'trophy',
           count: AWARD_REEL.length,
           label: 'GRAND PRIZE · 대상',
           noun: '수상',
@@ -343,45 +348,51 @@ function render(scene, i) {
   </div>`;
 }
 
-// 덱 자리: 초점 카드(0)는 가운데 앞, 이웃(1 · 2)은 양옆 뒤로 비스듬히, 그 너머(3)는 보이지 않게
-const SLOTS = [
-  { x: 0, z: 0, r: 0, s: 1, o: 1, d: 0 },
-  { x: 0.9, z: -170, r: 38, s: 0.86, o: 1, d: 0.52 },
-  { x: 1.56, z: -330, r: 48, s: 0.74, o: 0.6, d: 0.8 },
-  { x: 2.05, z: -450, r: 54, s: 0.62, o: 0, d: 1 },
-];
-
-// 카드 덱(커버플로): 한 번에 한 장씩 가운데로 — 휠 · 스와이프 · 방향키 · 버튼 · 옆 카드 누르기 · 끌기
+// 카드 덱: 한 번에 한 장씩 가운데로 — 휠 · 스와이프 · 방향키 · 버튼 · 옆 카드 누르기 · 끌기
+// 카드의 자리와 무대 장식은 장면마다 다른 보기 방식(deckViews.js)이 정한다
+const BASE = { x: 0, y: 0, z: 0, rotationX: 0, rotationY: 0, rotationZ: 0, scale: 1, autoAlpha: 1, '--dim': 0, '--clip': 0 };
 function deckReel(el, reducedMotion) {
   const stage = el.querySelector('.deck-stage');
   const cards = [...stage.querySelectorAll('.r-card')];
   if (!cards.length) return null;
+  const view = VIEWS[stage.dataset.view] || VIEWS.cover;
+  view.dress?.(cards, stage);
   // 초점이 바뀔 때 카드 표면을 훑는 빛
   cards.forEach((c) => c.querySelector('.card-media')?.insertAdjacentHTML('beforeend', '<i class="card-sweep" aria-hidden="true"></i>'));
   let focus = 0;
   let width = 0;
+  let height = 0;
+  let ctx = {};
+  let peekTl = null;
 
-  // f: 가운데에 올 위치(끌기 중에는 소수 — 자리 사이를 이어서 보간한다)
-  const slot = (j, f = focus) => {
-    const off = j - f;
-    const a = Math.min(3, Math.abs(off));
-    const i = Math.floor(a);
-    const t = a - i;
-    const A = SLOTS[i];
-    const B = SLOTS[Math.min(3, i + 1)];
-    const m = (k) => A[k] + (B[k] - A[k]) * t;
-    const sign = Math.sign(off);
-    return { x: sign * m('x') * width, z: m('z'), rotationY: sign * m('r'), scale: m('s'), autoAlpha: m('o'), '--dim': m('d'), zIndex: 10 - Math.round(a) };
+  // f: 가운데에 올 위치(끌기 · 미리 보기 중에는 소수 — 자리 사이를 이어서 보간한다)
+  const slot = (j, f = focus) => ({ ...BASE, ...view.slot(j - f, width, height, j, ctx) });
+  const track = (f) => view.track?.(stage, f, width, ctx);
+  const stopPeek = () => {
+    if (!peekTl) return;
+    peekTl.kill();
+    peekTl = null;
+    stage.classList.remove('is-dragging');
+  };
+  // 손가락 · 미리 보기를 따라 바로 그 자리에
+  const placeAt = (f) => {
+    cards.forEach((c, j) => {
+      const { zIndex, ...v } = slot(j, f);
+      gsap.killTweensOf(c);
+      gsap.set(c, { ...v, zIndex });
+    });
+    track(f);
   };
   const place = (animate) => {
     cards.forEach((c, j) => {
       const { zIndex, ...v } = slot(j);
       // 아직 시작 전인 등장 트윈까지 걷어 내야 늦게 시작해 옛 자리로 되돌리지 않는다
       gsap.killTweensOf(c);
-      gsap.set(c, { zIndex, xPercent: -50, transformOrigin: '50% 50%' });
+      gsap.set(c, { zIndex, xPercent: -50, transformOrigin: view.origin || '50% 50%' });
       if (animate && !reducedMotion) gsap.to(c, { ...v, duration: 0.95, ease: 'expo.out' });
       else gsap.set(c, v);
     });
+    track(focus);
   };
   const land = () => {
     const c = cards[focus];
@@ -392,6 +403,7 @@ function deckReel(el, reducedMotion) {
   // auto: 자동 재생이 옮긴 것 · animate: 움직임으로 옮길지
   // entry: 장면에 들어설 때 — 이전 방문의 초점과 비교한 방향을 쓰지 않는다
   const set = (k, { animate = true, auto = false, entry = false } = {}) => {
+    stopPeek();
     const prev = focus;
     focus = Math.max(0, Math.min(cards.length - 1, k));
     // 탭 순서에는 가운데 카드 하나만 — 키보드 초점이 덱 안에 있으면 새 가운데 카드로 옮긴다
@@ -405,12 +417,16 @@ function deckReel(el, reducedMotion) {
     // 바닥 빛은 초점 카드의 분야 색
     stage.style.setProperty('--fc', getComputedStyle(cards[focus]).getPropertyValue('--cc') || '');
     place(animate);
+    view.sync?.(stage, { focus, prev, count: cards.length, cards, card: cards[focus], animate: animate && focus !== prev && !reducedMotion });
     if (animate && focus !== prev) land();
     el.dispatchEvent(new CustomEvent('reelfocus', { detail: { focus, prev, count: cards.length, auto, entry } }));
   };
   const layout = () => {
     width = cards[0].offsetWidth;
-    if (width) place(false);
+    height = cards[0].offsetHeight;
+    if (!width) return;
+    ctx = view.layout?.(stage, width, height) || {};
+    place(false);
   };
 
   // 옆 카드를 누르면 그 카드를 가운데로, 가운데 카드를 누르면 상세로
@@ -468,6 +484,7 @@ function deckReel(el, reducedMotion) {
     'touchstart',
     (e) => {
       const t = e.touches[0];
+      stopPeek();
       tx = { x: t.clientX, y: t.clientY, f0: focus, lx: t.clientX, lt: performance.now(), v: 0, axis: '' };
     },
     { passive: true }
@@ -481,18 +498,16 @@ function deckReel(el, reducedMotion) {
       const t = e.touches[0];
       const dx = t.clientX - tx.x;
       const dy = t.clientY - tx.y;
-      if (!tx.axis && Math.hypot(dx, dy) > 8) tx.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      if (!tx.axis && Math.hypot(dx, dy) > 8) {
+        tx.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+        if (tx.axis === 'x') stage.classList.add('is-dragging');
+      }
       if (tx.axis !== 'x' || reducedMotion) return;
       const now = performance.now();
       tx.v = (t.clientX - tx.lx) / Math.max(1, now - tx.lt);
       tx.lx = t.clientX;
       tx.lt = now;
-      const f = dragPos(dx, tx.f0);
-      cards.forEach((c, j) => {
-        const { zIndex, ...v } = slot(j, f);
-        gsap.killTweensOf(c);
-        gsap.set(c, { ...v, zIndex });
-      });
+      placeAt(dragPos(dx, tx.f0));
     },
     { passive: true }
   );
@@ -505,6 +520,7 @@ function deckReel(el, reducedMotion) {
       const dy = t.clientY - tx.y;
       const { axis, v, f0 } = tx;
       tx = null;
+      stage.classList.remove('is-dragging');
       if (axis !== 'x' && !(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy))) return;
       // 놓는 순간의 속도로 한 장 더 넘길지 정한다
       let k = Math.round(dragPos(dx, f0) + Math.max(-0.6, Math.min(0.6, -v * 0.35)));
@@ -517,6 +533,7 @@ function deckReel(el, reducedMotion) {
   stage.addEventListener('touchcancel', () => {
     if (tx?.axis === 'x') place(true);
     tx = null;
+    stage.classList.remove('is-dragging');
   });
   stage.addEventListener('keydown', (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
@@ -570,17 +587,31 @@ function deckReel(el, reducedMotion) {
       set(k);
       return true;
     },
-    // 장면에 들어설 때: 카드가 오른쪽에서 한 장씩 날아와 제자리에 선다
+    // 장면에 들어설 때: 카드가 보기 방식마다 다른 곳에서 한 장씩 들어와 제자리에 선다(기본은 오른쪽에서 날아든다)
     intro(tl, at) {
       layout();
       if (reducedMotion) return;
       cards.forEach((c, j) => {
         const { zIndex, ...v } = slot(j);
         if (!v.autoAlpha) return;
-        gsap.set(c, { x: v.x + width * 1.6, z: v.z - 260, rotationY: v.rotationY - 38, autoAlpha: 0, '--dim': 1 });
+        gsap.set(c, view.enter ? view.enter(v, width, height, j) : { x: v.x + width * 1.6, z: v.z - 260, rotationY: v.rotationY - 38, autoAlpha: 0, '--dim': 1 });
         tl.to(c, { ...v, duration: 1.25, ease: 'expo.out' }, at + Math.abs(j - focus) * 0.09 + (j < focus ? 0.05 : 0));
       });
       tl.call(land, null, at + 0.5);
+    },
+    // 끌어 넘길 수 있다는 걸 보여 준다: 덱이 다음 카드 쪽으로 살짝 끌려갔다 제자리로 돌아온다
+    peek(amount = 0.34) {
+      if (reducedMotion || tx || cards.length < 2 || !width) return false;
+      stopPeek();
+      const dir = focus >= cards.length - 1 ? -1 : 1;
+      const p = { f: focus };
+      const go = () => placeAt(p.f);
+      stage.classList.add('is-dragging');
+      peekTl = gsap
+        .timeline({ onComplete: () => (stopPeek(), place(false)) })
+        .to(p, { f: focus + dir * amount, duration: 0.75, ease: 'power2.inOut', onUpdate: go })
+        .to(p, { f: focus, duration: 0.9, ease: 'back.out(2.2)', onUpdate: go }, '+=0.12');
+      return dir;
     },
   };
 }
@@ -942,6 +973,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     panels,
     step,
     autoFocus,
+    // 지금 장면의 덱을 살짝 끌어 보인다(끌기 안내) — 움직였으면 방향
+    peek: () => panels[current]?.reel?.peek() || 0,
     setLoopCenter,
     go(i, prev, duration) {
       if (prev >= 0) hide(prev);
