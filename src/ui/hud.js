@@ -65,7 +65,8 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
   btnIndex.addEventListener('click', () => (indexOpen ? closeIndex() : openIndex()));
   indexEl.querySelector('.index-close').addEventListener('click', () => closeIndex());
   indexEl.addEventListener('click', (e) => {
-    if (e.target === indexEl) closeIndex();
+    // 아카이브 링크는 페이지로 넘어가므로 목록을 닫는다(이동은 site.js가 맡는다)
+    if (e.target === indexEl || e.target.closest('a[data-link]')) closeIndex();
   });
   btnPlay.addEventListener('click', onToggleAuto);
   btnSound.addEventListener('click', onToggleSound);

@@ -30,6 +30,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/skills",
+      "destination": "/index.html"
+    },
+    {
       "source": "/works",
       "destination": "/index.html"
     },

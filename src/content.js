@@ -102,9 +102,9 @@ export const scenes = [
     layout: 'reel',
     hold: 11,
     category: 'robotics',
-    kicker: 'EMBODIED ROBOTICS — 로봇 · 임베디드 · IoT',
+    kicker: 'EMBODIED ROBOTICS — 휴머노이드 · 매니퓰레이터 · 4족 · IoT',
     title: ['EMBODIED', 'ROBOTICS'],
-    subtitle: '몸을 가진 지능을 설계한다 — 로봇에서 센서 · 회로까지',
+    subtitle: '몸을 가진 지능을 설계한다 — 보행 · 조작 로봇에서 센서 · 회로까지',
     projects: ['quadruped-robot', 'vision-robot-arm', 'robot-push-hackathon', 'iot-iv-pole', 'pressure-clicker', 'moisture-dehumidifier', 'peltier-cooler', 'hanok-ess'],
   },
   {

@@ -11,7 +11,8 @@ const SHOTS = {
   prologue: { pos: add(SETS.hangar, 5.5, 3.4, 7.4), target: add(SETS.hangar, 0, 2.2, 0), fov: 36, shift: [0, 0] },
   aerial: { pos: add(SETS.aerial, 11.15, 8.57, 16.22), target: add(SETS.aerial, 0, 3.4, 0), fov: 42, shift: [0, 0.1] },
   ground: { pos: add(SETS.ground, 15.35, 9.0, 18.35), target: add(SETS.ground, -2.2, 1.2, -2.2), fov: 44, shift: [0, 0.2] },
-  robotics: { pos: add(SETS.robotics, 0.175, 7.525, 14.975), target: add(SETS.robotics, 0.3, 0.9, -0.9), fov: 40, shift: [0, 0.18] },
+  // 로보틱스: 덱 양옆의 두 무리(휴머노이드 + 4족 · 매니퓰레이터 작업 셀)를 조금 낮고 가깝게
+  robotics: { pos: add(SETS.robotics, 0.2, 5.6, 12.0), target: add(SETS.robotics, 0.3, 0.9, -0.9), fov: 40, shift: [0, 0.12] },
   intelligence: { pos: add(SETS.core, 19.8, 3.24, 31.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [0, 0.11] },
   // 제품 · 창업: 격납고 패드 위에 떠 있는 드론을 비스듬히 — 이륙 직전의 장면
   build: { pos: add(SETS.hangar, -13, 9.5, 21), target: add(SETS.hangar, 1.5, 3.2, -10), fov: 40, shift: [0.34, 0.16] },
@@ -80,21 +81,23 @@ export class Director {
     if (aspect < 0.85) {
       // 세로 화면: 뒤로 물러나 화면 폭에 피사체를 담고, 제목(위)과 시트(아래) 사이 띠에 둔다
       if (id === 'robotics') {
-        // 걷는 개와 로봇팔의 가운데를 겨눈다
-        target.x -= 0.8;
-        pos.x -= 0.8;
+        // 오른쪽 앞에서 비스듬히 — 양옆 무리가 겹쳐 좁아지고, 카드 위 빈 띠에 셋이 한 줄로 든다
+        pos.sub(target).applyAxisAngle(THREE.Object3D.DEFAULT_UP, 0.4).add(target);
       }
-      const pull = { press: 1.25, robotics: 1.7, record: 1.3, intro: 1.2 }[id] || 1.45;
+      const pull = { press: 1.25, robotics: 1.9, record: 1.3, intro: 1.2 }[id] || 1.45;
       const back = pos.clone().sub(target).multiplyScalar(pull);
       pos.copy(target).add(back);
       fov += 8;
       const reel = this.scenes.find((x) => x.id === id)?.layout === 'reel';
       const stage = this.scenes.find((x) => x.id === id)?.layout === 'stage';
-      shift.set(0, id === 'finale' ? 0.45 : id === 'record' ? 0.12 : reel ? 0.06 : stage ? 0.02 : 0.2);
+      shift.set(0, id === 'finale' ? 0.45 : id === 'record' ? 0.12 : id === 'robotics' ? 0.2 : reel ? 0.06 : stage ? 0.02 : 0.2);
     } else if (aspect < 1.3) {
       const back = pos.clone().sub(target).multiplyScalar(1.15);
       pos.copy(target).add(back);
       shift.x *= 0.7;
+    } else if (id === 'robotics' && aspect > 1.9) {
+      // 낮고 넓은 화면: 휴머노이드 머리가 제목 줄에 닿지 않게 피사체를 조금 내린다
+      shift.y = 0.05;
     } else if (id === 'record' && (innerHeight < 1000 || aspect > 1.9)) {
       // 낮은 화면: 적층 막대가 위쪽 수치 띠로 올라가지 않게(가로 휴대폰은 카드 줄 뒤로 내린다)
       shift.y = innerHeight < 500 ? -0.3 : 0.08;

@@ -4,6 +4,7 @@ import { profile } from '../content.js';
 import { ORGS, WALL, ORG_INDEX, orgsOf, awardOrgs } from '../data/orgs.js';
 import { AWARDS, awardsOf, bestOf, TIER_KEY } from '../data/awards.js';
 import { pressOf } from '../data/press.js';
+import { DOMAIN_SKILLS, SKILLS, CERTS, SKILL_COUNT } from '../data/skills.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
@@ -272,6 +273,7 @@ export function awardCard(a) {
 const tabs = (on) => `<nav class="pg-tabs" aria-label="보기 전환">
     <a href="/works" data-link class="${on === 'works' ? 'is-on' : ''}"${on === 'works' ? ' aria-current="page"' : ''}>Works<sup>${projects.length}</sup></a>
     <a href="/awards" data-link class="${on === 'awards' ? 'is-on' : ''}"${on === 'awards' ? ' aria-current="page"' : ''}>Awards<sup>${AWARDS.length}</sup></a>
+    <a href="/skills" data-link class="${on === 'skills' ? 'is-on' : ''}"${on === 'skills' ? ' aria-current="page"' : ''}>Skills<sup>${SKILL_COUNT}</sup></a>
   </nav>`;
 
 const TIER_OF_KEY = Object.fromEntries(TIER_KEY.map((k, t) => [k, t]).filter(([k]) => k));
@@ -324,6 +326,117 @@ function awardsPage() {
     ${footer()}
   </div>`,
   };
+}
+
+// ── 보유 스킬(/skills): 숙련도 점수 대신 근거 — 기술마다 그 기술을 쓴 프로젝트와 받은 상 ──
+// 근거 눈금: 프로젝트 하나에 한 칸(그 프로젝트 분야의 색)
+const skTicks = (list) => `<span class="sk-ticks" aria-hidden="true">${list.map((p) => `<i data-cat="${esc(p.category)}"></i>`).join('')}</span>`;
+const skDate = (a) => a.date.replace(/-/g, '.');
+
+function skillRow(s) {
+  const n = s.evidence.length;
+  const explore = s.state === 'explore';
+  // 프로젝트 근거가 없으면 무엇이 근거인지(자격 · 수상 · 본인 기록)를 대신 적는다
+  const none = explore && !n ? '기록 없음' : s.certs.length ? '자격' : s.direct.length ? '수상' : 'NOTION';
+  const label = `${s.name} — ${n ? `프로젝트 ${n}건` : none}${s.awards.length ? `, 수상 ${s.awards.length}` : ''}${s.certs.length ? `, 자격 ${s.certs.length}` : ''}${explore ? ', 탐구 중' : ''}`;
+  const ev = [
+    ...s.evidence.map(({ project: p, tools }) => {
+      const aw = awardsOf(p.id).length;
+      const meta = [p.year, categoryOf(p.category).label, ...tools].filter(Boolean).join(' · ');
+      return `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}"><span class="sk-ev-t"><b>${esc(p.title)}</b><small>${esc(meta)}</small></span>${aw ? `<span class="sk-ev-aw">${LAUREL}${aw}</span>` : ''}<i aria-hidden="true">↗</i></a></li>`;
+    }),
+    ...s.direct.map(
+      (a) =>
+        `<li class="is-award"><a href="/awards" data-link><span class="sk-ev-t"><b>${esc(a.contest)}</b><small>${esc(a.grade)} · ${esc(skDate(a))} · 수상 기록</small></span><span class="sk-ev-aw">${LAUREL}</span><i aria-hidden="true">↗</i></a></li>`
+    ),
+    ...s.certs.map(
+      (c) => `<li class="is-cert"><a href="#sk-certs" data-jump><span class="sk-ev-t"><b>${esc(c.name)}</b><small>자격증${c.year ? ` · ${esc(c.year)}` : ''}</small></span><i aria-hidden="true">↓</i></a></li>`
+    ),
+  ];
+  return `<li class="sk-item${explore ? ' is-explore' : ''}" data-p="${s.evidence.map((e) => e.project.id).join(' ')}">
+    <button type="button" class="sk-key" aria-expanded="false" aria-controls="skp-${s.id}" aria-label="${esc(label)}">
+      <span class="sk-name"><b>${esc(s.name)}</b><small>${esc(s.en)}</small></span>
+      ${skTicks(s.evidence.map((e) => e.project))}
+      <span class="sk-flags">${explore ? '<em class="sk-exp">탐구 중</em>' : ''}${s.certs.length ? '<em class="sk-cert-f">자격</em>' : ''}${
+        s.awards.length ? `<em class="sk-aw-f">${LAUREL}${s.awards.length}</em>` : ''
+      }</span>
+      <span class="sk-cnt">${n ? `<b>${n}</b>` : `<b class="is-none">—</b>`}<small>${n ? 'PROJ' : esc(none)}</small></span>
+      <span class="sk-plus" aria-hidden="true"></span>
+    </button>
+    <div class="sk-ev" id="skp-${s.id}" hidden>
+      ${s.note ? `<p class="sk-note"><span>${explore ? 'NEXT' : 'NOTION'}</span>${esc(s.note)}</p>` : ''}
+      ${ev.length ? `<ul class="sk-evl">${ev.join('')}</ul>` : ''}
+    </div>
+  </li>`;
+}
+
+function skillsPage() {
+  const proven = new Set(SKILLS.flatMap((s) => s.evidence.map((e) => e.project.id)));
+  const certs = [...CERTS].sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999'));
+  const domainOf = (id) => DOMAIN_SKILLS.find((d) => d.id === id);
+  const card = (d, k) => {
+    const top = d.skills.filter((s) => s.evidence.length).slice(0, 4);
+    return `<li class="sk-dcard" data-dom="${d.id}" style="--i:${k}">
+      <a href="#sk-${d.id}" data-jump aria-label="${esc(`${d.ko} — 기술 ${d.skills.length}, 근거 프로젝트 ${d.projects.length}, 수상 ${d.awards}${d.certs.length ? `, 자격 ${d.certs.length}` : ''}`)}">
+        <span class="sk-dk"><span class="sk-dno">${pad(k + 1)}</span>${esc(d.code)}</span>
+        <span class="sk-dname">${esc(d.ko)}</span>
+        <span class="sk-den">${esc(d.label)}</span>
+        <span class="sk-dnum"><span><b>${d.skills.length}</b>기술</span><span><b>${d.projects.length}</b>프로젝트</span><span><b>${d.awards}</b>수상</span>${d.certs.length ? `<span><b>${d.certs.length}</b>자격</span>` : ''}</span>
+        <span class="sk-dtop">${top.map((s) => `<i>${esc(s.name)}</i>`).join('')}</span>
+        ${skTicks(d.projects)}
+        <span class="sk-dgo" aria-hidden="true">↓</span>
+      </a>
+    </li>`;
+  };
+  const section = (d, k) => `<section class="sk-sec reveal" id="sk-${d.id}" data-dom="${d.id}" aria-labelledby="sk-h-${d.id}">
+      <div class="sk-side">
+        <p class="sk-sec-k"><span>${pad(k + 1)}</span>${esc(d.code)} — ${esc(d.label)}</p>
+        <h2 class="sk-sec-h" id="sk-h-${d.id}" tabindex="-1">${esc(d.ko)}<sup>${pad(d.skills.length)}</sup></h2>
+        <p class="sk-sec-lead">${esc(d.lead)}</p>
+        <p class="sk-sec-n"><span><b>${d.projects.length}</b>프로젝트</span><span><b>${d.awards}</b>수상</span>${d.certs.length ? `<span><b>${d.certs.length}</b>자격</span>` : ''}</p>
+        ${
+          d.projects.length
+            ? `<ul class="sk-proj" aria-label="${esc(d.ko)} 근거 프로젝트">${d.projects
+                .map((p) => `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}" data-p="${p.id}"><b>${esc(p.title)}</b><small>${esc(p.year)}</small></a></li>`)
+                .join('')}</ul>`
+            : ''
+        }
+      </div>
+      <ul class="sk-list">${d.skills.map(skillRow).join('')}</ul>
+    </section>`;
+  return `<div class="pg pg-skills">
+    ${bar({ href: '/', label: 'FILM' })}
+    <section class="works-head sk-head">
+      <p class="pg-kicker">SKILL MAP — 프로젝트가 증명하는 기술</p>
+      <h1 class="works-title">Skills<sup>${pad(SKILL_COUNT)}</sup></h1>
+      ${tabs('skills')}
+      <p class="sk-lead">숙련도 점수 대신 근거를 셉니다. 기술마다 그 기술을 쓴 프로젝트와 그 프로젝트가 받은 상을 잇고, 누르면 근거가 열립니다.</p>
+      <dl class="sk-sum">
+        <div><dt>분야</dt><dd>${DOMAIN_SKILLS.length}</dd></div>
+        <div><dt>기술</dt><dd>${SKILL_COUNT}</dd></div>
+        <div><dt>근거 프로젝트</dt><dd>${proven.size}</dd></div>
+        <div><dt>자격증</dt><dd>${CERTS.length}</dd></div>
+      </dl>
+    </section>
+    <section class="sk-domains" aria-label="분야 한눈에 보기">
+      <ol class="sk-dgrid">${DOMAIN_SKILLS.map(card).join('')}</ol>
+      <p class="sk-legend" aria-hidden="true"><span><i class="lg-tick"></i>근거 프로젝트 한 칸(분야 색)</span><span class="lg-aw">${LAUREL}그 프로젝트들의 수상</span><span class="lg-cert">자격</span><span class="lg-exp">탐구 중 — 초기 · 검토 단계</span></p>
+    </section>
+    <div class="sk-matrix">${DOMAIN_SKILLS.map(section).join('')}</div>
+    <section class="sk-certs reveal" id="sk-certs" aria-labelledby="sk-h-certs">
+      <p class="pg-kicker">CERTIFICATIONS — 자격증</p>
+      <h2 class="ww-title" id="sk-h-certs" tabindex="-1">자격증<sup>${pad(CERTS.length)}</sup></h2>
+      <ol class="sk-cgrid">${certs
+        .map((c) => {
+          const d = domainOf(c.domain);
+          return `<li class="sk-cert" data-dom="${c.domain}"><span class="sk-cy">${c.year ? esc(c.year) : '—'}</span><b>${esc(c.name)}</b><small>${esc(d.code)} · ${esc(d.ko)}</small></li>`;
+        })
+        .join('')}</ol>
+      <p class="wall-note">근거는 프로젝트 기록(도구 · 역할 · 요약 · 스토리)에 그 기술이 적힌 경우만 셉니다. NOTION 줄과 자격증은 2026 Notion 포트폴리오의 본인 기록이며, 취득 연도가 적혀 있지 않은 자격은 비워 두었습니다.</p>
+    </section>
+    ${withWall()}
+    ${footer()}
+  </div>`;
 }
 
 function bar(back) {
@@ -579,6 +692,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   const parse = () => {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (path.toLowerCase() === '/awards') return { name: 'awards' };
+    if (path.toLowerCase() === '/skills') return { name: 'skills' };
     const m = path.match(/^\/works(?:\/([\w-]+))?$/);
     if (!m) return { name: 'film' };
     if (m[1]) {
@@ -624,6 +738,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   function mount(route) {
     pageMedia = [];
     if (route.name === 'works') page.innerHTML = worksPage(route.cat);
+    else if (route.name === 'skills') page.innerHTML = skillsPage();
     else if (route.name === 'awards') {
       const a = awardsPage();
       pageMedia = a.media;
@@ -634,7 +749,8 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     document.body.classList.add('page-open');
     bind(route);
     const p = route.name === 'detail' ? byId(route.id) : null;
-    document.title = p ? `${p.title} — 권용현 Physical AI Portfolio` : `${route.name === 'awards' ? 'Awards' : 'Works'} — 권용현 Physical AI Portfolio`;
+    const name = { awards: 'Awards', skills: 'Skills' }[route.name] || 'Works';
+    document.title = p ? `${p.title} — 권용현 Physical AI Portfolio` : `${name} — 권용현 Physical AI Portfolio`;
     page.focus({ preventScroll: true });
   }
 
@@ -644,6 +760,59 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     observer?.disconnect();
     document.body.classList.remove('page-open');
     document.title = '권용현 — Physical AI Portfolio';
+  }
+
+  // 보유 스킬: 기술 펼치기 · 기술 ↔ 근거 프로젝트 강조 · 분야로 건너뛰기
+  function bindSkills() {
+    const matrix = page.querySelector('.sk-matrix');
+    matrix.addEventListener('click', (e) => {
+      const b = e.target.closest('.sk-key');
+      if (!b) return;
+      const open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', String(open));
+      b.parentElement.classList.toggle('is-open', open);
+      document.getElementById(b.getAttribute('aria-controls')).hidden = !open;
+    });
+    // 기술에 올리면 그 기술의 프로젝트가, 프로젝트에 올리면 그 프로젝트를 근거로 둔 기술이 밝아진다
+    let lit = null;
+    const light = (el) => {
+      const item = el?.closest('.sk-item');
+      const chip = el?.closest('.sk-proj a');
+      const key = (item && item.dataset.p) || chip ? item || chip : null;
+      if (key === lit) return;
+      if (lit) {
+        const old = lit.closest('.sk-sec');
+        old.classList.remove('is-lit');
+        old.querySelectorAll('.is-hit').forEach((x) => x.classList.remove('is-hit'));
+      }
+      lit = key;
+      if (!lit) return;
+      const sec = lit.closest('.sk-sec');
+      sec.classList.add('is-lit');
+      lit.classList.add('is-hit');
+      if (item) {
+        const ids = item.dataset.p.split(' ');
+        sec.querySelectorAll('.sk-proj a').forEach((a) => a.classList.toggle('is-hit', ids.includes(a.dataset.p)));
+      } else sec.querySelectorAll('.sk-item').forEach((li) => li.classList.toggle('is-hit', li.dataset.p.split(' ').includes(chip.dataset.p)));
+    };
+    // 마우스에서만(터치는 누르면 펼친다)
+    matrix.addEventListener('pointerover', (e) => e.pointerType === 'mouse' && light(e.target));
+    matrix.addEventListener('pointerleave', () => light(null));
+    // 포커스는 키보드로 옮겼을 때만(터치로 누른 버튼이 다른 줄을 계속 흐리게 하지 않게)
+    matrix.addEventListener('focusin', (e) => e.target.matches(':focus-visible') && light(e.target));
+    matrix.addEventListener('focusout', (e) => !matrix.contains(e.relatedTarget) && light(null));
+    // 분야 카드 · 자격 줄: 페이지 안의 그 구획으로(주소는 그대로)
+    page.querySelectorAll('[data-jump]').forEach((a) =>
+      a.addEventListener('click', (e) => {
+        const to = page.querySelector(a.getAttribute('href'));
+        if (!to) return;
+        e.preventDefault();
+        // 등장 전(아래로 밀린) 위치가 아니라 제자리 기준으로, 위 막대 높이만큼 띄운다
+        const y = to.getBoundingClientRect().top - new DOMMatrix(getComputedStyle(to).transform).m42 + page.scrollTop;
+        page.scrollTo({ top: y - page.querySelector('.pg-bar').offsetHeight - 8, behavior: reducedMotion ? 'auto' : 'smooth' });
+        (to.querySelector('[tabindex="-1"]') || to).focus({ preventScroll: true });
+      })
+    );
   }
 
   function bind(route) {
@@ -664,7 +833,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
         }),
       { root: page, rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
     );
-    page.querySelectorAll('.reveal, .w-item, .aw-cell').forEach((el) => observer.observe(el));
+    page.querySelectorAll('.reveal, .w-item, .aw-cell, .sk-dcard').forEach((el) => observer.observe(el));
     // 상장 크게 보기(수상 아카이브 · 상세의 수상 칸)
     const certs = route.name === 'awards' ? pageMedia : JSON.parse(page.querySelector('.d-awards')?.dataset.media || '[]');
     // 등급으로 걸러 보는 중이면 라이트박스도 보이는 수상의 상장만 넘긴다
@@ -746,6 +915,10 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
         gsap.fromTo(items.filter((li) => !li.classList.contains('is-out')), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.03, ease: 'power3.out' });
       });
       gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .chips button'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'expo.out', delay: 0.2 });
+    } else if (route.name === 'skills') {
+      bindSkills();
+      if (!reducedMotion)
+        gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .sk-lead, .sk-sum > div'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'expo.out', delay: 0.2, clearProps: 'opacity,visibility,transform' });
     } else {
       const p = byId(route.id);
       const media = detailImages(p).map((im) => ({ type: 'image', src: im.src, caption: im.caption }));
@@ -787,7 +960,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       else back();
       return;
     }
-    const label = route.name === 'detail' ? byId(route.id).title : route.name === 'awards' ? 'AWARDS' : 'WORKS';
+    const label = route.name === 'detail' ? byId(route.id).title : route.name.toUpperCase();
     const doMount = () => {
       onOpen?.(route);
       mount(route);

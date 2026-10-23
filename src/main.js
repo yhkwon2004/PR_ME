@@ -5,6 +5,7 @@ import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import './styles/main.css';
 import './styles/pages.css';
 import './styles/premium.css';
+import './styles/skills.css';
 
 import * as THREE from 'three';
 import gsap from 'gsap';
@@ -67,7 +68,7 @@ function buildWorld() {
 
     actors = { drone, hangar, aerial, ground, robotics, core, records, links, video };
     director = new Director({ stage, actors, scenes, reducedMotion: reduced, onTransition });
-    director.hitTargets = [drone.hit, ground.rover.hit, robotics.dog.hit, robotics.arm.hit, core.hit];
+    director.hitTargets = [drone.hit, ground.rover.hit, robotics.dog.hit, robotics.humanoid.hit, robotics.arm.hit, core.hit];
     let reframeTimer = 0;
     addEventListener('resize', () => {
       clearTimeout(reframeTimer);
