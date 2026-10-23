@@ -448,8 +448,31 @@ small { font-size: .8em; }
 .chap button[aria-current="true"] { background: var(--panel-2); border-color: var(--honey); }
 
 /* ================= 8 data (simulation) ================= */
-.simfig { flex: 1; min-height: 0; display: flex; padding: .6em .8em; }
-.simfig .chart { flex: 1; }
+.pp-wrap { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1.02fr; gap: 2.2em; align-items: stretch; }
+.pp { position: relative; min-height: 0; }
+.pp-page { position: absolute; top: 0; margin: 0; height: 100%; background: #FFFFFF; border-radius: .25em; box-shadow: 0 1.2em 3em rgba(92, 62, 36, .2), 0 .1em .3em rgba(92, 62, 36, .12); }
+.pp-page img { width: 100%; height: 100%; border-radius: inherit; }
+.pp-1 { left: 0; top: 5%; height: 90%; aspect-ratio: 873 / 1147; transform: rotate(-4deg); transform-origin: 70% 60%; }
+.pp-2 { right: 0; aspect-ratio: 832 / 1125; }
+.pin { display: inline-grid; place-items: center; width: 1.9em; height: 1.9em; border-radius: 50%; background: var(--honey); color: #FFFFFF; font-style: normal; font-weight: 800; font-size: .95em; box-shadow: 0 0 0 .3em rgba(173, 98, 41, .22); }
+.pp-page .pin { position: absolute; transform: translate(-50%, -50%); pointer-events: none; }
+.slide.on .pp-page .pin { animation: pulse 2.4s ease-out 1.2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(173, 98, 41, .5); } 70% { box-shadow: 0 0 0 .9em rgba(173, 98, 41, 0); } 100% { box-shadow: 0 0 0 0 rgba(173, 98, 41, 0); } }
+.pinfo { display: flex; flex-direction: column; gap: .9em; min-height: 0; }
+.pmeta { display: flex; flex-direction: column; gap: .45em; }
+.pmeta .k { font-size: .86em; font-weight: 750; color: var(--honey); }
+.pmeta h3 { font-size: 1.45em; letter-spacing: -.02em; }
+.pmeta .en { font-size: .92em; color: var(--cream-2); line-height: 1.45; }
+.pmeta .by { font-size: .84em; color: var(--mute); }
+.pkeys { flex: 1; min-height: 0; display: grid; gap: .7em; }
+.pkeys li { display: grid; grid-template-columns: 2.6em 1fr; align-items: center; gap: .9em; padding: 1em 1.3em; }
+.pkeys li .pin { justify-self: center; }
+.pkeys b { display: block; font-size: 1.22em; letter-spacing: -.015em; }
+.pkeys p { margin-top: .25em; font-size: .95em; color: var(--cream-2); }
+.pmore { display: flex; align-items: center; gap: .8em; font-size: .88em; color: var(--cream-2); }
+.pmore .chip { flex: none; }
+.pf-curve { flex: none; align-self: stretch; width: 16em; margin: 0; display: grid; place-items: center; padding: .4em; border-radius: .5em; background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
+.pf-curve img { max-width: 100%; max-height: 100%; }
 
 /* ================= 9 results ================= */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; flex: 1.25; min-height: 0; }
@@ -478,11 +501,6 @@ small { font-size: .8em; }
 .pf .drops .ico { width: 2.1em; height: 2.1em; }
 .pf p { font-size: .9em; color: var(--cream-2); line-height: 1.45; }
 .pf p b { display: block; font-size: 1.2em; color: var(--cream); letter-spacing: -.01em; }
-.fan2 { position: relative; align-self: stretch; width: 15em; flex: none; }
-.fan2 img { position: absolute; top: 0; height: 100%; width: auto; border-radius: .2em; background: #FFFFFF; box-shadow: 0 .4em 1.2em rgba(92, 62, 36, .22); transition: transform .4s var(--ease); }
-.fan2 img:first-child { left: 5.4em; transform: rotate(6deg); }
-.fan2 img:last-child { left: 0; transform: rotate(-4deg); }
-.fan2:hover img:first-child { transform: rotate(9deg) translateX(.6em); }
 .pat3 { display: flex; align-items: center; gap: .2em; color: var(--honey); font-weight: 800; font-size: 1.4em; }
 .pat3 .ico { width: 3.2em; height: 3.2em; stroke-width: 1.3; }
 
@@ -876,7 +894,6 @@ small { font-size: .8em; }
   .sx-pcb { flex: none; }
   .sx-pcb .ph { height: 9em; }
   .proof2 { grid-template-columns: 1fr; }
-  .fan2 { height: 9em; width: 12em; }
   .reg-ph, .rs-ph { flex: none; height: 12em; }
   .lv-ph { flex: none; height: 13em; }
   .evi { grid-template-columns: 1fr; }
@@ -897,8 +914,10 @@ small { font-size: .8em; }
   .hero .disc { width: 13em; }
   .flow { grid-template-columns: 1fr; }
   .flow .arr { justify-self: center; transform: rotate(90deg); }
-  .simfig { overflow-x: auto; }
-  .simfig .chart { flex: none; width: 70em; height: 34em; }
+  .pp-wrap { grid-template-columns: 1fr; gap: 1.2em; }
+  .pp { height: 26em; }
+  .pf { flex-wrap: wrap; }
+  .pf-curve { width: 100%; height: 8em; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stat .num { font-size: 3.2em; }
   .kpi { grid-template-columns: 5.6em 1fr; }
@@ -938,7 +957,7 @@ small { font-size: .8em; }
 @media (prefers-reduced-motion: reduce) {
   .slide.on .b, .slide.on .plot i, .slide.on .hbar i, .slide.on .stackbar i, .slide.on .cmpbar i, .slide.on .bleed, .slide.on .pet img, .slide.on .impact-photo img, .slide.on .cover-photo img { animation: none; }
   .frame, [data-step], .scribble path { transition: none; }
-  .clock .colon { animation: none; }
+  .clock .colon, .slide.on .pp-page .pin { animation: none; }
 }
 
 @media print {
@@ -1327,19 +1346,42 @@ small { font-size: .8em; }
   <div class="note" hidden><p>실제 시연입니다. 폴대 상단에 모듈을 끼우고 수액백을 겁니다. 유속을 빠르게 하면 대시보드와 휴대폰에 유속 과다 알림이, 느리게 하거나 멈추면 각각 알림이 뜹니다. 영상 속 하우징은 구형 시제품입니다.</p></div>
 </section>
 
-<section class="slide" id="data" data-sec="4" data-time="16" data-title="다섯 가지 입원 상황 판별 데이터">
+<section class="slide" id="paper" data-sec="4" data-time="18" data-title="논문 — 상태 패턴 분석 기반 수액 이상 감지">
   <div class="frame">
-    <p class="lab b">Demo <span>상황별 판별 데이터</span></p>
-    <h2 class="h b">흔들림은 걸러내고, <mark>진짜 이상</mark>만 알립니다</h2>
+    <p class="lab b">Research <span>학술 검증</span></p>
+    <h2 class="h b">판별 알고리즘은 <mark>논문</mark>으로 먼저 검증했습니다</h2>
     <div class="bd">
-      <figure class="card simfig b"><div class="chart" data-chart="sim" role="img" aria-label="다섯 가지 입원 상황의 무게 신호와 이상 점수 차트 — 정상 투여 최고 0.13 알림 없음, 이송 중 흔들림 최고 0.39 알림 없음, 유속 저하 최고 0.99 알림 31:07, 줄 빠짐 최고 0.98 알림 30:02, 공기 유입 · 역류 최고 0.89 알림 30:01"></div></figure>
+      <div class="pp-wrap">
+        <div class="pp b">
+          <figure class="pp-page pp-1"><img src="media/paper-1.webp" alt="논문 1쪽 — 상태 패턴 분석 기반 수액 이상 감지 알고리즘, 저자와 초록" data-zoom></figure>
+          <figure class="pp-page pp-2"><img src="media/paper-2.webp" alt="논문 2쪽 — 상태 부호화와 4×4 패턴, 경량 CNN 구조, 선행 연구와의 비교표" data-zoom>
+            <span class="pin" style="left: 27%; top: 56%">1</span>
+            <span class="pin" style="left: 76%; top: 27%">2</span>
+            <span class="pin" style="left: 27%; top: 95%">3</span>
+          </figure>
+        </div>
+        <div class="pinfo">
+          <div class="card pmeta b">
+            <p class="k">국내 학술대회 발표 논문 · 2026.07</p>
+            <h3>상태 패턴 분석 기반 수액 이상 감지 알고리즘</h3>
+            <p class="en">A State Pattern Analysis-Based Algorithm for Intravenous Infusion Anomaly Detection</p>
+            <p class="by">원광대학교 컴퓨터소프트웨어공학과 · 한우진 · 정익상 · 권용현 · 최이지 · 이완범 교수</p>
+          </div>
+          <ol class="pkeys">
+            <li class="card b"><span class="pin">1</span><div><b>유속 변화를 4×4 패턴 이미지로</b><p>느림 −1 · 정상 0 · 빠름 +1, 연속 16개 상태</p></div></li>
+            <li class="card b"><span class="pin">2</span><div><b>사용자 입력 2개 → 0개</b><p>선행 Dual-Track 대비 · 점적 계수 입력 없이 판정</p></div></li>
+            <li class="card b"><span class="pin">3</span><div><b>파라미터 약 660개 경량 CNN</b><p>ESP32 메모리 약 10KB · 기기 안에서 실시간 판정</p></div></li>
+          </ol>
+          <p class="pmore b"><span class="chip lt">국제 학술대회 AIT 2026</span><span>Design of a Dual-Track Algorithm for Real-Time IV Monitoring Based on Load Cell</span></p>
+        </div>
+      </div>
     </div>
-    <div class="ft"><p class="src b">※ Python(NumPy · plotly.py)으로 계산한 차트 — 500 mL 수액 모의 신호, 1초 측정 · 30분 시점에 상황 발생 · 기대 추세는 투여 초기 5분 감소량의 최소제곱 직선 · 줄 빠짐은 당겨지는 순간의 장력 + 분리 후 빨라진 유출 · 마우스를 올리면 값 표시 · 코드 scripts/infutech-charts.py</p></div>
+    <div class="ft"><p class="src b">출처: 한우진 외, 「상태 패턴 분석 기반 수액 이상 감지 알고리즘」, 한국혁신산업학회 · 한국디지털정책학회 공동학술대회(2026.07), 원광대학교 지원 · AIT 2026(2026.01) · 쪽을 누르면 전문을 크게 볼 수 있습니다</p></div>
   </div>
-  <div class="note" hidden><p>다섯 가지 입원 상황을 같은 조건으로 돌린 결과입니다. 위는 무게, 아래는 이상 점수입니다. 줄이 빠지면 수액은 멈추지 않고 오히려 조금 더 빨리 새어 나갑니다. 그래서 당겨지는 순간의 장력과 기울기 변화를 함께 봅니다.</p><p>정상 투여와 이송 중 흔들림에서는 원신호가 크게 흔들려도 점수가 임계값 아래에 머뭅니다. 유속 저하, 줄 빠짐, 공기 유입이나 역류에서는 점수가 0.6을 넘는 순간 알림이 갑니다.</p></div>
+  <div class="note" hidden><p>판별 알고리즘은 논문으로 먼저 검증했습니다. 유속이 기준보다 느린지, 정상인지, 빠른지를 세 상태로 바꾸고, 연속 16개 상태를 4×4 패턴 이미지로 만들어 CNN이 봅니다. 그래서 순간적인 흔들림과 계속되는 이상을 구분합니다.</p><p>선행 방식과 달리 사용자가 점적 계수를 넣을 필요가 없고, 파라미터 660개짜리 경량 모델이라 기기 안의 ESP32에서 바로 판정합니다. 같은 알고리즘의 듀얼 트랙 설계는 국제 학술대회 AIT 2026에서도 발표했습니다.</p></div>
 </section>
 
-<section class="slide" id="results" data-sec="4" data-time="18" data-title="검증 성과 — 숫자로 증명">
+<section class="slide" id="results" data-sec="4" data-time="16" data-title="검증 성과 — 숫자로 증명">
   <div class="frame">
     <p class="lab b">Validation <span>검증 성과</span></p>
     <h2 class="h b">흔들리는 모의 병실에서, <mark>숫자로</mark> 증명했습니다</h2>
@@ -1354,13 +1396,13 @@ small { font-size: .8em; }
       </div>
       <div class="proof2 b">
         <div class="card pf"><div class="drops" aria-hidden="true"><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg></div><p><b>수액 10종 보정</b>점도별 감소 패턴으로 테스트 성공</p></div>
-        <div class="card pf"><div class="fan2"><img src="media/paper-2.webp" alt="논문 2쪽 — CNN 패턴 판별 구조와 실험 결과" data-zoom><img src="media/paper-1.webp" alt="논문 1쪽 — 상태 패턴 분석 기반 정맥 수액 이상 감지 알고리즘" data-zoom></div><p><b>학술 발표 논문 2편</b>국내 공동학술대회 · AIT 2026</p></div>
+        <div class="card pf"><figure class="pf-curve"><img src="media/cnn-curve.webp" alt="CNN 학습 곡선 — 80 epoch 동안 손실은 0 근처로 떨어지고 검증 정확도는 1.0 근처로 수렴" data-zoom></figure><p><b>CNN 학습 곡선</b>80 epoch · 손실 ↓ · 정확도 수렴</p></div>
         <div class="card pf"><p class="pat3" aria-hidden="true"><svg class="ico"><use href="#i-cert"/></svg>×3</p><p><b>특허 3건 심사 중</b>하드웨어 · 소프트웨어 · 실용신안</p></div>
       </div>
     </div>
     <div class="ft"><p class="src b">※ 모의 병실 반복시험(폴대 이동 · 흔들림 · 기울어짐 · 당겨짐, 500 mL) · ±5분 · 5초는 보정을 포함한 최대 검측 시간 기준</p></div>
   </div>
-  <div class="note" hidden><p>흔들리고 기울어지는 모의 병실에서 반복 시험했습니다. 잔량 오차 ±3%, 종료시점 예측 오차 ±5분, 이상 감지 5초 이내, 패턴 검증 정확도는 최근 여섯 번 학습 평균 97.3%입니다.</p><p>점도가 다른 수액 10종으로 알고리즘을 보정해 테스트에 성공했고, 논문 2편으로 발표했으며 특허 3건이 심사 중입니다.</p></div>
+  <div class="note" hidden><p>흔들리고 기울어지는 모의 병실에서 반복 시험했습니다. 잔량 오차 ±3%, 종료시점 예측 오차 ±5분, 이상 감지 5초 이내, 패턴 검증 정확도는 최근 여섯 번 학습 평균 97.3%입니다.</p><p>점도가 다른 수액 10종으로 알고리즘을 보정해 테스트에 성공했고, 학습 곡선도 안정적으로 수렴했습니다. 특허 3건이 심사 중입니다.</p></div>
 </section>
 
 <!-- ================= 05 시장분석 ================= -->
