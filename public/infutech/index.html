@@ -1,0 +1,1874 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INFU RETRO 피치덱</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="INFUTECH — 기존 링거폴대에 거는 무게센서 모듈로 입원 동물의 수액을 24시간 기록·감지하는 AIoT 솔루션, INFU RETRO 발표 자료">
+<meta name="theme-color" content="#17110D">
+<script>
+  // media/ and fonts/ are relative: served as /infutech (no slash) they would resolve from the site root
+  if (/\/infutech$/.test(location.pathname)) location.replace(location.pathname + '/' + location.search + location.hash);
+</script>
+<style>
+@font-face {
+  font-family: "Pretendard Pitch";
+  src: url("fonts/pretendard-pitch.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* Layout: a 16:9 stage (1em = 1/96 of its width) centred on full-bleed slide grounds;
+   portrait and short screens reflow each slide into a vertically scrolling card. */
+:root {
+  --paper: #EFE8DD;      /* slide ground */
+  --sheet: #F8F4EE;      /* cards */
+  --sheet-2: #F3ECE2;
+  --rule: #D6CABA;
+  --tan: #CDBBA6;        /* neutral bars, inactive marks */
+  --ink: #2A1F18;
+  --cocoa: #3B2A20;      /* dark cards */
+  --mute: #6E5E50;
+  --accent: #A87545;     /* caramel: fills, large figures */
+  --accent-ink: #8A5A2E; /* caramel for small text on paper */
+  --honey: #D9B48A;      /* accent on dark */
+  --cream: #F3ECE2;      /* text on dark */
+  --cream-mute: #BBAA99;
+  --night: #17110D;
+  --rule-dark: #4B3B2F;
+  --alert: #B4502F;
+  --scrim: rgba(23, 17, 13, .82);
+  --veil: rgba(23, 17, 13, .94);
+  --shade: rgba(23, 17, 13, .9);
+
+  --font: "Pretendard Pitch", "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+          "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+
+  --vw: 100vw;
+  --vh: 100vh;
+  --fw: min(var(--vw), calc(var(--vh) * 16 / 9));
+  --fh: calc(var(--fw) * 9 / 16);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: light;
+}
+@supports (height: 100dvh) { :root { --vh: 100dvh; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--night);
+  color: var(--ink);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  font-kerning: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+img { max-width: 100%; display: block; }
+button { font: inherit; color: inherit; }
+h1, h2, h3, h4, p, ol, ul, figure, blockquote { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+em { font-style: normal; color: var(--accent-ink); }
+strong, b { font-weight: 700; }
+small { font-size: .8em; }
+:focus-visible { outline: 3px solid var(--honey); outline-offset: 2px; border-radius: 4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- deck & slides ---------- */
+.deck { position: fixed; inset: 0; overflow: hidden; }
+.slide {
+  position: absolute; inset: 0;
+  background: var(--paper);
+  opacity: 0; visibility: hidden; z-index: 1;
+  /* the outgoing slide stays opaque underneath until the incoming one has faded in */
+  transition: opacity 0s .66s, visibility 0s .66s;
+  --dx: 2.2vw;
+}
+.slide.past { --dx: -2.2vw; }
+.slide.on {
+  opacity: 1; visibility: visible; z-index: 2;
+  transition: opacity .6s cubic-bezier(.3, .6, .3, 1), visibility 0s;
+  --dx: 0px;
+}
+.slide.dark { background: var(--night); color: var(--cream); }
+.dark em { color: var(--honey); }
+
+.frame {
+  position: absolute; left: 50%; top: 50%;
+  width: var(--fw); height: var(--fh);
+  transform: translate(calc(-50% + var(--dx)), -50%);
+  transition: transform .8s var(--ease);
+  font-size: calc(var(--fw) / 96);
+  padding: 2.9em 6em 2.4em;
+  display: flex; flex-direction: column;
+}
+
+/* build-in: every .b fades up in DOM order when its slide arrives */
+.slide.on .b { animation: rise .8s var(--ease) both; animation-delay: calc(140ms + var(--i, 0) * 75ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(1.1em); } }
+.slide.on .plot i { animation: grow 1s var(--ease) both; animation-delay: calc(380ms + var(--j, 0) * 70ms); }
+@keyframes grow { from { transform: scaleY(0); } }
+.slide.on .hbar i, .slide.on .stackbar i, .slide.on .cmpbar i { animation: growx 1.1s var(--ease) both; animation-delay: calc(420ms + var(--j, 0) * 90ms); }
+@keyframes growx { from { transform: scaleX(0); } }
+
+/* ---------- slide furniture ---------- */
+.hd {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 1em;
+  padding-bottom: .7em; border-bottom: .12em solid var(--rule);
+  font-size: .92em;
+}
+.dark .hd { border-color: var(--rule-dark); }
+.kick { color: var(--accent-ink); font-weight: 650; letter-spacing: .02em; }
+.dark .kick { color: var(--honey); }
+.kick b { font-weight: 800; margin-right: .55em; font-variant-numeric: tabular-nums; }
+.mark { font-weight: 760; letter-spacing: .12em; font-size: .88em; white-space: nowrap; }
+.ttl {
+  margin-top: .62em;
+  font-size: 2.55em; font-weight: 730; line-height: 1.22; letter-spacing: -.03em;
+  text-wrap: balance;
+}
+.sub { margin-top: .55em; font-size: 1em; color: var(--mute); line-height: 1.5; }
+.dark .sub { color: var(--cream-mute); }
+.bd { flex: 1; min-height: 0; margin-top: 1.5em; display: flex; flex-direction: column; gap: 1.15em; }
+.ft { margin-top: 1.15em; display: flex; flex-direction: column; gap: .55em; }
+.take { font-size: 1.28em; font-weight: 720; letter-spacing: -.015em; line-height: 1.4; }
+.take em { color: var(--accent-ink); }
+.src { font-size: .7em; color: var(--mute); line-height: 1.5; }
+.dark .src { color: var(--cream-mute); }
+
+.g { flex: 1; min-height: 0; display: grid; grid-template-columns: var(--c, 1fr 1fr); gap: 1.15em; }
+.stack { display: flex; flex-direction: column; gap: 1.15em; min-width: 0; min-height: 0; }
+.card {
+  min-width: 0; min-height: 0;
+  background: var(--sheet); border: 1px solid var(--rule); border-radius: .7em;
+  padding: 1.25em 1.4em;
+}
+.card.ink { background: var(--cocoa); border-color: var(--cocoa); color: var(--cream); }
+.card.ink em { color: var(--honey); }
+.card h3 { font-size: 1.02em; font-weight: 720; letter-spacing: -.01em; line-height: 1.35; }
+.cs { margin-top: .3em; font-size: .8em; color: var(--mute); line-height: 1.45; }
+.ink .cs { color: var(--cream-mute); }
+.num {
+  font-weight: 800; letter-spacing: -.045em; line-height: 1;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.num small { font-size: .42em; font-weight: 700; letter-spacing: 0; margin-left: .08em; }
+.ph { position: relative; overflow: hidden; border-radius: .7em; min-height: 0; background: var(--sheet-2); }
+.ph img { width: 100%; height: 100%; object-fit: cover; }
+.ico { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+[data-zoom] { cursor: zoom-in; }
+
+/* charts */
+.chart { display: flex; flex-direction: column; }
+.bars { flex: 1; min-height: 0; display: flex; flex-direction: column; margin-top: 1.1em; }
+.plot { flex: 1; min-height: 7em; display: flex; align-items: flex-end; gap: .8em; border-bottom: 1px solid var(--rule); }
+.plot > div { flex: 1; height: 100%; display: flex; align-items: flex-end; }
+.plot i {
+  position: relative; display: block; width: 100%; font-style: normal;
+  height: calc(var(--v) / var(--max) * 84%);
+  background: var(--tan); border-radius: .3em .3em 0 0;
+  transform-origin: 50% 100%;
+}
+.plot i.hl { background: var(--cocoa); }
+.plot i.ac { background: var(--accent); }
+.plot i b {
+  position: absolute; left: -.5em; right: -.5em; bottom: 100%; padding-bottom: .3em;
+  text-align: center; font-size: .95em; font-weight: 750; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.xl { display: flex; gap: .8em; padding-top: .45em; }
+.xl span { flex: 1; text-align: center; font-size: .74em; color: var(--mute); line-height: 1.3; }
+.hbar { display: block; height: .5em; border-radius: 99em; background: var(--rule-dark); overflow: hidden; }
+.hbar i { display: block; height: 100%; width: calc(var(--v) * 1%); background: var(--honey); border-radius: inherit; transform-origin: 0 50%; }
+
+/* news clippings */
+.news .press { font-size: .76em; color: var(--mute); }
+.news .press b { color: var(--accent-ink); font-weight: 700; }
+.news h4 { margin-top: .45em; font-size: 1em; font-weight: 720; line-height: 1.45; }
+.news blockquote { margin-top: .6em; font-size: .78em; color: var(--mute); line-height: 1.55; }
+.news cite { font-style: normal; font-weight: 650; }
+.news.tall { flex: 1; display: flex; flex-direction: column; }
+.news.tall h4 { font-size: 1.25em; }
+.news.tall blockquote { margin-top: auto; padding-top: 1em; font-size: .92em; }
+
+.chips { display: flex; flex-wrap: wrap; gap: .5em; }
+.chips li { border: .1em solid currentColor; border-radius: 99em; padding: .32em .9em; font-weight: 650; font-size: .88em; }
+
+/* ---------- 1 cover ---------- */
+.s-cover .frame { justify-content: center; }
+.cover-photo {
+  position: absolute; left: 54.5%;
+  right: calc((var(--fw) - var(--vw)) / 2);
+  top: calc((var(--fh) - var(--vh)) / 2);
+  bottom: calc((var(--fh) - var(--vh)) / 2);
+  overflow: hidden; background: var(--night);
+}
+.cover-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 35% 50%; }
+.cover-text { position: relative; width: 46%; display: flex; flex-direction: column; gap: 1.05em; }
+.eyebrow { font-size: .88em; font-weight: 720; letter-spacing: .08em; color: var(--accent-ink); }
+.cover-line { font-size: 1.28em; font-weight: 520; color: var(--cocoa); }
+.cover-line em { font-weight: 720; }
+.cover-ttl { font-size: 4.25em; font-weight: 790; line-height: 1.13; letter-spacing: -.04em; margin: .1em 0 .05em; }
+.cover-desc { font-size: 1.1em; line-height: 1.6; color: var(--cocoa); }
+.cover-foot { display: flex; align-items: center; flex-wrap: wrap; gap: .9em; margin-top: 1.2em; font-weight: 680; font-size: .95em; }
+.cover-foot .sep { width: 1px; height: 1.9em; background: var(--rule); }
+.cover-foot .brand { letter-spacing: .1em; }
+.cover-foot .prog { display: flex; align-items: center; gap: .8em; }
+.modu { height: 2.3em; width: auto; }
+.cover-module {
+  position: absolute; left: 46.2%; top: 51%;
+  width: 16.6em; aspect-ratio: 1; max-width: 100%;
+  border-radius: 50%; background: var(--sheet);
+  display: grid; place-items: center;
+  box-shadow: 0 1.4em 3.4em rgba(23, 17, 13, .35);
+}
+.cover-module img { width: 76%; }
+.cover-module figcaption {
+  position: absolute; top: calc(100% + 1em); left: 52%;
+  white-space: nowrap; color: var(--cream); font-size: .8em; font-weight: 650; letter-spacing: .04em;
+}
+
+/* ---------- 2 night scene ---------- */
+.bleed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
+.s-night .shade {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, var(--shade) 0%, rgba(23, 17, 13, .66) 42%, rgba(23, 17, 13, .1) 72%, rgba(23, 17, 13, 0) 100%);
+}
+.s-night .frame { justify-content: space-between; }
+.scene { position: relative; width: 58%; display: flex; flex-direction: column; gap: 1.4em; }
+.clock { position: relative; display: flex; align-items: baseline; gap: .7em; color: var(--honey); font-weight: 650; font-size: 1.05em; letter-spacing: .04em; }
+.clock .digits { font-size: 2.3em; font-weight: 300; letter-spacing: .02em; font-variant-numeric: tabular-nums; color: var(--cream); }
+.clock .colon { animation: blink 2s steps(1) infinite; }
+@keyframes blink { 50% { opacity: .15; } }
+.scene-ttl { font-size: 3.3em; font-weight: 720; line-height: 1.28; letter-spacing: -.035em; }
+.scene-sub { font-size: 1.85em; font-weight: 560; line-height: 1.45; color: var(--cream-mute); letter-spacing: -.02em; }
+.scene-sub em { font-weight: 720; }
+.gaps { display: flex; gap: .7em; margin-top: .4em; }
+.gaps li { display: flex; align-items: center; gap: .55em; padding: .55em 1.1em; border-radius: 99em; background: rgba(243, 236, 226, .1); border: 1px solid var(--rule-dark); font-weight: 680; }
+.gaps b { color: var(--honey); font-weight: 800; }
+
+/* ---------- 3 / 4 problem slides ---------- */
+.vs { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; margin-top: 1em; }
+.vs .vl { display: block; font-size: .82em; color: var(--cream-mute); }
+.vs .num { display: block; margin: .15em 0 .45em; font-size: 3.3em; }
+.vs .num.hon { color: var(--honey); }
+.ink .note-line { margin-top: 1.05em; font-size: .88em; color: var(--cream-mute); }
+.ink .note-line b { color: var(--cream); }
+
+.fig { display: flex; flex-direction: column; }
+.fig .num { font-size: 4.4em; margin-top: auto; }
+.fig .lede { margin-top: .5em; font-size: 1.08em; font-weight: 720; }
+.fig .num .pre { display: block; margin: 0 0 .25em; font-size: .3em; font-weight: 700; letter-spacing: -.01em; color: var(--mute); }
+.quarter { display: flex; gap: .7em; margin-top: 1.4em; }
+.quarter i { width: 4.2em; aspect-ratio: 1; border-radius: .45em; background: var(--tan); }
+.quarter i.on { background: var(--accent); }
+.dots { display: grid; grid-template-columns: repeat(10, 1fr); gap: .42em; margin-top: 1.3em; width: 17em; max-width: 100%; }
+.dots i { aspect-ratio: 1; border-radius: 50%; background: var(--rule); }
+.dots i.on { background: var(--cocoa); }
+
+/* ---------- 5 limits ---------- */
+.grp { display: flex; flex-direction: column; gap: .8em; min-width: 0; }
+.grp-l { font-size: .82em; font-weight: 720; letter-spacing: .06em; color: var(--accent-ink); }
+.lims { flex: 1; display: grid; grid-template-rows: 1fr 1fr; gap: .9em; min-height: 0; }
+.lim { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto 1fr; column-gap: 1.1em; }
+.lim .ico { grid-row: 1 / span 2; width: 3em; height: 3em; padding: .65em; border-radius: 50%; background: var(--sheet-2); color: var(--accent); stroke-width: 1.6; }
+.lim h3 { font-size: 1.22em; align-self: end; }
+.lim p { margin-top: .35em; font-size: .98em; line-height: 1.55; color: var(--cocoa); }
+.lim .x {
+  grid-column: 1 / -1; align-self: end;
+  margin-top: .9em; padding-top: .8em; border-top: 1px dashed var(--rule);
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: .3em .7em; font-size: .9em; color: var(--mute);
+}
+.lim .x b { font-size: 1.9em; color: var(--ink); font-weight: 800; letter-spacing: -.03em; white-space: nowrap; }
+.need { display: flex; align-items: center; gap: 1.6em; padding: 1em 1.4em; border-radius: .7em; background: var(--cocoa); color: var(--cream); }
+.need-l { font-weight: 720; color: var(--honey); white-space: nowrap; }
+.need ul { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: .8em; }
+.need li { display: flex; align-items: center; gap: .5em; font-weight: 680; }
+.need li .ico { color: var(--honey); width: 1.15em; height: 1.15em; stroke-width: 2.2; }
+
+/* ---------- 6 solution ---------- */
+.prod { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1em; }
+.prod img { width: auto; max-height: 28em; min-height: 0; object-fit: contain; }
+.parts { display: flex; flex-wrap: wrap; justify-content: center; gap: .45em 1.3em; font-size: .82em; font-weight: 650; color: var(--cocoa); }
+.parts span { display: flex; align-items: center; gap: .4em; }
+.parts span::before { content: ""; width: .45em; height: .45em; border-radius: 50%; background: var(--accent); }
+.steps { flex: 1; display: grid; grid-auto-rows: 1fr; gap: .85em; min-height: 0; }
+.step { display: grid; grid-template-columns: 3em 1fr; column-gap: 1.1em; align-content: center; padding: 1.1em 1.4em; }
+.step .n { grid-row: span 2; width: 3em; height: 3em; border-radius: 50%; display: grid; place-items: center; background: var(--cocoa); color: var(--cream); font-size: 1.05em; font-weight: 800; font-variant-numeric: tabular-nums; }
+.step h3 { font-size: 1.35em; }
+.step p { margin-top: .3em; font-size: 1em; line-height: 1.55; color: var(--cocoa); }
+.feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8em; }
+.feat { padding: .9em 1.15em; border-radius: .7em; background: var(--sheet-2); border: 1px solid var(--rule); }
+.feat b { display: block; font-size: 1em; }
+.feat span { font-size: .82em; color: var(--mute); }
+
+/* ---------- 7 algorithm ---------- */
+.pipe { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: stretch; gap: .6em; }
+.pipe .arr { align-self: center; width: 1.4em; height: 1.4em; color: var(--accent); stroke-width: 2; }
+.pstep { padding: 1.1em 1.25em; }
+.pstep .k { font-size: .82em; font-weight: 800; color: var(--accent-ink); font-variant-numeric: tabular-nums; letter-spacing: .06em; }
+.pstep h3 { margin-top: .3em; font-size: 1.22em; }
+.pstep p { margin-top: .4em; font-size: .9em; line-height: 1.5; color: var(--mute); }
+.pstep.ink .k { color: var(--honey); }
+.pstep.ink p { color: var(--cream-mute); }
+.curve { display: flex; flex-direction: column; gap: .8em; }
+.curve .ph { flex: 1; display: grid; place-items: center; background: transparent; }
+.curve .ph img { object-fit: contain; height: auto; max-height: 100%; mix-blend-mode: multiply; }
+.gyro { display: flex; gap: .8em; align-items: flex-start; font-size: .92em; line-height: 1.55; color: var(--cocoa); }
+.gyro b { white-space: nowrap; color: var(--accent-ink); }
+.acc { display: flex; flex-direction: column; justify-content: space-between; gap: 1em; }
+.acc .num { font-size: 6em; color: var(--honey); }
+.acc p { font-size: 1.1em; line-height: 1.6; }
+.acc .cs { font-size: .88em; }
+
+/* ---------- 8 hardware ---------- */
+.shot { display: flex; flex-direction: column; gap: .8em; align-items: center; }
+.shot .ph { flex: 1; width: 100%; display: grid; place-items: center; background: transparent; }
+.shot .ph img { width: auto; height: auto; max-height: 100%; object-fit: contain; border-radius: .4em; }
+.shot figcaption { font-weight: 700; font-size: .95em; }
+.spec { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2em; padding: 1.2em 1.6em; border-radius: .7em; background: var(--cocoa); color: var(--cream); }
+.spec div { display: flex; flex-direction: column; gap: .3em; }
+.spec span { font-size: .78em; color: var(--honey); font-weight: 650; }
+.spec b { font-size: 1em; }
+
+/* ---------- 9 demo ---------- */
+.video { display: flex; flex-direction: column; gap: .6em; min-height: 0; }
+.video video { width: 100%; height: auto; max-height: 100%; aspect-ratio: 16 / 9; border-radius: .7em; background: #000000; object-fit: contain; }
+.video figcaption { font-size: .78em; color: var(--cream-mute); }
+.chap { display: flex; flex-direction: column; gap: .9em; }
+.chap-l { font-size: .82em; font-weight: 720; letter-spacing: .06em; color: var(--honey); }
+.chap ol { display: grid; gap: .4em; }
+.chap button {
+  width: 100%; display: flex; align-items: center; gap: .9em; text-align: left;
+  padding: .72em 1em; border-radius: .55em; border: 1px solid var(--rule-dark);
+  background: transparent; color: var(--cream); font-size: .95em; font-weight: 600; cursor: pointer;
+  transition: background .25s, border-color .25s;
+}
+.chap button:hover { border-color: var(--honey); }
+.chap button time { font-variant-numeric: tabular-nums; color: var(--honey); font-weight: 700; min-width: 2.6em; }
+.chap button.alert time::after { content: ""; display: inline-block; width: .5em; height: .5em; margin-left: .45em; border-radius: 50%; background: var(--alert); vertical-align: .1em; }
+.chap button[aria-current="true"] { background: var(--cocoa); border-color: var(--honey); }
+.chap .cs { font-size: .84em; line-height: 1.55; }
+
+/* ---------- 10 simulation ---------- */
+.sim { display: flex; flex-direction: column; gap: .9em; }
+.sim-fig { min-width: 0; }
+.sim-in { min-width: 40em; }
+.sim-in img { width: 100%; height: auto; border-radius: .4em; }
+.verdicts { display: grid; grid-template-columns: repeat(5, 1fr); gap: .6em; margin-top: .8em; }
+.verdicts li { display: flex; flex-direction: column; align-items: center; gap: .45em; text-align: center; font-weight: 700; font-size: .92em; }
+.verdicts li span { font-size: .78em; font-weight: 700; padding: .25em .8em; border-radius: 99em; background: var(--sheet-2); border: 1px solid var(--rule); color: var(--cocoa); }
+.verdicts li.al span { background: var(--alert); border-color: var(--alert); color: var(--cream); }
+.sim .cs { font-size: .74em; }
+
+/* ---------- 11 results ---------- */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; }
+.stat { display: flex; flex-direction: column; justify-content: space-between; gap: .7em; padding: 1.4em 1.5em; }
+.stat .num { font-size: 6.2em; }
+.stat .num.ac { color: var(--accent); }
+.stat p:not(.num) { font-size: 1.08em; font-weight: 700; line-height: 1.4; }
+.stat p:not(.num) small { display: block; font-weight: 500; color: var(--mute); font-size: .82em; }
+.conds { display: grid; grid-template-columns: repeat(2, 1fr); gap: .8em 2.2em; margin-top: .9em; }
+.conds li { display: flex; gap: .7em; align-items: flex-start; font-size: 1em; line-height: 1.5; }
+.conds li .ico { color: var(--accent); width: 1.3em; height: 1.3em; margin-top: .1em; }
+
+/* ---------- 12 papers ---------- */
+.award { display: flex; flex-direction: column; gap: 1em; }
+.award .ph { flex: 1; background: var(--sheet-2); display: grid; place-items: center; padding: .8em; }
+.award .ph img { width: auto; height: auto; max-height: 100%; object-fit: contain; border-radius: .3em; box-shadow: 0 .4em 1.4em rgba(23, 17, 13, .18); }
+.award .who { font-size: .8em; font-weight: 700; color: var(--accent-ink); }
+.award h3 { margin-top: .3em; font-size: 1.02em; line-height: 1.45; }
+.papers { display: flex; flex-direction: column; gap: 1em; }
+.papers .pp { flex: 1; min-height: 0; position: relative; }
+.papers .pp img { position: absolute; width: 62%; height: auto; border-radius: .25em; box-shadow: 0 .5em 1.6em rgba(23, 17, 13, .2); background: #FFFFFF; }
+.papers .pp img:first-child { left: 0; top: 0; }
+.papers .pp img:last-child { right: 0; top: 14%; }
+
+/* ---------- 13 market / 14 why now ---------- */
+.chart-box { flex: 1; min-height: 9em; margin-top: 1em; }
+/* line chart: plot box maps 60–100% to its height; the line stretches, dots and labels stay round */
+.lc { display: flex; flex-direction: column; }
+.lc-plot { position: relative; flex: 1; min-height: 6em; margin: 1.6em .4em 0; border-bottom: 1px solid var(--rule); }
+.lc-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.lc-plot polyline { fill: none; stroke: var(--cocoa); stroke-width: 2.5; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
+.pt { position: absolute; left: calc(var(--x) * 1%); bottom: calc(var(--y) * 1%); width: .8em; height: .8em; margin: 0 0 -.4em -.4em; border-radius: 50%; background: var(--cocoa); }
+.pt.hl { width: 1em; height: 1em; margin: 0 0 -.5em -.5em; background: var(--accent); box-shadow: 0 0 0 .25em var(--sheet); }
+.pt b { position: absolute; left: 50%; bottom: 100%; transform: translate(-50%, -.4em); font-size: .95em; font-weight: 750; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pt.lo b { bottom: auto; top: 100%; transform: translate(-50%, .4em); }
+.lc-x { position: relative; height: 1.7em; margin: 0 .4em; }
+.lc-x span { position: absolute; left: calc(var(--x) * 1%); top: .45em; transform: translateX(-50%); font-size: .74em; color: var(--mute); }
+.slide.on .lc-plot svg { animation: wipe 1.3s var(--ease) .45s both; }
+@keyframes wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.slide.on .pt { animation: pop .5s var(--ease) both; animation-delay: calc(450ms + var(--x) * 12ms); }
+@keyframes pop { from { opacity: 0; transform: scale(.4); } }
+.tl { display: grid; gap: .75em; margin-top: 1em; }
+.tl li { display: grid; grid-template-columns: 4.6em 1fr; gap: .8em; font-size: 1em; line-height: 1.45; }
+.tl time { font-weight: 750; color: var(--accent-ink); font-variant-numeric: tabular-nums; }
+.tl li:last-child { font-weight: 700; }
+
+/* ---------- 15 compare ---------- */
+.tbl { overflow-x: auto; border-radius: .7em; border: 1px solid var(--rule); background: var(--sheet); min-width: 0; }
+.cmp { width: 100%; height: 100%; border-collapse: collapse; font-size: 1.02em; }
+.cmp thead th { background: var(--cocoa); color: var(--cream); font-weight: 650; font-size: .86em; padding: 1em .8em; text-align: center; white-space: nowrap; }
+.cmp td, .cmp tbody th { padding: .85em .8em; text-align: center; border-top: 1px solid var(--rule); line-height: 1.35; }
+.cmp tbody th { font-weight: 720; white-space: nowrap; }
+.cmp small { display: block; font-size: .78em; font-weight: 500; color: var(--mute); }
+.cmp tr.us th, .cmp tr.us td { background: var(--accent); color: var(--cream); font-weight: 720; border-top: 0; }
+.cmp tr.us small { color: var(--cream); opacity: .85; }
+.mod { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .8em; text-align: center; }
+.mod img { max-height: 20em; width: auto; }
+.mod b { font-size: .95em; }
+.mod span { font-size: .76em; color: var(--mute); }
+
+/* ---------- 16 IP ---------- */
+.prog-card { display: flex; align-items: center; gap: 1.6em; padding: 1em 1.4em; }
+.prog-card .modu { height: 2.8em; }
+.prog-card .sep { width: 1px; align-self: stretch; background: var(--rule); }
+.prog-card p { font-size: .8em; color: var(--mute); }
+.prog-card b { display: block; font-size: 1.25em; color: var(--ink); }
+.pat { display: flex; flex-direction: column; justify-content: space-between; gap: .6em; }
+.pat .k { font-size: .98em; font-weight: 720; color: var(--accent-ink); display: flex; align-items: center; gap: .5em; }
+.pat .k .ico { width: 1.3em; height: 1.3em; }
+.pat .num { font-size: 4.6em; }
+.pat p { font-size: .92em; color: var(--mute); }
+.cert { display: flex; flex-direction: column; gap: .45em; justify-content: center; padding-inline: 1.8em; }
+.cert .k { font-size: .98em; font-weight: 720; color: var(--accent-ink); }
+.ink.cert .k { color: var(--honey); }
+.cert b { font-size: 2.5em; letter-spacing: -.03em; font-weight: 780; }
+.cert p { font-size: .98em; color: var(--mute); }
+.ink.cert p { color: var(--cream-mute); }
+.ink.cert p strong { color: var(--cream); }
+
+/* ---------- 17 cost / 18 pricing ---------- */
+.cost { width: 100%; height: 100%; border-collapse: collapse; font-size: .98em; font-variant-numeric: tabular-nums; }
+.cost th, .cost td { padding: .45em .6em; text-align: left; border-bottom: 1px solid var(--rule); line-height: 1.35; }
+.cost thead th { font-size: .82em; color: var(--mute); font-weight: 650; border-bottom: .12em solid var(--cocoa); }
+.cost td:last-child, .cost th:last-child { text-align: right; white-space: nowrap; }
+.cost tbody th { font-weight: 750; color: var(--accent-ink); white-space: nowrap; vertical-align: top; }
+.cost tr.sub td { color: var(--mute); font-size: .9em; }
+.cost tfoot td, .cost tfoot th { border-bottom: 0; border-top: .12em solid var(--cocoa); font-weight: 800; font-size: 1.12em; padding-top: .6em; color: var(--ink); }
+.stackbar { display: flex; height: 2.3em; border-radius: .45em; overflow: hidden; margin-top: .9em; }
+.stackbar i { flex: var(--w) 1 0; display: grid; place-items: center; font-style: normal; font-size: .78em; font-weight: 700; color: var(--cream); transform-origin: 0 50%; }
+.stackbar i:nth-child(1) { background: var(--cocoa); }
+.stackbar i:nth-child(2) { background: var(--accent); }
+.stackbar i:nth-child(3) { background: var(--tan); color: var(--ink); }
+.legend { display: flex; flex-wrap: wrap; gap: .4em 1.2em; margin-top: .6em; font-size: .76em; color: var(--mute); }
+.pl { display: grid; gap: .6em; margin-top: 1em; font-variant-numeric: tabular-nums; }
+.pl div { display: flex; justify-content: space-between; gap: 1em; font-size: 1.08em; }
+.pl div b { white-space: nowrap; }
+.pl .tot { padding-top: .55em; border-top: .12em solid var(--rule-dark); font-size: 1.15em; }
+.pl .tot b { color: var(--honey); }
+.callout { display: flex; gap: 1em; align-items: center; }
+.callout .num { font-size: 3.2em; color: var(--accent); }
+.callout p { font-size: .98em; line-height: 1.5; }
+
+.price { display: flex; flex-direction: column; gap: .5em; }
+.price .k { font-size: .9em; font-weight: 720; color: var(--accent-ink); }
+.ink.price .k { color: var(--honey); }
+.price .num { font-size: 4em; }
+.price .num small { font-size: .32em; }
+.price p { font-size: .88em; line-height: 1.5; color: var(--cocoa); }
+.ink.price p { color: var(--cream-mute); }
+.price p b { color: var(--ink); }
+.ink.price p b { color: var(--cream); }
+.cmpbar { display: grid; grid-template-columns: 7em 1fr; gap: .9em 1em; align-items: center; margin-top: 1.2em; font-size: 1em; }
+.cmpbar .lab { font-weight: 650; }
+.cmpbar .row { display: flex; align-items: center; gap: .8em; min-width: 0; }
+/* the longest bar takes 62% of the row so its label always fits beside it */
+.cmpbar i { display: block; height: 1.7em; border-radius: .3em; width: calc(var(--v) * .62%); background: var(--tan); transform-origin: 0 50%; flex: none; }
+.cmpbar i.ac { background: var(--accent); }
+.cmpbar b { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.eq { display: grid; gap: .7em; margin-top: 1.1em; font-size: 1.02em; font-variant-numeric: tabular-nums; }
+.eq b { font-weight: 800; }
+.eq .acc-t { color: var(--accent-ink); font-weight: 700; }
+
+/* ---------- 19 MOU ---------- */
+.deal { display: flex; flex-direction: column; gap: .9em; }
+.deal .ph { flex: 1; min-height: 0; }
+.deal .doc { position: relative; flex: 1; min-height: 0; background: var(--sheet-2); border-radius: .5em; overflow: hidden; }
+.deal .doc img { position: absolute; inset: .8em; margin: auto; width: auto; height: auto; max-width: calc(100% - 1.6em); max-height: calc(100% - 1.6em); box-shadow: 0 .4em 1.2em rgba(23, 17, 13, .16); }
+.mid { display: flex; flex-direction: column; justify-content: center; }
+.tag { align-self: flex-start; font-size: .74em; font-weight: 750; padding: .3em .8em; border-radius: 99em; background: var(--accent); color: var(--cream); }
+.deal h3 { font-size: 1.15em; }
+.deal h3 small { display: block; margin-top: .2em; font-size: .7em; font-weight: 600; color: var(--mute); }
+.facts { display: grid; gap: .35em; font-size: .84em; line-height: 1.45; }
+.facts li { display: grid; grid-template-columns: 4.2em 1fr; gap: .6em; }
+.facts li span { color: var(--mute); }
+.facts li b { font-weight: 720; }
+.next { display: flex; align-items: center; gap: 1em; padding: .9em 1.4em; border-radius: .7em; background: var(--cocoa); color: var(--cream); font-weight: 650; }
+.next b { color: var(--honey); white-space: nowrap; }
+
+/* ---------- 20 go-to-market ---------- */
+.rings { position: relative; min-height: 0; container-type: size; --d: min(100cqw, 100cqh); }
+.rings .r { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); border-radius: 50%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.rings .r1 { width: var(--d); height: var(--d); background: var(--sheet-2); border: 1px solid var(--rule); padding-top: calc(var(--d) * .11); }
+.rings .r2 { width: calc(var(--d) * .62); height: calc(var(--d) * .62); background: var(--tan); padding-top: calc(var(--d) * .07); }
+.rings .r3 { width: calc(var(--d) * .32); height: calc(var(--d) * .32); background: var(--cocoa); color: var(--cream); justify-content: center; }
+.rings .k { font-size: .76em; font-weight: 750; letter-spacing: .04em; color: var(--accent-ink); }
+.rings .r2 .k { color: var(--ink); }
+.rings .r3 .k { color: var(--honey); }
+.rings strong { font-size: 2.2em; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; }
+.rings .r2 strong { font-size: 1.85em; }
+.rings .r3 strong { font-size: 1.15em; line-height: 1.3; }
+.gtm { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9em; }
+.gstep { display: flex; flex-direction: column; gap: .55em; padding: 1.4em 1.4em; }
+.gstep .k { font-size: .86em; font-weight: 800; letter-spacing: .06em; color: var(--accent-ink); }
+.gstep.ink .k { color: var(--honey); }
+.gstep h3 { font-size: 1.55em; letter-spacing: -.02em; }
+.gstep p { font-size: 1em; line-height: 1.55; color: var(--mute); }
+.gstep.ink p { color: var(--cream-mute); }
+.gstep .lean { margin-top: auto; padding-top: .8em; border-top: 1px dashed var(--rule); font-size: .9em; font-weight: 650; color: var(--cocoa); line-height: 1.45; }
+.gstep.ink .lean { border-color: var(--rule-dark); color: var(--honey); }
+
+/* ---------- 21 impact ---------- */
+.impact-photo {
+  position: absolute; left: 66%;
+  right: calc((var(--fw) - var(--vw)) / 2);
+  top: calc((var(--fh) - var(--vh)) / 2);
+  bottom: calc((var(--fh) - var(--vh)) / 2);
+  overflow: hidden;
+}
+.impact-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 40% 50%; }
+.s-impact .hd, .s-impact .ttl, .s-impact .bd, .s-impact .ft { width: 56%; }
+.s-impact .ttl { font-size: 3.4em; }
+.who3 { display: grid; gap: 1.1em; }
+.who3 li { display: grid; grid-template-columns: 3.8em 6.4em 1fr; align-items: center; gap: 1.1em; padding: 1.35em 1.5em; }
+.who3 .ico { width: 3.8em; height: 3.8em; padding: .85em; border-radius: 50%; background: var(--sheet-2); color: var(--accent); stroke-width: 1.5; }
+.who3 b { font-size: 1.3em; color: var(--accent-ink); }
+.who3 p { font-size: 1.12em; line-height: 1.5; font-weight: 600; }
+
+/* ---------- 22 team ---------- */
+.team { flex: 1; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 2em 1.6em; padding: 0 4em; }
+.team li { width: calc((100% - 3 * 1.6em) / 4); display: flex; flex-direction: column; align-items: center; gap: .55em; text-align: center; }
+.avatar { width: 8.2em; height: 8.2em; border-radius: 50%; overflow: hidden; background: var(--tan); display: grid; place-items: center; box-shadow: 0 0 0 .3em var(--sheet); }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar.mono { background: var(--cocoa); color: var(--honey); }
+.avatar.mono span { font-size: 2.1em; font-weight: 750; letter-spacing: -.02em; }
+.team .role { margin-top: .4em; font-size: .86em; font-weight: 720; color: var(--accent-ink); letter-spacing: .02em; }
+.team .nm { font-size: 1.3em; font-weight: 780; }
+.creds { display: flex; flex-wrap: wrap; justify-content: center; gap: .6em; }
+.creds li { font-size: .8em; font-weight: 650; padding: .4em 1em; border-radius: 99em; background: var(--sheet); border: 1px solid var(--rule); }
+
+/* ---------- 23 end ---------- */
+.s-end { background: var(--cocoa); }
+.s-end .frame { align-items: center; justify-content: center; text-align: center; gap: 1.5em; }
+.end-ttl { font-size: 7em; font-weight: 760; letter-spacing: -.05em; line-height: 1; color: var(--cream); }
+.end-rule { width: 3.2em; height: .16em; background: var(--honey); border-radius: 99em; }
+.end-sub { font-size: 1.6em; color: var(--cream-mute); font-weight: 520; }
+.end-sign { margin-top: 2.2em; display: flex; flex-direction: column; align-items: center; gap: .8em; }
+.end-sign b { letter-spacing: .3em; color: var(--honey); font-size: 1.05em; }
+.end-sign span { font-size: .9em; color: var(--cream-mute); }
+.end-act { display: flex; gap: .8em; margin-top: 1em; }
+.end-act button { padding: .7em 1.4em; border-radius: 99em; border: 1px solid var(--rule-dark); background: transparent; color: var(--cream); font-size: .95em; font-weight: 650; cursor: pointer; }
+.end-act button:hover { border-color: var(--honey); }
+
+/* ---------- chrome ---------- */
+.chrome {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  display: flex; align-items: center; gap: 18px;
+  padding: 26px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: linear-gradient(to top, var(--scrim), rgba(23, 17, 13, 0));
+  color: var(--cream); font: 600 13px/1 var(--font);
+  transition: opacity .4s, transform .4s;
+}
+.chrome.idle { opacity: 0; transform: translateY(10px); pointer-events: none; }
+.where { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; min-width: 0; }
+.where b { color: var(--honey); font-variant-numeric: tabular-nums; }
+.where span { overflow: hidden; text-overflow: ellipsis; }
+.chaps { flex: 1; display: flex; gap: 4px; min-width: 80px; }
+.chaps button { flex: var(--n) 1 0; height: 22px; padding: 0; border: 0; background: none; cursor: pointer; position: relative; display: flex; align-items: center; }
+.chaps button::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: -1.5px; border-radius: 99px; background: rgba(243, 236, 226, .22); }
+.chaps button i { position: relative; display: block; height: 3px; width: calc(var(--f, 0) * 100%); border-radius: 99px; background: var(--honey); transition: width .5s var(--ease); }
+.chaps button:hover::before { background: rgba(243, 236, 226, .45); }
+.tip { position: absolute; bottom: 100%; left: 50%; transform: translate(-50%, -4px); padding: 6px 9px; border-radius: 6px; background: var(--cocoa); color: var(--cream); font-size: 12px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .2s; }
+.chaps button:hover .tip, .chaps button:focus-visible .tip { opacity: 1; }
+.ctl { display: flex; align-items: center; gap: 4px; }
+.count { font-variant-numeric: tabular-nums; margin-right: 8px; white-space: nowrap; }
+.count b { color: var(--cream); }
+.count span { color: var(--cream-mute); }
+.ctl button { width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 10px; background: transparent; cursor: pointer; }
+.ctl button:hover { background: rgba(243, 236, 226, .12); }
+.ctl button[aria-pressed="true"] { background: rgba(217, 180, 138, .22); color: var(--honey); }
+.ctl .ico { width: 20px; height: 20px; stroke-width: 1.8; }
+.bar-line { position: fixed; left: 0; bottom: 0; z-index: 19; height: 3px; width: calc(var(--p, 0) * 100%); background: var(--accent); transition: width .6s var(--ease); }
+
+.panel { position: fixed; inset: 0; z-index: 30; background: var(--veil); color: var(--cream); overflow-y: auto; overscroll-behavior: contain; }
+.panel-in { max-width: 1180px; margin: 0 auto; padding: calc(40px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)); }
+.panel-hd { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 28px; }
+.panel-hd h2 { font-size: 22px; font-weight: 750; }
+.panel-x { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--rule-dark); background: transparent; color: var(--cream); cursor: pointer; display: grid; place-items: center; }
+.toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 26px 30px; }
+.toc-sec h3 { display: flex; gap: 8px; font-size: 13px; font-weight: 700; color: var(--honey); letter-spacing: .04em; margin-bottom: 8px; }
+.toc-sec h3 b { font-variant-numeric: tabular-nums; }
+.toc-sec button { width: 100%; display: grid; grid-template-columns: 26px 1fr; gap: 8px; text-align: left; padding: 8px 10px; border: 0; border-radius: 8px; background: none; color: var(--cream); font: 500 15px/1.4 var(--font); cursor: pointer; }
+.toc-sec button span { color: var(--cream-mute); font-variant-numeric: tabular-nums; font-size: 13px; padding-top: 1px; }
+.toc-sec button:hover { background: rgba(243, 236, 226, .08); }
+.toc-sec button[aria-current="true"] { background: rgba(217, 180, 138, .18); }
+.keys { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--rule-dark); display: flex; flex-wrap: wrap; gap: 10px 26px; font-size: 13px; color: var(--cream-mute); }
+.keys kbd { display: inline-block; min-width: 24px; padding: 3px 7px; margin-right: 6px; border-radius: 5px; border: 1px solid var(--rule-dark); font: 600 12px var(--font); color: var(--cream); text-align: center; }
+
+.notes {
+  position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 25;
+  transform: translateX(-50%);
+  width: min(780px, calc(100vw - 32px)); max-height: 38vh; overflow-y: auto;
+  padding: 18px 22px; border-radius: 14px;
+  background: var(--cocoa); color: var(--cream);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .4);
+  font: 400 16px/1.7 var(--font);
+}
+.notes h2 { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--honey); margin-bottom: 6px; }
+.notes p + p { margin-top: .6em; }
+
+.lightbox { display: grid; place-items: center; cursor: zoom-out; }
+.lightbox figure { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); }
+.lightbox img { max-width: min(92vw, 1400px); max-height: 82vh; width: auto; height: auto; border-radius: 8px; background: #FFFFFF; }
+.lightbox figcaption { font-size: 14px; color: var(--cream-mute); text-align: center; max-width: 720px; }
+
+.black { position: fixed; inset: 0; z-index: 40; background: #000000; cursor: none; }
+.toast {
+  position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 26;
+  transform: translate(-50%, 8px); opacity: 0; pointer-events: none;
+  max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: 99px;
+  background: var(--cocoa); color: var(--cream); font: 600 13px/1.4 var(--font); text-align: center;
+  transition: opacity .35s, transform .35s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast kbd { font: inherit; color: var(--honey); }
+.deck.hide-cursor, .deck.hide-cursor * { cursor: none !important; }
+
+/* ---------- portrait & short screens: each slide becomes a scrolling card ---------- */
+@media (max-aspect-ratio: 1/1), (max-height: 520px) {
+  .frame {
+    left: 0; top: 0; width: 100%; height: 100%;
+    transform: translateX(var(--dx));
+    font-size: clamp(13.5px, 3.7vw, 17px);
+    display: block; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+    padding: calc(20px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(92px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  }
+  .ttl { font-size: 1.6em; }
+  .bd { margin-top: 1.2em; }
+  .ft { margin-top: 1.4em; }
+  .take { font-size: 1.1em; }
+  .g { grid-template-columns: 1fr; }
+  .g.m2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ph { height: 14em; }
+  .curve .ph, .shot .ph { height: auto; }
+  .plot { flex: none; height: 11em; }
+  .cmp { min-width: 36em; height: auto; }
+  .cost { height: auto; }
+  .chart-box { flex: none; height: 13em; }
+
+  .cover-photo { position: relative; left: auto; right: auto; top: auto; bottom: auto; height: 34vh; min-height: 200px; margin: calc(-20px - env(safe-area-inset-top, 0px)) calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 1.6em calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
+  .cover-text { width: auto; }
+  .cover-ttl { font-size: 2.45em; }
+  .cover-line { font-size: 1.08em; }
+  .cover-desc { font-size: 1em; }
+  .cover-desc br { display: none; }
+  .cover-module { left: auto; right: 16px; top: calc(max(34vh, 200px) - 6.6em); width: 7.6em; }
+  .cover-module figcaption { display: none; }
+
+  .s-night .shade { background: rgba(23, 17, 13, .74); }
+  .scene { width: auto; margin: 2.4em 0; gap: 1.1em; }
+  .scene-ttl { font-size: 2em; }
+  .scene-sub { font-size: 1.25em; }
+  .gaps { flex-wrap: wrap; }
+
+  .quarter i { width: 2.2em; }
+  .lims { grid-template-rows: none; }
+  .need { flex-direction: column; align-items: flex-start; gap: .8em; }
+  .need ul { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+  .prod img { max-height: 15em; }
+  .feats { grid-template-columns: 1fr; }
+  .pipe { grid-template-columns: 1fr; }
+  .pipe .arr { justify-self: center; transform: rotate(90deg); }
+  .curve .ph { min-height: 0; padding: .6em; }
+  .acc .num { font-size: 3.6em; }
+  .spec { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 1.1em; }
+  .shot .ph { flex: none; }
+  .verdicts { grid-template-columns: repeat(5, minmax(0, 1fr)); font-size: .82em; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat .num { font-size: 3em; }
+  .conds { grid-template-columns: 1fr; }
+  .award .ph { min-height: 13em; flex: none; height: 15em; }
+  .papers .pp { height: 18em; flex: none; }
+  .prog-card { flex-wrap: wrap; gap: 1em; }
+  .prog-card .sep { display: none; }
+  .pat .num { font-size: 2.6em; }
+  .callout .num { font-size: 2.4em; }
+  .price .num { font-size: 3em; }
+  .cmpbar { grid-template-columns: 6em 1fr; }
+  .deal .ph, .deal .doc { flex: none; height: 15em; }
+  .rings { height: 19em; flex: none; }
+  .gtm { grid-template-columns: 1fr; }
+  .impact-photo { position: relative; left: auto; right: auto; top: auto; bottom: auto; height: 30vh; min-height: 190px; border-radius: .7em; margin-top: 1.4em; }
+  .s-impact .hd, .s-impact .ttl, .s-impact .bd, .s-impact .ft { width: auto; }
+  .s-impact .ttl { font-size: 2em; }
+  .who3 li { grid-template-columns: 2.8em 1fr; }
+  .who3 li p { grid-column: 2; }
+  .who3 .ico { width: 2.8em; height: 2.8em; grid-row: span 2; }
+  .team { padding: 0; gap: 1.4em .8em; }
+  .team li { width: calc((100% - .8em) / 2); }
+  .avatar { width: 6em; height: 6em; }
+  .s-end .frame { display: flex; flex-direction: column; }
+  .end-ttl { font-size: 3.4em; }
+  .end-sub { font-size: 1.15em; }
+
+  .where { display: none; }
+  .chrome { gap: 10px; padding-top: 10px; background: var(--scrim); }
+  .count { margin-right: 2px; }
+  .ctl button { width: 36px; height: 36px; }
+  .ctl .fs { display: none; }
+}
+@media (max-width: 380px) {
+  .ctl .nt { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide.on .b, .slide.on .plot i, .slide.on .hbar i, .slide.on .stackbar i, .slide.on .cmpbar i, .slide.on .lc-plot svg, .slide.on .pt { animation: none; }
+  .frame { transition: none; }
+  .clock .colon { animation: none; }
+}
+
+@media print {
+  @page { size: 1600px 900px; margin: 0; }
+  :root { --vw: 1600px; --vh: 900px; }
+  html, body { height: auto; overflow: visible; background: none; }
+  .deck { position: static; overflow: visible; }
+  .slide { position: relative; width: 1600px; height: 900px; opacity: 1; visibility: visible; overflow: hidden; break-after: page; --dx: 0px; }
+  .slide .b, .slide .plot i, .slide .hbar i, .slide .stackbar i, .slide .cmpbar i, .lc-plot svg, .pt { animation: none !important; }
+  .chrome, .bar-line, .panel, .notes, .toast, .black { display: none !important; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-clip" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4M9 10h6M9 14h6M9 18h3"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-pump" viewBox="0 0 24 24"><rect x="4" y="4.5" width="16" height="11" rx="2"/><path d="M8 8.5h5M8 11.5h3M16 8.5v3M12 15.5V20M8 20h8"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3.5c3 4 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.5-6 5.5-10z"/><path d="M9.5 14a2.5 2.5 0 0 0 2.5 2.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.2l2.7 2.7L16.2 9.4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/><rect x="9.5" y="9.5" width="5" height="5"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9.5 3h5M10.5 3v6L5 19a1.5 1.5 0 0 0 1.3 2h11.4a1.5 1.5 0 0 0 1.3-2L13.5 9V3"/><path d="M7.5 15h9"/></symbol>
+  <symbol id="i-move" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M12 3l-2.5 2.5M12 3l2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5M21 12l-2.5-2.5M21 12l-2.5 2.5"/></symbol>
+  <symbol id="i-hosp" viewBox="0 0 24 24"><path d="M4 21V8.5L12 4l8 4.5V21"/><path d="M12 10v6M9 13h6M3 21h18"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><circle cx="6.5" cy="10.5" r="1.7"/><circle cx="10" cy="6.5" r="1.7"/><circle cx="14" cy="6.5" r="1.7"/><circle cx="17.5" cy="10.5" r="1.7"/><path d="M12 12c-2.6 0-4.5 2.6-4.5 5 0 1.6 1.2 2.5 2.4 2.5 1 0 1.4-.5 2.1-.5s1.1.5 2.1.5c1.2 0 2.4-.9 2.4-2.5 0-2.4-1.9-5-4.5-5z"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 5h14v10l-4 4H5z"/><path d="M15 19v-4h4M8.5 9h7M8.5 12.5h4"/></symbol>
+  <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+</svg>
+
+<main class="deck" id="deck">
+
+<!-- ============ 표지 ============ -->
+<section class="slide s-cover" id="cover" data-sec="0" data-title="반려동물 주사약물 투약 관리 AIoT 솔루션">
+  <div class="frame">
+    <div class="cover-photo"><img src="media/cover-night.webp" alt="불 꺼진 입원실, 링거폴대 옆 케이지에서 잠든 강아지" decoding="async"></div>
+    <div class="cover-text">
+      <p class="eyebrow b">2026 NEXT WAVE-UP 아이디어 리그 · 일반·기술 트랙</p>
+      <p class="cover-line b">말하지 못하는 입원 동물의 <em>투약안전</em>을 지킵니다</p>
+      <h1 class="cover-ttl b">반려동물<br>주사약물 투약 관리<br>AIoT 솔루션</h1>
+      <p class="cover-desc b">기존 링거폴대에 <strong>무게센서 모듈 하나</strong>만 걸면 <br>잔량 · 종료시간 · 이상을 24시간 자동 기록합니다</p>
+      <ul class="chips b"><li>수액 잔량</li><li>종료 예측</li><li>이상 알림</li></ul>
+      <div class="cover-foot b">
+        <span class="brand">INFUTECH · WON SHOT</span><span class="sep"></span>
+        <span class="prog"><img class="modu" src="media/modu-logo.webp" alt="모두의창업"><span>1기 · 2R 확장형 상품</span></span>
+      </div>
+    </div>
+    <figure class="cover-module b">
+      <img src="media/module.webp" alt="INFU RETRO 무게센서 모듈 — 로드셀과 PCB가 든 흰 하우징 두 개, 아래에 수액백 후크">
+      <figcaption>INFU RETRO · 무게센서 모듈</figcaption>
+    </figure>
+  </div>
+  <div class="note" hidden><p>안녕하십니까, INFUTECH입니다. 저희는 말하지 못하는 입원 동물의 수액을, 기존 링거폴대 그대로 지켜보는 AIoT 솔루션을 만듭니다.</p></div>
+</section>
+
+<!-- ============ 01 문제 배경 ============ -->
+<section class="slide dark s-night" id="night" data-sec="1" data-title="새벽 3시, 동물병원 입원실">
+  <img class="bleed" src="media/scene-night.webp" alt="" decoding="async">
+  <div class="shade"></div>
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>01</b>문제 배경</span><span class="mark">WON SHOT</span></header>
+    <div class="scene">
+      <p class="clock b"><span class="digits">03<span class="colon">:</span>00</span>새벽 3시, 동물병원 입원실</p>
+      <h2 class="scene-ttl b">보호자는 집에 있고,<br>수의사는 다른 환자를 봅니다</h2>
+      <p class="scene-sub b">다음 순회 전까지, 이 변화는<br><em>기록되지도, 확인되지도 않습니다</em></p>
+      <ol class="gaps b"><li><b>①</b>기록 공백</li><li><b>②</b>확인 공백</li></ol>
+    </div>
+    <p class="src b">실제 전남대학교 · 전북권 동물병원 설문조사 결과</p>
+  </div>
+  <div class="note" hidden><p>새벽 3시 동물병원 입원실을 떠올려 보십시오. 보호자는 집에 있고, 당직 수의사는 다른 환자를 보고 있습니다.</p><p>다음 순회 전까지 이 변화는 기록되지도, 확인되지도 않습니다. 저희가 푸는 문제는 바로 이 두 가지, 기록 공백과 확인 공백입니다.</p></div>
+</section>
+
+<section class="slide" id="gap-record" data-sec="1" data-title="① 기록 공백">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>01</b>문제 배경 · ① 기록 공백</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">기록이 없으면, 아무도 지킬 수 없습니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: .72fr 1.25fr 1.15fr">
+        <div class="ph b"><img src="media/nurse-record.webp" alt="입원실에서 클립보드에 손으로 투약을 기록하는 의료진" decoding="async"></div>
+        <div class="card chart b">
+          <h3>동물병원 피해구제 접수 <small>(건)</small></h3>
+          <p class="cs">2021→2025 3배, 올해는 상반기에만 45건</p>
+          <div class="bars" style="--max: 45">
+            <div class="plot">
+              <div><i style="--v: 9"><b>9</b></i></div>
+              <div><i style="--v: 20"><b>20</b></i></div>
+              <div><i style="--v: 11"><b>11</b></i></div>
+              <div><i style="--v: 16"><b>16</b></i></div>
+              <div><i style="--v: 27"><b>27</b></i></div>
+              <div><i class="hl" style="--v: 45"><b>45</b></i></div>
+            </div>
+            <div class="xl"><span>2021</span><span>2022</span><span>2023</span><span>2024</span><span>2025</span><span>2026<br>상반기</span></div>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="card ink b">
+            <h3>진료기록 확보 여부별 분쟁 해결률</h3>
+            <div class="vs">
+              <div><span class="vl">확보</span><strong class="num hon"><span data-count="30">30</span><small>%</small></strong><span class="hbar"><i style="--v: 30"></i></span></div>
+              <div><span class="vl">미확보</span><strong class="num"><span data-count="19.5">19.5</span><small>%</small></strong><span class="hbar"><i style="--v: 19.5; --j: 1"></i></span></div>
+            </div>
+            <p class="note-line">기록이 없으면 <b>5건 중 4건</b>이 미해결</p>
+          </div>
+          <article class="card news tall b">
+            <p class="press"><b>데일리벳</b> · 2026.09.09</p>
+            <h4>「동물병원 피해구제 신청 급증, ‘진료상 과실’이 대부분」</h4>
+            <blockquote>“의사소통이 어려운 반려동물을 대상으로… 소비자가 진료 과실을 명확히 입증하기 어렵다” — <cite>한국소비자원</cite></blockquote>
+          </article>
+        </div>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="take b">수기 기록에 의존하는 투약 관리 → <em>자동으로 남는 기록</em>이 필요합니다</p>
+      <p class="src b">출처: 한국소비자원 동물병원 피해구제 분석(2026.9, 2021~2026.6 접수 128건) · 데일리벳 2026.09.09</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>먼저 기록 공백입니다. 많은 동물병원이 아직 투약을 손으로 기록합니다.</p><p>한국소비자원에 접수된 동물병원 피해구제 신청은 2021년 9건에서 2025년 27건으로 세 배가 됐고, 올해는 상반기에만 45건입니다.</p><p>그런데 진료기록이 없으면 분쟁 해결률은 19.5%로 떨어집니다. 다섯 건 중 네 건은 해결되지 못합니다. 그래서 자동으로 남는 기록이 필요합니다.</p></div>
+</section>
+
+<section class="slide" id="gap-watch" data-sec="1" data-title="② 확인 공백">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>01</b>문제 배경 · ② 확인 공백</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">아파도 말하지 못하고, 밤에는 지켜볼 사람이 없습니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1fr 1fr .9fr">
+        <div class="card fig b">
+          <h3>입원 개 · 고양이 정맥 카테터</h3>
+          <div class="quarter" aria-hidden="true"><i></i><i></i><i></i><i class="on"></i></div>
+          <p class="num"><span data-count="26.7">26.7</span><small>%</small></p>
+          <p class="lede">약 4마리 중 1마리에 합병증</p>
+          <p class="cs">빠짐 · 막힘 · 줄 끊김 · 정맥염 (美 CSU 연구에서도 19.9%)</p>
+        </div>
+        <div class="card fig b">
+          <h3>24시간 운영 동물병원 (서울)</h3>
+          <div class="dots" data-dots="100" data-on="8" role="img" aria-label="100곳 중 8곳"></div>
+          <p class="num"><small class="pre">100곳 중 약</small><span data-count="8">8</span><small>곳</small></p>
+          <p class="cs">서울 7.95% · 경기 6.53%</p>
+        </div>
+        <article class="card ink news b" style="display:flex; flex-direction:column; justify-content:space-between; gap:1em">
+          <div>
+            <p class="press" style="color: var(--cream-mute)"><b style="color: var(--honey)">데일리벳</b> · 2018.07.27</p>
+            <h4 style="font-size: 1.6em; line-height: 1.35; margin-top: .5em">「24시간 동물병원에<br>수의사가 없다」</h4>
+          </div>
+          <p style="font-size: .9em; line-height: 1.6; color: var(--cream-mute)">‘24시간’을 내건 서울 동물병원 73곳 조사<br>→ <strong style="color: var(--cream)">16곳은 “더 이상 24시간 진료를 보지 않는다”</strong>고 응답</p>
+        </article>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="take b">사람의 눈에만 의존하는 확인 → <em>24시간 자동 감지</em>가 필요합니다</p>
+      <p class="src b">출처: RVC·BSAVA 연구(2024, 19개 기관 382마리) · Simpson et al., J Small Anim Pract(2023) · 데일리벳 수도권 동물병원 운영시간 조사(2025) · 데일리벳 2018.07.27</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>두 번째는 확인 공백입니다. 입원한 개와 고양이의 정맥 카테터는 약 네 마리 중 한 마리꼴로 빠짐, 막힘 같은 합병증이 생긴다는 연구가 있습니다.</p><p>하지만 24시간 운영하는 동물병원은 서울 기준 100곳 중 약 8곳뿐입니다.</p><p>24시간을 내건 병원조차 실제로는 야간 진료를 하지 않는 곳이 있다는 보도도 있습니다. 사람의 눈에만 기대는 확인에는 한계가 있습니다.</p></div>
+</section>
+
+<!-- ============ 02 기존 시스템의 한계 ============ -->
+<section class="slide" id="limits" data-sec="2" data-title="지금의 방식으로는 두 공백이 메워지지 않습니다">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>02</b>기존 시스템의 한계</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">지금의 방식으로는 두 공백이 메워지지 않습니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1fr 1fr">
+        <div class="grp b">
+          <p class="grp-l">사람에게 기대는 방식</p>
+          <div class="lims">
+            <div class="card lim">
+              <svg class="ico"><use href="#i-clip"/></svg>
+              <h3>수기 투약 기록</h3>
+              <p>투약을 손으로 적습니다. 남지 않은 기록은 분쟁에서 근거가 되지 못합니다.</p>
+              <p class="x"><b>19.5%</b>진료기록이 없을 때 분쟁 해결률</p>
+            </div>
+            <div class="card lim">
+              <svg class="ico"><use href="#i-clock"/></svg>
+              <h3>정기 순회 확인</h3>
+              <p>다음 순회 전까지는 빠짐 · 막힘 · 소진을 아무도 보지 못합니다.</p>
+              <p class="x"><b>100곳 중 8곳</b>24시간 운영 동물병원 (서울)</p>
+            </div>
+          </div>
+        </div>
+        <div class="grp b">
+          <p class="grp-l">기존 장비</p>
+          <div class="lims">
+            <div class="card lim">
+              <svg class="ico"><use href="#i-pump"/></svg>
+              <h3>동물용 인퓨전펌프</h3>
+              <p>펌프식 유량 제어 장비를 따로 들여야 합니다. 입원장마다 놓기엔 비쌉니다.</p>
+              <p class="x"><b>약 110만 원</b>대당 · 입원장 5대면 550만 원</p>
+            </div>
+            <div class="card lim">
+              <svg class="ico"><use href="#i-drop"/></svg>
+              <h3>사람 병원용 수액 모니터</h3>
+              <p>광학식은 방울을 세고(DripAssist · 아이링거), 무게식은 폴대째 바꿔야 합니다(토킹폴).</p>
+              <p class="x"><b>사람 병원</b>중심 · 수액세트 클립 또는 폴대 교체</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="need b">
+        <span class="need-l">그래서 필요한 것</span>
+        <ul>
+          <li><svg class="ico"><use href="#i-check"/></svg>기존 폴대 그대로</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>자동으로 남는 기록</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>24시간 이상 감지</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>부담 없는 도입가</li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="src b">출처: 한국소비자원 동물병원 피해구제 분석(2026.9) · 데일리벳 수도권 동물병원 운영시간 조사(2025) · SW Medi 동물용 인퓨전펌프 판매가(2025) · Shift Labs 제품 자료 · 삼성전자 뉴스룸(2017) · KOITA 기술사업화 DB(아이링거)</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>지금 병원이 쓰는 방법을 보겠습니다. 기록은 손으로, 확인은 순회로 합니다. 기록이 없으면 분쟁 해결률은 19.5%이고, 24시간 지켜보는 병원은 서울 100곳 중 8곳뿐입니다.</p><p>장비로 풀려면 대당 약 110만 원인 인퓨전펌프를 따로 들여야 하고, 다른 모니터링 기기는 대부분 사람 병원용이라 폴대나 수액 세트를 바꿔야 합니다.</p><p>그래서 필요한 것은 네 가지입니다. 기존 폴대 그대로, 자동으로 남는 기록, 24시간 감지, 그리고 부담 없는 도입가입니다.</p></div>
+</section>
+
+<!-- ============ 03 아이디어 소개 ============ -->
+<section class="slide" id="solution" data-sec="3" data-title="INFU RETRO — 모듈 하나 걸면 폴대가 스마트해집니다">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>03</b>아이디어 소개 · INFU RETRO</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">모듈 하나 걸면, 지금 쓰는 폴대가 스마트해집니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: .95fr 1.1fr">
+        <figure class="card prod b">
+          <img src="media/module.webp" alt="INFU RETRO 실물 모듈 — 왼쪽은 로드셀, 오른쪽은 자체 PCB가 보이는 하우징, 아래에 수액백 후크" data-zoom>
+          <figcaption class="parts"><span>로드셀 (무게센서)</span><span>자체 PCB · 무선</span><span>수액백 후크</span></figcaption>
+        </figure>
+        <div class="stack">
+          <ol class="steps">
+            <li class="card step b"><span class="n">1</span><h3>걸고</h3><p>지금 쓰는 링거 걸이에 모듈을 걸고, 수액백은 모듈 후크에 겁니다. 폴대 교체도 공구도 필요 없습니다.</p></li>
+            <li class="card step b"><span class="n">2</span><h3>재고</h3><p>로드셀이 수액 무게를 1초마다 재고, 칼만필터가 흔들림을 보정합니다.</p></li>
+            <li class="card step b"><span class="n">3</span><h3>알립니다</h3><p>대시보드와 휴대폰에서 잔량, 종료 예상시간, 이상 알림을 바로 확인합니다.</p></li>
+          </ol>
+          <div class="feats b">
+            <div class="feat"><b>센서 1개</b><span>단일 정밀측정</span></div>
+            <div class="feat"><b>제품 간편성</b><span>기존 환경 변경 없이 사용</span></div>
+            <div class="feat"><b>위험상황 조기 감지</b><span>이상 감지 · 흔들림 보정</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note" hidden><p>저희 해법은 INFU RETRO, 무게센서 모듈 하나입니다. 지금 쓰는 링거 걸이에 모듈을 걸고, 수액백은 모듈 후크에 겁니다. 폴대 교체도 공구도 필요 없습니다.</p><p>로드셀이 수액 무게를 실시간으로 재고, 칼만필터가 흔들림을 보정합니다.</p><p>그리고 대시보드와 휴대폰에서 잔량, 종료 예상시간, 이상 알림을 바로 확인합니다. 센서는 하나, 공구는 필요 없습니다.</p></div>
+</section>
+
+<section class="slide" id="algorithm" data-sec="3" data-title="핵심 알고리즘 — CNN 이미지 패턴 판별">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>03</b>아이디어 소개 · 핵심 알고리즘</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">통계식 대신, CNN이 이미지 패턴으로 판별합니다</h2>
+    <div class="bd">
+      <ol class="pipe b">
+        <li class="card pstep"><p class="k">01</p><h3>무게 수집</h3><p>1초 간격 로드셀 측정</p></li>
+        <svg class="ico arr" aria-hidden="true"><use href="#i-arrow"/></svg>
+        <li class="card pstep"><p class="k">02</p><h3>칼만필터</h3><p>동물 움직임 · 폴대 흔들림으로 생긴 순간 노이즈 제거</p></li>
+        <svg class="ico arr" aria-hidden="true"><use href="#i-arrow"/></svg>
+        <li class="card pstep"><p class="k">03</p><h3>유속 산출</h3><p>투여 초기 무게 감소량과 방울 수(GTT)로 투여속도 추정</p></li>
+        <svg class="ico arr" aria-hidden="true"><use href="#i-arrow"/></svg>
+        <li class="card ink pstep"><p class="k">04</p><h3>CNN 이미지 패턴</h3><p>시계열을 이미지 패턴으로 바꿔 정상 · 이상 분류</p></li>
+      </ol>
+      <div class="g" style="--c: 1.55fr 1fr">
+        <figure class="card curve b">
+          <h3>CNN 학습 곡선 <small style="color: var(--mute); font-weight: 500">손실 · 정확도 — 기존 개발 결과</small></h3>
+          <div class="ph"><img src="media/cnn-curve.webp" alt="CNN 학습 곡선 — 80 epoch 동안 손실은 0 근처로 떨어지고 검증 정확도는 1.0 근처로 수렴" data-zoom></div>
+          <p class="gyro"><b>+ 자이로 보정 학습</b><span>테스트 환경에서 자이로로 흔들림 ↔ 무게 관계를 학습해 무게를 보정합니다. 그래서 실제 제품에는 무게센서 하나만 들어갑니다.</span></p>
+        </figure>
+        <div class="card ink acc b">
+          <div>
+            <p class="cs">검증 정확도 (val_acc)</p>
+            <p class="num"><span data-count="99">99</span><small>%</small></p>
+          </div>
+          <p>기초 · 영양수액 등 <em>10여 종</em> 점도별 무게 감소 패턴 학습 → 자동 보정</p>
+          <p class="cs">이미지 패턴 학습으로 하드웨어는 가볍게, 다양한 변수에도 적용</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note" hidden><p>핵심은 알고리즘입니다. 무게를 1초마다 수집하고, 칼만필터로 동물 움직임을 걸러내고, 초기 무게 감소량과 방울 수로 유속을 계산하고, 통계식 대신 신호를 이미지 패턴으로 바꿔 CNN이 판별합니다.</p><p>테스트 환경에서는 자이로로 흔들림과 무게의 관계를 학습해 보정하기 때문에, 실제 제품은 무게센서 하나로 가볍게 만들 수 있습니다.</p><p>CNN 검증 정확도는 99%이고, 수액 10여 종의 점도를 학습해 자동 보정합니다.</p></div>
+</section>
+
+<section class="slide" id="hardware" data-sec="3" data-title="하드웨어 — 자체 설계 PCB">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>03</b>아이디어 소개 · 하드웨어 · 통신</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">무게센서 하나로 끝내는 자체 설계 PCB</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1fr 1fr">
+        <figure class="card shot b">
+          <div class="ph"><img src="media/pcb-layout.webp" alt="60 × 35mm PCB 배선 레이아웃 설계 화면" data-zoom></div>
+          <figcaption>PCB 설계 (60 × 35mm)</figcaption>
+        </figure>
+        <figure class="card shot b">
+          <div class="ph"><img src="media/pcb-real.webp" alt="실물 제작한 PCB의 앞면과 뒷면 — 파란 기판과 초록 기판" data-zoom></div>
+          <figcaption>실물 제작 완료 (앞면 · 뒷면)</figcaption>
+        </figure>
+      </div>
+      <div class="spec b">
+        <div><span>ADS1232 앰프</span><b>무게센서 신호 직접 처리</b></div>
+        <div><span>제품 센서 1개</span><b>무게센서만 탑재 (자이로는 학습용)</b></div>
+        <div><span>ESP 무선 일체형</span><b>USB-C · 로드셀 4핀</b></div>
+        <div><span>MQTT 이벤트 전송</span><b>트래픽 80% 이상 감소</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="note" hidden><p>하드웨어는 60×35mm 자체 PCB에 무게센서 하나만 올렸습니다. 무선 통신과 이벤트 전송으로 트래픽을 80% 이상 줄였습니다.</p></div>
+</section>
+
+<!-- ============ 04 시연 ============ -->
+<section class="slide dark" id="demo" data-sec="4" data-title="시연 영상">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>04</b>시연</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">폴대에 걸고, 유속이 바뀌면 바로 알립니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1.85fr 1fr">
+        <figure class="video b">
+          <video id="demo-video" src="media/demo.mp4" poster="media/demo-poster.webp" controls muted playsinline preload="metadata"></video>
+          <figcaption>시제품 시연 영상 (구형 하우징) · 0:25</figcaption>
+        </figure>
+        <div class="chap b">
+          <p class="chap-l">장면 바로가기</p>
+          <ol>
+            <li><button type="button" data-t="0"><time>0:00</time>폴대 상단에 모듈 장착</button></li>
+            <li><button type="button" data-t="6"><time>0:06</time>수액백 걸고 투여 시작</button></li>
+            <li><button type="button" data-t="13"><time>0:13</time>유속 빠름</button></li>
+            <li><button type="button" data-t="15" class="alert"><time>0:15</time>유속 과다 알림</button></li>
+            <li><button type="button" data-t="18" class="alert"><time>0:18</time>유속 느림 → 알림</button></li>
+            <li><button type="button" data-t="22" class="alert"><time>0:22</time>유속 정지 → 알림</button></li>
+          </ol>
+          <p class="cs">모니터의 대시보드와 휴대폰 앱에 같은 알림이 함께 뜹니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note" hidden><p>실제 시연 영상입니다. 폴대 상단에 모듈을 끼우고 수액백을 겁니다.</p><p>유속을 빠르게 하면 대시보드와 휴대폰에 유속 과다 알림이 뜨고, 느리게 하거나 멈추면 각각 알림이 갑니다. 영상 속 하우징은 구형 시제품입니다.</p></div>
+</section>
+
+<section class="slide" id="simulation" data-sec="4" data-title="다섯 가지 입원 상황 판별">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>04</b>시연 · 상황별 판별</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">흔들림은 걸러내고, 진짜 이상만 알립니다</h2>
+    <p class="sub b">이상 점수가 임계값 0.6을 넘을 때만 알림을 보냅니다</p>
+    <div class="bd">
+      <div class="card sim b">
+        <div class="sim-fig tbl" style="border: 0; background: none; border-radius: 0">
+          <div class="sim-in">
+            <img src="media/sim-states.webp" alt="500mL 수액 모의 신호 그래프 다섯 개 — 각 그래프는 무게, 이상 점수, 잔차를 위아래로 보여 줌" data-zoom>
+            <ol class="verdicts">
+              <li>정상상태 (정상 투여)<span>통과</span></li>
+              <li>흔들림 발생 상태<span>보정 후 통과</span></li>
+              <li class="al">유속변화 (감소 상황)<span>알림</span></li>
+              <li class="al">줄빠짐 상황<span>알림</span></li>
+              <li class="al">공기색전 / 역류 등<span>알림</span></li>
+            </ol>
+          </div>
+        </div>
+        <p class="cs">※ 500mL 수액 모의 신호 시뮬레이션 · 위: 무게 (점 = 원신호, 실선 = 칼만필터, 점선 = 정상 유속 기대 추세) · 가운데: 이상 점수 · 아래: 잔차</p>
+      </div>
+    </div>
+  </div>
+  <div class="note" hidden><p>그래프는 다섯 가지 입원 상황을 시뮬레이션한 결과입니다. 위는 무게, 가운데는 이상 점수, 아래는 잔차입니다.</p><p>정상 투여와 이송 중 흔들림에서는 점수가 임계값 아래에 머물고, 유속 저하 · 줄 빠짐 · 공기 유입이나 역류에서는 점수가 0.6을 넘어 알림이 갑니다.</p></div>
+</section>
+
+<section class="slide" id="results" data-sec="4" data-title="검증 성과 — 숫자로 증명">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>04</b>시연 · 검증 성과</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">흔들리는 모의 병실에서, 숫자로 증명했습니다</h2>
+    <p class="sub b">폴대 이동 · 흔들림 · 기울어짐 · 당겨짐 반복시험 (500mL) — ±5분 · 5초는 보정을 포함한 최대 검측 시간 기준</p>
+    <div class="bd">
+      <div class="stats g m2">
+        <div class="card stat b"><p class="num">±<span data-count="3">3</span><small>%</small></p><p>잔량 측정 오차</p></div>
+        <div class="card stat b"><p class="num">±<span data-count="5">5</span><small>분</small></p><p>투여 종료시점<br>예측 오차</p></div>
+        <div class="card stat b"><p class="num"><span data-count="5">5</span><small>초</small></p><p>이내 이상 감지<small>흔들림 · 당겨짐 보정</small></p></div>
+        <div class="card stat b"><p class="num ac"><span data-count="99">99</span><small>%</small></p><p>CNN 이상 패턴<br>검증 정확도</p></div>
+      </div>
+      <div class="card b">
+        <h3>시험 조건</h3>
+        <ul class="conds">
+          <li><svg class="ico"><use href="#i-move"/></svg>병동 내 폴대 이동 · 흔들림 · 기울어짐 변수 반복 적용</li>
+          <li><svg class="ico"><use href="#i-drop"/></svg>500mL 기준 잔량 ±3%, 종료시점 ±5분 이내</li>
+          <li><svg class="ico"><use href="#i-flask"/></svg>기초 · 영양수액 등 10여 종 점도 데이터 학습</li>
+          <li><svg class="ico"><use href="#i-cpu"/></svg>테스트 환경: 자이로 병행 측정 → 흔들림 · 무게 관계 보정 학습</li>
+          <li><svg class="ico"><use href="#i-hosp"/></svg>원광대 간호학과 실험 세팅 협력</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="note" hidden><p>흔들리고 기울어지는 모의 병실에서 반복 시험했습니다. 500mL 기준 잔량 오차 ±3%, 종료시점 예측 오차 ±5분입니다.</p><p>±5분과 5초 이내 감지는 흔들림 · 당겨짐 보정을 포함해 계산한 최대 검측 시간 기준입니다. 패턴 검증 정확도는 99%입니다.</p></div>
+</section>
+
+<section class="slide" id="papers" data-sec="4" data-title="학술 검증 — 우수논문상 2회">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>04</b>시연 · 학술 검증</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">국내외 학회에서 두 번 인정받았습니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1.15fr 1fr .9fr">
+        <figure class="card award b">
+          <div class="ph"><img src="media/award-ait.webp" alt="AIT 2026 국제학술대회 Best Paper Award 상장" data-zoom></div>
+          <figcaption><p class="who">AIT 2026 국제학술대회 · Best Paper Award · 2026.01</p><h3>Design of a Dual-Track Algorithm for Real-Time IV Monitoring Based on Load Cell</h3></figcaption>
+        </figure>
+        <figure class="card award b">
+          <div class="ph"><img src="media/award-kiis.webp" alt="한국혁신산업학회 공동학술대회 우수논문상 상장" data-zoom></div>
+          <figcaption><p class="who">한국혁신산업학회 · 한국디지털정책학회 우수논문상 · 2026.07.06</p><h3>CNN 상태 패턴 분석 기반 정맥 수액 이상 감지 알고리즘</h3></figcaption>
+        </figure>
+        <figure class="card papers b">
+          <div class="pp">
+            <img src="media/paper-1.webp" alt="논문 첫 장 — 상태 패턴 분석 기반 정맥 수액 이상 감지 알고리즘, 초록과 서론" data-zoom>
+            <img src="media/paper-2.webp" alt="논문 둘째 장 — CNN 패턴 판별 구조와 실험 결과 표" data-zoom>
+          </div>
+          <figcaption><p class="who" style="font-size: .8em; font-weight: 700; color: var(--accent-ink)">논문 초록</p><h3 style="font-size: .95em; margin-top: .3em; line-height: 1.45">A State Pattern Analysis-Based Algorithm for Intravenous Infusion Anomaly Detection</h3></figcaption>
+        </figure>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="src b">특허 심사 진행 중 — 하드웨어 특허 · 소프트웨어 특허 · 실용신안 각 1건</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>이 연구로 국내외 학회에서 두 번 상을 받았습니다. 1월 AIT 2026 국제학술대회 Best Paper Award, 7월 한국혁신산업학회 · 한국디지털정책학회 공동학술대회 우수논문상입니다.</p></div>
+</section>
+
+<!-- ============ 05 시장분석 ============ -->
+<section class="slide" id="market" data-sec="5" data-title="수요와 시장 규모">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>05</b>시장분석 · 근거</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">수요는 이미 일상이 됐고, 시장은 커지고 있습니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1fr 1fr 1fr">
+        <div class="card chart b">
+          <h3>동물병원 이용 경험률 <small>(%)</small></h3>
+          <p class="cs">최근 1년 · 양육가구 기준</p>
+          <div class="chart-box lc" role="img" aria-label="2021년 73.0%, 2022년 71.8%, 2023년 80.4%, 2024년 93.0%, 2025년 95.1%">
+            <div class="lc-plot">
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="10,67.5 30,70.5 50,49 70,17.5 90,12.25"/></svg>
+              <span class="pt" style="--x: 10; --y: 32.5"><b>73.0</b></span>
+              <span class="pt lo" style="--x: 30; --y: 29.5"><b>71.8</b></span>
+              <span class="pt" style="--x: 50; --y: 51"><b>80.4</b></span>
+              <span class="pt" style="--x: 70; --y: 82.5"><b>93.0</b></span>
+              <span class="pt hl" style="--x: 90; --y: 87.75"><b>95.1</b></span>
+            </div>
+            <div class="lc-x" aria-hidden="true"><span style="--x: 10">2021</span><span style="--x: 30">2022</span><span style="--x: 50">2023</span><span style="--x: 70">2024</span><span style="--x: 90">2025</span></div>
+          </div>
+        </div>
+        <div class="card chart b">
+          <h3>국내 반려동물 시장 <small>(원)</small></h3>
+          <p class="cs">2022년 8조 → 2027년 15조 목표</p>
+          <div class="bars" style="--max: 15">
+            <div class="plot" style="padding: 0 12%; gap: 18%">
+              <div><i style="--v: 8"><b>8조</b></i></div>
+              <div><i class="hl" style="--v: 15"><b>15조</b></i></div>
+            </div>
+            <div class="xl" style="padding: 0 12%; gap: 18%"><span>2022<br>실적</span><span>2027<br>정부 목표</span></div>
+          </div>
+        </div>
+        <div class="card chart b">
+          <h3>동물용 인퓨전펌프 CAGR</h3>
+          <p class="cs">글로벌 · 조사기관별 전망</p>
+          <div class="bars" style="--max: 12.3">
+            <div class="plot">
+              <div><i class="hl" style="--v: 12.3"><b>12.3%</b></i></div>
+              <div><i style="--v: 7.4"><b>7.4%</b></i></div>
+              <div><i style="--v: 7.2"><b>7.2%</b></i></div>
+              <div><i style="--v: 6.55"><b>6.55%</b></i></div>
+            </div>
+            <div class="xl"><span>Data<br>Bridge</span><span>Grand<br>View</span><span>GM<br>Insights</span><span>MRF</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="src b">출처: 농림축산식품부 2025 양육현황 조사(2026.2) · 농식품부 반려동물 연관산업 육성 대책 · Data Bridge / Grand View / GM Insights / MRF 시장 보고서</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>수요는 이미 일상이 됐고, 시장은 커지고 있습니다.</p><p>반려가구의 동물병원 이용 경험률은 2025년 95.1%입니다. 국내 반려동물 시장은 2022년 8조 원에서 2027년 15조 원을 목표로 하고, 동물용 인퓨전펌프 시장은 조사기관에 따라 연 6.55~12.3% 성장할 것으로 봅니다.</p></div>
+</section>
+
+<section class="slide" id="why-now" data-sec="5" data-title="왜 지금인가 — 투약 기록 의무화">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>05</b>시장분석 · 왜 지금인가</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">지금, 동물병원 투약 기록 의무화가 추진되고 있습니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1fr 1.05fr">
+        <div class="card chart b">
+          <h3>동물병원 의료용 마약류 처방량 <small>(만 개)</small></h3>
+          <p class="cs">3년 새 +37% — 기록 · 보고 압력도 함께 커집니다</p>
+          <div class="bars" style="--max: 353">
+            <div class="plot" style="gap: 1.4em">
+              <div><i style="--v: 257.6"><b>257.6</b></i></div>
+              <div><i style="--v: 299.2"><b>299.2</b></i></div>
+              <div><i style="--v: 323.6"><b>323.6</b></i></div>
+              <div><i class="hl" style="--v: 353"><b>353</b></i></div>
+            </div>
+            <div class="xl" style="gap: 1.4em"><span>2022</span><span>2023</span><span>2024</span><span>2025</span></div>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="card b" style="flex: 1">
+            <h3>규제 타임라인</h3>
+            <ol class="tl">
+              <li><time>2023.01</time><span>동물병원 진료비 게시 의무 시행</span></li>
+              <li><time>2025.12</time><span>진료비 공개 항목 11종 → 20종 확대</span></li>
+              <li><time>2026.04</time><span>마약류 관리 강화 — 투약 시 소유자 정보 기록 추진</span></li>
+              <li><time>2026.08</time><span>합동점검 46곳 중 28곳 위반 적발</span></li>
+              <li><time>2026.09</time><span>진료기록 발급 의무화 추진</span></li>
+            </ol>
+          </div>
+          <div class="g b" style="--c: 1fr 1fr; flex: none">
+            <article class="card news"><p class="press"><b>정책브리핑</b> · 2026.04.27</p><h4>「동물병원 의료용 마약류 관리 강화…정보관리 의무화 · 합동점검」</h4></article>
+            <article class="card news"><p class="press"><b>중앙일보</b> · 2026.09.02</p><h4>「동물병원 진료비 공개 · 진료기록 발급 의무화…수의계는 반발」</h4></article>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="take b">기록 의무화 흐름 — <em>자동 기록 수요가 열리는 시점</em>입니다</p>
+      <p class="src b">출처: 연합뉴스 2026.05.31(NIMS 처방량) · 농식품부 · 식약처 보도자료(2025.12, 2026.4) · 데일리벳 2026.08.05 · 중앙일보 2026.09.02</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>왜 지금일까요. 동물병원 마약류 처방량은 3년 만에 37% 늘었습니다.</p><p>정부는 진료비 공개를 20종으로 늘렸고, 올해는 투약 시 소유자 정보를 기록하는 제도와 진료기록 발급 의무화가 추진되고 있습니다.</p><p>언론도 이 흐름을 계속 다루고 있습니다. 기록을 요구하는 압력이 커지는 지금이 자동 기록 시장이 열리는 시점입니다.</p></div>
+</section>
+
+<!-- ============ 06 차별점 ============ -->
+<section class="slide" id="compare" data-sec="6" data-title="대안 비교">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>06</b>차별점 · 대안 비교</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">동물병원 폴대에 바로 끼우는 무게센서 제품은 아직 없습니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: .62fr 2fr">
+        <figure class="card mod b">
+          <img src="media/module.webp" alt="INFU RETRO 실물 모듈" data-zoom>
+          <figcaption><b>INFU RETRO 실물 모듈</b><br><span>로드셀(좌) · 자체 PCB(우) · 수액백 후크</span></figcaption>
+        </figure>
+        <div class="tbl b">
+          <table class="cmp">
+            <thead><tr><th scope="col">제품</th><th scope="col">가격</th><th scope="col">측정 방식</th><th scope="col">설치 방식</th><th scope="col">주 사용처</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">동물용 인퓨전펌프<small>동물병원 장비</small></th><td>약 110만 원</td><td>펌프식 유량 제어</td><td>별도 장비 도입</td><td>동물병원</td></tr>
+              <tr><th scope="row">DripAssist<small>美 Shift Labs</small></th><td>약 $400</td><td>광학 방울 계수</td><td>드립 챔버 클립</td><td>사람 · 수의</td></tr>
+              <tr><th scope="row">토킹폴<small>삼성 C랩 · 2017</small></th><td>미공개</td><td>무게센서</td><td>폴대 일체형 (교체)</td><td>사람 병원</td></tr>
+              <tr><th scope="row">아이링거<small>신성티케이</small></th><td>미공개</td><td>적외선 · 광학</td><td>수액 세트 클립</td><td>사람 병원</td></tr>
+              <tr class="us"><th scope="row">INFU RETRO<small>INFUTECH</small></th><td>25만 원<small>+ 월 12만 원</small></td><td>무게센서 + CNN</td><td>기존 폴대 상단 장착</td><td>동물병원 전용</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="take b">가장 낮은 도입가 · <em>기존 폴대 그대로</em> · 동물병원 입원 환경에 맞춘 설계</p>
+      <p class="src b">출처: SW Medi 동물용 인퓨전펌프 판매가(2025) · Shift Labs 제품 자료 · 삼성전자 뉴스룸(2017) · KOITA 기술사업화 DB(아이링거) · 아이디어 제안서</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>대안을 보겠습니다. 동물용 인퓨전펌프는 대당 약 110만 원이고, 다른 모니터링 기기들은 대부분 사람 병원용이거나 방울을 세는 광학 방식입니다.</p><p>INFU RETRO는 25만 원에 기존 폴대에 바로 끼우는 무게센서 방식으로, 동물병원 입원 환경에 맞춰 설계했습니다.</p></div>
+</section>
+
+<section class="slide" id="ip" data-sec="6" data-title="IP · 인증">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>06</b>차별점 · IP · 인증</span><span class="mark">INFUTECH</span></header>
+    <h2 class="ttl b">인증 장벽 없이, 바로 판매할 수 있는 단계를 준비합니다</h2>
+    <div class="bd">
+      <div class="card prog-card b">
+        <img class="modu" src="media/modu-logo.webp" alt="모두의창업">
+        <span class="sep"></span>
+        <p>사업화 프로그램<b>모두의창업 1기 · 2R 확장형 상품</b></p>
+      </div>
+      <div class="g" style="--c: 1fr 1fr 1fr; flex: 1">
+        <div class="card pat b"><p class="k"><svg class="ico"><use href="#i-shield"/></svg>하드웨어 특허</p><p class="num"><span data-count="1">1</span><small>건</small></p><p>변리사 통해 심사 진행 중</p></div>
+        <div class="card pat b"><p class="k"><svg class="ico"><use href="#i-shield"/></svg>소프트웨어 특허</p><p class="num"><span data-count="1">1</span><small>건</small></p><p>변리사 통해 심사 진행 중</p></div>
+        <div class="card pat b"><p class="k"><svg class="ico"><use href="#i-shield"/></svg>실용신안</p><p class="num"><span data-count="1">1</span><small>건</small></p><p>변리사 통해 심사 진행 중</p></div>
+      </div>
+      <div class="g" style="--c: 1fr 1fr; flex: 1">
+        <div class="card cert b"><p class="k">KC 인증</p><b>병행 진행 중</b><p>특허 심사와 함께 제품 인증을 동시에 추진</p></div>
+        <div class="card ink cert b"><p class="k">의료기기 인증</p><b>인증 없이 사용 가능</b><p>반려동물 대상 제품임을 확인 → <strong>실제 상용 판매 가능</strong></p></div>
+      </div>
+    </div>
+  </div>
+  <div class="note" hidden><p>저희는 모두의창업 1기 2R 확장형 상품입니다. 하드웨어 특허, 소프트웨어 특허, 실용신안 각 1건이 변리사를 통해 심사 중이고, KC 인증도 병행하고 있습니다.</p><p>반려동물 대상 제품이라 의료기기 인증 없이 사용할 수 있음을 확인해, 바로 상용 판매가 가능합니다.</p></div>
+</section>
+
+<!-- ============ 07 제품 원가 ============ -->
+<section class="slide" id="cost" data-sec="7" data-title="1대 기준 원가 구조">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>07</b>제품 원가 · 단위 경제성</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">센서를 줄인 설계가, 8만 원대 원가로 이어집니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1.35fr 1fr">
+        <div class="card b" style="overflow-x: auto">
+          <table class="cost">
+            <thead><tr><th scope="col">구분</th><th scope="col">항목</th><th scope="col">1대 기준 예상 비용</th></tr></thead>
+            <tbody>
+              <tr><th scope="row" rowspan="4">제조</th><td>하드웨어 BOM (PCB · 로드셀 · 배터리, MOQ 10,000ea 기준)</td><td>15,000원</td></tr>
+              <tr><td>조립 인건비</td><td>10,000원</td></tr>
+              <tr><td>테스트 · 검수 · 캘리브레이션</td><td>5,000원</td></tr>
+              <tr><td>패키징</td><td>5,000원</td></tr>
+              <tr><th scope="row" rowspan="3">운영</th><td>인증비 배분 (3년 이내 회수 금액)</td><td>7,000원</td></tr>
+              <tr><td>서버 · 소프트웨어 운영 배분</td><td>5,000원</td></tr>
+              <tr><td>A/S · 불량 대응 충당</td><td>8,000원</td></tr>
+              <tr><th scope="row" rowspan="2">유통</th><td>물류비</td><td>5,000원</td></tr>
+              <tr><td>영업 · 유통 비용</td><td>25,000원</td></tr>
+            </tbody>
+            <tfoot><tr><th scope="row" colspan="2">실질 판매원가 합계</th><td>85,000원</td></tr></tfoot>
+          </table>
+        </div>
+        <div class="stack">
+          <div class="card b">
+            <h3>원가 구성</h3>
+            <div class="stackbar" role="img" aria-label="제조 35,000원, 운영 20,000원, 유통 30,000원"><i style="--w: 35">제조 3.5만</i><i style="--w: 20; --j: 1">운영 2만</i><i style="--w: 30; --j: 2">유통 3만</i></div>
+            <p class="legend"><span>제조: BOM · 조립 · 테스트 · 패키징</span><span>운영: 인증 · 서버 · A/S</span><span>유통: 물류 · 영업</span></p>
+          </div>
+          <div class="card callout b">
+            <p class="num">1.5<small>만 원</small></p>
+            <p>센서 1개 설계로 <strong>하드웨어 BOM은 15,000원</strong> — 원가의 18%에 그칩니다</p>
+          </div>
+          <div class="card ink b" style="flex: 1">
+            <h3>1대 기준 수익</h3>
+            <div class="pl">
+              <div><span>판매가</span><b>250,000원</b></div>
+              <div><span>원가</span><b>− 85,000원</b></div>
+              <div class="tot"><span>공헌이익</span><b>165,000원</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="src b">※ 원가 항목은 아이디어 제안서 기준 · 판매가는 제안서, 구독료는 내부 기준</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>센서를 줄인 설계 덕분에 대당 원가는 8만 5천 원입니다. 제조 3만 5천 원, 운영 2만 원, 유통 3만 원이고, 그중 하드웨어 BOM은 1만 5천 원뿐입니다.</p><p>판매가 25만 원에서 원가를 빼면 대당 16만 5천 원이 남습니다.</p></div>
+</section>
+
+<section class="slide" id="pricing" data-sec="7" data-title="가격과 수익 구조">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>07</b>제품 원가 · 가격과 수익</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">장비는 한 번, 관제는 매달 — 쌓이는 매출</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1fr 1fr; flex: none">
+        <div class="card price b">
+          <p class="k">① 하드웨어 판매</p>
+          <p class="num"><span data-count="25">25</span><small>만 원 / 대</small></p>
+          <p>원가 8.5만 원 → <b>대당 공헌이익 16.5만 원</b></p>
+          <p class="cs" style="font-size: .78em">유통사 공급가 17만 원 / 대 (MOQ 300개, ㈜사씨엔 약정)</p>
+        </div>
+        <div class="card ink price b">
+          <p class="k">② 관제 SaaS 구독</p>
+          <p class="num"><span data-count="12">12</span><small>만 원 / 대 · 월</small></p>
+          <p><b>대당 연 144만 원</b> · 대시보드 · 투약 기록 · 유지관리</p>
+        </div>
+      </div>
+      <div class="g" style="--c: 1fr 1fr">
+        <div class="card mid b">
+          <h3>병원 1곳 · 입원장 5대 도입 시</h3>
+          <div class="cmpbar">
+            <span class="lab">인퓨전펌프</span><span class="row"><i style="--v: 100"></i><b>550만 원</b></span>
+            <span class="lab" style="color: var(--accent-ink)">INFU RETRO</span><span class="row"><i class="ac" style="--v: 22.7; --j: 1"></i><b>125만 원 <small style="color: var(--mute); font-weight: 600">+ 월 60만 원</small></b></span>
+          </div>
+          <p class="cs" style="margin-top: 1em">※ 병원당 5대 = SOM(50곳 · 250대) 평균 가정</p>
+        </div>
+        <div class="card mid b">
+          <h3>초기 3년 목표 (50곳 · 250대)</h3>
+          <div class="eq">
+            <p>하드웨어 250대 × 25만 원 = <b>6,250만 원</b></p>
+            <p>구독 250대 × 12만 원 × 12개월 = <b>연 3억 6,000만 원</b></p>
+            <p class="acc-t">설치 대수가 늘수록 반복 매출이 쌓입니다</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="src b">출처: 아이디어 제안서(원가 · 판매가) · 동물용 인퓨전펌프 판매가(2025) · 구독료 · 3년 목표 산출은 내부 기준</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>수익 구조는 두 가지입니다. 하드웨어는 대당 25만 원, 원가 8만 5천 원으로 대당 약 16만 5천 원이 남습니다. 여기에 기기 한 대당 월 12만 원의 관제 구독이 붙습니다.</p><p>입원장 5대 병원이라면 펌프는 550만 원이지만 저희는 125만 원으로 시작합니다. 3년 목표 250대 기준 구독 매출만 연 3억 6천만 원이고, 설치가 늘수록 반복 매출이 쌓입니다.</p></div>
+</section>
+
+<!-- ============ 08 MOU 체결 현황 ============ -->
+<section class="slide" id="mou" data-sec="8" data-title="구매의향 · 공급 약정 · MOU">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>08</b>MOU 체결 현황</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">구매의향과 공급 약정, 문서로 확인했습니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1fr 1fr 1fr">
+        <div class="card deal b">
+          <span class="tag">구매의향서 (LOI)</span>
+          <h3>전남대학교 동물병원<small>광주 · 전남 실증의 거점 (진입 전략 STEP 2)</small></h3>
+          <div class="ph"><img src="media/loi-jnu.webp" alt="전남대학교 동물병원 앞에서 INFU RETRO 모듈을 들고 선 두 사람" data-zoom></div>
+          <ul class="facts">
+            <li><span>내용</span><b>INFU RETRO 구매의향 확인</b></li>
+          </ul>
+        </div>
+        <div class="card deal b">
+          <span class="tag">물품공급 및 판매 약정</span>
+          <h3>㈜사씨엔<small>전남 순천 · 회원사 대상 공급</small></h3>
+          <div class="doc"><img src="media/doc-supply.webp" alt="물품공급 및 판매 약정서 첫 장"></div>
+          <ul class="facts">
+            <li><span>체결</span><b>2026.08.19 · 약정기간 2년</b></li>
+            <li><span>품목</span><b>INFU RETRO · INFU MINI</b></li>
+            <li><span>규모</span><b>17만 원 × MOQ 300개 · 약 5,000만 원 규모</b></li>
+          </ul>
+        </div>
+        <div class="card deal b">
+          <span class="tag">구매의향 · 사업협력 MOU</span>
+          <h3>㈜에스케이엠엔엠 (SKM&amp;M)<small>의료기기 생산 · 유통</small></h3>
+          <div class="doc"><img src="media/doc-mou.webp" alt="스마트 수액관리 솔루션 구매의향 및 사업협력 업무협약서 첫 장"></div>
+          <ul class="facts">
+            <li><span>체결</span><b>2026.10.11</b></li>
+            <li><span>규모</span><b>총 5,000만 원 규모 구매의향</b></li>
+            <li><span>협력</span><b>유통망 판로 확보 · 홍보 · 현장 의견 반영</b></li>
+          </ul>
+        </div>
+      </div>
+      <p class="next b"><b>다음 단계</b>제품 생산 · 인증을 마치면 수량 · 단가 · 납기를 정해 본계약으로 전환합니다</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>판로는 이미 문서로 확인했습니다. 전남대학교 동물병원과 구매의향서를 맺었습니다.</p><p>8월에는 ㈜사씨엔과 대당 17만 원, 최소 300개 기준의 물품공급 약정을, 10월에는 의료기기 유통사 ㈜에스케이엠엔엠과 5,000만 원 규모의 구매의향 업무협약을 맺었습니다. 제품 생산과 인증을 마치면 본계약으로 전환합니다.</p></div>
+</section>
+
+<!-- ============ 09 시장 진입 전략 ============ -->
+<section class="slide" id="gtm" data-sec="9" data-title="전북에서 증명하고, 전국 3,950곳으로">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>09</b>시장 진입 전략</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">전북에서 증명하고, 전국 3,950곳으로</h2>
+    <div class="bd">
+      <div class="g" style="--c: .85fr 1.4fr">
+        <div class="rings b" role="img" aria-label="TAM 전국 동물병원 3,950곳, SAM 호남권 약 300곳, SOM 3년 50곳 250대">
+          <div class="r r1"><span class="k">TAM · 전국 동물병원</span><strong><span data-count="3950">3,950</span>곳</strong></div>
+          <div class="r r2"><span class="k">SAM · 호남권</span><strong>약 300곳</strong></div>
+          <div class="r r3"><span class="k">SOM · 3년</span><strong>50곳<br>250대</strong></div>
+        </div>
+        <ol class="gtm">
+          <li class="card ink gstep b"><p class="k">STEP 1</p><h3>전북 실증</h3><p>대학 인접 일반 · 24시 동물병원 레퍼런스 확보</p><p class="lean">INFUTECH 거점 · 원광대</p></li>
+          <li class="card gstep b"><p class="k">STEP 2</p><h3>광주 · 전남 확대</h3><p>전남대 수의대 · 동물병원 연계, 입원 데이터 고도화</p><p class="lean">전남대학교 동물병원 LOI · ㈜사씨엔 공급 약정</p></li>
+          <li class="card gstep b"><p class="k">STEP 3</p><h3>전국 B2B</h3><p>대학병원 · 24시 센터 사례로 전국 공급</p><p class="lean">㈜에스케이엠엔엠 의료기기 유통망 MOU</p></li>
+        </ol>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="src b">출처: 농림축산식품부 전국 동물병원 진료비 현황조사(2025, 3,950곳) · SAM · SOM은 아이디어 제안서 자체 추정</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>시장은 전국 동물병원 3,950곳입니다. 먼저 호남권 약 300곳을 공략해, 3년 안에 50곳 250대를 확보하는 것이 목표입니다.</p><p>1단계로 대학과 가까운 전북 동물병원에서 실증하고, 2단계로 광주 · 전남, 3단계로 전국에 공급합니다.</p><p>이미 전남대학교 동물병원과 구매의향서를 맺었고, 이곳이 2단계 확장의 거점입니다. 전국 단계에서는 MOU를 맺은 의료기기 유통사의 판로를 활용합니다.</p></div>
+</section>
+
+<!-- ============ 10 기대효과 ============ -->
+<section class="slide s-impact" id="impact" data-sec="10" data-title="말하지 못해도, 먼저 알아챕니다">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>10</b>기대효과</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">말하지 못해도,<br>먼저 알아챕니다</h2>
+    <div class="bd" style="justify-content: center">
+      <ul class="who3">
+        <li class="card b"><svg class="ico"><use href="#i-hosp"/></svg><b>동물병원</b><p>반복 순회 · 수기 기록 부담 ↓, 장비 교체 없이 도입</p></li>
+        <li class="card b"><svg class="ico"><use href="#i-user"/></svg><b>보호자</b><p>시간별로 남는 투약 기록 → 신뢰와 분쟁 대응 근거</p></li>
+        <li class="card b"><svg class="ico"><use href="#i-paw"/></svg><b>반려동물</b><p>소진 · 중단 · 유속 이상을 먼저 발견</p></li>
+      </ul>
+    </div>
+    <div class="impact-photo"><img src="media/vet-cat.webp" alt="창가 입원장에서 링거를 맞는 고양이 곁에서 태블릿을 확인하는 수의사" decoding="async"></div>
+  </div>
+  <div class="note" hidden><p>병원은 순회와 수기 기록 부담을 덜고, 보호자는 남는 기록으로 신뢰를 얻고, 반려동물은 이상을 더 빨리 발견합니다.</p></div>
+</section>
+
+<!-- ============ 11 팀 소개 ============ -->
+<section class="slide" id="team" data-sec="11" data-title="팀 INFUTECH">
+  <div class="frame">
+    <header class="hd b"><span class="kick"><b>11</b>팀 소개</span><span class="mark">WON SHOT</span></header>
+    <h2 class="ttl b">입원 동물의 수액, INFUTECH가 지켜보겠습니다</h2>
+    <div class="bd">
+      <ul class="team">
+        <li class="b"><span class="avatar"><img src="media/team-kwon.webp" alt=""></span><span class="role">CEO / Engineer</span><span class="nm">권용현</span></li>
+        <li class="b"><span class="avatar"><img src="media/team-jeong.webp" alt=""></span><span class="role">Engineer</span><span class="nm">정익상</span></li>
+        <li class="b"><span class="avatar"><img src="media/team-kim.webp" alt=""></span><span class="role">Clinical Tester</span><span class="nm">김은강</span></li>
+        <li class="b"><span class="avatar"><img src="media/team-han-yerin.webp" alt=""></span><span class="role">Marketer</span><span class="nm">한예린</span></li>
+        <li class="b"><span class="avatar mono" aria-hidden="true"><span>우진</span></span><span class="role">Developer</span><span class="nm">한우진</span></li>
+        <li class="b"><span class="avatar mono" aria-hidden="true"><span>이지</span></span><span class="role">Marketer</span><span class="nm">최이지</span></li>
+        <li class="b"><span class="avatar"><img src="media/team-han-byeol.webp" alt=""></span><span class="role">Field demonstration</span><span class="nm">한별</span></li>
+      </ul>
+      <ul class="creds b">
+        <li>WON+UP 캡스톤디자인 경진대회 대상 (총장상)</li>
+        <li>AIT 2026 Best Paper Award</li>
+        <li>2026 호남권 글로벌 피우다 프로젝트 장려상</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note" hidden><p>이 일을 설계, AI, 펌웨어, 서버, 현장 협력을 맡은 저희 INFUTECH 팀이 해내겠습니다. 말하지 못해도 먼저 알아채겠습니다.</p></div>
+</section>
+
+<!-- ============ 마무리 ============ -->
+<section class="slide dark s-end" id="end" data-sec="12" data-title="감사합니다">
+  <div class="frame">
+    <h2 class="end-ttl b">감사합니다</h2>
+    <span class="end-rule b"></span>
+    <p class="end-sub b">말하지 못해도, 먼저 알아챕니다</p>
+    <div class="end-sign b"><b>INFUTECH</b><span>INFU RETRO · 반려동물 주사약물 투약 관리 AIoT 솔루션 · WON SHOT</span></div>
+    <div class="end-act b"><button type="button" data-go="0">처음으로</button><button type="button" data-open="toc">목차 보기</button></div>
+  </div>
+  <div class="note" hidden><p>감사합니다.</p></div>
+</section>
+
+</main>
+
+<nav class="chrome" id="chrome" aria-label="슬라이드 조작">
+  <p class="where" aria-hidden="true"><b id="where-n">01</b><span id="where-t">표지</span></p>
+  <div class="chaps" id="chaps"></div>
+  <div class="ctl">
+    <p class="count" aria-hidden="true"><b id="count-n">1</b><span> / <span id="count-t">23</span></span></p>
+    <button type="button" id="btn-prev" aria-label="이전 슬라이드"><svg class="ico"><use href="#i-prev"/></svg></button>
+    <button type="button" id="btn-next" aria-label="다음 슬라이드"><svg class="ico"><use href="#i-next"/></svg></button>
+    <button type="button" id="btn-toc" aria-label="목차 (O)" aria-pressed="false"><svg class="ico"><use href="#i-grid"/></svg></button>
+    <button type="button" id="btn-notes" class="nt" aria-label="발표 노트 (N)" aria-pressed="false"><svg class="ico"><use href="#i-note"/></svg></button>
+    <button type="button" id="btn-fs" class="fs" aria-label="전체 화면 (F)" aria-pressed="false"><svg class="ico"><use href="#i-full"/></svg></button>
+  </div>
+</nav>
+<div class="bar-line" id="bar-line" aria-hidden="true"></div>
+
+<div class="panel" id="toc" hidden role="dialog" aria-modal="true" aria-labelledby="toc-h">
+  <div class="panel-in">
+    <div class="panel-hd"><h2 id="toc-h">목차</h2><button type="button" class="panel-x" data-close aria-label="목차 닫기"><svg class="ico" style="width:18px;height:18px"><use href="#i-x"/></svg></button></div>
+    <div class="toc-grid" id="toc-grid"></div>
+    <p class="keys">
+      <span><kbd>→</kbd><kbd>Space</kbd>다음</span>
+      <span><kbd>←</kbd>이전</span>
+      <span><kbd>12</kbd><kbd>Enter</kbd>12번 슬라이드로</span>
+      <span><kbd>O</kbd>목차</span>
+      <span><kbd>N</kbd>발표 노트</span>
+      <span><kbd>F</kbd>전체 화면</span>
+      <span><kbd>B</kbd>화면 가리기</span>
+      <span><kbd>Home</kbd><kbd>End</kbd>처음 · 끝</span>
+    </p>
+  </div>
+</div>
+<aside class="notes" id="notes" hidden aria-live="polite"><h2>발표 노트</h2><div id="notes-body"></div></aside>
+<div class="panel lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="이미지 크게 보기"><figure><img id="lb-img" alt=""><figcaption id="lb-cap"></figcaption></figure></div>
+<div class="black" id="black" hidden></div>
+<p class="toast" id="toast" role="status"></p>
+<p class="sr" id="live" aria-live="polite"></p>
+
+<script>
+(() => {
+  const SECTIONS = ['표지', '문제 배경', '기존 시스템의 한계', '아이디어 소개', '시연', '시장분석', '차별점', '제품 원가', 'MOU 체결 현황', '시장 진입 전략', '기대효과', '팀 소개', '마무리'];
+  const $ = (s, r = document) => r.querySelector(s);
+  const deck = $('#deck');
+  const slides = [...deck.querySelectorAll('.slide')];
+  const total = slides.length;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const reflow = matchMedia('(max-aspect-ratio: 1/1), (max-height: 520px)');
+  const pad = n => String(n).padStart(2, '0');
+  let cur = -1;
+
+  // ---- one-time setup ----
+  slides.forEach(s => {
+    s.querySelectorAll('.b').forEach((el, i) => el.style.setProperty('--i', i));
+    s.querySelectorAll('.plot').forEach(p => [...p.children].forEach((c, j) => c.firstElementChild?.style.setProperty('--j', j)));
+  });
+  document.querySelectorAll('[data-dots]').forEach(el => {
+    const n = +el.dataset.dots, on = +el.dataset.on;
+    el.innerHTML = Array.from({ length: n }, (_, k) => k < on ? '<i class="on"></i>' : '<i></i>').join('');
+  });
+
+  // section index → slide indices
+  const bySec = SECTIONS.map((_, si) => slides.map((s, k) => +s.dataset.sec === si ? k : -1).filter(k => k >= 0));
+
+  // chapter bar
+  const chaps = $('#chaps');
+  chaps.innerHTML = SECTIONS.map((name, si) =>
+    `<button type="button" style="--n:${bySec[si].length}" data-sec="${si}" aria-label="${name} (${bySec[si].length}장)"><i></i><span class="tip">${si && si < 12 ? pad(si) + ' ' : ''}${name}</span></button>`).join('');
+  chaps.addEventListener('click', e => {
+    const b = e.target.closest('button[data-sec]');
+    if (b) go(bySec[+b.dataset.sec][0]);
+  });
+
+  // table of contents
+  $('#toc-grid').innerHTML = SECTIONS.map((name, si) => `
+    <div class="toc-sec"><h3>${si && si < 12 ? `<b>${pad(si)}</b>` : ''}${name}</h3>
+      ${bySec[si].map(k => `<button type="button" data-go="${k}"><span>${k + 1}</span>${slides[k].dataset.title}</button>`).join('')}
+    </div>`).join('');
+  $('#count-t').textContent = total;
+
+  // ---- navigation ----
+  function go(n, quiet) {
+    n = Math.max(0, Math.min(total - 1, n));
+    if (n === cur) return;
+    const prev = slides[cur];
+    slides.forEach((s, k) => s.classList.toggle('past', k < n));
+    if (prev) {
+      prev.classList.remove('on');
+      prev.inert = true;
+      prev.setAttribute('aria-hidden', 'true');
+      leave(prev);
+    }
+    const s = slides[n];
+    s.classList.add('on');
+    s.inert = false;
+    s.removeAttribute('aria-hidden');
+    const f = s.querySelector('.frame');
+    if (f) f.scrollTop = 0;
+    cur = n;
+    enter(s);
+    sync();
+    try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
+    if (!quiet) $('#live').textContent = `${n + 1} / ${total}, ${s.dataset.title}`;
+  }
+  const next = () => go(cur + 1);
+  const prev = () => go(cur - 1);
+
+  function sync() {
+    const s = slides[cur], si = +s.dataset.sec;
+    $('#where-n').textContent = si && si < 12 ? pad(si) : '·';
+    $('#where-t').textContent = SECTIONS[si];
+    $('#count-n').textContent = cur + 1;
+    document.documentElement.style.setProperty('--p', (cur + 1) / total);
+    $('#bar-line').style.setProperty('--p', (cur + 1) / total);
+    [...chaps.children].forEach((b, k) => {
+      const idx = bySec[k], pos = idx.indexOf(cur);
+      b.style.setProperty('--f', k < si ? 1 : k > si ? 0 : (pos + 1) / idx.length);
+      b.toggleAttribute('aria-current', k === si);
+    });
+    document.querySelectorAll('#toc-grid [data-go]').forEach(b => b.setAttribute('aria-current', +b.dataset.go === cur ? 'true' : 'false'));
+    $('#notes-body').innerHTML = s.querySelector('.note')?.innerHTML || '<p>이 슬라이드에는 노트가 없습니다.</p>';
+    $('#btn-prev').disabled = cur === 0;
+    $('#btn-next').disabled = cur === total - 1;
+  }
+
+  function enter(s) {
+    s.querySelectorAll('[data-count]').forEach(countUp);
+    const v = s.querySelector('video');
+    if (v) {
+      v.muted = true;
+      try { v.currentTime = 0; } catch (_) {}
+      v.play().catch(() => {});
+    }
+  }
+  function leave(s) {
+    s.querySelector('video')?.pause();
+  }
+
+  function countUp(el) {
+    const raw = el.dataset.count, target = parseFloat(raw);
+    const dec = (raw.split('.')[1] || '').length;
+    const fmt = v => v.toLocaleString('ko-KR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    cancelAnimationFrame(el._raf);
+    if (reduce.matches) { el.textContent = fmt(target); return; }
+    const t0 = performance.now() + 250, dur = 1200;
+    const tick = now => {
+      const p = Math.max(0, Math.min(1, (now - t0) / dur));
+      el.textContent = fmt(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) el._raf = requestAnimationFrame(tick);
+    };
+    el.textContent = fmt(0);
+    el._raf = requestAnimationFrame(tick);
+  }
+
+  // ---- demo video chapters ----
+  const video = $('#demo-video');
+  const chapBtns = [...document.querySelectorAll('.chap [data-t]')];
+  chapBtns.forEach(b => b.addEventListener('click', () => {
+    video.currentTime = +b.dataset.t;
+    video.play().catch(() => {});
+  }));
+  video.addEventListener('timeupdate', () => {
+    const t = video.currentTime;
+    let on = 0;
+    chapBtns.forEach((b, k) => { if (t >= +b.dataset.t - .05) on = k; });
+    chapBtns.forEach((b, k) => b.setAttribute('aria-current', k === on ? 'true' : 'false'));
+  });
+
+  // ---- overlays ----
+  const toc = $('#toc'), notes = $('#notes'), lightbox = $('#lightbox'), black = $('#black');
+  function setPanel(el, open, btn) {
+    el.hidden = !open;
+    if (btn) btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+  }
+  function toggleToc(open = toc.hidden) {
+    setPanel(toc, open, $('#btn-toc'));
+    if (open) (toc.querySelector('[aria-current="true"]') || toc.querySelector('button'))?.focus();
+  }
+  const toggleNotes = (open = notes.hidden) => setPanel(notes, open, $('#btn-notes'));
+  toc.addEventListener('click', e => {
+    const b = e.target.closest('[data-go]');
+    if (b) { go(+b.dataset.go); toggleToc(false); return; }
+    if (e.target.closest('[data-close]') || e.target === toc) toggleToc(false);
+  });
+  document.addEventListener('click', e => {
+    const g = e.target.closest('.slide [data-go]');
+    if (g) go(+g.dataset.go);
+    if (e.target.closest('.slide [data-open="toc"]')) toggleToc(true);
+  });
+  $('#btn-prev').addEventListener('click', prev);
+  $('#btn-next').addEventListener('click', next);
+  $('#btn-toc').addEventListener('click', () => toggleToc());
+  $('#btn-notes').addEventListener('click', () => toggleNotes());
+
+  const fsBtn = $('#btn-fs');
+  if (!document.fullscreenEnabled) fsBtn.hidden = true;
+  function toggleFs() {
+    if (!document.fullscreenEnabled) return;
+    const p = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+    p?.catch?.(() => {});
+  }
+  fsBtn.addEventListener('click', toggleFs);
+  document.addEventListener('fullscreenchange', () => fsBtn.setAttribute('aria-pressed', document.fullscreenElement ? 'true' : 'false'));
+
+  function openLightbox(img) {
+    $('#lb-img').src = img.currentSrc || img.src;
+    $('#lb-img').alt = img.alt;
+    $('#lb-cap').textContent = img.alt;
+    lightbox.hidden = false;
+  }
+  lightbox.addEventListener('click', () => { lightbox.hidden = true; });
+  black.addEventListener('click', () => { black.hidden = true; });
+
+  const toast = $('#toast');
+  let toastTimer;
+  function say(html, ms = 2600) {
+    toast.innerHTML = html;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), ms);
+  }
+
+  // ---- keyboard ----
+  let digits = '', digitTimer;
+  addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (t.matches?.('input, textarea, select')) return;
+    if (!black.hidden) { black.hidden = true; e.preventDefault(); return; }
+    if (!lightbox.hidden) { if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') { lightbox.hidden = true; e.preventDefault(); } return; }
+    if (!toc.hidden) {
+      if (e.key === 'Escape' || e.key === 'o' || e.key === 'O' || e.key === 'g' || e.key === 'G') { toggleToc(false); e.preventDefault(); }
+      return;
+    }
+    const onControl = t.closest?.('button, a, video');
+    if (/^[0-9]$/.test(e.key)) {
+      digits = (digits + e.key).slice(-3);
+      clearTimeout(digitTimer);
+      digitTimer = setTimeout(() => { digits = ''; }, 1800);
+      say(`<kbd>${digits}</kbd>번 슬라이드 — Enter로 이동`, 1800);
+      return;
+    }
+    switch (e.key) {
+      case 'Enter':
+        if (digits) { go(+digits - 1); digits = ''; toast.classList.remove('show'); e.preventDefault(); }
+        else if (!onControl) { next(); e.preventDefault(); }
+        break;
+      case 'ArrowRight': case 'PageDown':
+        next(); e.preventDefault(); break;
+      case 'ArrowLeft': case 'PageUp': case 'Backspace':
+        prev(); e.preventDefault(); break;
+      case 'ArrowDown': if (!reflow.matches) { next(); e.preventDefault(); } break;
+      case 'ArrowUp': if (!reflow.matches) { prev(); e.preventDefault(); } break;
+      case ' ':
+        if (onControl) return;
+        e.shiftKey ? prev() : next(); e.preventDefault(); break;
+      case 'Home': go(0); e.preventDefault(); break;
+      case 'End': go(total - 1); e.preventDefault(); break;
+      case 'o': case 'O': case 'g': case 'G': toggleToc(true); e.preventDefault(); break;
+      case 'n': case 'N': toggleNotes(); break;
+      case 'f': case 'F': toggleFs(); break;
+      case 'b': case 'B': case '.': black.hidden = false; break;
+      case 'Escape': if (!notes.hidden) toggleNotes(false); break;
+    }
+  });
+
+  // ---- pointer: click or tap advances on the stage ----
+  let down = null, lastType = 'mouse';
+  deck.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; lastType = e.pointerType; });
+  deck.addEventListener('click', e => {
+    const z = e.target.closest('[data-zoom]');
+    if (z) { openLightbox(z); return; }
+    if (reflow.matches || e.button !== 0) return;
+    if (e.target.closest('a, button, video, input, label, table, .tbl')) return;
+    if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6) return;
+    if (!getSelection().isCollapsed) return;
+    if (lastType === 'touch' && e.clientX < innerWidth * .3) prev(); else next();
+  });
+
+  // ---- wheel (stage only): one notch, one slide ----
+  let wheelLock = false, wheelAcc = 0, wheelTimer;
+  deck.addEventListener('wheel', e => {
+    if (reflow.matches) return;
+    const scroller = e.target.closest('.tbl, .notes');
+    if (scroller && scroller.scrollWidth > scroller.clientWidth && Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => { wheelLock = false; wheelAcc = 0; }, 220);
+    if (wheelLock) return;
+    wheelAcc += Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    if (Math.abs(wheelAcc) > 40) {
+      wheelAcc > 0 ? next() : prev();
+      wheelLock = true; wheelAcc = 0;
+    }
+  }, { passive: false });
+
+  // ---- swipe ----
+  let ts = null;
+  deck.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) { ts = null; return; }
+    const t = e.touches[0];
+    ts = { x: t.clientX, y: t.clientY, at: Date.now(), inScroller: !!e.target.closest('.tbl') };
+  }, { passive: true });
+  deck.addEventListener('touchend', e => {
+    if (!ts) return;
+    const t = e.changedTouches[0], dx = t.clientX - ts.x, dy = t.clientY - ts.y;
+    const quick = Date.now() - ts.at < 900;
+    if (quick && !ts.inScroller && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) { dx < 0 ? next() : prev(); }
+    else if (quick && !reflow.matches && Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx) * 1.4) { dy < 0 ? next() : prev(); }
+    ts = null;
+  }, { passive: true });
+
+  // ---- chrome auto-hide on the stage ----
+  const chrome = $('#chrome');
+  let idleTimer;
+  function wake() {
+    chrome.classList.remove('idle');
+    deck.classList.remove('hide-cursor');
+    clearTimeout(idleTimer);
+    if (reflow.matches) return;
+    idleTimer = setTimeout(() => {
+      if (chrome.matches(':hover') || chrome.contains(document.activeElement) || !toc.hidden) return wake();
+      chrome.classList.add('idle');
+      deck.classList.add('hide-cursor');
+    }, 2800);
+  }
+  addEventListener('mousemove', wake, { passive: true });
+  addEventListener('touchstart', wake, { passive: true });
+  chrome.addEventListener('focusin', wake);
+  reflow.addEventListener?.('change', wake);
+
+  // ---- start ----
+  function fromHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const k = slides.findIndex(s => s.id === id);
+    return k >= 0 ? k : (/^\d+$/.test(id) ? +id - 1 : 0);
+  }
+  addEventListener('hashchange', () => go(fromHash()));
+  go(fromHash(), true);
+  wake();
+  setTimeout(() => say(reflow.matches
+    ? '옆으로 밀어 넘기고, 위아래로 스크롤해 읽습니다'
+    : '<kbd>→</kbd> · <kbd>Space</kbd> · 클릭으로 넘기기 · <kbd>O</kbd> 목차 · <kbd>N</kbd> 발표 노트 · <kbd>F</kbd> 전체 화면', 4200), 900);
+})();
+</script>
+</body>
+</html>
