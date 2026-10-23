@@ -4,6 +4,7 @@
   "installCommand": "npm ci --no-audit --no-fund",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "cleanUrls": true,
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -25,6 +26,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/about",
+      "destination": "/index.html"
+    },
     {
       "source": "/awards",
       "destination": "/index.html"

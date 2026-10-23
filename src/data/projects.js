@@ -57,7 +57,7 @@ export const projects = raw
   .sort((a, b) => rank(a.category) - rank(b.category) || lastYear(b.year) - lastYear(a.year) || firstYear(b.year) - firstYear(a.year));
 
 // 아카이브에서 두 칸을 차지하는 대표작(가로 사진이 있을 때만)
-const FEATURED = ['pixhawk-drone', 'airsim-driving', 'baja-ev-formula', 'av-competition', 'quadruped-robot', 'iot-iv-pole', 'huss-evidence-ai', 'recap-jbmotors'];
+export const FEATURED = ['pixhawk-drone', 'airsim-driving', 'baja-ev-formula', 'av-competition', 'quadruped-robot', 'iot-iv-pole', 'huss-evidence-ai', 'recap-jbmotors'];
 projects.forEach((p) => (p.wide = FEATURED.includes(p.id) && !!p.cover && p.cover.ratio >= 1.2));
 
 export const byId = (id) => projects.find((p) => p.id === id);

@@ -6,6 +6,7 @@ import './styles/main.css';
 import './styles/pages.css';
 import './styles/premium.css';
 import './styles/skills.css';
+import './styles/about.css';
 import './styles/guide.css';
 import './styles/perf.css';
 import './styles/clarity.css';
@@ -666,6 +667,8 @@ function hintNextScene(delay) {
     // 손으로 무언가 하는 중이면(카드를 넘기는 등) 손을 쉴 때까지 미룬다
     const busy = 1600 - (performance.now() - lastHand);
     if (busy > 0) return hintNextScene(busy + 60);
+    // 손가락 · 마우스가 아직 화면을 끄는 중이면 놓을 때까지
+    if (touchHold || document.documentElement.classList.contains('is-pulling')) return hintNextScene(600);
     if (guide.talking) return hintNextScene(900);
     const reel = panels.current?.reel;
     if (!coarse && reel && reel.focus < reel.count - 1) return; // 넘길 카드가 남았으면 카드 안내가 먼저(휴대폰은 위로 밀면 바로 다음 장면)
@@ -726,7 +729,8 @@ function loop(now) {
   // 장면을 거의 가리는 창(라이트박스 · 인덱스)이 열리면 20 — 건너뛴 시간은 모아 다음 3D 프레임에 한 번에 넘긴다
   // (카드 · 글자 같은 화면 움직임은 그대로 매 프레임)
   acc3d += dt;
-  const cap = lightbox.open || hud.indexOpen ? 20 : perf.settings.fps;
+  // 휴대폰에서 손가락이 카드 덱을 잡고 있는 동안은 30 — 카드가 손가락을 따라 매 프레임 움직일 여유를 GPU에 남긴다
+  const cap = lightbox.open || hud.indexOpen ? 20 : touchHold && coarse ? Math.min(30, perf.settings.fps) : perf.settings.fps;
   if (now - last3d < 1000 / cap - 4) return;
   last3d = now;
   const d3 = Math.min(acc3d, 0.1);

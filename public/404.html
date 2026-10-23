@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>페이지를 찾을 수 없어요 — 권용현 Physical AI Portfolio</title>
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#05070c" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #05070c;
+        --fg: #eef2f7;
+        --muted: #8d97a7;
+        --line: rgba(232, 237, 244, 0.28);
+        --cyan: #5ef2ff;
+        --orange: #ff6b1a;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+      }
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 32px 18px;
+        text-align: center;
+      }
+      .k {
+        margin: 0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        color: var(--cyan);
+      }
+      h1 {
+        margin: 14px 0 0;
+        font-size: clamp(72px, 18vw, 180px);
+        line-height: 0.9;
+        letter-spacing: -0.06em;
+      }
+      h1 span {
+        color: var(--orange);
+      }
+      p.t {
+        margin: 22px auto 0;
+        max-width: 26em;
+        font-size: 16px;
+        line-height: 1.7;
+        color: var(--muted);
+        word-break: keep-all;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 30px;
+      }
+      a {
+        padding: 12px 18px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--fg);
+        font-size: 14px;
+        text-decoration: none;
+        transition: border-color 0.3s;
+      }
+      a:hover,
+      a:focus-visible {
+        border-color: var(--cyan);
+        outline: none;
+      }
+      a.main {
+        background: var(--fg);
+        color: var(--bg);
+        border-color: var(--fg);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="k">SIGNAL LOST — 404</p>
+      <h1>4<span>0</span>4</h1>
+      <p class="t">주소가 바뀌었거나 없는 페이지예요. 아래에서 보고 싶은 곳으로 이동해 주세요.</p>
+      <nav aria-label="이동">
+        <a class="main" href="/">메인 필름</a>
+        <a href="/about">프로필</a>
+        <a href="/works">프로젝트</a>
+        <a href="/awards">수상</a>
+        <a href="/skills">스킬</a>
+      </nav>
+    </main>
+  </body>
+</html>

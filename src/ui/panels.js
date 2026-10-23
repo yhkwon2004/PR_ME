@@ -218,6 +218,7 @@ function render(scene, i) {
           <div><dt>With</dt><dd>${WALL.length}</dd></div>
         </dl>
         <div class="endcard-actions" data-r>
+          <a class="btn-works" href="/about" data-link>프로필 · 이력서 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/works" data-link>모든 프로젝트 보기 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/awards" data-link>수상 기록 · 상장 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/skills" data-link>보유 스킬 <span aria-hidden="true">↗</span></a>
@@ -347,6 +348,27 @@ function damp(cur, target, vel, dt) {
   return [target + (c + t) * e, (vel - w * t) * e];
 }
 const expoOut = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
+// 손을 놓는 순간의 속도(px/ms): 마지막 0.1초 동안 움직인 거리로 — 한두 번의 떨림 · 몰려 들어온 이벤트에 휘둘리지 않게
+function velocity() {
+  const pts = [];
+  return {
+    reset(x, t) {
+      pts.length = 0;
+      pts.push([x, t]);
+    },
+    add(x, t) {
+      pts.push([x, t]);
+      while (pts.length > 2 && t - pts[0][1] > 100) pts.shift();
+    },
+    // 손가락이 멈춘 채로 떼면 0
+    get(now) {
+      const a = pts[0];
+      const b = pts[pts.length - 1];
+      if (!b || now - b[1] > 80 || b[1] - a[1] < 1) return 0;
+      return (b[0] - a[0]) / (b[1] - a[1]);
+    },
+  };
+}
 const INTRO = 1.25; // 등장 한 장의 길이(초)
 
 // 카드 덱(커버플로): 한 번에 한 장씩 가운데로 — 휠 · 스와이프 · 방향키 · 버튼 · 옆 카드 누르기 · 끌기.
@@ -455,7 +477,8 @@ function deckReel(el, reducedMotion) {
   };
   // auto: 자동 재생이 옮긴 것 · animate: 움직임으로 옮길지 · v: 손을 놓은 속도(초당 카드 수)
   // entry: 장면에 들어설 때 — 이전 방문의 초점과 비교한 방향을 쓰지 않는다
-  const set = (k, { animate = true, auto = false, entry = false, v } = {}) => {
+  // drag: 끄는 중에 가운데가 바뀌었다(착지 연출은 손을 놓을 때)
+  const set = (k, { animate = true, auto = false, entry = false, drag = false, v } = {}) => {
     stopPeek();
     const prev = focus;
     focus = Math.max(0, Math.min(n - 1, k));
@@ -472,8 +495,8 @@ function deckReel(el, reducedMotion) {
     if (v !== undefined) vel = v;
     if (!animate || reducedMotion) snap();
     else wake();
-    if (animate && focus !== prev) land();
-    el.dispatchEvent(new CustomEvent('reelfocus', { detail: { focus, prev, count: n, auto, entry } }));
+    if (animate && !drag && focus !== prev) land();
+    el.dispatchEvent(new CustomEvent('reelfocus', { detail: { focus, prev, count: n, auto, entry, drag } }));
   };
   const layout = () => {
     width = cards[0].offsetWidth;
@@ -483,26 +506,44 @@ function deckReel(el, reducedMotion) {
     else snap();
   };
 
-  // 끌기: 시작한 순간의 위치 기준(그 사이 자동 재생이 넘겨도 손 아래 덱이 튀지 않게), 끝에서는 고무줄처럼 덜 끌린다
-  const span = () => Math.max(80, width * 0.9);
+  // 끌기: 끌기가 시작된 순간의 위치 기준(그 사이 자동 재생이 넘겨도 손 아래 덱이 튀지 않게).
+  // 한 장 거리는 가운데 카드가 손가락 밑에 붙어 다니도록 원근으로 줄어드는 만큼 짧게, 끝에서는 고무줄처럼 점점 덜 끌린다
+  const span = () => Math.max(80, width * 0.84);
+  const RUB = 0.6; // 끝에서 더 끌려 나가는 최대(카드 수)
+  const rubber = (o) => RUB * Math.tanh((o * 0.4) / RUB);
+  const unrubber = (d) => (RUB / 0.4) * Math.atanh(Math.max(-0.995, Math.min(0.995, d / RUB)));
   const dragPos = (dx, f0) => {
     const f = f0 - dx / span();
-    if (f < 0) return f * 0.35;
-    if (f > n - 1) return n - 1 + (f - (n - 1)) * 0.35;
+    if (f < 0) return rubber(f);
+    if (f > n - 1) return n - 1 + rubber(f - (n - 1));
     return f;
   };
-  // 놓을 때: 속도만큼 더 미끄러진 자리의 가장 가까운 카드로 — 짧게 끌어도 한 장은 넘긴다
-  const release = (dx, f0, vPx) => {
+  // 지금 보이는 위치를 끌기의 기준으로(끝에서 고무줄로 끌려 나가 있던 덱을 잡아도 튀지 않게)
+  const grab = () => (pos < 0 ? unrubber(pos) : pos > n - 1 ? n - 1 + unrubber(pos - (n - 1)) : pos);
+  // 끄는 동안: 가운데에 가장 가까운 카드가 바로 초점이 된다(번호 · 설명 · 분위기 · 소리가 손가락을 따라) — 반을 조금 넘어가면 바뀐다
+  const follow = (tick) => {
+    const k = Math.max(0, Math.min(n - 1, Math.round(pos)));
+    if (k === focus || Math.abs(pos - focus) < 0.56) return;
+    set(k, { drag: true });
+    if (tick) navigator.vibrate?.(4);
+  };
+  // 놓을 때: 놓은 속도만큼 더 미끄러진 자리의 가장 가까운 카드로(세게 튕기면 두 장까지) — 짧게 끌어도 한 장은 넘긴다
+  // k0: 끌기를 시작할 때의 카드 · reach: 속도로 더 갈 수 있는 최대(카드 수 — 휠은 관성 이벤트가 이미 거리에 들어 있어 짧게)
+  const release = (dx, k0, vPx, reach = 1.6) => {
     held = false;
     stage.classList.remove('is-dragging');
     const v = -vPx * (1000 / span()); // 초당 카드 수
-    let k = Math.round(pos + Math.max(-0.7, Math.min(0.7, v * 0.12)));
-    if (k === f0 && Math.abs(dx) > 40) k = f0 - Math.sign(dx);
+    let k = Math.round(pos + Math.max(-reach, Math.min(reach, v * 0.14)));
+    if (k === k0 && Math.abs(dx) > 40) k = k0 - Math.sign(dx);
     k = Math.max(0, Math.min(n - 1, k));
+    // 스프링이 목표를 지나쳐 되돌아오지 않을 만큼만 속도를 넘긴다
+    const room = k - pos;
+    const v1 = Math.sign(v) === Math.sign(room) ? Math.sign(v) * Math.min(Math.abs(v), Math.abs(room) * 11) : v;
     if (k === focus) {
-      vel = v;
+      vel = v1;
       wake();
-    } else set(k, { v });
+      if (focus !== k0) land(); // 끄는 동안 이미 바뀐 카드가 자리에 닿는다
+    } else set(k, { v: v1 });
   };
 
   // 옆 카드를 누르면 그 카드를 가운데로, 가운데 카드를 누르면 상세로
@@ -548,7 +589,7 @@ function deckReel(el, reducedMotion) {
         return;
       }
       const now = performance.now();
-      if (!wheel) wheel = { f0: pos, dx: 0, lt: now, v: 0 };
+      if (!wheel) wheel = { f0: grab(), k0: focus, dx: 0, lt: now, v: 0 };
       const px = e.deltaX * (e.deltaMode === 1 ? 32 : 1);
       wheel.dx -= px;
       wheel.v = -px / Math.max(8, now - wheel.lt);
@@ -556,24 +597,32 @@ function deckReel(el, reducedMotion) {
       held = true;
       stage.classList.add('is-dragging');
       pos = dragPos(wheel.dx * 0.8, wheel.f0);
+      follow(false);
       wake();
       clearTimeout(wheelT);
       wheelT = setTimeout(() => {
         const w = wheel;
         wheel = null;
-        release(w.dx, Math.round(w.f0), w.v * 0.5);
+        release(w.dx, w.k0, w.v * 0.5, 0.7);
       }, 130);
     },
     { passive: false }
   );
-  // 터치: 손가락을 따라 덱이 함께 움직이고, 놓으면 그 속도 그대로 가까운 카드(빠르게 튕기면 다음 카드)로 붙는다
+  // 터치: 손가락을 따라 덱이 함께 움직이고, 놓으면 그 속도 그대로 가까운 카드(빠르게 튕기면 다음 카드)로 붙는다.
+  // 움직이던 덱에 손가락이 닿으면 그 자리에서 붙잡는다 — 연달아 튕겨 넘길 때 앞의 움직임에서 이어서
   let tx = null;
+  const tv = velocity();
   stage.addEventListener(
     'touchstart',
     (e) => {
       const t = e.touches[0];
       stopPeek();
-      tx = { x: t.clientX, y: t.clientY, f0: pos, k0: focus, lx: t.clientX, lt: performance.now(), v: 0, axis: '' };
+      if (!reducedMotion && (Math.abs(vel) > 0.05 || Math.abs(pos - focus) > 0.01)) {
+        held = true;
+        vel = 0;
+      }
+      tx = { x: t.clientX, y: t.clientY, f0: pos, k0: focus, axis: '' };
+      tv.reset(t.clientX, performance.now());
     },
     { passive: true }
   );
@@ -582,6 +631,8 @@ function deckReel(el, reducedMotion) {
     (e) => {
       if (!tx || e.touches.length > 1) return;
       const t = e.touches[0];
+      const now = performance.now();
+      tv.add(t.clientX, now);
       const dx = t.clientX - tx.x;
       const dy = t.clientY - tx.y;
       if (!tx.axis && Math.hypot(dx, dy) > 8) {
@@ -590,15 +641,15 @@ function deckReel(el, reducedMotion) {
           held = true;
           vel = 0;
           stage.classList.add('is-dragging');
+          // 끌기가 시작된 이 자리부터 손가락과 1:1로(처음 8px만큼 덱이 튀어 따라붙지 않게)
+          tx.x = t.clientX;
+          tx.f0 = grab();
+          tx.k0 = focus;
         }
       }
       if (tx.axis !== 'x' || reducedMotion) return;
-      const now = performance.now();
-      // 손가락 속도(px/ms)는 살짝 고르게 — 마지막 한 번의 떨림에 휘둘리지 않게
-      tx.v = tx.v * 0.4 + ((t.clientX - tx.lx) / Math.max(1, now - tx.lt)) * 0.6;
-      tx.lx = t.clientX;
-      tx.lt = now;
-      pos = dragPos(dx, tx.f0);
+      pos = dragPos(t.clientX - tx.x, tx.f0);
+      follow(true);
       wake();
     },
     { passive: true }
@@ -610,9 +661,8 @@ function deckReel(el, reducedMotion) {
       const t = e.changedTouches[0];
       const dx = t.clientX - tx.x;
       const dy = t.clientY - tx.y;
-      const { axis, v, k0 } = tx;
-      // 손가락이 멈춘 채로 떼면 속도는 0
-      const vNow = performance.now() - tx.lt > 90 ? 0 : v;
+      const { axis, k0 } = tx;
+      const v = tv.get(performance.now());
       tx = null;
       if (axis !== 'x' && !(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy))) {
         if (held) release(0, focus, 0);
@@ -623,7 +673,7 @@ function deckReel(el, reducedMotion) {
         set(focus - Math.sign(dx));
         return;
       }
-      release(dx, k0, vNow);
+      release(dx, k0, v);
     },
     { passive: true }
   );
@@ -643,15 +693,18 @@ function deckReel(el, reducedMotion) {
   // 마우스로 끌기: 터치처럼 덱이 포인터를 따라 움직인다
   stage.addEventListener('dragstart', (e) => e.preventDefault());
   let md = null;
+  const mv = velocity();
   stage.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
     stopPeek();
-    md = { x: e.clientX, y: e.clientY, f0: pos, k0: focus, lx: e.clientX, lt: performance.now(), v: 0, on: false };
+    md = { x: e.clientX, y: e.clientY, k0: focus, f0: pos, on: false };
+    mv.reset(e.clientX, performance.now());
     dragged = false;
   });
   addEventListener('pointermove', (e) => {
     if (!md || e.pointerType !== 'mouse') return;
     const dx = e.clientX - md.x;
+    mv.add(e.clientX, performance.now());
     // 가로로 뚜렷이 끌 때만 덱을 잡는다 — 세로 끌기(장면 넘김)가 먼저 시작됐으면 놓아준다
     if (!md.on && (Math.abs(dx) < 6 || Math.abs(dx) < Math.abs(e.clientY - md.y) || document.documentElement.classList.contains('is-pulling'))) return;
     if (!md.on) {
@@ -659,6 +712,10 @@ function deckReel(el, reducedMotion) {
       held = true;
       vel = 0;
       stage.classList.add('is-dragging');
+      // 잡은 자리부터 포인터와 1:1로
+      md.x = e.clientX;
+      md.f0 = grab();
+      md.k0 = focus;
       // 창 밖에서 놓아도 끝을 받는다(끄는 동안만 — 그냥 누르기는 카드 링크로 가게)
       try {
         stage.setPointerCapture(e.pointerId);
@@ -666,12 +723,9 @@ function deckReel(el, reducedMotion) {
         /* 붙잡지 못해도 끌기는 된다 */
       }
     }
-    const now = performance.now();
-    md.v = md.v * 0.4 + ((e.clientX - md.lx) / Math.max(1, now - md.lt)) * 0.6;
-    md.lx = e.clientX;
-    md.lt = now;
     if (!reducedMotion) {
-      pos = dragPos(dx, md.f0);
+      pos = dragPos(e.clientX - md.x, md.f0);
+      follow(false);
       wake();
     }
   });
@@ -682,16 +736,16 @@ function deckReel(el, reducedMotion) {
   });
   addEventListener('pointerup', (e) => {
     if (!md) return;
-    const { x, on, k0, v, lt } = md;
+    const { x, on, k0 } = md;
     md = null;
     if (!on) return;
     const dx = e.clientX - x;
-    if (Math.abs(dx) < 36) return release(0, focus, 0);
+    if (Math.abs(dx) < 30 && focus === k0) return release(0, focus, 0);
     dragged = true;
     if (reducedMotion) {
       held = false;
       set(focus - Math.sign(dx));
-    } else release(dx, k0, performance.now() - lt > 90 ? 0 : v);
+    } else release(dx, k0, mv.get(performance.now()));
     setTimeout(() => (dragged = false), 0);
   });
   addEventListener('resize', layout);

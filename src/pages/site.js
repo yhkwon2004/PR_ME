@@ -1,14 +1,64 @@
 import gsap from 'gsap';
-import { projects, byId, CATEGORIES, categoryOf } from '../data/projects.js';
-import { profile } from '../content.js';
+import { projects, byId, CATEGORIES, categoryOf, FEATURED } from '../data/projects.js';
+import { profile, scenes } from '../content.js';
 import { ORGS, WALL, ORG_INDEX, orgsOf, awardOrgs } from '../data/orgs.js';
 import { AWARDS, awardsOf, bestOf, TIER_KEY } from '../data/awards.js';
-import { pressOf } from '../data/press.js';
+import { PRESS, pressOf } from '../data/press.js';
 import { DOMAIN_SKILLS, SKILLS, CERTS, SKILL_COUNT } from '../data/skills.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
 const isExternal = (url) => /^https?:\/\//.test(url) || url.startsWith('mailto:');
+
+// 한 줄 알림(복사 · 공유 결과) — 화면 아래 가운데에 잠깐
+let flashEl = null;
+let flashT = 0;
+function flash(text) {
+  if (!flashEl) {
+    flashEl = document.createElement('p');
+    flashEl.className = 'pg-flash';
+    flashEl.setAttribute('role', 'status');
+    document.body.appendChild(flashEl);
+  }
+  flashEl.textContent = text;
+  flashEl.classList.add('is-on');
+  clearTimeout(flashT);
+  flashT = setTimeout(() => flashEl.classList.remove('is-on'), 2400);
+}
+async function copyText(v) {
+  try {
+    await navigator.clipboard.writeText(v);
+    return true;
+  } catch {
+    // 권한이 없거나 보안 연결이 아니면 예전 방식으로
+  }
+  const ta = document.createElement('textarea');
+  ta.value = v;
+  ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try {
+    ok = document.execCommand('copy');
+  } catch {
+    ok = false;
+  }
+  ta.remove();
+  return ok;
+}
+// 링크 공유: 휴대폰은 기기의 공유 창(카카오톡 · 메시지 등), 그 밖에는 주소를 복사한다
+async function shareLink({ title, text, url }) {
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+    try {
+      await navigator.share({ title, text, url });
+      return;
+    } catch (e) {
+      if (e?.name === 'AbortError') return;
+    }
+  }
+  flash((await copyText(url)) ? '링크를 복사했어요' : `복사하지 못했어요 — ${url}`);
+}
 
 function youtubeId(url) {
   try {
@@ -286,6 +336,7 @@ export function awardCard(a) {
 }
 
 const tabs = (on) => `<nav class="pg-tabs" aria-label="보기 전환">
+    <a href="/about" data-link class="${on === 'about' ? 'is-on' : ''}"${on === 'about' ? ' aria-current="page"' : ''}>프로필</a>
     <a href="/works" data-link class="${on === 'works' ? 'is-on' : ''}"${on === 'works' ? ' aria-current="page"' : ''}>프로젝트<sup>${projects.length}</sup></a>
     <a href="/awards" data-link class="${on === 'awards' ? 'is-on' : ''}"${on === 'awards' ? ' aria-current="page"' : ''}>수상<sup>${AWARDS.length}</sup></a>
     <a href="/skills" data-link class="${on === 'skills' ? 'is-on' : ''}"${on === 'skills' ? ' aria-current="page"' : ''}>스킬<sup>${SKILL_COUNT}</sup></a>
@@ -372,6 +423,132 @@ function skillRow(s) {
       ${ev.length ? `<ul class="sk-evl">${ev.join('')}</ul>` : ''}
     </div>
   </li>`;
+}
+
+// ── 프로필: 필름 · 아카이브에 흩어진 기록을 한 장으로 — 모두 기존 기록(프로필 · 소개 장면 · 프로젝트 · 수상 · 자격 · 보도)에서 옮긴다.
+//    PDF로 저장(인쇄)하면 A4 이력서 모양으로 바뀐다 ──
+const yearsOf = (y = '') => (String(y).match(/20\d{2}/g) || []).map(Number);
+const dot = (d = '') => d.replace(/-/g, '.');
+function aboutPage() {
+  const intro = scenes.find((s) => s.id === 'prologue') || {};
+  const timeline = intro.timeline || [];
+  const email = profile.links.find((l) => l.url.startsWith('mailto:'));
+  const links = profile.links.filter((l) => l !== email);
+  const years = [...projects.flatMap((p) => yearsOf(p.year)), ...AWARDS.map((a) => +a.year), ...timeline.map(([y]) => +y)].filter(Boolean);
+  const from = Math.min(...years);
+  const to = Math.max(...years);
+  const grand = AWARDS.filter((a) => a.tier === 1).length;
+  const featured = FEATURED.map(byId).filter(Boolean);
+  const certs = [...CERTS].sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999'));
+  const inYear = (y) => ({ p: projects.filter((p) => yearsOf(p.year).includes(+y)).length, a: AWARDS.filter((a) => a.year === String(y)).length });
+  const h = (no, title, n, more) =>
+    `<h2 class="ab-h"><span class="ab-no">${no}</span>${esc(title)}${n ? `<sup>${pad(n)}</sup>` : ''}${more ? `<a class="ab-more" href="${more.href}" data-link>${esc(more.label)} <span aria-hidden="true">→</span></a>` : ''}</h2>`;
+  const linkList = (list) =>
+    `<ul class="ab-links">${list
+      .map((l) => `<li><a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}><span>${esc(l.label)}</span><b>${esc(l.value)}</b></a></li>`)
+      .join('')}</ul>`;
+  return `<div class="pg pg-about">
+    ${bar({ href: '/', label: '메인' })}
+    <section class="works-head ab-head">
+      <p class="pg-kicker">PROFILE — 한눈에 보는 권용현</p>
+      <h1 class="works-title">Profile<sup>${from}–${to}</sup></h1>
+      ${tabs('about')}
+    </section>
+
+    <section class="ab-id" aria-label="소개">
+      <div class="ab-who">
+        <p class="ab-name"><b>${esc(profile.name)}</b><span>${esc(profile.en)}</span></p>
+        <p class="ab-role"><b>${esc(profile.role)}</b> — ${esc(profile.roleKo)}</p>
+        ${intro.lead ? `<p class="ab-lead">${esc(intro.lead)}</p>` : ''}
+        <p class="ab-motto">“${esc(profile.motto)}”</p>
+        <p class="ab-print-url">${esc(location.origin.replace(/^https?:\/\//, ''))}${email ? ` · ${esc(email.value)}` : ''}</p>
+      </div>
+      <div class="ab-act">
+        ${email ? `<a class="ab-btn is-main" href="${esc(email.url)}"><span>메일 보내기</span><small>${esc(email.value)}</small></a><button type="button" class="ab-btn" data-copy="${esc(email.value)}"><span>이메일 복사</span></button>` : ''}
+        <button type="button" class="ab-btn" data-print><span>PDF로 저장</span><small>A4 이력서</small></button>
+        <button type="button" class="ab-btn" data-share><span>링크 공유</span></button>
+      </div>
+      ${linkList(links)}
+    </section>
+
+    <dl class="ab-nums">
+      <div><dt>프로젝트</dt><dd>${projects.length}</dd></div>
+      <div><dt>수상</dt><dd>${AWARDS.length}<small>대상 ${grand}</small></dd></div>
+      <div><dt>자격증</dt><dd>${CERTS.length}</dd></div>
+      <div><dt>보도</dt><dd>${PRESS.length}</dd></div>
+      <div><dt>활동</dt><dd>${from}<small>— ${to}</small></dd></div>
+    </dl>
+
+    ${
+      intro.pillars?.length
+        ? `<section class="ab-sec reveal">${h('01', '핵심 역량')}<ol class="ab-pillars">${intro.pillars
+            .map((p) => `<li><span class="ab-no">${esc(p.no)}</span><b>${esc(p.title)}</b><small>${esc(p.text)}</small></li>`)
+            .join('')}</ol></section>`
+        : ''
+    }
+
+    ${
+      timeline.length
+        ? `<section class="ab-sec reveal">${h('02', '걸어온 길')}<ol class="ab-time">${timeline
+            .map(([y, t]) => {
+              const n = inYear(y);
+              const count = [n.p && `프로젝트 ${n.p}`, n.a && `수상 ${n.a}`].filter(Boolean).join(' · ');
+              return `<li><time>${esc(y)}</time><b>${esc(t)}</b>${count ? `<small>${count}</small>` : ''}</li>`;
+            })
+            .join('')}</ol></section>`
+        : ''
+    }
+
+    <section class="ab-sec reveal">
+      ${h('03', '대표 프로젝트', featured.length, { href: '/works', label: `전체 ${projects.length}개` })}
+      <ul class="ab-proj">${featured
+        .map((p) => {
+          const best = bestOf(p);
+          return `<li data-cat="${esc(p.category)}"><a href="${p.path}" data-link>
+            <span class="ab-pk">${esc(categoryOf(p.category).ko)} · ${esc(p.year)}</span>
+            <b class="ab-pt">${esc(p.title)}</b>
+            <span class="ab-pone">${esc(p.oneLiner)}</span>
+            ${p.role.length ? `<span class="ab-prole">${esc(p.role.join(' · '))}</span>` : ''}
+            ${best ? `<span class="ab-paw" data-tier="${best.key}">${LAUREL}${esc(best.label)}${best.count > 1 ? ` 외 ${best.count - 1}` : ''}</span>` : ''}
+          </a></li>`;
+        })
+        .join('')}</ul>
+    </section>
+
+    <section class="ab-sec reveal">
+      ${h('04', '수상', AWARDS.length, { href: '/awards', label: '상장 보기' })}
+      <ul class="ab-aw">${AWARDS.map(
+        (a) => `<li data-tier="${TIER_KEY[a.tier]}"><time datetime="${esc(a.date)}">${esc(dot(a.date))}</time><b>${esc(a.contest)}</b><span class="ab-g">${esc(a.grade)}</span>${a.issuer ? `<small>${esc(a.issuer)}</small>` : ''}</li>`
+      ).join('')}</ul>
+    </section>
+
+    <section class="ab-sec ab-two reveal">
+      <div>
+        ${h('05', '자격증', CERTS.length)}
+        <ul class="ab-cert">${certs.map((c) => `<li><time>${c.year ? esc(c.year) : '—'}</time><b>${esc(c.name)}</b></li>`).join('')}</ul>
+      </div>
+      <div>
+        ${h('06', '언론 보도', PRESS.length)}
+        <ul class="ab-press">${PRESS.map(
+          (a) => `<li><a href="${esc(a.url)}" target="_blank" rel="noopener"><time>${a.date ? esc(dot(a.date)) : '인터뷰'}</time><b>${esc(a.title)}</b><small>${esc(a.publisher)} · ${esc(a.relation)}</small></a></li>`
+        ).join('')}</ul>
+      </div>
+    </section>
+
+    <section class="ab-sec reveal">
+      ${h('07', '기술', SKILL_COUNT, { href: '/skills', label: '근거 보기' })}
+      <ul class="ab-skill">${DOMAIN_SKILLS.map((d) => {
+        const list = d.skills.filter((s) => s.state !== 'explore' && (s.evidence.length || s.certs.length || s.direct.length)).slice(0, 8);
+        return list.length ? `<li data-dom="${d.id}"><b>${esc(d.ko)}</b><span>${list.map((s) => `<i>${esc(s.name)}</i>`).join('')}</span></li>` : '';
+      }).join('')}</ul>
+    </section>
+
+    <section class="ab-sec ab-contact reveal">
+      ${h('08', '연락처')}
+      ${linkList(profile.links)}
+    </section>
+    ${footer()}
+  </div>`;
 }
 
 function skillsPage() {
@@ -573,6 +750,7 @@ function detailPage(p) {
               .join('')}</ul></div>`
           : ''
       }
+      <div class="d-acts"><button type="button" class="d-share" data-share><span aria-hidden="true">↗</span> 이 프로젝트 링크 공유</button></div>
     </section>
 
     ${
@@ -699,6 +877,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (path.toLowerCase() === '/awards') return { name: 'awards' };
     if (path.toLowerCase() === '/skills') return { name: 'skills' };
+    if (path.toLowerCase() === '/about') return { name: 'about' };
     const m = path.match(/^\/works(?:\/([\w-]+))?$/);
     if (!m) return { name: 'film' };
     if (m[1]) {
@@ -745,6 +924,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     pageMedia = [];
     if (route.name === 'works') page.innerHTML = worksPage(route.cat);
     else if (route.name === 'skills') page.innerHTML = skillsPage();
+    else if (route.name === 'about') page.innerHTML = aboutPage();
     else if (route.name === 'awards') {
       const a = awardsPage();
       pageMedia = a.media;
@@ -755,7 +935,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     document.body.classList.add('page-open');
     bind(route);
     const p = route.name === 'detail' ? byId(route.id) : null;
-    const name = { awards: 'Awards', skills: 'Skills' }[route.name] || 'Works';
+    const name = { awards: 'Awards', skills: 'Skills', about: 'Profile' }[route.name] || 'Works';
     document.title = p ? `${p.title} — 권용현 Physical AI Portfolio` : `${name} — 권용현 Physical AI Portfolio`;
     page.focus({ preventScroll: true });
   }
@@ -900,6 +1080,13 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
         gsap.fromTo(items.filter((li) => !li.classList.contains('is-out')), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.03, ease: 'power3.out' });
       });
       gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .chips button'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'expo.out', delay: 0.2 });
+    } else if (route.name === 'about') {
+      page.querySelector('[data-print]')?.addEventListener('click', () => print());
+      page.querySelectorAll('[data-copy]').forEach((b) =>
+        b.addEventListener('click', async () => flash((await copyText(b.dataset.copy)) ? `이메일 주소를 복사했어요 — ${b.dataset.copy}` : '복사하지 못했어요'))
+      );
+      if (!reducedMotion)
+        gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .ab-who > *, .ab-act > *, .ab-nums > div'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.035, ease: 'expo.out', delay: 0.2, clearProps: 'opacity,visibility,transform' });
     } else if (route.name === 'skills') {
       bindSkills();
       if (!reducedMotion)
@@ -924,6 +1111,12 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       gsap.fromTo(page.querySelectorAll('.d-hero-text > *'), { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.08, ease: 'expo.out', delay: 0.25 });
     }
     page.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', close));
+    // 링크 공유: 프로젝트는 그 프로젝트 주소, 프로필은 프로필 주소
+    const p = route.name === 'detail' ? byId(route.id) : null;
+    const share = p
+      ? { title: `${p.title} — 권용현 Physical AI`, text: p.oneLiner, url: `${location.origin}${p.path}` }
+      : { title: `${profile.name} — ${profile.role}`, text: profile.roleKo, url: `${location.origin}${location.pathname}` };
+    page.querySelectorAll('[data-share]').forEach((b) => b.addEventListener('click', () => shareLink(share)));
   }
 
   async function apply(route, { animate = true } = {}) {
@@ -946,7 +1139,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       else back();
       return;
     }
-    const label = route.name === 'detail' ? byId(route.id).title : route.name.toUpperCase();
+    const label = route.name === 'detail' ? byId(route.id).title : route.name === 'about' ? 'PROFILE' : route.name.toUpperCase();
     const doMount = () => {
       onOpen?.(route);
       mount(route);

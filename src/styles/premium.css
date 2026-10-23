@@ -94,6 +94,7 @@
   opacity: 0;
   pointer-events: none;
   transition: background 0.35s;
+  will-change: opacity; /* 덱을 끄는 동안 매 프레임 바뀌어도 카드를 다시 칠하지 않게(합성만) */
 }
 .deck .r-card:not(.is-focus):hover .card-dim {
   background: rgba(3, 5, 9, 0.35);
