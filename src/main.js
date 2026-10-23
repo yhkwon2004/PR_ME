@@ -168,6 +168,12 @@ const panels = createPanels($('stage'), scenes, {
     const h = holdOf(director?.index);
     if (h > 0) elapsed = (h * focus) / count;
     if (!entry) takeOver();
+    // 손으로 마지막 카드까지 왔다: 다음 장면으로 넘어가는 법을 한 번 보여 준다
+    if (!entry && focus === count - 1) guide.edge(panels.current?.querySelector('.deck-btn.is-scene'));
+  },
+  // 마지막 카드의 '다음 장면' 버튼 · 소개 장면 끝의 '다음 장면' 버튼
+  onEdge: () => {
+    if (goTo(director.index + 1)) takeOver();
   },
   // 덱의 가운데 카드가 바뀌면 배경 분위기도 그 카드로
   // 카드를 넘길 때마다 펜타토닉 한 음

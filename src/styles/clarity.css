@@ -100,3 +100,129 @@
     transition: none;
   }
 }
+
+/* ── 다음 장면으로 넘어가는 안내 ──
+   덱의 마지막 카드: 다음 버튼(→)이 '다음 장면 · 이름 ↓' 알약으로 바뀌고 숨 쉬듯 빛난다 — 누르면 다음 장면 */
+.db-next {
+  display: none;
+}
+.deck-nav .deck-btn.is-scene {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  height: 38px;
+  padding: 0 14px 0 10px;
+  border-color: var(--cyan);
+  background: rgba(8, 36, 44, 0.78);
+  color: var(--fg);
+  animation: edge-glow 1.8s ease-in-out infinite;
+}
+.deck-btn.is-scene .db-arrow {
+  color: var(--cyan);
+  font-size: 14px;
+  transform: rotate(90deg);
+  animation: edge-bob 1.2s ease-in-out infinite;
+}
+.deck-btn.is-scene .db-next {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  line-height: 1;
+}
+.db-next small {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--cyan);
+}
+.db-next b {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.deck-btn.is-scene:hover {
+  background: rgba(94, 242, 255, 0.16);
+}
+@keyframes edge-glow {
+  50% {
+    box-shadow: 0 0 0 6px rgba(94, 242, 255, 0.14), 0 0 26px -6px rgba(94, 242, 255, 0.7);
+  }
+}
+@keyframes edge-bob {
+  50% {
+    transform: rotate(90deg) translateX(3px);
+  }
+}
+/* 마지막 카드에서는 '전체 보기'와 다음 장면 버튼이 나란히 — 장 수 글자는 접어 막대를 짧게 */
+.at-deck-end .deck-label .reel-stats {
+  display: none;
+}
+
+/* 덱이 없는 장면(소개)의 끝: '다음 장면' 버튼 */
+.scene-next {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  justify-content: center;
+  column-gap: 10px;
+  row-gap: 4px;
+  width: max-content;
+  max-width: 100%;
+  margin: 22px auto 0;
+  padding: 10px 18px;
+  border: 1px solid var(--cyan);
+  border-radius: 999px;
+  background: rgba(8, 36, 44, 0.72);
+  color: var(--fg);
+  animation: edge-glow 1.8s ease-in-out infinite;
+}
+.sn-k {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--cyan);
+}
+.scene-next b {
+  font-size: 14px;
+  font-weight: 700;
+}
+.sn-arrow {
+  font-style: normal;
+  color: var(--cyan);
+  animation: edge-bob-down 1.2s ease-in-out infinite;
+}
+.sn-how {
+  grid-column: 1 / -1;
+  font-size: 10.5px;
+  color: var(--muted);
+  text-align: center;
+}
+.scene-next:hover,
+.scene-next:focus-visible {
+  background: rgba(94, 242, 255, 0.16);
+}
+@keyframes edge-bob-down {
+  50% {
+    transform: translateY(3px);
+  }
+}
+@media (max-width: 820px) {
+  .deck-nav .deck-btn.is-scene {
+    height: 34px;
+    padding: 0 12px 0 8px;
+  }
+  .db-next small {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deck-nav .deck-btn.is-scene,
+  .deck-btn.is-scene .db-arrow,
+  .scene-next,
+  .sn-arrow {
+    animation: none;
+  }
+}

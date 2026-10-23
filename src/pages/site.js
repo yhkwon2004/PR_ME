@@ -655,12 +655,13 @@ function detailPage(p) {
     }
 
     <nav class="d-next" aria-label="다른 프로젝트">
-      <a class="d-prev-link" href="${prev.path}" data-link>← ${esc(prev.title)}</a>
+      <a class="d-prev-link" href="${prev.path}" data-link>← 이전 프로젝트 · ${esc(prev.title)}</a>
       <a class="d-next-card" href="${next.path}" data-link>
         <div class="d-next-media">${next.cover ? media(next.cover, { sizes: '100vw' }) : typeCover(next)}</div>
-        <span class="d-next-k">NEXT PROJECT — ${esc(categoryOf(next.category).label)}</span>
+        <span class="d-next-k">다음 프로젝트 · ${esc(categoryOf(next.category).ko)} →</span>
         <b class="d-next-t">${esc(next.title)}</b>
       </a>
+      <p class="d-next-how">카드를 누르거나 <kbd>←</kbd> <kbd>→</kbd> 키로 이전 · 다음 프로젝트</p>
     </nav>
     ${footer()}
   </article>`;
@@ -1047,6 +1048,11 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       if (!current) return busy; // 닫히는 커튼 동안에는 필름 단축키를 막는다
       if (e.key === 'Escape') {
         close();
+        return true;
+      }
+      // 프로젝트 페이지: ← → 로 이전 · 다음 프로젝트(라이트박스 · 입력 칸에서는 그대로)
+      if (current.name === 'detail' && !lightbox.open && !e.target.closest?.('input, textarea') && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+        page.querySelector(e.key === 'ArrowRight' ? '.d-next-card' : '.d-prev-link')?.click();
         return true;
       }
       return true; // 페이지가 열려 있으면 필름 단축키를 막는다

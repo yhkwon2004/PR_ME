@@ -235,6 +235,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
   let lastAuto = null; // 매 프레임 같은 값을 다시 쓰지 않게
   let lastRing = -1;
   let deckTold = false;
+  let edgeTold = false;
   let coachTold = false;
   let takeoverTold = false;
   return {
@@ -297,6 +298,16 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       say(`지난번에 '${s.ko}' 장면까지 보셨어요`, { action: '이어 보기', onAction: () => onGo(saved.i), ms: 9000 });
     },
     say,
+    // 덱의 마지막 카드에 처음 닿았을 때(휴대폰): '다음 장면' 버튼 위에서 위로 미는 손끝을 한 번
+    edge(btn) {
+      if (!touch || edgeTold || !btn) return;
+      edgeTold = true;
+      setTimeout(() => {
+        if (!btn.isConnected || !btn.classList.contains('is-scene')) return;
+        const r = btn.getBoundingClientRect();
+        showGhost('y', { left: innerWidth / 2, top: r.top - 90, width: 0, height: 0 });
+      }, reducedMotion ? 0 : 650);
+    },
     // 끌기 안내(kind: 'x' 덱 · 'y' 장면) — rect: 손끝이 움직일 자리
     ghost: showGhost,
     hideGhost,

@@ -38,7 +38,7 @@ function deck(cards, { count, label, noun, all, allLabel, stats = '', infos = []
           <span class="deck-nav"${n < 2 ? ' hidden' : ''}>
             <button type="button" class="deck-btn" data-reel="-1" aria-label="이전 ${noun}">←</button>
             <span class="deck-count" aria-hidden="true"><b class="deck-now">01</b><span class="deck-ticks">${'<i></i>'.repeat(count)}${end ? '<i class="is-all"></i>' : ''}</span><span class="deck-total">${pad(count)}</span></span>
-            <button type="button" class="deck-btn" data-reel="1" aria-label="다음 ${noun}">→</button>
+            <button type="button" class="deck-btn" data-reel="1" aria-label="다음 ${noun}" data-label="다음 ${noun}"><span class="db-arrow" aria-hidden="true">→</span><span class="db-next" aria-hidden="true"><small>다음 장면</small><b></b></span></button>
           </span>
           ${all ? `<a class="reel-all" href="${esc(all)}" data-link>${allLabel} <span aria-hidden="true">↗</span></a>` : ''}
         </div>`;
@@ -77,7 +77,11 @@ function creditBeat(c, kicker) {
     </section>`;
 }
 
-function render(scene, i) {
+// 덱이 없는 장면의 끝: 다음 장면으로 넘어가는 버튼(누르면 넘어가고, 스크롤 · 스와이프로도 된다는 것을 알려 준다)
+const sceneNext = (next) =>
+  next ? `<button type="button" class="scene-next" data-next><span class="sn-k">다음 장면</span><b>${esc(next.ko)}</b><i class="sn-arrow" aria-hidden="true">↓</i><small class="sn-how">스크롤 · 스와이프로도</small></button>` : '';
+
+function render(scene, i, next) {
   const L = scene.layout;
   if (L === 'hero') {
     return `<div class="hero">
@@ -286,6 +290,7 @@ function render(scene, i) {
         })}
       </div>`
       : '';
+    if (!reel && foot) foot += sceneNext(next);
     return `<div class="stage${reel ? ' has-reel' : ''}">
       <div class="stage-head panel-content">
         ${kicker(scene, i)}
@@ -747,7 +752,8 @@ function deckReel(el, reducedMotion) {
   };
 }
 
-function bindReel(el, reducedMotion, onReelFocus, onCard) {
+// next: 다음 장면(마지막 카드에서 다음 버튼이 '다음 장면'으로) · onEdge: 끝에서 다음 버튼을 누르면
+function bindReel(el, reducedMotion, onReelFocus, onCard, { next: nextScene, onEdge } = {}) {
   const reel = el.querySelector('.deck') ? deckReel(el, reducedMotion) : null;
   el.reel = reel;
   if (!reel) return;
@@ -773,7 +779,14 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
     });
     if (!reducedMotion && dir) gsap.fromTo(node.children, { autoAlpha: 0, y: dir > 0 ? 16 : -16 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.05, delay: 0.12 });
   };
-  el.querySelectorAll('[data-reel]').forEach((b) => b.addEventListener('click', () => reel.step(+b.dataset.reel)));
+  el.querySelectorAll('[data-reel]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const d = +b.dataset.reel;
+      if (!reel.step(d) && d > 0) onEdge?.();
+    })
+  );
+  const nextName = el.querySelector('.db-next b');
+  if (nextName && nextScene) nextName.textContent = nextScene.ko;
   // 번호 · 눈금 · 버튼 상태를 초점에 맞춘다
   const sync = (dir = 0) => {
     const f = reel.focus;
@@ -790,8 +803,13 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
       const next = nav.querySelector('[data-reel="1"]');
       // 누르던 버튼이 끝에서 꺼지면 초점을 반대쪽 버튼으로 넘겨 잃지 않게
       const active = document.activeElement;
+      // 마지막 카드: 다음 버튼이 '다음 장면 · 이름 ↓'으로 — 누르면 다음 장면(마지막 장면이면 꺼진다)
+      const atEnd = f >= reel.count - 1;
       prev.disabled = f <= 0;
-      next.disabled = f >= reel.count - 1;
+      next.disabled = atEnd && !nextScene;
+      next.classList.toggle('is-scene', atEnd && !!nextScene);
+      next.setAttribute('aria-label', atEnd && nextScene ? `다음 장면 — ${nextScene.ko}` : next.dataset.label);
+      el.classList.toggle('at-deck-end', atEnd);
       if (active === prev && prev.disabled) next.focus({ preventScroll: true });
       if (active === next && next.disabled) prev.focus({ preventScroll: true });
     }
@@ -807,13 +825,13 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
   showInfo(0);
 }
 
-export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus, onCard }) {
+export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus, onCard, onEdge }) {
   const panels = scenes.map((scene, i) => {
     const el = document.createElement('section');
     el.className = `panel layout-${scene.layout}`;
     el.dataset.scene = scene.id;
     el.setAttribute('aria-label', `${pad(i)} ${scene.label}`);
-    el.innerHTML = render(scene, i);
+    el.innerHTML = render(scene, i, scenes[i + 1]);
     el.hidden = true;
     el.inert = true;
     root.appendChild(el);
@@ -822,8 +840,10 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       el,
       reducedMotion,
       (from, r) => from === panels[current] && onReelFocus?.(r),
-      (from, card, dir, focus) => from === panels[current] && onCard?.(card, dir, focus)
+      (from, card, dir, focus) => from === panels[current] && onCard?.(card, dir, focus),
+      { next: scenes[i + 1], onEdge: () => el === panels[current] && onEdge?.() }
     );
+    el.querySelector('[data-next]')?.addEventListener('click', () => el === panels[current] && onEdge?.());
     const sheet = el.querySelector('.stage-foot');
     if (sheet) {
       const end = () => sheet.classList.toggle('is-end', sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 4);
