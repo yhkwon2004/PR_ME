@@ -340,9 +340,7 @@ small { font-size: .8em; }
 
 /* ================= field research ================= */
 .field { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.4em; }
-.mosaic { display: grid; grid-template-columns: 1.15fr 1fr; grid-template-rows: 1fr 1fr; gap: .7em; min-height: 0; }
-.mosaic .ph:first-child { grid-row: span 2; }
-.mosaic .ph:first-child img { object-position: 45% 50%; }
+.mosaic { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: .7em; min-height: 0; }
 .trail { display: flex; flex-direction: column; gap: .7em; min-height: 0; }
 .trail li { flex: 1; display: grid; grid-template-columns: 2.5em 1fr; gap: 1em; align-items: center; padding: .85em 1.3em; }
 .trail .n { width: 2.5em; height: 2.5em; border-radius: 50%; display: grid; place-items: center; background: var(--panel-2); border: 1px solid #EED1AE; color: var(--honey); font-weight: 800; }
@@ -1157,12 +1155,13 @@ small { font-size: .8em; }
     <div class="bd">
       <div class="field">
         <div class="mosaic">
-          <figure class="ph b"><img src="media/field-bag.webp" alt="실제 수액백을 건 폴대에서 투여 줄을 조절하며 시험하는 팀원" decoding="async"><figcaption class="cap">모의 병실 시험 · 실제 수액</figcaption></figure>
-          <figure class="ph b"><img src="media/loi-jnu.webp" alt="전남대학교 수의과대학에서 INFU RETRO 모듈을 들고 선 두 사람" data-zoom decoding="async"><figcaption class="cap">전남대학교 수의과대학</figcaption></figure>
+          <figure class="ph b"><img src="media/field-interview.webp" alt="전북 지역 병원 접수대 앞에서 링거폴대에 단 모듈을 보여 주며 의료진을 인터뷰하는 팀원들" data-zoom decoding="async" style="object-position: 20% 50%"><figcaption class="cap">전북지역 병원 인터뷰 · 레퍼런스 데이터 확보</figcaption></figure>
+          <figure class="ph b"><img src="media/field-bag.webp" alt="실제 수액백을 건 폴대에서 투여 줄을 조절하며 시험하는 팀원" data-zoom decoding="async"><figcaption class="cap">모의 병실 시험 · 실제 수액</figcaption></figure>
           <figure class="ph b"><img src="media/field-alert.webp" alt="대시보드와 휴대폰에 뜬 유속 알림을 확인하는 시연 장면" data-zoom decoding="async"><figcaption class="cap">대시보드 · 휴대폰 알림 시연</figcaption></figure>
+          <figure class="ph b"><img src="media/loi-jnu.webp" alt="전남대학교 수의과대학에서 INFU RETRO 모듈을 들고 선 두 사람" data-zoom decoding="async"><figcaption class="cap">전남대학교 수의과대학</figcaption></figure>
         </div>
         <ol class="trail">
-          <li class="card b"><span class="n">1</span><div><h3>동물병원 설문 · 인터뷰<small>전남대 · 전북권 동물병원</small></h3><p class="did">야간 공백 · 수기 기록 → 24시간 자동 기록</p></div></li>
+          <li class="card b"><span class="n">1</span><div><h3>병원 인터뷰 · 설문<small>전북권 병원 · 전남대</small></h3><p class="did">야간 공백 · 수기 기록 → 24시간 자동 기록</p></div></li>
           <li class="card b"><span class="n">2</span><div><h3>모의 병실 실험<small>원광대 간호학과</small></h3><p class="did">흔들림 오측정 → 자이로로 편차 학습</p></div></li>
           <li class="card b"><span class="n">3</span><div><h3>수액 10종 테스트<small>의료실증팀</small></h3><p class="did">점도별 감소 패턴 → 알고리즘 보정 성공</p></div></li>
           <li class="card hi b"><span class="n">4</span><div><h3>수의과대학 · 유통사 미팅<small>전남대 수의대 · ㈜씨엔 · SKM&amp;M</small></h3><p class="did">구매 의사 → LOI · 공급 약정 · MOU</p></div></li>
@@ -1170,7 +1169,7 @@ small { font-size: .8em; }
       </div>
     </div>
   </div>
-  <div class="note" hidden><p>저희는 책상이 아니라 현장에서 시작했습니다. 동물병원 설문과 인터뷰에서 야간 공백과 수기 기록 문제를 확인했고, 원광대 간호학과와 모의 병실을 꾸려 흔들림 오측정을 자이로 데이터로 학습해 잡았습니다.</p><p>의료실증팀이 수액 10종으로 알고리즘을 보정해 테스트에 성공했고, 수의과대학과 유통사를 만나 실제 구매 의사까지 확인했습니다.</p></div>
+  <div class="note" hidden><p>저희는 책상이 아니라 현장에서 시작했습니다. 전북 지역 병원을 직접 찾아가 모듈을 보여 주며 인터뷰하고 레퍼런스 데이터를 모았고, 동물병원 설문에서 야간 공백과 수기 기록 문제를 확인했습니다. 이어서 원광대 간호학과와 모의 병실을 꾸려 흔들림 오측정을 자이로 데이터로 학습해 잡았습니다.</p><p>의료실증팀이 수액 10종으로 알고리즘을 보정해 테스트에 성공했고, 수의과대학과 유통사를 만나 실제 구매 의사까지 확인했습니다.</p></div>
 </section>
 
 <section class="slide" id="solution" data-sec="3" data-time="21" data-title="INFU RETRO — 링거폴대에 모듈 하나">
@@ -1549,7 +1548,7 @@ small { font-size: .8em; }
           <div class="tier t3"><span>SOM · 3년</span><b>50곳 · 250대</b></div>
         </div>
         <ol class="road" data-step="1">
-          <li class="card hi rstep"><p class="k">STEP 1</p><h3>전북 실증</h3><figure class="ph rs-ph"><img src="media/field-alert.webp" alt="모의 병실에서 대시보드와 휴대폰 알림을 시연하는 장면" data-zoom></figure><p>대학 인접 일반 · 24시 동물병원에서 레퍼런스 확보</p><p class="partner">원광대 간호학과 실험 협력</p></li>
+          <li class="card hi rstep"><p class="k">STEP 1</p><h3>전북 실증</h3><figure class="ph rs-ph"><img src="media/field-interview.webp" alt="전북 지역 병원에서 모듈을 보여 주며 의료진을 인터뷰하는 팀원들" data-zoom style="object-position: 8% 50%"><figcaption class="cap">전북지역 병원 인터뷰</figcaption></figure><p>대학 인접 일반 · 24시 동물병원에서 레퍼런스 확보</p><p class="partner">원광대 간호학과 실험 협력</p></li>
           <li class="card rstep"><p class="k">STEP 2</p><h3>광주 · 전남 확대</h3><figure class="ph rs-ph"><img src="media/loi-jnu.webp" alt="전남대학교 수의과대학에서 INFU RETRO 모듈을 들고 선 두 사람" data-zoom></figure><p>전남대 수의대 · 동물병원 연계, 입원 데이터 고도화</p><p class="partner">전남대학교 수의과대학 LOI · ㈜씨엔 공급 약정</p></li>
           <li class="card rstep"><p class="k">STEP 3</p><h3>전국 B2B</h3><figure class="ph rs-ph doc-ph"><img src="media/doc-skmm-1.webp" alt="SKM&amp;M 구매의향 및 사업협력 업무협약서 1쪽" data-zoom></figure><p>대학병원 · 24시 센터 사례로 전국에 공급</p><p class="partner">㈜에스케이엠엔엠 의료기기 유통망 MOU</p></li>
         </ol>
@@ -1557,7 +1556,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 수의미래연구소 집계(농식품부 자료, 2025.6 전국 동물병원 5,312곳) · SAM · SOM은 아이디어 제안서 자체 추정</p></div>
   </div>
-  <div class="note" hidden><p>전국 동물병원 5,312곳 중 호남권 300곳을 먼저 공략해, 3년 안에 50곳 250대가 목표입니다.</p><p>[클릭] 전북에서 실증하고, 전남대 수의과대학을 거점으로 광주 · 전남으로, 유통사 MOU로 전국에 공급합니다.</p></div>
+  <div class="note" hidden><p>전국 동물병원 5,312곳 중 호남권 300곳을 먼저 공략해, 3년 안에 50곳 250대가 목표입니다.</p><p>[클릭] 이미 병원 인터뷰로 레퍼런스 데이터를 모으고 있는 전북에서 실증하고, 전남대 수의과대학을 거점으로 광주 · 전남으로, 유통사 MOU로 전국에 공급합니다.</p></div>
 </section>
 
 <!-- ================= 10 기대효과 ================= -->
