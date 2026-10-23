@@ -294,8 +294,8 @@ small { font-size: .8em; }
 .big small { font-size: .45em; letter-spacing: -.02em; margin-left: .04em; }
 .big-sub { position: relative; margin-top: .55em; font-size: 2.1em; font-weight: 650; letter-spacing: -.03em; line-height: 1.4; }
 .scribble { position: absolute; left: -4%; right: -4%; bottom: -.55em; width: 108%; height: .7em; overflow: visible; }
-.scribble path { fill: none; stroke: var(--caramel); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 700; stroke-dashoffset: 700; transition: stroke-dashoffset 1s var(--ease) .2s; }
-.in .scribble path, .scribble.drawn path { stroke-dashoffset: 0; }
+.scribble path { fill: none; stroke: var(--caramel); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 700; stroke-dashoffset: 700; transition: stroke-dashoffset 1s var(--ease) 1.1s; }
+.slide.on .scribble path { stroke-dashoffset: 0; }
 .big-note { margin-top: 1.5em; font-size: 1.08em; color: var(--cream-2); }
 .watch-band { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2.2em; width: 66em; max-width: 100%; margin: 0 auto; padding: 1.4em 2em; border-radius: 1em; background: var(--panel); border: 1px solid var(--line); }
 .dots { display: grid; grid-template-columns: repeat(20, 1fr); gap: .28em; width: 15em; }
@@ -320,23 +320,45 @@ small { font-size: .8em; }
 .quote cite { display: block; margin-top: .3em; font-style: normal; font-size: .85em; color: var(--mute); }
 
 /* ================= 5 limits ================= */
+.lim-grp { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+.lim-grp p { display: flex; align-items: center; gap: .8em; font-size: .86em; font-weight: 760; letter-spacing: .04em; color: var(--mute); }
+.lim-grp p::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
 .lims { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; flex: 1; min-height: 0; }
-.lim { display: flex; flex-direction: column; align-items: flex-start; gap: .8em; padding: 1.5em 1.4em; }
-.lim .x { align-self: stretch; }
+.lim { display: flex; flex-direction: column; gap: .85em; padding: 1.35em 1.35em 1.2em; }
 .lim .tag { font-size: .76em; font-weight: 700; letter-spacing: .06em; color: var(--mute); }
-.lim .ico { order: 2; align-self: center; width: 8.4em; height: 8.4em; padding: 2em; margin: auto 0; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FFFFFF, var(--panel-2)); box-shadow: inset 0 0 0 1px var(--line); color: var(--honey); stroke-width: 1.4; }
-.lim h3 { order: 1; font-size: 1.5em; }
-.lim .x { order: 3; }
-.lim p { font-size: 1.1em; line-height: 1.6; color: var(--cream-2); }
-.lim .x { margin-top: auto; padding-top: .9em; border-top: 1px dashed var(--line); }
-.lim .x b { display: block; font-size: 3.1em; font-weight: 800; letter-spacing: -.04em; color: var(--cream); }
-.lim:last-child .x b { color: var(--alert); }
-.lim .x span { font-size: .92em; color: var(--mute); }
-.need { display: flex; align-items: center; gap: 1.8em; padding: 1.05em 1.6em; border-radius: .9em; background: linear-gradient(90deg, #FFF3E3, #FBE8D2); border: 1px solid #EED1AE; }
-.need-l { font-weight: 720; color: var(--honey); white-space: nowrap; }
-.need ul { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: .8em; }
-.need li { display: flex; align-items: center; gap: .5em; font-weight: 680; font-size: 1.05em; }
-.need li .ico { color: var(--honey); width: 1.15em; height: 1.15em; stroke-width: 2.2; }
+.lim h3 { margin-top: -.4em; font-size: 1.45em; }
+.lim .x b { display: block; font-size: 3em; font-weight: 800; letter-spacing: -.04em; line-height: 1.05; color: var(--cream); }
+.lim:nth-child(n+3) .x b { color: var(--alert); }
+.lim .x span { font-size: .9em; color: var(--mute); }
+.lim .why { display: flex; align-items: flex-start; gap: .45em; padding-top: .75em; border-top: 1px dashed var(--line); font-size: .92em; line-height: 1.45; color: var(--cream-2); }
+.lim .why .ico { width: 1.05em; height: 1.05em; margin-top: .2em; color: var(--alert); stroke-width: 2.4; }
+/* small diagrams, one per card */
+.lv { flex: 1; min-height: 6.8em; display: flex; flex-direction: column; justify-content: center; gap: .55em; padding: .9em 1em; border-radius: .7em; background: var(--panel-2); }
+.lv-log { gap: .75em; }
+.lv-log p { display: grid; grid-template-columns: 3.3em 1fr 1.3em; align-items: center; gap: .6em; padding-bottom: .5em; border-bottom: 1px dashed #DACBB9; font-size: 1.15em; font-variant-numeric: tabular-nums; }
+.lv-log span { font-weight: 650; color: var(--mute); }
+.lv-log b { font-weight: 700; color: var(--cream-2); }
+.lv-log b.blank { color: #CDBDAA; }
+.lv-log .ico { width: 1.25em; height: 1.25em; color: var(--sage); stroke-width: 2; }
+.lv-log i { font-style: normal; font-weight: 850; text-align: center; color: var(--alert); }
+.rl { display: flex; align-items: center; padding: 0 .4em 1.6em; }
+.rl .pt { position: relative; width: 1.25em; height: 1.25em; flex: none; border-radius: 50%; background: var(--honey); box-shadow: 0 0 0 .28em rgba(173, 98, 41, .14); }
+.rl .gap { position: relative; flex: 1; height: .65em; margin: 0 .35em; border-radius: 99em; background: repeating-linear-gradient(135deg, rgba(208, 78, 45, .6) 0 .3em, rgba(208, 78, 45, .16) .3em .6em); }
+.rl em { position: absolute; top: calc(100% + .55em); left: 50%; transform: translateX(-50%); white-space: nowrap; font-style: normal; font-size: .88em; font-weight: 720; color: var(--mute); }
+.rl .gap em { color: var(--alert); }
+.pumps { display: flex; justify-content: center; gap: .25em; color: var(--honey); }
+.pumps .ico { width: 2.9em; height: 2.9em; stroke-width: 1.3; }
+.lv-pumps p, .lv-round p.cap2 { font-size: 1em; font-weight: 650; text-align: center; color: var(--cream-2); }
+.lv-pumps p b { color: var(--cream); }
+.lv-sens { flex-direction: row; flex-wrap: wrap; align-content: center; gap: .4em; }
+.lv-sens span { display: inline-flex; align-items: center; gap: .35em; padding: .35em .7em; border-radius: 99em; background: #FFFFFF; border: 1px dashed #D9CBBA; font-size: 1em; font-weight: 680; color: var(--cream-2); }
+.lv-sens .ico { width: 1.45em; height: 1.45em; color: var(--mute); stroke-width: 1.5; }
+.lv-sens p { flex-basis: 100%; margin-top: .3em; font-size: 1em; font-weight: 650; text-align: center; color: var(--cream-2); }
+.needs { display: grid; gap: .55em; }
+.needs-l { font-size: .86em; font-weight: 760; letter-spacing: .04em; color: var(--honey); }
+.needs ul { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; }
+.needs li { display: flex; align-items: center; justify-content: center; gap: .5em; padding: .8em 1em; border-radius: .8em; background: linear-gradient(90deg, #FFF3E3, #FBE8D2); border: 1px solid #EED1AE; font-size: 1.05em; font-weight: 720; text-align: center; }
+.needs li .ico { width: 1.2em; height: 1.2em; color: var(--honey); stroke-width: 2.2; }
 
 /* ================= field research ================= */
 .field { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.4em; }
@@ -890,7 +912,6 @@ small { font-size: .8em; }
   .proof2 { grid-template-columns: 1fr; }
   .fan2 { height: 9em; width: 12em; }
   .reg-ph, .rs-ph { flex: none; height: 12em; }
-  .lim .ico { width: 4.4em; height: 4.4em; padding: 1em; margin: .2em 0; }
   .evi { grid-template-columns: 1fr; }
   .s-impact .ft { width: auto; }
   .vs2 p { grid-template-columns: 1fr 5.4em; }
@@ -901,8 +922,8 @@ small { font-size: .8em; }
   .path { grid-template-columns: 1fr; }
   .path li + li::before { display: none; }
   .proof .paper img { height: 3.6em; }
-  .need { flex-direction: column; align-items: flex-start; gap: .8em; }
-  .need ul { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+  .lim-grp { display: none; }
+  .needs ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6em; }
   .sol { grid-template-columns: 1fr; }
   .callouts.l { text-align: left; }
   .hero { height: auto; padding: 1em 0; }
@@ -1028,12 +1049,12 @@ small { font-size: .8em; }
     <div class="scene">
       <p class="clock b"><span class="digits">03<span class="colon">:</span>00</span>새벽 3시, 동물병원 입원실</p>
       <h2 class="scene-ttl b">보호자는 집에 있고,<br>수의사는 다른 환자를 봅니다</h2>
-      <p class="scene-sub" data-step="1">다음 순회 전까지, 이 변화는<br><em>기록되지도, 확인되지도 않습니다</em></p>
-      <ul class="gaps" data-step="2"><li>확인 공백</li><li>기록 공백</li></ul>
+      <p class="scene-sub b">다음 순회 전까지, 이 변화는<br><em>기록되지도, 확인되지도 않습니다</em></p>
+      <ul class="gaps b"><li>확인 공백</li><li>기록 공백</li></ul>
     </div>
     <p class="scene-src">전남대학교 · 전북권 동물병원 설문조사 결과를 바탕으로 한 장면</p>
   </div>
-  <div class="note" hidden><p>새벽 3시 동물병원 입원실입니다. 보호자는 집에 있고, 당직 수의사는 다른 환자를 봅니다.</p><p>[클릭] 다음 순회 전까지 수액에 무슨 일이 생겨도, 기록되지도 확인되지도 않습니다. [클릭] 저희가 푸는 문제는 이 두 가지, 확인 공백과 기록 공백입니다.</p></div>
+  <div class="note" hidden><p>새벽 3시 동물병원 입원실입니다. 보호자는 집에 있고, 당직 수의사는 다른 환자를 봅니다.</p><p>다음 순회 전까지 수액에 무슨 일이 생겨도, 기록되지도 확인되지도 않습니다. 저희가 푸는 문제는 이 두 가지, 확인 공백과 기록 공백입니다.</p></div>
 </section>
 
 <section class="slide" id="watch" data-sec="1" data-time="16" data-title="① 확인 공백 — 26.7%">
@@ -1042,21 +1063,21 @@ small { font-size: .8em; }
     <div class="hook2">
       <div class="hook">
         <p class="big b"><span data-count="26.7">26.7</span><small>%</small></p>
-        <p class="big-sub" data-step="1"><mark>4마리 중 1마리</mark>꼴로 카테터 합병증
+        <p class="big-sub b"><mark>4마리 중 1마리</mark>꼴로 카테터 합병증
           <svg class="scribble" viewBox="0 0 600 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12 C 160 4, 330 10, 596 6"/><path d="M70 24 C 240 18, 420 22, 560 16"/></svg>
         </p>
-        <p class="big-note" data-step="1">입원한 개 · 고양이 정맥 카테터 — 빠짐 · 막힘 · 줄 끊김 · 정맥염<br>美 CSU 연구에서도 19.9%</p>
+        <p class="big-note b">입원한 개 · 고양이 정맥 카테터 — 빠짐 · 막힘 · 줄 끊김 · 정맥염<br>美 CSU 연구에서도 19.9%</p>
       </div>
       <figure class="pet b"><img src="media/pet-cat-iv.webp" alt="입원장에서 수액 줄을 단 채 잠든 고양이" decoding="async"></figure>
     </div>
-    <div class="watch-band" data-step="2">
+    <div class="watch-band b">
       <div class="dots" data-dots="100" data-on="8" role="img" aria-label="100곳 중 8곳"></div>
       <p>그런데 24시간 지켜보는 동물병원은 <em>서울 100곳 중 약 8곳</em>입니다
         <small>서울 7.95% · 경기 6.53% · 야간 당직 수의사를 구하지 못해 24시간 진료를 접는 병원도 늘고 있습니다</small></p>
     </div>
     <div class="ft"><p class="src b">출처: RVC·BSAVA 연구(2024, 19개 기관 382마리) · Simpson et al., J Small Anim Pract(2023) · 데일리벳 수도권 동물병원 운영시간 조사(2025) · 데일리벳 2018.07.27</p></div>
   </div>
-  <div class="note" hidden><p>숫자 하나로 시작하겠습니다. 26.7%. [클릭] 입원한 개와 고양이의 정맥 카테터는 네 마리 중 한 마리꼴로 빠지거나 막히는 합병증이 생깁니다.</p><p>[클릭] 그런데 24시간 지켜보는 병원은 서울 100곳 중 8곳뿐입니다. 사람의 눈만으로는 밤을 지킬 수 없습니다.</p></div>
+  <div class="note" hidden><p>숫자 하나로 시작하겠습니다. 26.7%. 입원한 개와 고양이의 정맥 카테터는 네 마리 중 한 마리꼴로 빠지거나 막히는 합병증이 생깁니다.</p><p>그런데 24시간 지켜보는 병원은 서울 100곳 중 8곳뿐입니다. 사람의 눈만으로는 밤을 지킬 수 없습니다.</p></div>
 </section>
 
 <section class="slide" id="record" data-sec="1" data-time="15" data-title="② 기록 공백 — 해결률 19.5%">
@@ -1081,7 +1102,7 @@ small { font-size: .8em; }
             <div class="xl"><span>2021</span><span>2022</span><span>2023</span><span>2024</span><span>2025</span><span>2026<br>1~6월</span></div>
           </div>
         </div>
-        <div class="card hi chart" data-step="1" style="display: flex; flex-direction: column">
+        <div class="card hi chart b" style="display: flex; flex-direction: column">
           <h3>진료기록 확보 여부별 분쟁 해결률</h3>
           <div class="rate2">
             <div><p class="lbl">기록 있음</p><p class="num hon"><span data-count="30">30</span><small>%</small></p><span class="hbar"><i style="--v: 30"></i></span><p class="cs">80건 중 24건 해결</p></div>
@@ -1097,7 +1118,7 @@ small { font-size: .8em; }
       <p class="src b">출처: 한국소비자원 동물병원 피해구제 분석(2026.9, 2021~2026.6 접수 128건) · 데일리벳 2026.09.09</p>
     </div>
   </div>
-  <div class="note" hidden><p>두 번째는 기록 공백입니다. 동물병원 피해구제 신청은 4년 만에 세 배가 됐고, 올해는 6월까지만 45건입니다.</p><p>[클릭] 진료기록이 있으면 30%가 해결되지만, 없으면 19.5%로 떨어집니다. 다섯 건 중 네 건은 해결되지 못합니다. 그래서 자동으로 남는 기록이 필요합니다.</p></div>
+  <div class="note" hidden><p>두 번째는 기록 공백입니다. 동물병원 피해구제 신청은 4년 만에 세 배가 됐고, 올해는 6월까지만 45건입니다.</p><p>진료기록이 있으면 30%가 해결되지만, 없으면 19.5%로 떨어집니다. 다섯 건 중 네 건은 해결되지 못합니다. 그래서 자동으로 남는 기록이 필요합니다.</p></div>
 </section>
 
 <!-- ================= 02 기존 시스템의 한계 ================= -->
@@ -1106,45 +1127,63 @@ small { font-size: .8em; }
     <p class="lab b">Pain Point <span>기존 시스템의 한계</span></p>
     <h2 class="h b">지금 방식으로는 두 공백을 <mark>메울 수 없습니다</mark></h2>
     <div class="bd">
+      <div class="lim-grp b"><p>사람이 메우는 방식</p><p>장비로 메우는 방식</p></div>
       <div class="lims">
         <div class="card lim b">
           <p class="tag">사람 · 기록</p>
-          <svg class="ico"><use href="#i-clip"/></svg>
           <h3>수기 투약 기록</h3>
+          <div class="lv lv-log" aria-hidden="true">
+            <p><span>22:00</span><b>120 mL</b><svg class="ico"><use href="#i-check"/></svg></p>
+            <p><span>01:00</span><b class="blank">—</b><i>?</i></p>
+            <p><span>04:00</span><b class="blank">—</b><i>?</i></p>
+          </div>
           <p class="x"><b>19.5%</b><span>기록이 없을 때 분쟁 해결률</span></p>
+          <p class="why"><svg class="ico"><use href="#i-x"/></svg>빈칸 · 사후 기록은 분쟁 근거가 못 됨</p>
         </div>
         <div class="card lim b">
           <p class="tag">사람 · 확인</p>
-          <svg class="ico"><use href="#i-clock"/></svg>
           <h3>정기 순회 확인</h3>
+          <div class="lv lv-round" aria-hidden="true">
+            <div class="rl"><i class="pt"><em>순회</em></i><i class="gap"><em>못 봄</em></i><i class="pt"><em>순회</em></i><i class="gap"><em>못 봄</em></i><i class="pt"><em>순회</em></i></div>
+            <p class="cap2">순회 사이는 아무도 보지 않는 시간</p>
+          </div>
           <p class="x"><b>71.8%</b><span>수의사 1명이 지키는 동물병원</span></p>
+          <p class="why"><svg class="ico"><use href="#i-x"/></svg>그 사이의 빠짐 · 막힘 · 소진을 놓침</p>
         </div>
         <div class="card lim b">
-          <p class="tag">장비</p>
-          <svg class="ico"><use href="#i-pump"/></svg>
+          <p class="tag">장비 · 펌프</p>
           <h3>동물용 인퓨전펌프</h3>
-          <p class="x"><b>110만 원</b><span>대당 · 입원장 5대면 550만 원</span></p>
+          <div class="lv lv-pumps" aria-hidden="true">
+            <div class="pumps"><svg class="ico"><use href="#i-pump"/></svg><svg class="ico"><use href="#i-pump"/></svg><svg class="ico"><use href="#i-pump"/></svg><svg class="ico"><use href="#i-pump"/></svg><svg class="ico"><use href="#i-pump"/></svg></div>
+            <p>입원장 5대 = <b>550만 원</b></p>
+          </div>
+          <p class="x"><b>110만 원</b><span>대당 판매가</span></p>
+          <p class="why"><svg class="ico"><use href="#i-x"/></svg>입원장마다 두기엔 비싼 별도 장비</p>
         </div>
         <div class="card lim b">
-          <p class="tag">장비</p>
-          <svg class="ico"><use href="#i-chip"/></svg>
+          <p class="tag">장비 · 스마트 폴대</p>
           <h3>다중 센서 스마트 폴대</h3>
-          <p class="x"><b>100만 원+</b><span>자이로 · 가속도 등 센서를 더할수록 오르는 제작비</span></p>
+          <div class="lv lv-sens" aria-hidden="true">
+            <span><svg class="ico"><use href="#i-scale"/></svg>무게</span><span><svg class="ico"><use href="#i-gyro"/></svg>자이로</span><span><svg class="ico"><use href="#i-move"/></svg>가속도</span><span><svg class="ico"><use href="#i-eye"/></svg>광학</span>
+            <p>흔들림을 센서 수로 잡는 구조</p>
+          </div>
+          <p class="x"><b>100만 원+</b><span>제작비</span></p>
+          <p class="why"><svg class="ico"><use href="#i-x"/></svg>센서를 더할수록 비싸지고, 폴대째 바꿔야 함</p>
         </div>
       </div>
-      <div class="need" data-step="1">
-        <span class="need-l">그래서 필요한 것</span>
+      <div class="needs b">
+        <p class="needs-l">그래서 필요한 것</p>
         <ul>
-          <li><svg class="ico"><use href="#i-check"/></svg>기존 폴대 그대로</li>
           <li><svg class="ico"><use href="#i-check"/></svg>자동으로 남는 기록</li>
           <li><svg class="ico"><use href="#i-check"/></svg>24시간 이상 감지</li>
           <li><svg class="ico"><use href="#i-check"/></svg>부담 없는 도입가</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>기존 폴대 그대로 · 센서 1개</li>
         </ul>
       </div>
     </div>
-    <div class="ft"><p class="src b">출처: 한국소비자원(2026.9) · 수의미래연구소 집계(농식품부 자료, 2025.6 — 전국 동물병원 5,312곳 중 1인 병원 3,815곳) · SW Medi 동물용 인퓨전펌프 판매가(2025) · 스마트 폴대 제작비는 INFUTECH 시장조사</p></div>
+    <div class="ft"><p class="src b">출처: 한국소비자원(2026.9) · 수의미래연구소 집계(농식품부 자료, 2025.6 — 전국 동물병원 5,312곳 중 1인 병원 3,815곳) · SW Medi 동물용 인퓨전펌프 판매가(2025) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 기록지 · 순회 그림은 이해를 돕는 예시</p></div>
   </div>
-  <div class="note" hidden><p>지금 병원은 기록은 손으로, 확인은 순회로 합니다. 그런데 전국 동물병원 열 곳 중 일곱 곳은 수의사 한 명이 지킵니다. 장비로 풀려면 대당 110만 원 펌프를 들여야 하고, 스마트 폴대는 흔들림을 잡으려고 자이로 · 가속도 센서를 여러 개 넣느라 제작비만 100만 원을 넘깁니다.</p><p>[클릭] 그래서 필요한 건 네 가지입니다. 기존 폴대 그대로, 자동으로 남는 기록, 24시간 감지, 부담 없는 가격.</p></div>
+  <div class="note" hidden><p>지금 병원은 사람과 장비로 이 공백을 메우려 합니다. 기록은 손으로 남기다 보니 빈칸과 사후 기록이 생기고, 기록이 없으면 분쟁 해결률은 19.5%에 그칩니다. 확인은 순회로 하지만, 전국 동물병원 열 곳 중 일곱 곳은 수의사 한 명이 지켜 순회와 순회 사이를 볼 사람이 없습니다.</p><p>장비로 풀려면 대당 110만 원 펌프를 입원장마다 들여야 하고, 스마트 폴대는 흔들림을 잡으려 자이로 · 가속도 센서를 더하느라 제작비만 100만 원을 넘습니다. 그래서 필요한 건 각각에 대한 답, 자동으로 남는 기록, 24시간 감지, 부담 없는 가격, 그리고 기존 폴대 그대로 쓰는 센서 하나입니다.</p></div>
 </section>
 
 <!-- ================= 03 아이디어 소개 ================= -->
@@ -1189,7 +1228,7 @@ small { font-size: .8em; }
           <div class="card co b"><figure class="th light-th"><img src="media/cnn-curve.webp" alt="CNN 학습 곡선 — 손실 감소와 검증 정확도 수렴" data-zoom></figure><div><p class="k">AI</p><b>CNN 이상 판별</b><span>신호 패턴 분류 · 정확도 97.3%</span></div></div>
         </div>
       </div>
-      <ol class="flow" data-step="1">
+      <ol class="flow b">
         <li class="card fstep"><span class="n">1</span><b>걸고</b><span>기존 링거 걸이에 · 공구 없이</span></li>
         <svg class="ico arr" aria-hidden="true"><use href="#i-arrow"/></svg>
         <li class="card fstep"><span class="n">2</span><b>재고</b><span>1초 측정 · 흔들림 보정 · 유속 계산</span></li>
@@ -1198,7 +1237,7 @@ small { font-size: .8em; }
       </ol>
     </div>
   </div>
-  <div class="note" hidden><p>저희 해법은 INFU RETRO, 무게센서 모듈 하나입니다. 로드셀이 1초마다 수액 무게를 재고, 칼만필터가 흔들림을 걸러내고, CNN이 정상과 이상을 판별합니다. 검증 정확도는 평균 97.3%입니다.</p><p>[클릭] 쓰는 법은 세 단계입니다. 기존 걸이에 걸고, 무게를 재고, 대시보드와 휴대폰으로 알립니다. 폴대 교체도, 공구도 필요 없습니다.</p></div>
+  <div class="note" hidden><p>저희 해법은 INFU RETRO, 무게센서 모듈 하나입니다. 로드셀이 1초마다 수액 무게를 재고, 칼만필터가 흔들림을 걸러내고, CNN이 정상과 이상을 판별합니다. 검증 정확도는 평균 97.3%입니다.</p><p>쓰는 법은 세 단계입니다. 기존 걸이에 걸고, 무게를 재고, 대시보드와 휴대폰으로 알립니다. 폴대 교체도, 공구도 필요 없습니다.</p></div>
 </section>
 
 <section class="slide" id="sensor" data-sec="3" data-time="22" data-title="센서는 줄이고, 학습으로 채웠습니다">
@@ -1225,8 +1264,8 @@ small { font-size: .8em; }
           <div class="sx-sig" id="sx-sig" role="img" aria-label="폴대가 흔들릴 때 자이로 신호와 무게 편차가 함께 움직이는 모습"></div>
           <p class="sx-out">흔들림 ↔ 무게 편차를 학습 → <em>칼만필터 · CNN 보정</em></p>
         </div>
-        <svg class="ico sx-arr" data-step="1" aria-hidden="true"><use href="#i-arrow"/></svg>
-        <div class="card hi sx-prod" data-step="1">
+        <svg class="ico sx-arr b" aria-hidden="true"><use href="#i-arrow"/></svg>
+        <div class="card hi sx-prod b">
           <p class="sx-k">제품<small>무게센서 1개 + 학습된 보정</small></p>
           <div class="sx-pcb">
             <figure class="ph"><img src="media/pcb-layout.webp" alt="60 × 35mm PCB 배선 설계 화면" data-zoom><figcaption class="cap">PCB 설계</figcaption></figure>
@@ -1241,7 +1280,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">※ 기존 스마트 폴대 제작비는 INFUTECH 시장조사 기준 · 자이로는 개발 · 학습 장비에만 달고 제품에는 넣지 않습니다 · 신호 그림은 흔들림 구간 모의 데이터</p></div>
   </div>
-  <div class="note" hidden><p>핵심 기술입니다. 기존 스마트 폴대는 흔들림을 잡으려고 자이로, 가속도 같은 센서를 여러 개 넣습니다. 그래서 제작비만 100만 원을 넘기는 구성이 대부분입니다.</p><p>저희는 반대로 갔습니다. 학습할 때만 무게센서와 자이로를 함께 달아, 폴대가 흔들릴 때 무게가 얼마나 틀어지는지를 데이터로 모았고, 그 편차를 칼만필터와 CNN이 스스로 보정하도록 학습시켰습니다.</p><p>[클릭] 그래서 제품에는 무게센서 하나만 들어갑니다. 대당 원가 8만 원, 판별 정확도 97.3%입니다.</p></div>
+  <div class="note" hidden><p>핵심 기술입니다. 기존 스마트 폴대는 흔들림을 잡으려고 자이로, 가속도 같은 센서를 여러 개 넣습니다. 그래서 제작비만 100만 원을 넘기는 구성이 대부분입니다.</p><p>저희는 반대로 갔습니다. 학습할 때만 무게센서와 자이로를 함께 달아, 폴대가 흔들릴 때 무게가 얼마나 틀어지는지를 데이터로 모았고, 그 편차를 칼만필터와 CNN이 스스로 보정하도록 학습시켰습니다.</p><p>그래서 제품에는 무게센서 하나만 들어갑니다. 대당 원가 8만 원, 판별 정확도 97.3%입니다.</p></div>
 </section>
 
 <!-- ================= 04 시연 ================= -->
@@ -1282,7 +1321,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">※ 500 mL 수액 모의 신호 시뮬레이션 · 30분 시점에 상황 발생 · 위: 무게(g) · 아래: 이상 점수 · 기대 추세는 투여 초기 5분 감소량으로 산출</p></div>
   </div>
-  <div class="note" hidden><p>다섯 가지 입원 상황을 같은 조건으로 돌린 결과입니다. 위는 무게, 아래는 이상 점수입니다.</p><p>정상 투여와 이송 중 흔들림에서는 원신호가 크게 흔들려도 점수가 임계값 아래에 머뭅니다. [클릭] 유속 저하, 줄 빠짐, 공기 유입이나 역류에서는 점수가 0.6을 넘는 순간 알림이 갑니다.</p></div>
+  <div class="note" hidden><p>다섯 가지 입원 상황을 같은 조건으로 돌린 결과입니다. 위는 무게, 아래는 이상 점수입니다.</p><p>정상 투여와 이송 중 흔들림에서는 원신호가 크게 흔들려도 점수가 임계값 아래에 머뭅니다. 유속 저하, 줄 빠짐, 공기 유입이나 역류에서는 점수가 0.6을 넘는 순간 알림이 갑니다.</p></div>
 </section>
 
 <section class="slide" id="results" data-sec="4" data-time="18" data-title="검증 성과 — 숫자로 증명">
@@ -1298,7 +1337,7 @@ small { font-size: .8em; }
           <div class="ep" role="img" aria-label="최근 6 epoch 검증 정확도 95.7, 99.0, 95.2, 97.3, 97.4, 99.0%"><i style="--v: 95.66"></i><i style="--v: 99"></i><i style="--v: 95.24"></i><i style="--v: 97.29"></i><i style="--v: 97.41"></i><i style="--v: 99"></i></div>
           <p class="cond">최근 6 epoch 평균 · 95.2~99.0%</p></div>
       </div>
-      <div class="proof2" data-step="1">
+      <div class="proof2 b">
         <div class="card pf"><div class="drops" aria-hidden="true"><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg></div><p><b>수액 10종 보정</b>점도별 감소 패턴으로 테스트 성공</p></div>
         <div class="card pf"><div class="fan2"><img src="media/paper-2.webp" alt="논문 2쪽 — CNN 패턴 판별 구조와 실험 결과" data-zoom><img src="media/paper-1.webp" alt="논문 1쪽 — 상태 패턴 분석 기반 정맥 수액 이상 감지 알고리즘" data-zoom></div><p><b>학술 발표 논문 2편</b>국내 공동학술대회 · AIT 2026</p></div>
         <div class="card pf"><p class="pat3" aria-hidden="true"><svg class="ico"><use href="#i-cert"/></svg>×3</p><p><b>특허 3건 심사 중</b>하드웨어 · 소프트웨어 · 실용신안</p></div>
@@ -1306,7 +1345,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">※ 모의 병실 반복시험(폴대 이동 · 흔들림 · 기울어짐 · 당겨짐, 500 mL) · ±5분 · 5초는 보정을 포함한 최대 검측 시간 기준</p></div>
   </div>
-  <div class="note" hidden><p>흔들리고 기울어지는 모의 병실에서 반복 시험했습니다. 잔량 오차 ±3%, 종료시점 예측 오차 ±5분, 이상 감지 5초 이내, 패턴 검증 정확도는 최근 여섯 번 학습 평균 97.3%입니다.</p><p>[클릭] 점도가 다른 수액 10종으로 알고리즘을 보정해 테스트에 성공했고, 논문 2편으로 발표했으며 특허 3건이 심사 중입니다.</p></div>
+  <div class="note" hidden><p>흔들리고 기울어지는 모의 병실에서 반복 시험했습니다. 잔량 오차 ±3%, 종료시점 예측 오차 ±5분, 이상 감지 5초 이내, 패턴 검증 정확도는 최근 여섯 번 학습 평균 97.3%입니다.</p><p>점도가 다른 수액 10종으로 알고리즘을 보정해 테스트에 성공했고, 논문 2편으로 발표했으며 특허 3건이 심사 중입니다.</p></div>
 </section>
 
 <!-- ================= 05 시장분석 ================= -->
@@ -1336,7 +1375,7 @@ small { font-size: .8em; }
             <div class="xl"><span>Data<br>Bridge</span><span>Grand<br>View</span><span>GM<br>Insights</span><span>MRF</span></div>
           </div>
         </div>
-        <div class="card hi" data-step="1" style="display: flex; flex-direction: column">
+        <div class="card hi b" style="display: flex; flex-direction: column">
           <h3>왜 지금인가 — 기록을 요구하는 흐름</h3>
           <ol class="tl">
             <li><time>2023.01</time><span>진료비 게시 의무 시행</span></li>
@@ -1353,7 +1392,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 농림축산식품부 2025 반려동물 양육현황 조사(2026.2) · 수의미래연구소 집계(농식품부 자료, 2025.6) · 농식품부 연관산업 육성 대책 · Data Bridge / Grand View / GM Insights / MRF · 농식품부 진료항목 표준화(2025.4) · 연합뉴스 2026.05.31 · 중앙일보 2026.09.02</p></div>
   </div>
-  <div class="note" hidden><p>반려동물을 키우는 가구는 29.2%로 역대 최대이고, 그중 95%가 1년 안에 동물병원을 찾습니다. 동물병원은 2년 새 300곳 넘게 늘어 5,312곳이 됐고, 동물용 인퓨전펌프 시장도 연 7~12%씩 큽니다.</p><p>[클릭] 그리고 지금, 진료항목 표준화와 마약류 투약 기록, 진료기록 발급 의무화가 잇따라 추진되고, 마약류 처방량은 3년 새 37% 늘었습니다. 기록을 요구하는 압력이 커지는 지금이 시장이 열리는 시점입니다.</p></div>
+  <div class="note" hidden><p>반려동물을 키우는 가구는 29.2%로 역대 최대이고, 그중 95%가 1년 안에 동물병원을 찾습니다. 동물병원은 2년 새 300곳 넘게 늘어 5,312곳이 됐고, 동물용 인퓨전펌프 시장도 연 7~12%씩 큽니다.</p><p>그리고 지금, 진료항목 표준화와 마약류 투약 기록, 진료기록 발급 의무화가 잇따라 추진되고, 마약류 처방량은 3년 새 37% 늘었습니다. 기록을 요구하는 압력이 커지는 지금이 시장이 열리는 시점입니다.</p></div>
 </section>
 
 <!-- ================= 06 차별점 ================= -->
@@ -1378,7 +1417,7 @@ small { font-size: .8em; }
           </tbody>
         </table>
       </div>
-      <div class="edge" data-step="1">
+      <div class="edge b">
         <div><svg class="ico"><use href="#i-tag"/></svg><p><b>가장 낮은 도입가</b><span>5대 125만 원 · 펌프 대비 −77%</span></p></div>
         <div><svg class="ico"><use href="#i-check"/></svg><p><b>기존 폴대 그대로</b><span>교체 · 공구 없이 상단에 걸기</span></p></div>
         <div><svg class="ico"><use href="#i-chip"/></svg><p><b>센서 1개 설계</b><span>학습으로 보정 · 원가 8만 원</span></p></div>
@@ -1387,7 +1426,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: SW Medi 동물용 인퓨전펌프 판매가(2025) · Shift Labs 제품 자료 · 삼성전자 뉴스룸(2017) · KOITA 기술사업화 DB(아이링거) · 아이디어 제안서</p></div>
   </div>
-  <div class="note" hidden><p>대안을 비교하면, 펌프는 비싼 별도 장비이고 나머지는 사람 병원용 광학 방식이거나 폴대를 바꿔야 합니다. INFU RETRO는 25만 원에 기존 폴대에 바로 끼우는 동물병원 전용 무게센서입니다.</p><p>[클릭] 가장 싸고, 폴대를 바꾸지 않고, 센서 하나로 흔들림까지 잡습니다.</p></div>
+  <div class="note" hidden><p>대안을 비교하면, 펌프는 비싼 별도 장비이고 나머지는 사람 병원용 광학 방식이거나 폴대를 바꿔야 합니다. INFU RETRO는 25만 원에 기존 폴대에 바로 끼우는 동물병원 전용 무게센서입니다.</p><p>가장 싸고, 폴대를 바꾸지 않고, 센서 하나로 흔들림까지 잡습니다.</p></div>
 </section>
 
 <section class="slide" id="reg" data-sec="6" data-time="15" data-title="인허가 — 사람용 의료기기 허가 없이 공급">
@@ -1414,7 +1453,7 @@ small { font-size: .8em; }
             </ol>
           </div>
         </div>
-        <div class="card check" data-step="1">
+        <div class="card check b">
           <p class="k">INFU RETRO 구조 확인</p>
           <ul>
             <li><svg class="ico"><use href="#i-check"/></svg><p><b>동물 몸에 닿지 않음</b>폴대와 수액백 사이에서 무게만</p></li>
@@ -1429,7 +1468,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">근거: 「의료기기법」 제46조(동물용 의료기기 특례) · 농림축산검역본부 「동물용의료기기의 범위 및 분류 등에 관한 규정」(고시 제2021-36호) · 데일리벳 2013.08(동물용 의료기기 등급별 신고 · 허가제, 2014.1 시행) · 최종 품목 등급은 검역본부 분류표로 확인</p></div>
   </div>
-  <div class="note" hidden><p>인허가 장벽도 낮습니다. 동물 전용 의료기기는 의료기기법 특례에 따라 식약처가 아니라 농림축산검역본부 소관이고, 가장 낮은 1등급은 허가가 아니라 신고입니다.</p><p>[클릭] INFU RETRO는 동물 몸에 닿지 않고 주입도 제어하지 않는, 수액 무게만 재는 장치입니다. 1등급 기준에 맞는 구조라 사람용처럼 긴 허가 심사 없이 공급할 수 있습니다. KC 인증과 특허 3건도 함께 진행 중입니다.</p></div>
+  <div class="note" hidden><p>인허가 장벽도 낮습니다. 동물 전용 의료기기는 의료기기법 특례에 따라 식약처가 아니라 농림축산검역본부 소관이고, 가장 낮은 1등급은 허가가 아니라 신고입니다.</p><p>INFU RETRO는 동물 몸에 닿지 않고 주입도 제어하지 않는, 수액 무게만 재는 장치입니다. 1등급 기준에 맞는 구조라 사람용처럼 긴 허가 심사 없이 공급할 수 있습니다. KC 인증과 특허 3건도 함께 진행 중입니다.</p></div>
 </section>
 
 <!-- ================= 07 제품 원가 ================= -->
@@ -1461,7 +1500,7 @@ small { font-size: .8em; }
             <tfoot><tr><th scope="row" colspan="2">실질 판매원가</th><td>80,000원</td></tr></tfoot>
           </table>
         </div>
-        <div class="g" data-step="1" style="--c: 1fr 1fr; grid-template-rows: auto 1fr">
+        <div class="g b" style="--c: 1fr 1fr; grid-template-rows: auto 1fr">
           <div class="card hi">
             <h3>1대 기준 수익</h3>
             <div class="pl">
@@ -1493,7 +1532,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 아이디어 제안서(원가 · 판매가) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 동물용 인퓨전펌프 판매가(2025) · 구독료 · 3년 목표는 내부 기준 · 유통사 공급가 17만 원/대(MOQ 300개, ㈜씨엔 약정)</p></div>
   </div>
-  <div class="note" hidden><p>다중 센서 스마트 폴대는 제작비만 100만 원을 넘지만, 센서를 하나로 줄인 INFU RETRO는 유통까지 포함한 실질 원가가 8만 원입니다. 그중 하드웨어 부품은 1만 5천 원뿐입니다.</p><p>[클릭] 25만 원에 팔면 대당 17만 원이 남고, 여기에 기기당 월 12만 원 관제 구독이 붙습니다. 입원장 5대 병원이라면 펌프 550만 원 대신 125만 원으로 시작하고, 3년 목표 250대면 구독 매출만 연 3억 6천만 원입니다.</p></div>
+  <div class="note" hidden><p>다중 센서 스마트 폴대는 제작비만 100만 원을 넘지만, 센서를 하나로 줄인 INFU RETRO는 유통까지 포함한 실질 원가가 8만 원입니다. 그중 하드웨어 부품은 1만 5천 원뿐입니다.</p><p>25만 원에 팔면 대당 17만 원이 남고, 여기에 기기당 월 12만 원 관제 구독이 붙습니다. 입원장 5대 병원이라면 펌프 550만 원 대신 125만 원으로 시작하고, 3년 목표 250대면 구독 매출만 연 3억 6천만 원입니다.</p></div>
 </section>
 
 <!-- ================= 08 MOU 체결 현황 ================= -->
@@ -1547,7 +1586,7 @@ small { font-size: .8em; }
           <div class="tier t2"><span>SAM · 호남권</span><b>약 300곳</b></div>
           <div class="tier t3"><span>SOM · 3년</span><b>50곳 · 250대</b></div>
         </div>
-        <ol class="road" data-step="1">
+        <ol class="road b">
           <li class="card hi rstep"><p class="k">STEP 1</p><h3>전북 실증</h3><figure class="ph rs-ph"><img src="media/field-interview.webp" alt="전북 지역 병원에서 모듈을 보여 주며 의료진을 인터뷰하는 팀원들" data-zoom style="object-position: 8% 50%"><figcaption class="cap">전북지역 병원 인터뷰</figcaption></figure><p>대학 인접 일반 · 24시 동물병원에서 레퍼런스 확보</p><p class="partner">원광대 간호학과 실험 협력</p></li>
           <li class="card rstep"><p class="k">STEP 2</p><h3>광주 · 전남 확대</h3><figure class="ph rs-ph"><img src="media/loi-jnu.webp" alt="전남대학교 수의과대학에서 INFU RETRO 모듈을 들고 선 두 사람" data-zoom></figure><p>전남대 수의대 · 동물병원 연계, 입원 데이터 고도화</p><p class="partner">전남대학교 수의과대학 LOI · ㈜씨엔 공급 약정</p></li>
           <li class="card rstep"><p class="k">STEP 3</p><h3>전국 B2B</h3><figure class="ph rs-ph doc-ph"><img src="media/doc-skmm-1.webp" alt="SKM&amp;M 구매의향 및 사업협력 업무협약서 1쪽" data-zoom></figure><p>대학병원 · 24시 센터 사례로 전국에 공급</p><p class="partner">㈜에스케이엠엔엠 의료기기 유통망 MOU</p></li>
@@ -1556,7 +1595,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 수의미래연구소 집계(농식품부 자료, 2025.6 전국 동물병원 5,312곳) · SAM · SOM은 아이디어 제안서 자체 추정</p></div>
   </div>
-  <div class="note" hidden><p>전국 동물병원 5,312곳 중 호남권 300곳을 먼저 공략해, 3년 안에 50곳 250대가 목표입니다.</p><p>[클릭] 이미 병원 인터뷰로 레퍼런스 데이터를 모으고 있는 전북에서 실증하고, 전남대 수의과대학을 거점으로 광주 · 전남으로, 유통사 MOU로 전국에 공급합니다.</p></div>
+  <div class="note" hidden><p>전국 동물병원 5,312곳 중 호남권 300곳을 먼저 공략해, 3년 안에 50곳 250대가 목표입니다.</p><p>이미 병원 인터뷰로 레퍼런스 데이터를 모으고 있는 전북에서 실증하고, 전남대 수의과대학을 거점으로 광주 · 전남으로, 유통사 MOU로 전국에 공급합니다.</p></div>
 </section>
 
 <!-- ================= 10 기대효과 ================= -->
@@ -1570,7 +1609,7 @@ small { font-size: .8em; }
         <div class="card b"><p class="num">−2.06<small>회</small></p><p>근무조당 병실 확인 방문<small>원격 수액 모니터링 · 핀란드 6개 병원 · 간호사 응답 216건</small></p></div>
         <div class="card b"><p class="num">2.12<small>분</small></p><p>이상 알림 후 평균 대응<small>IoT 수액 모니터링 · 中 대학병원 2개 병동 · 도입 전후 1년</small></p></div>
       </div>
-      <ul class="who3" data-step="1">
+      <ul class="who3 b">
         <li class="card"><svg class="ico"><use href="#i-hosp"/></svg><div><b>동물병원</b><p>순회 · 수기 기록 부담 ↓</p></div><p class="m"><strong>−77%</strong><small>도입비 (펌프 대비)</small></p></li>
         <li class="card"><svg class="ico"><use href="#i-user"/></svg><div><b>보호자</b><p>시간별 투약 기록 → 신뢰</p></div><p class="m"><strong>24시간</strong><small>자동 기록</small></p></li>
         <li class="card"><svg class="ico"><use href="#i-paw"/></svg><div><b>반려동물</b><p>소진 · 중단 · 유속 이상 조기 발견</p></div><p class="m"><strong>5초</strong><small>이내 감지</small></p></li>
@@ -1579,7 +1618,7 @@ small { font-size: .8em; }
     <div class="ft"><p class="src b">출처: Puolitaival et al., Advances in Therapy(2022) — 근무조당 5.05분 확보 · 간호사 56.3% 시간 절약 응답(자기보고 설문) · Tong et al., Frontiers in Medicine(2025) — 수액 합병증 감소 · 정시 완료율 향상</p></div>
     <div class="impact-photo"><img src="media/vet-cat.webp" alt="창가 입원장에서 링거를 맞는 고양이 곁에서 태블릿을 확인하는 수의사" decoding="async"></div>
   </div>
-  <div class="note" hidden><p>사람 병원에서는 효과가 먼저 확인됐습니다. 핀란드 6개 병원에서 원격 수액 모니터링을 쓴 간호사들은 근무조당 병실 확인 방문이 2회 줄었다고 답했고, 중국 대학병원에서는 이상 알림 뒤 평균 2분 만에 대응했습니다.</p><p>[클릭] 동물병원은 순회와 기록 부담을 덜고, 보호자는 남는 기록으로 신뢰를 얻고, 반려동물은 이상을 먼저 발견합니다.</p></div>
+  <div class="note" hidden><p>사람 병원에서는 효과가 먼저 확인됐습니다. 핀란드 6개 병원에서 원격 수액 모니터링을 쓴 간호사들은 근무조당 병실 확인 방문이 2회 줄었다고 답했고, 중국 대학병원에서는 이상 알림 뒤 평균 2분 만에 대응했습니다.</p><p>동물병원은 순회와 기록 부담을 덜고, 보호자는 남는 기록으로 신뢰를 얻고, 반려동물은 이상을 먼저 발견합니다.</p></div>
 </section>
 
 <!-- ================= 11 팀 소개 ================= -->
@@ -1868,7 +1907,7 @@ small { font-size: .8em; }
     <div class="panel-hd"><div><h2 id="toc-h">목차</h2><p>본 발표 20장 · 5분 · 부록은 본 발표 자료의 원문 · 상세</p></div><button type="button" class="panel-x" data-close aria-label="목차 닫기"><svg class="ico" style="width:18px;height:18px"><use href="#i-x"/></svg></button></div>
     <div class="toc-grid" id="toc-grid"></div>
     <p class="keys">
-      <span><kbd>→</kbd><kbd>Space</kbd>다음 · 클릭 애니메이션</span>
+      <span><kbd>→</kbd><kbd>Space</kbd>다음</span>
       <span><kbd>←</kbd>이전</span>
       <span><kbd>12</kbd><kbd>Enter</kbd>12번 장으로</span>
       <span><kbd>O</kbd>목차</span>
@@ -1950,18 +1989,18 @@ function simulate(kind, seed) {
 
   // ---- simulation panels ----
   const CASES = [
-    ['normal', 11, '① 정상 투여', 0],
-    ['shake', 23, '② 이송 중 흔들림', 0],
-    ['drop', 37, '③ 유속 저하', 1],
-    ['line', 41, '④ 줄 빠짐', 1],
-    ['air', 53, '⑤ 공기 유입 · 역류', 1],
+    ['normal', 11, '① 정상 투여'],
+    ['shake', 23, '② 이송 중 흔들림'],
+    ['drop', 37, '③ 유속 저하'],
+    ['line', 41, '④ 줄 빠짐'],
+    ['air', 53, '⑤ 공기 유입 · 역류'],
   ];
   const X0 = 30, X1 = 252, WY0 = 18, WY1 = 262, SY0 = 298, SY1 = 384;
   const xs = t => X0 + (t / 3600) * (X1 - X0);
   const wy = g => WY1 - ((g - 200) / 360) * (WY1 - WY0);
   const sy = v => SY1 - v * (SY1 - SY0);
   const f1 = v => v.toFixed(1);
-  $('#sims').innerHTML = CASES.map(([kind, seed, name, step]) => {
+  $('#sims').innerHTML = CASES.map(([kind, seed, name]) => {
     const r = simulate(kind, seed);
     const alertAt = r.score.findIndex(v => v >= 0.6);
     const peak = Math.max(...r.score);
@@ -1992,7 +2031,7 @@ function simulate(kind, seed) {
       <text x="${X0 - 4}" y="${sy(0) + 3}" text-anchor="end">0</text><text class="thr-t" x="${X0 - 4}" y="${sy(0.6) + 3}" text-anchor="end">0.6</text><text x="${X0 - 4}" y="${sy(1) + 3}" text-anchor="end">1</text>
       ${area}<polyline class="sc" points="${scoreLine}"/>${mark}${xt}
     </svg>`;
-    return `<figure class="card sim" ${step ? 'data-step="1" data-dim' : ''}>
+    return `<figure class="card sim b">
       <figcaption class="sim-h"><b>${name}</b>${verdict}</figcaption>${svg}
       <div class="sim-f"><p>최고 점수<b>${peak.toFixed(2)}</b></p><p class="${alertAt >= 0 ? 'al' : ''}">알림<b>${alertAt < 0 ? '없음' : mmss(alertAt)}</b></p></div>
     </figure>`;
