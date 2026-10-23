@@ -444,6 +444,7 @@ function bar(back) {
     <a class="pg-back" href="${back.href}" data-link>← ${esc(back.label)}</a>
     <a class="pg-brand" href="/" data-link aria-label="필름으로">KWON</a>
     <button type="button" class="pg-close" data-close aria-label="닫기"><i></i><i></i></button>
+    <i class="pg-progress" aria-hidden="true"></i>
   </header>`;
 }
 
@@ -948,6 +949,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (current && route.name === current.name && route.id === current.id && route.cat === current.cat) return;
     const prev = current;
     current = route.name === 'film' ? null : route;
+    toTop.classList.remove('is-on');
     if (route.name === 'film') {
       if (!prev) return onClose?.();
       const back = () => {
@@ -994,12 +996,27 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     } else navigate('/');
   }
 
-  // 히어로 패럴랙스(리스너는 하나만)
+  // 맨 위로 버튼(페이지가 길어 한참 내려왔을 때만)
+  const toTop = document.createElement('button');
+  toTop.type = 'button';
+  toTop.className = 'to-top';
+  toTop.setAttribute('aria-label', '맨 위로');
+  toTop.innerHTML = '<span aria-hidden="true">↑</span>';
+  document.body.appendChild(toTop);
+  toTop.addEventListener('click', () => {
+    page.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+    page.focus({ preventScroll: true });
+  });
+
+  // 히어로 패럴랙스 · 읽은 만큼 차는 막대 · 맨 위로 버튼(리스너는 하나만)
   page.addEventListener(
     'scroll',
     () => {
       const media0 = page.querySelector('.d-hero-media');
       const y = page.scrollTop;
+      const max = page.scrollHeight - page.clientHeight;
+      page.querySelector('.pg-progress')?.style.setProperty('--sp', max > 0 ? (y / max).toFixed(4) : '0');
+      toTop.classList.toggle('is-on', !!current && y > innerHeight * 1.2);
       const stacked = innerWidth <= 820 && media0?.parentElement.classList.contains('is-land');
       if (media0 && !reducedMotion && !stacked && y < innerHeight * 1.2) media0.style.transform = `translate3d(0, ${y * 0.35}px, 0)`;
     },

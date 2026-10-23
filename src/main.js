@@ -6,10 +6,11 @@ import './styles/main.css';
 import './styles/pages.css';
 import './styles/premium.css';
 import './styles/skills.css';
+import './styles/guide.css';
 
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { scenes } from './content.js';
+import { scenes, profile } from './content.js';
 import { createStage } from './core/stage.js';
 import { SETS } from './core/layout.js';
 import { Drone } from './actors/drone.js';
@@ -25,6 +26,7 @@ import { bindCardFx } from './ui/cards.js';
 import { createAudio } from './audio.js';
 import { createMood } from './ui/mood.js';
 import { createSite } from './pages/site.js';
+import { createGuide } from './ui/guide.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 // 검증용(?capture)에서는 자동 진입하지 않는다
@@ -143,9 +145,10 @@ const panels = createPanels($('stage'), scenes, {
   reducedMotion: reduced,
   onReplay: () => goTo(0),
   // 릴 초점을 손으로 옮기면(스크롤 · 스와이프 · 버튼) 자동 재생 시계를 그 카드 자리로 맞춘다
-  onReelFocus: ({ focus, count }) => {
+  onReelFocus: ({ focus, count, entry }) => {
     const h = holdOf(director?.index);
     if (h > 0) elapsed = (h * focus) / count;
+    if (!entry) takeOver();
   },
   // 덱의 가운데 카드가 바뀌면 배경 분위기도 그 카드로
   // 카드를 넘길 때마다 펜타토닉 한 음
@@ -174,6 +177,25 @@ const hud = createHud(scenes, {
   },
 });
 hud.setAuto(auto);
+
+// 관람 안내: 다음 장면 버튼 · 알림 · 처음 방문 사용법 · 이어 보기
+const guide = createGuide(scenes, {
+  profile,
+  reducedMotion: reduced,
+  onNext: () => goTo(director.index + 1),
+  onGo: (i) => goTo(i),
+  onAuto: () => {
+    auto = true;
+    hud.setAuto(true);
+  },
+});
+// 손으로 넘기기 시작하면(휠 · 스와이프 · 방향키 · 카드) 자동 재생을 멈춘다 — 읽는 도중 장면이 넘어가지 않게
+function takeOver() {
+  if (!auto || !started) return;
+  auto = false;
+  hud.setAuto(false);
+  guide.takeover();
+}
 
 // ── 작품 아카이브 · 상세 페이지 ─────────────────────────────────
 let pageCovered = false;
@@ -207,6 +229,12 @@ function onTransition(i, prev, duration) {
   if (!panels.panels[i]?.reel) mood.clear();
   panels.go(i, prev, duration); // 뒤로 돌아와 마지막 카드에서 시작하는 릴이면 onReelFocus가 시계를 맞춘다
   hud.setScene(i, prev, duration);
+  guide.setScene(i, !!panels.panels[i]?.reel);
+  // 주소에 지금 장면을 남긴다(새로 고침 · 공유해도 그 장면으로) — 작품 페이지가 열려 있을 때는 건드리지 않는다
+  if (started && !site.open && location.pathname === '/') {
+    const want = i > 0 ? `#${scenes[i].id}` : '';
+    if (location.hash !== want) history.replaceState(history.state, '', `/${location.search}${want}`);
+  }
   if (prev >= 0) audio.whoosh(Math.max(1.2, duration));
 }
 
@@ -223,8 +251,16 @@ function stepOrGo(dir) {
 }
 
 createInput({
-  next: () => stepOrGo(1),
-  prev: () => stepOrGo(-1),
+  next: () => {
+    const r = stepOrGo(1);
+    if (r) takeOver();
+    return r;
+  },
+  prev: () => {
+    const r = stepOrGo(-1);
+    if (r) takeOver();
+    return r;
+  },
   first: () => goTo(0),
   last: () => goTo(scenes.length - 1),
   isBlocked: () => !started || lightbox.open || hud.indexOpen || site.open || site.busy,
@@ -254,6 +290,13 @@ createInput({
     }
     return false;
   },
+});
+
+// 주소의 장면을 손으로 바꾸면(#robotics 등) 그 장면으로
+addEventListener('hashchange', () => {
+  if (!started || site.open) return;
+  const i = scenes.findIndex((s) => `#${s.id}` === location.hash);
+  if (i >= 0 && i !== director.index) goTo(i);
 });
 
 $('brand').addEventListener('click', (e) => {
@@ -483,7 +526,10 @@ function start(withSound) {
       video.load();
     }, 5000);
   }
-  director.go(0);
+  // 주소에 장면이 있으면(#robotics 등) 그 장면으로, 없으면 처음부터 — 지난번 멈춘 곳이 있으면 이어 보기를 권한다
+  const deep = scenes.findIndex((s) => `#${s.id}` === location.hash);
+  director.go(deep > 0 ? deep : 0);
+  if (deep <= 0) setTimeout(() => !site.open && guide.offerResume(), reduced ? 600 : 3200);
   site.markFilm();
   syncSoundHint();
   setTimeout(syncSoundHint, 900);
@@ -565,6 +611,7 @@ function loop(now) {
         panels.autoFocus(elapsed / hold);
       }
       hud.setProgress(hold > 0 ? elapsed / hold : 0);
+      guide.setProgress(hold > 0 ? elapsed / hold : 0, auto && hold > 0);
       if (auto && hold > 0 && elapsed >= hold) goTo(director.index + 1);
     }
   }
