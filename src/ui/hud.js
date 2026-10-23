@@ -18,14 +18,14 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
 
   timeline.innerHTML = scenes
     .map(
-      (s, i) => `<li><button type="button" data-i="${i}" aria-label="${pad(i)} ${s.label}">
-        <span class="tl-no">${pad(i)}</span><span class="tl-name">${s.code}</span><i class="tl-fill"></i>
+      (s, i) => `<li><button type="button" data-i="${i}" aria-label="${pad(i)} ${s.ko} — ${s.label}">
+        <span class="tl-no">${pad(i)}</span><span class="tl-name">${s.ko}</span><i class="tl-fill"></i>
       </button></li>`
     )
     .join('');
   indexList.innerHTML = scenes
     .map(
-      (s, i) => `<li><button type="button" data-i="${i}"><span class="ix-no">${pad(i)}</span><span class="ix-name">${s.label}</span><span class="ix-code">${s.code}</span></button></li>`
+      (s, i) => `<li><button type="button" data-i="${i}"><span class="ix-no">${pad(i)}</span><span class="ix-name">${s.ko}</span><span class="ix-code">${s.label}</span></button></li>`
     )
     .join('');
   const tlButtons = [...timeline.querySelectorAll('button')];
@@ -76,6 +76,8 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
     active = i;
     tlButtons.forEach((b, j) => {
       b.classList.toggle('is-active', j === i);
+      // 휴대폰: 지금 장면의 칸만 넓혀 이름을 보인다
+      b.parentElement.classList.toggle('is-now', j === i);
       b.classList.toggle('is-past', j < i);
       if (j === i) b.setAttribute('aria-current', 'step');
       else b.removeAttribute('aria-current');
@@ -88,8 +90,8 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
 
     // 장면 사이 타이틀 카드
     if (prev >= 0 && duration > 0.5 && !reducedMotion) {
-      card.querySelector('.tc-no').textContent = `SCENE ${pad(i)}`;
-      card.querySelector('.tc-name').textContent = scenes[i].label;
+      card.querySelector('.tc-no').textContent = `${pad(i)} · ${scenes[i].label}`;
+      card.querySelector('.tc-name').textContent = scenes[i].ko;
       gsap.killTweensOf(card);
       gsap
         .timeline()
@@ -115,11 +117,12 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
 
   function setAuto(on) {
     btnPlay.setAttribute('aria-pressed', String(on));
+    btnPlay.setAttribute('aria-label', on ? '자동 재생 끄기' : '자동 재생 켜기');
     btnPlay.classList.toggle('is-on', on);
-    btnPlay.querySelector('.lbl').textContent = on ? 'AUTO' : 'MANUAL';
   }
   function setSound(on) {
     btnSound.setAttribute('aria-pressed', String(on));
+    btnSound.setAttribute('aria-label', on ? '소리 끄기' : '소리 켜기');
     btnSound.classList.toggle('is-on', on);
   }
 

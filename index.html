@@ -73,10 +73,10 @@
         <span id="hud-tc">TC 00:00:00:00</span>
       </div>
       <nav class="hud-nav" aria-label="재생 제어">
-        <button type="button" id="btn-play" aria-pressed="true" aria-label="자동 재생"><span class="ico-play"></span><span class="lbl">AUTO</span></button>
-        <button type="button" id="btn-sound" aria-pressed="false" aria-label="사운드"><span class="ico-sound"><i></i><i></i><i></i><i></i></span><span class="lbl">SOUND</span></button>
-        <a class="hud-works" href="/works" data-link aria-label="작품 목록"><span class="ico-grid"><i></i><i></i><i></i><i></i></span><span class="lbl">WORKS</span></a>
-        <button type="button" id="btn-index" aria-expanded="false" aria-controls="index" aria-label="장면 목록"><span class="ico-index"><i></i><i></i></span><span class="lbl">INDEX</span></button>
+        <button type="button" id="btn-play" aria-pressed="true" aria-label="자동 재생 끄기" title="자동 재생 (P)"><span class="ico-play"></span><span class="lbl"><span class="lbl-l">자동 재생</span><span class="lbl-s">자동</span></span></button>
+        <button type="button" id="btn-sound" aria-pressed="false" aria-label="소리 켜기" title="소리 (M)"><span class="ico-sound"><i></i><i></i><i></i><i></i></span><span class="lbl">소리</span></button>
+        <a class="hud-works" href="/works" data-link aria-label="프로젝트 목록" title="프로젝트 · 수상 · 스킬"><span class="ico-grid"><i></i><i></i><i></i><i></i></span><span class="lbl">프로젝트</span></a>
+        <button type="button" id="btn-index" aria-expanded="false" aria-controls="index" aria-label="목차 — 장면 바로가기 · 연락처" title="목차 (I)"><span class="ico-index"><i></i><i></i></span><span class="lbl">목차</span></button>
       </nav>
     </header>
 
@@ -92,7 +92,7 @@
       <ol class="timeline" id="timeline" aria-label="장면 목록"></ol>
       <div class="hint" id="hint" aria-hidden="true">
         <span class="hint-mouse"><i></i></span>
-        <span>SCROLL · SWIPE · ← →</span>
+        <span>스크롤 · 스와이프 · ← → 로 넘기기</span>
       </div>
     </footer>
 
@@ -102,8 +102,8 @@
     <nav class="index" id="index" aria-label="전체 장면" hidden>
       <button class="index-close" type="button" aria-label="장면 목록 닫기">×</button>
       <div class="index-inner">
-        <p class="index-kicker">SCENE INDEX — 장면 바로가기</p>
-        <nav class="index-archive" aria-label="아카이브 페이지"><span>ARCHIVE</span><a href="/works" data-link>WORKS</a><a href="/awards" data-link>AWARDS</a><a href="/skills" data-link>SKILLS</a></nav>
+        <p class="index-kicker">목차 — 보고 싶은 장면을 누르세요</p>
+        <nav class="index-archive" aria-label="아카이브 페이지"><span>모아 보기</span><a href="/works" data-link>프로젝트</a><a href="/awards" data-link>수상</a><a href="/skills" data-link>스킬</a></nav>
         <ol id="index-list"></ol>
       </div>
     </nav>

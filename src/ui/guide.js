@@ -33,7 +33,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
   next.type = 'button';
   next.className = 'next-cue';
   next.hidden = true;
-  next.innerHTML = `<span class="nc-ring" aria-hidden="true"><svg viewBox="0 0 36 36"><circle class="nc-track" cx="18" cy="18" r="16" /><circle class="nc-fill" cx="18" cy="18" r="16" pathLength="100" /></svg><i>→</i></span><span class="nc-t"><small>NEXT</small><b></b></span>`;
+  next.innerHTML = `<span class="nc-ring" aria-hidden="true"><svg viewBox="0 0 36 36"><circle class="nc-track" cx="18" cy="18" r="16" /><circle class="nc-fill" cx="18" cy="18" r="16" pathLength="100" /></svg><i>→</i></span><span class="nc-t"><small>다음 장면</small><b></b></span>`;
   hudBottom?.appendChild(next);
   next.addEventListener('click', () => onNext());
   const ncName = next.querySelector('b');
@@ -183,7 +183,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       : [
           ['', '스크롤 · ← →', '다음 카드 · 장면'],
           ['↗', '카드 클릭', '프로젝트 자세히'],
-          ['☰', 'INDEX', '장면 · 아카이브 · 연락처'],
+          ['☰', '목차', '장면 · 모아 보기 · 연락처'],
         ];
     hint.classList.add('is-coach');
     hint.innerHTML = items
@@ -201,7 +201,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
     const row = document.createElement('nav');
     row.className = 'index-archive index-contact';
     row.setAttribute('aria-label', '연락처');
-    row.innerHTML = `<span>CONTACT</span>${profile.links
+    row.innerHTML = `<span>연락처</span>${profile.links
       .map((l) => `<a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}>${esc(l.label.toUpperCase())}</a>`)
       .join('')}${email ? `<button type="button" class="ic-copy" data-copy="${esc(email.value)}">이메일 복사</button>` : ''}`;
     archive.after(row);
@@ -250,7 +250,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       if (i >= last) next.hidden = true;
       else {
         next.hidden = false;
-        ncName.textContent = `${pad(i + 1)} ${scenes[i + 1].code}`;
+        ncName.textContent = scenes[i + 1].ko;
         next.setAttribute('aria-label', `다음 장면 — ${pad(i + 1)} ${scenes[i + 1].label}`);
       }
       // 처음 방문 안내는 첫 장면을 떠나면 다 본 것으로
@@ -294,7 +294,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       }
       if (!saved || !(saved.i > 1 && saved.i < last) || Date.now() - saved.at > 14 * 864e5) return;
       const s = scenes[saved.i];
-      say(`지난번에 SC ${pad(saved.i)} · ${s.label}까지 보셨어요`, { action: '이어 보기', onAction: () => onGo(saved.i), ms: 9000 });
+      say(`지난번에 '${s.ko}' 장면까지 보셨어요`, { action: '이어 보기', onAction: () => onGo(saved.i), ms: 9000 });
     },
     say,
     // 끌기 안내(kind: 'x' 덱 · 'y' 장면) — rect: 손끝이 움직일 자리

@@ -1,5 +1,19 @@
 [
  {
+  "id": "wknews-interview",
+  "type": "interview",
+  "title": "원대신문 인터뷰 — 권용현",
+  "originalTitle": "",
+  "publisher": "원대신문",
+  "date": "",
+  "url": "https://www.wknews.net/news/articleView.html?idxno=42096",
+  "summary": "원광대학교 학보 원대신문에 실린 권용현 인터뷰입니다. 질문과 답 전체는 기사 원문에서 볼 수 있습니다.",
+  "relation": "인터뷰",
+  "project": null,
+  "image": null,
+  "qa": []
+ },
+ {
   "id": "huss-ai-2026",
   "title": "HUSS AI 경진대회 2위 · 학교폭력 피해학생 상담 서비스",
   "originalTitle": "K-컬처 사업단, 2026 HUSS 융합캠프서 우수한 성적 거둬",

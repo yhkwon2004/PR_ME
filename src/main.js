@@ -8,6 +8,7 @@ import './styles/premium.css';
 import './styles/skills.css';
 import './styles/guide.css';
 import './styles/perf.css';
+import './styles/clarity.css';
 
 import * as THREE from 'three';
 import gsap from 'gsap';
@@ -283,7 +284,7 @@ createInput({
       if (k >= 0 && k < reel.count) return `${dir > 0 ? '다음' : '이전'} 카드 · ${pad2(k + 1)}/${pad2(reel.count)}`;
     }
     const j = i + dir;
-    return j >= 0 && j < scenes.length ? `${pad2(j)} ${scenes[j].code}` : null;
+    return j >= 0 && j < scenes.length ? `${dir > 0 ? '다음' : '이전'} 장면 · ${scenes[j].ko}` : null;
   },
   onPull: (st) => guide.pull(st),
   next: () => {

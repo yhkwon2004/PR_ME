@@ -34,6 +34,7 @@ export const profile = {
 export const scenes = [
   {
     id: 'intro',
+    ko: '시작', // 화면에 보이는 장면 이름
     code: 'BOOT',
     label: 'Opening',
     layout: 'hero',
@@ -46,6 +47,7 @@ export const scenes = [
   },
   {
     id: 'prologue',
+    ko: '소개',
     code: 'PROLOGUE',
     label: 'Prologue',
     layout: 'stage',
@@ -69,6 +71,7 @@ export const scenes = [
   },
   {
     id: 'aerial',
+    ko: '드론',
     code: 'AERIAL',
     label: 'Aerial Autonomy',
     layout: 'reel',
@@ -85,6 +88,7 @@ export const scenes = [
   },
   {
     id: 'ground',
+    ko: '자율주행 · 차량',
     code: 'GROUND',
     label: 'Ground Mobility',
     layout: 'reel',
@@ -97,6 +101,7 @@ export const scenes = [
   },
   {
     id: 'robotics',
+    ko: '로봇',
     code: 'ROBOTICS',
     label: 'Embodied Robotics',
     layout: 'reel',
@@ -109,6 +114,7 @@ export const scenes = [
   },
   {
     id: 'intelligence',
+    ko: 'AI',
     code: 'AI',
     label: 'Machine Intelligence',
     layout: 'reel',
@@ -125,6 +131,7 @@ export const scenes = [
   },
   {
     id: 'build',
+    ko: '창업 · 제품',
     code: 'BUILD',
     label: 'Build & Launch',
     layout: 'reel',
@@ -141,6 +148,7 @@ export const scenes = [
   },
   {
     id: 'press',
+    ko: '언론 보도',
     code: 'PRESS',
     label: 'In the Press',
     layout: 'reel',
@@ -148,14 +156,15 @@ export const scenes = [
     press: true,
     kicker: 'IN THE PRESS — 공식 보도',
     title: ['IN THE', 'PRESS'],
-    subtitle: '대학과 사업단이 기사로 남긴 장면들 — 누르면 기사 원문으로',
+    subtitle: '학보 인터뷰와 대학 · 사업단 공식 기사 — 누르면 기사 원문으로',
     stats: [
       { value: `${pressData.length}건`, label: '공식 보도' },
-      { value: `${pressData.filter((a) => a.relation === '직접 소개').length}건`, label: '이름 · 팀 직접 소개' },
+      { value: `${pressData.filter((a) => a.relation === '직접 소개' || a.relation === '인터뷰').length}건`, label: '인터뷰 · 직접 소개' },
     ],
   },
   {
     id: 'record',
+    ko: '수상 기록',
     code: 'RECORD',
     label: 'The Record',
     layout: 'stage',
@@ -173,6 +182,7 @@ export const scenes = [
   },
   {
     id: 'finale',
+    ko: '엔딩 · 연락처',
     code: 'CREDITS',
     label: 'End Credits',
     layout: 'finale',

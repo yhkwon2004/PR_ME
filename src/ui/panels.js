@@ -68,7 +68,7 @@ function creditWith(role) {
 // 엔딩 크레딧의 보도: 기사 제목을 신문 지면처럼 — 매체 · 날짜
 function creditPress(role) {
   return `<div class="credit credit-press"><span>${esc(role)}</span><ol>${PRESS.map(
-    (a) => `<li><small>${esc(a.publisher)} · ${esc(a.date.replace(/-/g, '.'))}</small><b>${esc(a.title)}</b></li>`
+    (a) => `<li><small>${esc(a.publisher)} · ${esc(a.date ? a.date.replace(/-/g, '.') : a.relation)}</small><b>${esc(a.title)}</b></li>`
   ).join('')}</ol></div>`;
 }
 
@@ -101,7 +101,7 @@ function render(scene, i) {
       <div class="reel deck press-reel panel-content" data-r>
         ${deck(PRESS.map(pressCard), {
           count: PRESS.length,
-          label: 'IN THE PRESS',
+          label: '보도 · 인터뷰',
           noun: '기사',
           stats: scene.stats ? scene.stats.map((s) => `${esc(s.value)} ${esc(s.label)}`).join(' · ') : '',
           infos: PRESS.map(deckPressInfo),
@@ -127,10 +127,10 @@ function render(scene, i) {
             list.map((p, k) => projectCard(p, k, { cls: 'r-card' })),
             {
               count: list.length,
-              label: 'PROJECTS',
+              label: '프로젝트',
               noun: '프로젝트',
               all: href,
-              allLabel: 'VIEW ALL',
+              allLabel: '전체 보기',
               stats: scene.stats ? scene.stats.map((s) => `${esc(s.value)} ${esc(s.label)}`).join(' · ') : '',
               infos: list.map(deckInfo),
               end: {
@@ -276,10 +276,10 @@ function render(scene, i) {
       ? `<div class="reel deck aw-reel panel-content" data-r>
         ${deck(AWARD_REEL.map(awardCard), {
           count: AWARD_REEL.length,
-          label: 'GRAND PRIZE · 대상',
+          label: '대표 수상 · 대상',
           noun: '수상',
           all: '/awards',
-          allLabel: 'ALL AWARDS',
+          allLabel: '수상 전체 보기',
           infos: AWARD_REEL.map(deckAwardInfo),
           end: {
             card: deckAllCard({

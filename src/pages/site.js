@@ -52,7 +52,7 @@ const LAUREL = `<svg class="laurel" viewBox="0 0 24 24" aria-hidden="true"><path
 function awardBadge(p) {
   const b = bestOf(p);
   if (!b) return '';
-  return `<span class="card-award" data-tier="${b.key}">${LAUREL}<b>${esc(b.label)}</b>${b.count > 1 ? `<small>+${b.count - 1}</small>` : ''}</span>`;
+  return `<span class="card-award" data-tier="${b.key}">${LAUREL}<b>${esc(b.label)}</b>${b.count > 1 ? `<small>외 ${b.count - 1}</small>` : ''}</span>`;
 }
 
 // 프로젝트 타일 — 사진 위에 글을 얹은 시네마 플레이트(필름 릴 · 아카이브 공통)
@@ -186,7 +186,7 @@ export function deckInfo(p) {
   const b = bestOf(p);
   return `<div class="di">
     <p class="di-meta"><span class="di-cat" data-cat="${esc(p.category)}">${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}${
-      b ? `<span class="di-award" data-tier="${b.key}">${LAUREL}${esc(b.label)}${b.count > 1 ? ` +${b.count - 1}` : ''}</span>` : ''
+      b ? `<span class="di-award" data-tier="${b.key}">${LAUREL}${esc(b.label)}${b.count > 1 ? ` 외 ${b.count - 1}건` : ''}</span>` : ''
     }${diOrgs(orgsOf(p.id))}</p>
     <h3 class="di-title">${esc(p.title)}</h3>
     ${p.oneLiner ? `<p class="di-line">${esc(p.oneLiner)}</p>` : ''}
@@ -209,32 +209,46 @@ export function deckAllCard({ href, label, total, unit, thumbs }) {
     <figure class="card-media">
       <span class="all-grid" aria-hidden="true">${thumbs.map((src) => `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" />`).join('')}</span>
       <span class="card-shade" aria-hidden="true"></span>
-      <span class="all-copy"><small>VIEW ALL</small><b>${total}</b><span>${esc(unit)}</span><i aria-hidden="true">↗</i></span>
-      <figcaption class="card-cap"><span class="card-meta">ARCHIVE</span><h3 class="card-title">${esc(label)}</h3></figcaption>
+      <span class="all-copy"><small>전체 보기</small><b>${total}</b><span>${esc(unit)}</span><i aria-hidden="true">↗</i></span>
+      <figcaption class="card-cap"><span class="card-meta">모아 보기</span><h3 class="card-title">${esc(label)}</h3></figcaption>
     </figure>
   </a>`;
 }
 export function deckAllInfo({ href, title, line, cta, ghost }) {
   return `<div class="di di-all">
-    <p class="di-meta"><span class="di-cat">ARCHIVE</span><span>${projects.length} PROJECTS · ${AWARDS.length} AWARDS</span></p>
+    <p class="di-meta"><span class="di-cat">모아 보기</span><span>${projects.length} PROJECTS · ${AWARDS.length} AWARDS</span></p>
     <h3 class="di-title">${esc(title)}</h3>
     <p class="di-line">${esc(line)}</p>
     <p class="di-actions"><a class="di-open" href="${esc(href)}" data-link>${esc(cta)} <span aria-hidden="true">→</span></a>${ghost ? `<a class="di-ghost" href="${esc(ghost.href)}" data-link>${esc(ghost.label)}</a>` : ''}</p>
   </div>`;
 }
 
+// 보도 날짜(인터뷰처럼 날짜를 모르면 빈칸)
+const pressDate = (a) => (a.date ? a.date.replace(/-/g, '.') : '');
+const relKey = (a) => (a.relation === '관련 보도' ? 'related' : 'direct');
+// 인터뷰의 첫 질문과 답(기사에서 옮겨 적은 것만 — 없으면 요약)
+const firstQA = (a) => (a.qa?.length ? a.qa[0] : null);
+
 // 필름 '보도' 장면의 카드: 신문에서 오려 낸 기사처럼 — 제호 · 날짜, 사진, 제목
+// 인터뷰는 사진 대신 짙은 잉크 칸에 큰 따옴표와 이름 — 질문과 답이 있으면 첫 질문을 싣는다
 export function pressCard(a, k) {
   const cat = a.project?.category || 'product';
-  return `<a class="r-card p-card" href="${esc(a.url)}" target="_blank" rel="noopener" data-cat="${esc(cat)}" data-rel="${a.relation === '직접 소개' ? 'direct' : 'related'}" aria-label="${esc(`${a.publisher} 보도 — ${a.title} (새 창)`)}">
+  const qa = firstQA(a);
+  const visual = a.interview
+    ? `<span class="pc-iv"><i class="pc-quote" aria-hidden="true">“</i>${
+        qa ? `<span class="pc-iv-q">Q. ${esc(qa.q)}</span>` : `<small>INTERVIEW</small><b>${esc(profile.name)}</b><span>${esc(profile.en)}</span>`
+      }</span>`
+    : `<span class="pc-photo"><img src="${esc(a.image.thumb)}" srcset="${esc(a.image.thumb)} 720w, ${esc(a.image.src)} ${a.image.w}w" sizes="${REEL_SIZES}" alt="${esc(a.image.alt)}" loading="lazy" decoding="async" /></span>`;
+  const label = a.interview ? `${a.publisher} 인터뷰 — ${a.title} (새 창)` : `${a.publisher} 보도 — ${a.title} (새 창)`;
+  return `<a class="r-card p-card${a.interview ? ' is-interview' : ''}" href="${esc(a.url)}" target="_blank" rel="noopener" data-cat="${esc(cat)}" data-rel="${relKey(a)}" aria-label="${esc(label)}">
     <figure class="card-media">
-      <span class="pc-mast"><b>${esc(a.publisher)}</b><span>NEWS</span></span>
+      <span class="pc-mast"><b>${esc(a.publisher)}</b><span>${a.interview ? 'INTERVIEW' : 'NEWS'}</span></span>
       <span class="pc-rule" aria-hidden="true"></span>
-      <span class="pc-photo"><img src="${esc(a.image.thumb)}" srcset="${esc(a.image.thumb)} 720w, ${esc(a.image.src)} ${a.image.w}w" sizes="${REEL_SIZES}" alt="${esc(a.image.alt)}" loading="lazy" decoding="async" /></span>
+      ${visual}
       <figcaption class="pc-cap">
-        <span class="card-meta">${esc(a.date.replace(/-/g, '.'))} · ${pad(k + 1)}</span>
+        <span class="card-meta">${[pressDate(a) || (a.interview ? '학보 인터뷰' : ''), pad(k + 1)].filter(Boolean).join(' · ')}</span>
         <h3 class="pc-title">${esc(a.title)}</h3>
-        <span class="pc-foot"><em>${esc(a.relation)}</em><i aria-hidden="true">기사 원문 ↗</i></span>
+        <span class="pc-foot"><em>${esc(a.relation)}</em><i aria-hidden="true">${a.interview ? '인터뷰 원문 ↗' : '기사 원문 ↗'}</i></span>
       </figcaption>
       <span class="card-glare" aria-hidden="true"></span>
     </figure>
@@ -242,11 +256,12 @@ export function pressCard(a, k) {
 }
 export function deckPressInfo(a) {
   const p = a.project;
-  return `<div class="di di-press">
-    <p class="di-meta"><span class="di-cat">${esc(a.publisher)}</span><span>${esc(a.date.replace(/-/g, '.'))}</span><span class="di-rel" data-rel="${a.relation === '직접 소개' ? 'direct' : 'related'}">${esc(a.relation)}</span></p>
+  const qa = firstQA(a);
+  return `<div class="di di-press${a.interview ? ' di-interview' : ''}">
+    <p class="di-meta"><span class="di-cat">${esc(a.publisher)}</span>${pressDate(a) ? `<span>${esc(pressDate(a))}</span>` : ''}<span class="di-rel" data-rel="${relKey(a)}">${esc(a.relation)}</span></p>
     <h3 class="di-title">${esc(a.title)}</h3>
-    <p class="di-line">${esc(a.summary)}</p>
-    <p class="di-actions"><a class="di-open" href="${esc(a.url)}" target="_blank" rel="noopener">기사 원문 보기 <span aria-hidden="true">↗</span></a>${p ? `<a class="di-ghost" href="${p.path}" data-link>${esc(p.title)} →</a>` : ''}</p>
+    ${qa ? `<p class="di-line di-qa"><b>Q. ${esc(qa.q)}</b> ${esc(qa.a)}</p>` : `<p class="di-line">${esc(a.summary)}</p>`}
+    <p class="di-actions"><a class="di-open" href="${esc(a.url)}" target="_blank" rel="noopener">${a.interview ? '인터뷰 원문 보기' : '기사 원문 보기'} <span aria-hidden="true">↗</span></a>${p ? `<a class="di-ghost" href="${p.path}" data-link>${esc(p.title)} →</a>` : ''}</p>
   </div>`;
 }
 
@@ -271,9 +286,9 @@ export function awardCard(a) {
 }
 
 const tabs = (on) => `<nav class="pg-tabs" aria-label="보기 전환">
-    <a href="/works" data-link class="${on === 'works' ? 'is-on' : ''}"${on === 'works' ? ' aria-current="page"' : ''}>Works<sup>${projects.length}</sup></a>
-    <a href="/awards" data-link class="${on === 'awards' ? 'is-on' : ''}"${on === 'awards' ? ' aria-current="page"' : ''}>Awards<sup>${AWARDS.length}</sup></a>
-    <a href="/skills" data-link class="${on === 'skills' ? 'is-on' : ''}"${on === 'skills' ? ' aria-current="page"' : ''}>Skills<sup>${SKILL_COUNT}</sup></a>
+    <a href="/works" data-link class="${on === 'works' ? 'is-on' : ''}"${on === 'works' ? ' aria-current="page"' : ''}>프로젝트<sup>${projects.length}</sup></a>
+    <a href="/awards" data-link class="${on === 'awards' ? 'is-on' : ''}"${on === 'awards' ? ' aria-current="page"' : ''}>수상<sup>${AWARDS.length}</sup></a>
+    <a href="/skills" data-link class="${on === 'skills' ? 'is-on' : ''}"${on === 'skills' ? ' aria-current="page"' : ''}>스킬<sup>${SKILL_COUNT}</sup></a>
   </nav>`;
 
 const TIER_OF_KEY = Object.fromEntries(TIER_KEY.map((k, t) => [k, t]).filter(([k]) => k));
@@ -282,13 +297,12 @@ function awardsPage() {
   const media = awardMedia(AWARDS);
   const years = [...new Set(AWARDS.map((a) => a.year))];
   const count = (t) => AWARDS.filter((a) => a.tier === t).length;
-  const grand = AWARDS.filter((a) => a.tier === 1);
   // 등급별 수치가 곧 보기 필터 — 누르면 그 등급만 남는다
   const sum = (g, n, label) => `<button type="button" data-g="${g}"${g in TIER_OF_KEY ? ` data-tier="${g}"` : ''} aria-pressed="${g === 'all'}"><b>${n}</b><span>${label}</span></button>`;
   return {
     media,
     html: `<div class="pg pg-awards">
-    ${bar({ href: '/', label: 'FILM' })}
+    ${bar({ href: '/', label: '메인' })}
     <section class="works-head aw-head">
       <p class="pg-kicker">AWARD ARCHIVE — 상장과 프로젝트</p>
       <h1 class="works-title">Awards<sup>${pad(AWARDS.length)}</sup></h1>
@@ -299,27 +313,17 @@ function awardsPage() {
         ${sum('project', AWARDS.filter((a) => a.project).length, '프로젝트와 연결')}
       </div>
     </section>
-    ${
-      grand.length
-        ? `<section class="aw-feat" aria-label="대상 수상">
-      <h2 class="aw-feat-h"><span class="aw-feat-k">GRAND PRIZE</span><b>대상</b><sup>${pad(grand.length)}</sup></h2>
-      <ul class="aw-grid aw-feat-row">${grand.map(awardTile).join('')}</ul>
-    </section>`
-        : ''
-    }
-    ${
-      // 대표 상장(대상)만 먼저 — 나머지 수상은 펼쳐 보거나 등급 버튼으로 본다
-      grand.length
-        ? `<div class="aw-more"><button type="button" class="aw-more-btn" aria-expanded="false" aria-controls="aw-rest"><span>나머지 수상 ${AWARDS.length - grand.length}건 모두 보기</span><i aria-hidden="true">↓</i></button><p>대표 상장(대상 ${grand.length}건)을 먼저 보여 드립니다 · 최우수상부터 장려상까지는 펼쳐서</p></div>`
-        : ''
-    }
-    <div class="aw-rest" id="aw-rest"${grand.length ? ' hidden' : ''}>${years
+    <p class="aw-guide">수상 <b>${AWARDS.length}건 전체</b>를 연도별로 보여 드립니다 — 해마다 <b class="g">대상</b>부터 · 상장을 누르면 크게, 프로젝트를 누르면 그 작업으로</p>
+    <div class="aw-list" id="aw-list">${years
       .map((y) => {
-        const list = AWARDS.filter((a) => a.year === y);
-        // 대상은 위 대표 줄에 있으니 '전체'에서는 연도 목록에서 뺀다(등급으로 걸러 볼 때만 다시 나온다)
-        const shown = grand.length ? list.filter((a) => a.tier !== 1) : list;
-        const cells = list.map((a) => (grand.length && a.tier === 1 ? awardTile(a).replace('class="aw-cell"', 'class="aw-cell is-out"') : awardTile(a))).join('');
-        return `<section class="aw-year" data-year="${y}" aria-label="${y}년 수상"${shown.length ? '' : ' hidden'}><h2 class="aw-y"><span>${y}</span><sup>${pad(shown.length)}</sup></h2><ul class="aw-grid">${cells}</ul></section>`;
+        // 해마다 높은 등급부터, 같은 등급은 최근 것부터
+        const list = AWARDS.filter((a) => a.year === y).sort((a, b) => a.tier - b.tier || b.date.localeCompare(a.date));
+        const tiers = [1, 2, 3, 4, 5]
+          .map((t) => [t, list.filter((a) => a.tier === t).length])
+          .filter(([, n]) => n)
+          .map(([t, n]) => `<span data-tier="${TIER_KEY[t]}">${['', '대상', '최우수', '우수', '장려', '기타'][t]} ${n}</span>`)
+          .join('');
+        return `<section class="aw-year" data-year="${y}" aria-label="${y}년 수상 ${list.length}건"><h2 class="aw-y"><span>${y}</span><sup>${pad(list.length)}</sup><small class="aw-y-tiers">${tiers}</small></h2><ul class="aw-grid">${list.map(awardTile).join('')}</ul></section>`;
       })
       .join('')}</div>
     ${withWall()}
@@ -405,7 +409,7 @@ function skillsPage() {
       <ul class="sk-list">${d.skills.map(skillRow).join('')}</ul>
     </section>`;
   return `<div class="pg pg-skills">
-    ${bar({ href: '/', label: 'FILM' })}
+    ${bar({ href: '/', label: '메인' })}
     <section class="works-head sk-head">
       <p class="pg-kicker">SKILL MAP — 프로젝트가 증명하는 기술</p>
       <h1 class="works-title">Skills<sup>${pad(SKILL_COUNT)}</sup></h1>
@@ -442,7 +446,7 @@ function skillsPage() {
 function bar(back) {
   return `<header class="pg-bar">
     <a class="pg-back" href="${back.href}" data-link>← ${esc(back.label)}</a>
-    <a class="pg-brand" href="/" data-link aria-label="필름으로">KWON</a>
+    <a class="pg-brand" href="/" data-link aria-label="메인 화면으로">KWON</a>
     <button type="button" class="pg-close" data-close aria-label="닫기"><i></i><i></i></button>
     <i class="pg-progress" aria-hidden="true"></i>
   </header>`;
@@ -455,15 +459,15 @@ function worksPage(cat) {
   const on = catList(cat);
   const counts = Object.fromEntries(CATEGORIES.map((c) => [c.id, projects.filter((p) => p.category === c.id).length]));
   return `<div class="pg pg-works">
-    ${bar({ href: '/', label: 'FILM' })}
+    ${bar({ href: '/', label: '메인' })}
     <section class="works-head">
       <p class="pg-kicker">PROJECT ARCHIVE — 권용현이 만든 것들</p>
       <h1 class="works-title">Works<sup>${pad(projects.length)}</sup></h1>
       ${tabs('works')}
       <nav class="chips" aria-label="분야">
-        <button type="button" data-cat="all" class="${cat === 'all' ? 'is-on' : ''}">All<sup>${projects.length}</sup></button>
+        <button type="button" data-cat="all" class="${cat === 'all' ? 'is-on' : ''}">전체<sup>${projects.length}</sup></button>
         ${CATEGORIES.filter((c) => counts[c.id])
-          .map((c) => `<button type="button" data-cat="${c.id}" class="${on?.includes(c.id) ? 'is-on' : ''}">${esc(c.label)}<sup>${counts[c.id]}</sup></button>`)
+          .map((c) => `<button type="button" data-cat="${c.id}" class="${on?.includes(c.id) ? 'is-on' : ''}">${esc(c.ko)}<sup>${counts[c.id]}</sup></button>`)
           .join('')}
       </nav>
     </section>
@@ -546,7 +550,7 @@ function detailPage(p) {
   const rest = gallery.map((im, k) => ({ im, k })).filter(({ im }) => !storyImgs.has(im.file) && im.file !== coverFile);
   const showGallery = rest.length > 0;
   return `<article class="pg pg-detail" data-cat="${esc(p.category)}">
-    ${bar({ href: '/works', label: 'WORKS' })}
+    ${bar({ href: '/works', label: '프로젝트 목록' })}
     <section class="d-hero${p.cover && p.cover.ratio >= 0.9 ? ' is-land' : ''}${p.cover ? '' : ' is-type'}" style="--ar:${(p.cover?.ratio || 1).toFixed(3)}">
       <div class="d-hero-media">${p.cover ? media(p.cover, { eager: true, full: true }) : typeCover(p, 'is-hero')}</div>
       <div class="d-hero-text">
@@ -837,9 +841,9 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     page.querySelectorAll('.reveal, .w-item, .aw-cell, .sk-dcard').forEach((el) => observer.observe(el));
     // 상장 크게 보기(수상 아카이브 · 상세의 수상 칸)
     const certs = route.name === 'awards' ? pageMedia : JSON.parse(page.querySelector('.d-awards')?.dataset.media || '[]');
-    // 등급으로 걸러 보는 중이면 라이트박스도 보이는 수상의 상장만 넘긴다
+    // 수상 아카이브: 라이트박스도 화면에 보이는 순서(해마다 높은 등급부터)대로, 걸러 보는 중이면 보이는 수상만 넘긴다
     const showCert = (b) => {
-      if (!page.querySelector('.aw-sum.is-filtered')) return lightbox.show({ media: certs }, +b.dataset.cert, b);
+      if (route.name !== 'awards') return lightbox.show({ media: certs }, +b.dataset.cert, b);
       const media = [];
       let at = 0;
       page.querySelectorAll('.aw-year .aw-cell:not(.is-out) [data-cert]').forEach((x) => {
@@ -852,31 +856,13 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
 
     if (route.name === 'awards') {
       const sum = page.querySelector('.aw-sum');
-      const rest = page.querySelector('.aw-rest');
-      const more = page.querySelector('.aw-more-btn');
-      const openRest = (on) => {
-        if (!rest || !more) return;
-        rest.hidden = !on;
-        more.setAttribute('aria-expanded', String(on));
-        more.querySelector('span').textContent = on ? '대표 상장만 보기' : `나머지 수상 ${rest.querySelectorAll('.aw-cell').length - page.querySelectorAll('.aw-feat .aw-cell').length}건 모두 보기`;
-      };
-      more?.addEventListener('click', () => {
-        const on = rest.hidden;
-        openRest(on);
-        if (on) rest.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
-      });
       sum.addEventListener('click', (e) => {
         const b = e.target.closest('button[data-g]');
         if (!b) return;
         const g = b.getAttribute('aria-pressed') === 'true' && b.dataset.g !== 'all' ? 'all' : b.dataset.g;
-        // 등급으로 걸러 볼 때는 연도별 목록을 펼친다(걸러 볼 대상이 그 안에 있다)
-        if (g !== 'all') openRest(true);
-        const moreBar = page.querySelector('.aw-more');
-        if (moreBar) moreBar.hidden = g !== 'all';
         sum.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.g === g)));
         sum.classList.toggle('is-filtered', g !== 'all');
-        const hasFeat = !!page.querySelector('.aw-feat');
-        const keep = (li) => (g === 'all' ? !(hasFeat && li.dataset.g === 'grand') : g === 'project' ? li.hasAttribute('data-p') : li.dataset.g === g);
+        const keep = (li) => (g === 'all' ? true : g === 'project' ? li.hasAttribute('data-p') : li.dataset.g === g);
         const shown = [];
         page.querySelectorAll('.aw-year').forEach((sec) => {
           const cells = [...sec.querySelectorAll('.aw-cell')];
@@ -886,9 +872,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
           sec.querySelector('.aw-y sup').textContent = pad(vis.length);
           shown.push(...vis);
         });
-        // 대상 띠는 전체 보기에서만
-        const feat = page.querySelector('.aw-feat');
-        if (feat) feat.hidden = g !== 'all';
         // 남은 카드는 CSS 등장 전환을 처음부터 다시 — 앞쪽 몇 장은 차례로
         shown.forEach((li, k) => {
           li.classList.remove('is-in');
