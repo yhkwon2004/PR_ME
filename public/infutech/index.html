@@ -411,14 +411,17 @@ small { font-size: .8em; }
 .sx-big { padding-top: .8em; border-top: 1px dashed var(--line); }
 .sx-big b { display: block; font-size: 2.7em; font-weight: 800; letter-spacing: -.04em; line-height: 1.05; color: var(--alert); }
 .sx-big span { font-size: .86em; color: var(--mute); }
-.sx-ph { flex: 1; min-height: 0; }
+.sx-ph { flex: 1; min-height: 6em; }
 .sx-ph img { object-position: 45% 50%; }
 .sx-pair { display: flex; align-items: center; gap: .5em; }
 .sx-pair li { display: inline-flex; align-items: center; gap: .4em; padding: .35em .8em; border-radius: 99em; background: rgba(173, 98, 41, .1); color: var(--honey); font-size: .86em; font-weight: 750; }
 .sx-pair li .ico { width: 1.3em; height: 1.3em; }
 .sx-pair .plus { color: var(--mute); font-weight: 700; }
-.sx-fig { margin: 0; padding: .35em .4em .2em; border-radius: .6em; background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
-.sx-fig img { width: 100%; height: auto; }
+.sx-fig { margin: 0; padding: .3em .4em; border-radius: .6em; background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
+.sx-fig .chart { height: 15em; }
+/* charts are plotly.py specs (charts/charts.js) drawn in place by Plotly.js */
+.chart { width: 100%; height: 100%; min-width: 0; }
+.chart .main-svg { font-variant-numeric: tabular-nums; }
 .sx-out { font-size: 1.02em; font-weight: 720; line-height: 1.45; }
 .sx-out em { font-weight: 800; }
 .sx-pcb { flex: 1; min-height: 0; display: grid; grid-template-rows: 1fr 1fr; gap: .5em; }
@@ -445,8 +448,8 @@ small { font-size: .8em; }
 .chap button[aria-current="true"] { background: var(--panel-2); border-color: var(--honey); }
 
 /* ================= 8 data (simulation) ================= */
-.simfig { flex: 1; min-height: 0; display: grid; place-items: center; padding: .7em .9em; }
-.simfig img { width: 100%; height: 100%; object-fit: contain; }
+.simfig { flex: 1; min-height: 0; display: flex; padding: .6em .8em; }
+.simfig .chart { flex: 1; }
 
 /* ================= 9 results ================= */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; flex: 1.25; min-height: 0; }
@@ -894,8 +897,8 @@ small { font-size: .8em; }
   .hero .disc { width: 13em; }
   .flow { grid-template-columns: 1fr; }
   .flow .arr { justify-self: center; transform: rotate(90deg); }
-  .simfig { overflow-x: auto; place-items: start; }
-  .simfig img { width: 62em; max-width: none; height: auto; }
+  .simfig { overflow-x: auto; }
+  .simfig .chart { flex: none; width: 70em; height: 34em; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stat .num { font-size: 3.2em; }
   .kpi { grid-template-columns: 5.6em 1fr; }
@@ -1237,7 +1240,7 @@ small { font-size: .8em; }
         </div>
         <div class="hero b"><div class="disc"><img src="media/module.webp" alt="INFU RETRO 실물 모듈 — 로드셀과 자체 PCB가 든 하우징, 아래에 수액백 후크" data-zoom></div></div>
         <div class="callouts">
-          <div class="card co b"><figure class="th"><img src="media/fig-filter.webp" alt="흔들리는 원신호(점)와 칼만필터 출력(선) — Python 그래프" data-zoom></figure><div><p class="k">FILTER</p><b>칼만필터 흔들림 보정</b><span>움직임 · 폴대 이동 노이즈 제거</span></div></div>
+          <div class="card co b"><figure class="th"><div class="chart" data-chart="filter" role="img" aria-label="흔들리는 원신호(점)와 칼만필터 출력(선)"></div></figure><div><p class="k">FILTER</p><b>칼만필터 흔들림 보정</b><span>움직임 · 폴대 이동 노이즈 제거</span></div></div>
           <div class="card co b"><figure class="th light-th"><img src="media/cnn-curve.webp" alt="CNN 학습 곡선 — 손실 감소와 검증 정확도 수렴" data-zoom></figure><div><p class="k">AI</p><b>CNN 이상 판별</b><span>신호 패턴 분류 · 정확도 97.3%</span></div></div>
         </div>
       </div>
@@ -1274,7 +1277,7 @@ small { font-size: .8em; }
           <p class="sx-k">학습 단계<small>개발 장비에서만</small></p>
           <ul class="sx-pair"><li><svg class="ico"><use href="#i-scale"/></svg>무게센서</li><li class="plus">+</li><li><svg class="ico"><use href="#i-gyro"/></svg>자이로</li></ul>
           <figure class="ph sx-ph"><img src="media/field-bag.webp" alt="실제 수액백을 건 폴대에서 흔들림 데이터를 모으는 팀원" data-zoom decoding="async"><figcaption class="cap">모의 병실 · 실제 수액으로 데이터 수집</figcaption></figure>
-          <figure class="sx-fig"><img src="media/fig-gyro.webp" alt="학습 장비 신호 그래프 — 자이로 각속도, 같은 시각의 무게 편차(r = 0.95), 자이로로 보정한 뒤의 잔차(RMS 2.1 g → 0.5 g)" data-zoom></figure>
+          <figure class="sx-fig"><div class="chart" data-chart="gyro" role="img" aria-label="학습 장비 신호 차트 — 자이로 각속도, 같은 시각의 무게 편차(r = 0.95), 자이로로 보정한 뒤의 잔차(RMS 2.1 g → 0.5 g)"></div></figure>
           <p class="sx-out">흔들림 ↔ 무게 편차 학습 → 편차 <em>2.1 g → 0.5 g</em></p>
         </div>
         <svg class="ico sx-arr b" aria-hidden="true"><use href="#i-arrow"/></svg>
@@ -1291,7 +1294,7 @@ small { font-size: .8em; }
         </div>
       </div>
     </div>
-    <div class="ft"><p class="src b">※ 기존 스마트 폴대 제작비는 INFUTECH 시장조사 기준 · 자이로는 개발 · 학습 장비에만 달고 제품에는 넣지 않습니다 · 그래프는 Python(NumPy · Matplotlib)으로 계산한 학습 장비 모의 신호(20 Hz)</p></div>
+    <div class="ft"><p class="src b">※ 기존 스마트 폴대 제작비는 INFUTECH 시장조사 기준 · 자이로는 개발 · 학습 장비에만 달고 제품에는 넣지 않습니다 · 차트는 Python(NumPy · plotly.py)으로 계산한 학습 장비 모의 신호(20 Hz)</p></div>
   </div>
   <div class="note" hidden><p>핵심 기술입니다. 기존 스마트 폴대는 흔들림을 잡으려고 자이로, 가속도 같은 센서를 여러 개 넣습니다. 그래서 제작비만 100만 원을 넘기는 구성이 대부분입니다.</p><p>저희는 반대로 갔습니다. 학습할 때만 무게센서와 자이로를 함께 달아, 폴대가 흔들릴 때 무게가 얼마나 틀어지는지를 데이터로 모았고, 그 편차를 칼만필터와 CNN이 스스로 보정하도록 학습시켰습니다.</p><p>그래서 제품에는 무게센서 하나만 들어갑니다. 대당 원가 8만 원, 판별 정확도 97.3%입니다.</p></div>
 </section>
@@ -1329,11 +1332,11 @@ small { font-size: .8em; }
     <p class="lab b">Demo <span>상황별 판별 데이터</span></p>
     <h2 class="h b">흔들림은 걸러내고, <mark>진짜 이상</mark>만 알립니다</h2>
     <div class="bd">
-      <figure class="card simfig b"><img src="media/fig-sim.webp" alt="다섯 가지 입원 상황의 무게 신호와 이상 점수 그래프 — 정상 투여 최고 0.13 알림 없음, 이송 중 흔들림 최고 0.39 알림 없음, 유속 저하 최고 0.99 알림 31:07, 줄 빠짐 최고 0.98 알림 30:01, 공기 유입 · 역류 최고 0.89 알림 30:01" data-zoom></figure>
+      <figure class="card simfig b"><div class="chart" data-chart="sim" role="img" aria-label="다섯 가지 입원 상황의 무게 신호와 이상 점수 차트 — 정상 투여 최고 0.13 알림 없음, 이송 중 흔들림 최고 0.39 알림 없음, 유속 저하 최고 0.99 알림 31:07, 줄 빠짐 최고 0.98 알림 30:02, 공기 유입 · 역류 최고 0.89 알림 30:01"></div></figure>
     </div>
-    <div class="ft"><p class="src b">※ Python(NumPy · Matplotlib)으로 계산 · 작도 — 500 mL 수액 모의 신호, 1초 측정 · 30분 시점에 상황 발생 · 기대 추세는 투여 초기 5분 감소량의 최소제곱 직선 · 코드 scripts/infutech-figures.py</p></div>
+    <div class="ft"><p class="src b">※ Python(NumPy · plotly.py)으로 계산한 차트 — 500 mL 수액 모의 신호, 1초 측정 · 30분 시점에 상황 발생 · 기대 추세는 투여 초기 5분 감소량의 최소제곱 직선 · 줄 빠짐은 당겨지는 순간의 장력 + 분리 후 빨라진 유출 · 마우스를 올리면 값 표시 · 코드 scripts/infutech-charts.py</p></div>
   </div>
-  <div class="note" hidden><p>다섯 가지 입원 상황을 같은 조건으로 돌린 결과입니다. 위는 무게, 아래는 이상 점수입니다.</p><p>정상 투여와 이송 중 흔들림에서는 원신호가 크게 흔들려도 점수가 임계값 아래에 머뭅니다. 유속 저하, 줄 빠짐, 공기 유입이나 역류에서는 점수가 0.6을 넘는 순간 알림이 갑니다.</p></div>
+  <div class="note" hidden><p>다섯 가지 입원 상황을 같은 조건으로 돌린 결과입니다. 위는 무게, 아래는 이상 점수입니다. 줄이 빠지면 수액은 멈추지 않고 오히려 조금 더 빨리 새어 나갑니다. 그래서 당겨지는 순간의 장력과 기울기 변화를 함께 봅니다.</p><p>정상 투여와 이송 중 흔들림에서는 원신호가 크게 흔들려도 점수가 임계값 아래에 머뭅니다. 유속 저하, 줄 빠짐, 공기 유입이나 역류에서는 점수가 0.6을 넘는 순간 알림이 갑니다.</p></div>
 </section>
 
 <section class="slide" id="results" data-sec="4" data-time="18" data-title="검증 성과 — 숫자로 증명">
@@ -1936,6 +1939,8 @@ small { font-size: .8em; }
 <p class="toast" id="toast" role="status"></p>
 <p class="sr" id="live" aria-live="polite"></p>
 
+<script src="vendor/plotly-basic.min.js"></script>
+<script src="charts/charts.js"></script>
 <script>
 (() => {
   const SECTIONS = ['표지', '문제 배경', '기존 시스템의 한계', '아이디어 소개', '시연', '시장분석', '차별점', '제품 원가', 'MOU 체결 현황', '시장 진입 전략', '기대효과', '팀 소개', '마무리', '부록'];
@@ -1947,6 +1952,34 @@ small { font-size: .8em; }
   const pad = n => String(n).padStart(2, '0');
   const mmss = sec => `${Math.floor(sec / 60)}:${pad(Math.floor(sec % 60))}`;
 
+
+  // ---- charts: plotly.py specs drawn by Plotly.js; text and margins follow the stage size ----
+  const scaleFonts = (o, k) => {
+    if (Array.isArray(o)) return o.forEach(v => scaleFonts(v, k));
+    if (!o || typeof o !== 'object') return;
+    for (const [key, v] of Object.entries(o)) {
+      if (key === 'font' && v && typeof v.size === 'number') v.size *= k;
+      scaleFonts(v, k);
+    }
+  };
+  function drawCharts() {
+    if (!window.Plotly || !window.INFU_CHARTS) return;
+    document.querySelectorAll('[data-chart]').forEach(el => {
+      const c = INFU_CHARTS[el.dataset.chart];
+      if (!c || !el.clientWidth) return;
+      const k = Math.min(1.6, Math.max(.7, el.clientWidth / c.base));
+      const layout = JSON.parse(JSON.stringify(c.layout));
+      scaleFonts(layout, k);
+      if (layout.margin) for (const m of ['l', 'r', 't', 'b']) if (m in layout.margin) layout.margin[m] *= k;
+      (layout.annotations || []).forEach(a => { if (a.xshift) a.xshift *= k; if (a.yshift) a.yshift *= k; });
+      layout.autosize = true;
+      Plotly.react(el, c.data, layout, { displayModeBar: false, staticPlot: c.static, scrollZoom: false, doubleClick: false, showTips: false });
+    });
+  }
+  drawCharts();
+  document.fonts?.ready.then(drawCharts);
+  let chartTimer;
+  addEventListener('resize', () => { clearTimeout(chartTimer); chartTimer = setTimeout(drawCharts, 160); });
 
   // ---- slides, steps, sections ----
   const slides = [...deck.querySelectorAll('.slide')];
