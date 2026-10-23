@@ -118,13 +118,14 @@ let hoverHold = false;
 let touchHold = false;
 // 끌기 안내: 손으로 보는 중(자동 재생 꺼짐)에 한동안 아무 입력이 없으면 넘기는 법을 반투명한 손끝으로 보여 준다
 let lastInput = performance.now();
+let lastHand = 0; // 마지막으로 손을 쓴 시각(멈춤 상태로 늘리지 않는 실제 입력)
 let hintsLeft = 4;
 const coarse = matchMedia('(pointer: coarse)').matches;
 ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach((t) =>
   addEventListener(
     t,
     () => {
-      lastInput = performance.now();
+      lastInput = lastHand = performance.now();
       guide?.hideGhost();
       guide?.stopHint();
     },
@@ -251,11 +252,18 @@ function onTransition(i, prev, duration) {
   elapsed = 0;
   // 카드 덱이 없는 장면에서는 분위기를 걷는다(덱이 있으면 아래 panels.go가 첫 카드로 맞춘다)
   if (!panels.panels[i]?.reel) mood.clear();
-  panels.go(i, prev, duration); // 뒤로 돌아와 마지막 카드에서 시작하는 릴이면 onReelFocus가 시계를 맞춘다
+  // 끌어서 넘겼으면 끌려 올라가 있던 패널을 그 자리에서 이어 내보내고, 다음 장면을 더 빨리 들인다
+  const nav = pendingNav;
+  pendingNav = null;
+  panels.go(i, prev, duration, nav || {}); // 뒤로 돌아와 마지막 카드에서 시작하는 릴이면 onReelFocus가 시계를 맞춘다
   hud.setScene(i, prev, duration);
   guide.setScene(i, !!panels.panels[i]?.reel);
-  // 덱이 없는 장면(소개): 조금 머물면 아래로 넘기는 법을 보여 준다
-  if (started && !panels.panels[i]?.reel && i > 0 && i < scenes.length - 1) hintNextScene(3200);
+  // 덱이 없는 장면(소개): 조금 머물면 아래로 넘기는 법을 보여 준다.
+  // 휴대폰은 위로 밀면 덱이 있어도 바로 다음 장면이라, 덱 장면에서도 카드 안내 뒤에 한 번
+  if (started && i > 0 && i < scenes.length - 1) {
+    if (!panels.panels[i]?.reel) hintNextScene(3200);
+    else if (coarse) hintNextScene(7500);
+  }
   // 주소에 지금 장면을 남긴다(새로 고침 · 공유해도 그 장면으로) — 작품 페이지가 열려 있을 때는 건드리지 않는다
   if (started && !site.open && location.pathname === '/') {
     const want = i > 0 ? `#${scenes[i].id}` : '';
@@ -264,27 +272,35 @@ function onTransition(i, prev, duration) {
   if (prev >= 0) audio.whoosh(Math.max(1.2, duration));
 }
 
-function goTo(i) {
+function goTo(i, opts) {
   if (!started) return false;
-  return director.go(Math.max(0, Math.min(scenes.length - 1, i)));
+  return director.go(Math.max(0, Math.min(scenes.length - 1, i)), opts);
 }
 
-// 스크롤 · 스와이프 · 화살표: 프로젝트 릴이 있으면 카드를 한 장씩 넘긴 뒤 다음 장면으로
-function stepOrGo(dir) {
+// 스크롤 · 화살표 · 마우스로 끌기: 프로젝트 릴이 있으면 카드를 한 장씩 넘긴 뒤 다음 장면으로.
+// 휴대폰에서 위아래로 밀면(swipe) 카드는 건너뛰고 바로 다음 · 이전 장면 — 카드는 옆으로 넘긴다
+let pendingNav = null;
+function stepOrGo(dir, how) {
   if (!started) return false;
-  if (panels.step(dir)) return 'step'; // 시계는 onReelFocus가 맞춘다
-  return goTo(director.index + dir);
+  if (!(how === 'swipe' && panels.current?.reel) && panels.step(dir)) return 'step'; // 시계는 onReelFocus가 맞춘다
+  const j = director.index + dir;
+  if (j < 0 || j >= scenes.length || director.index < 0) return false;
+  if (!how) return goTo(j);
+  pendingNav = { quick: true, from: guide.commitPull(), first: how === 'swipe' };
+  const ok = goTo(j, { quick: true });
+  if (!ok) pendingNav = null;
+  return ok;
 }
 
 const pad2 = (n) => String(n).padStart(2, '0');
 createInput({
   // 위아래로 끄는 동안 무엇으로 넘어갈지(다음 카드 · 다음 장면) — 넘어갈 것이 없으면 null
-  pullLabel: (dir) => {
+  pullLabel: (dir, how) => {
     if (!started) return null;
     const i = director.index;
     if (scenes[i]?.layout === 'finale') return null;
     const reel = panels.panels[i]?.reel;
-    if (reel?.paged) {
+    if (reel?.paged && how !== 'swipe') {
       const k = reel.focus + dir;
       if (k >= 0 && k < reel.count) return `${dir > 0 ? '다음' : '이전'} 카드 · ${pad2(k + 1)}/${pad2(reel.count)}`;
     }
@@ -292,13 +308,13 @@ createInput({
     return j >= 0 && j < scenes.length ? `${dir > 0 ? '다음' : '이전'} 장면 · ${scenes[j].ko}` : null;
   },
   onPull: (st) => guide.pull(st),
-  next: () => {
-    const r = stepOrGo(1);
+  next: (how) => {
+    const r = stepOrGo(1, how);
     if (r) takeOver();
     return r;
   },
-  prev: () => {
-    const r = stepOrGo(-1);
+  prev: (how) => {
+    const r = stepOrGo(-1, how);
     if (r) takeOver();
     return r;
   },
@@ -624,10 +640,13 @@ soundHint?.addEventListener('click', () => {
 // 필름은 언제나 사운드와 함께 시작한다(사운드 버튼으로 끌 수 있다)
 $('enter-sound').addEventListener('click', () => start(true));
 
-// 넘길 카드가 남았으면 덱을 살짝 끌어 보이고(옆으로), 아니면 화면을 위로 끌어 올려 보인다(아래로 넘기면 다음 장면)
+// 넘길 카드가 남았으면 덱을 살짝 끌어 보이고(옆으로), 아니면 화면을 위로 끌어 올려 보인다(아래로 넘기면 다음 장면).
+// 휴대폰은 위로 밀면 바로 다음 장면이라 두 안내를 번갈아(장면 넘김부터)
+let idleFlip = false;
 function idleHint() {
   const reel = panels.current?.reel;
-  if (reel && reel.focus < reel.count - 1 && panels.peek() > 0) {
+  const cardFirst = !coarse || (idleFlip = !idleFlip) === false;
+  if (cardFirst && reel && reel.focus < reel.count - 1 && panels.peek() > 0) {
     guide.ghost('x', reel.card.getBoundingClientRect());
     return true;
   }
@@ -644,9 +663,15 @@ function hintNextScene(delay) {
   if (i >= scenes.length - 1 || hintedScenes.has(i)) return;
   sceneHintT = setTimeout(() => {
     if (director.index !== i || director.trans || site.open || lightbox.open || hud.indexOpen) return;
+    // 손으로 무언가 하는 중이면(카드를 넘기는 등) 손을 쉴 때까지 미룬다
+    const busy = 1600 - (performance.now() - lastHand);
+    if (busy > 0) return hintNextScene(busy + 60);
+    if (guide.talking) return hintNextScene(900);
     const reel = panels.current?.reel;
-    if (reel && reel.focus < reel.count - 1) return; // 넘길 카드가 남았으면 카드 안내가 먼저
-    if (guide.sceneHint(`다음 장면 · ${scenes[i + 1].ko}`, reel?.card?.getBoundingClientRect())) hintedScenes.add(i);
+    if (!coarse && reel && reel.focus < reel.count - 1) return; // 넘길 카드가 남았으면 카드 안내가 먼저(휴대폰은 위로 밀면 바로 다음 장면)
+    if (!guide.sceneHint(`다음 장면 · ${scenes[i + 1].ko}`, reel?.card?.getBoundingClientRect())) return;
+    hintedScenes.add(i);
+    lastInput = performance.now(); // 손을 쉬는 안내(idleHint)가 곧바로 또 뜨지 않게
   }, delay);
 }
 

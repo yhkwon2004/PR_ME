@@ -110,7 +110,8 @@ export class Director {
     return { pos, target, fov, shift };
   }
 
-  go(index, { instant = false } = {}) {
+  // quick: 손으로 끌어 넘긴 전환 — 크레인 이동을 조금 짧게(손을 뗀 뒤 기다리는 시간이 길지 않게)
+  go(index, { instant = false, quick = false } = {}) {
     if (index < 0 || index >= this.scenes.length) return false;
     if (index === this.index && !instant) return false;
     const prev = this.index;
@@ -120,7 +121,7 @@ export class Director {
     const shot = this.shotFor(id);
     const from = { pos: this.camPos.clone(), target: this.camTarget.clone(), fov: this.fov, shift: this.shift.clone() };
     const dist = from.pos.distanceTo(shot.pos);
-    let duration = instant ? 0 : THREE.MathUtils.clamp(1.9 + dist * 0.022, 2.1, 3.4);
+    let duration = instant ? 0 : quick ? THREE.MathUtils.clamp(1.4 + dist * 0.016, 1.6, 2.5) : THREE.MathUtils.clamp(1.9 + dist * 0.022, 2.1, 3.4);
     if (this.reducedMotion && !instant) duration = 1.2;
     const mid = from.pos.clone().lerp(shot.pos, 0.5);
     mid.y += Math.min(14, dist * 0.22);

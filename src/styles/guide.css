@@ -707,3 +707,11 @@ body.deck-cue .panel:not([hidden]) .deck-count {
     display: none;
   }
 }
+
+/* 장면을 당겨 넘기는 동안 덱 아래 줄(번호 · 화살표)은 흐리게 — 같은 자리에 뜨는 표시와 겹쳐 보이지 않게 */
+.deck-nav {
+  transition: opacity 0.3s;
+}
+#stage.is-pulling .deck-nav {
+  opacity: 0.12;
+}

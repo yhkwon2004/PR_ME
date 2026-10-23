@@ -165,11 +165,22 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
     pull.classList.toggle('is-armed', !!st.armed);
     if (st.armed && !armed) navigator.vibrate?.(8);
     armed = !!st.armed;
-    // 화면 전체가 손가락을 따라 살짝 끌려온다(고무줄처럼)
+    // 화면 전체가 손가락을 따라 끌려온다 — 처음엔 손가락만큼, 더 끌수록 덜(고무줄처럼)
     if (stageEl && !reducedMotion) {
       stageEl.classList.add('is-pulling');
-      stageEl.style.translate = `0 ${(-st.dir * Math.min(1.2, st.p) * 18).toFixed(1)}px`;
+      stageEl.style.translate = `0 ${(-st.dir * 32 * Math.tanh(Math.max(0, st.p) * 0.9)).toFixed(1)}px`;
     }
+  }
+  // 끌어서 넘어가는 순간: 끌려 와 있던 거리를 돌려주고 화면은 제자리로(움직임 없이) — 나가는 패널이 그 자리에서 이어 빠진다
+  function commitPull() {
+    if (!stageEl?.classList.contains('is-pulling')) return 0;
+    const y = parseFloat(String(stageEl.style.translate).split(' ')[1]) || 0;
+    stageEl.style.transition = 'none';
+    stageEl.style.translate = '';
+    stageEl.classList.remove('is-pulling');
+    void stageEl.offsetWidth;
+    stageEl.style.transition = '';
+    return y;
   }
 
   // ── 장면 넘김 안내: 카드 안내처럼 반투명한 손끝이 아래에서 위로 밀어 올리고(두 번),
@@ -211,8 +222,8 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
   if (hint && firstVisit) {
     const items = touch
       ? [
-          ['↕', '위로 스와이프', '다음 카드 · 장면'],
-          ['☝', '카드 탭', '프로젝트 자세히'],
+          ['↕', '위로 스와이프', '다음 장면'],
+          ['↔', '카드는 옆으로', '탭하면 자세히'],
           ['☰', '목록', '장면 · 아카이브'],
         ]
       : [
@@ -279,7 +290,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       // 좁은 화면은 첫 장면 아래에 자리가 없어, 처음 방문 사용법을 위쪽 알림으로 한 번
       if (i === 0 && firstVisit && !coachTold && matchMedia('(max-width: 820px), (max-height: 500px)').matches) {
         coachTold = true;
-        setTimeout(() => current === 0 && say(touch ? '위로 스와이프하면 다음 장면 · 카드를 탭하면 프로젝트 · ☰ 장면 목록' : '스크롤하면 다음 장면 · 카드를 누르면 프로젝트 · ☰ 장면 목록', { ms: 7000 }), reducedMotion ? 500 : 3200);
+        setTimeout(() => current === 0 && say(touch ? '위로 밀면 다음 장면 · 카드는 옆으로 넘기고 탭하면 프로젝트 · ☰ 장면 목록' : '스크롤하면 다음 장면 · 카드를 누르면 프로젝트 · ☰ 장면 목록', { ms: 7000 }), reducedMotion ? 500 : 3200);
       }
       document.body.classList.toggle('has-deck', !!hasDeck);
       if (i >= last) next.hidden = true;
@@ -303,7 +314,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
           // 덱이 살짝 끌려갔다 돌아오는 동안 반투명한 손끝이 같은 방향으로 민다
           const rect = onPeek?.();
           if (rect) showGhost('x', rect);
-          say(touch ? '카드를 옆으로 넘기거나 탭하면 프로젝트를 볼 수 있어요' : '카드를 옆으로 넘기거나(← → · 휠) 눌러서 프로젝트를 볼 수 있어요', { ms: 4800 });
+          say(touch ? '카드는 옆으로 넘기고 탭하면 자세히 · 위로 밀면 다음 장면' : '카드를 옆으로 넘기거나(← → · 휠) 눌러서 프로젝트를 볼 수 있어요', { ms: 4800 });
         }, reducedMotion ? 400 : 2200);
       }
     },
@@ -340,6 +351,11 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
     hideGhost,
     // 당겨 넘기기 표시: { dir, p, armed, label } · 끝나면 null
     pull: setPull,
+    commitPull,
+    // 알림이 떠 있는 중(같은 아래쪽에 뜨는 장면 넘김 안내는 알림이 걷힌 뒤에)
+    get talking() {
+      return !toast.hidden;
+    },
     get firstVisit() {
       return firstVisit;
     },

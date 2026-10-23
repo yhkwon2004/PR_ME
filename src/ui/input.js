@@ -25,6 +25,11 @@ function scrollableX(el) {
 // 당겨 넘기기: 이만큼(px) 위아래로 끌면 놓는 순간 넘어간다 — 빠르게 튕기지 않아도(마우스는 조금 더)
 const PULL = 46;
 const MOUSE_PULL = 64;
+// 짧게 튕기기: 이만큼(px)만 움직였어도 빠르게(px/ms) 튕기고 놓았으면 넘긴다
+const FLICK = 22;
+const FLICK_V = 0.45;
+// 패널 글을 끝까지 스크롤한 손가락이 떼지 않고 더 밀면: 끝에 닿은 자리부터 이만큼 더 밀어야 넘어간다
+const HANDOFF = PULL + 18;
 const html = document.documentElement;
 
 export function createInput({ next, prev, first, last, isBlocked, onKey, onPull, pullLabel }) {
@@ -33,10 +38,11 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
   let idleTimer = 0;
   let stepped = false;
 
-  const fire = (dir, lockMs = 1100) => {
+  // how: 'swipe'(손가락으로 위아래 — 카드는 건너뛰고 장면) · 'drag'(마우스로 끌기) · 없으면 휠 · 키
+  const fire = (dir, lockMs = 1100, how) => {
     const now = performance.now();
     if (now < lockUntil) return;
-    const moved = dir > 0 ? next() : prev();
+    const moved = dir > 0 ? next(how) : prev(how);
     if (moved === false) return;
     // 릴 카드 한 장은 장면 전환보다 짧게 잠근다
     stepped = moved === 'step';
@@ -76,6 +82,10 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
   let st = 0;
   let startEl = null;
   let couldScroll = { 1: false, '-1': false };
+  let ly = 0; // 손가락 속도 재기: 마지막 위치 · 시각 · 속도(px/ms)
+  let lt = 0;
+  let vy = 0;
+  let base = null; // 패널 글을 끝까지 스크롤한 뒤 이어서 미는 손가락: 끝에 닿은 자리
   let pull = null; // 지금 끄는 중인 당겨 넘기기 { dir, p, armed, label }
   // 손가락을 댄 곳이 알림 · 크레딧처럼 자기 몫의 끌기가 있는 곳이면 당겨 넘기기를 쓰지 않는다
   const ownsDrag = (el) => !!el?.closest?.('.guide-toast, .credits');
@@ -95,8 +105,10 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
     (e) => {
       const t = e.touches[0];
       sx = t.clientX;
-      sy = t.clientY;
-      st = performance.now();
+      sy = ly = t.clientY;
+      st = lt = performance.now();
+      vy = 0;
+      base = null;
       startEl = e.target;
       // 손가락을 대는 순간 패널이 더 스크롤될 수 있었는지 기억한다
       couldScroll = { 1: !!scrollableAncestor(startEl, 1), '-1': !!scrollableAncestor(startEl, -1) };
@@ -104,22 +116,34 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
     },
     { passive: true }
   );
-  // 위아래로 끄는 동안: 끈 만큼 다음 · 이전 표시가 차오른다
+  // 위아래로 끄는 동안: 끈 만큼 다음 · 이전 표시가 차오르고 화면이 손가락을 따라온다
   addEventListener(
     'touchmove',
     (e) => {
       if (e.touches.length > 1 || isBlocked() || ownsDrag(startEl)) return endPull();
       const t = e.touches[0];
+      const now = performance.now();
+      // 손가락 속도는 살짝 고르게 — 마지막 한 번의 떨림에 휘둘리지 않게
+      vy = vy * 0.4 + ((t.clientY - ly) / Math.max(1, now - lt)) * 0.6;
+      ly = t.clientY;
+      lt = now;
       const dx = t.clientX - sx;
       const dy = t.clientY - sy;
       if (Math.abs(dy) < 12 || Math.abs(dy) < Math.abs(dx) * 1.2) return endPull();
       const dir = dy < 0 ? 1 : -1;
-      // 패널을 스크롤하던 손가락이면 표시하지 않는다
-      if (couldScroll[dir] || scrollableAncestor(startEl, dir)) return endPull();
-      const label = pullLabel?.(dir);
+      let dist = Math.abs(dy);
+      let need = PULL;
+      if (couldScroll[dir]) {
+        // 패널 글을 스크롤하던 손가락: 끝에 닿으면 떼지 않아도 그 자리부터 이어서 당겨 넘긴다
+        if (scrollableAncestor(startEl, dir)) return endPull();
+        if (base === null) base = t.clientY;
+        dist = (base - t.clientY) * dir;
+        need = HANDOFF;
+        if (dist < 12) return endPull();
+      } else if (scrollableAncestor(startEl, dir)) return endPull();
+      const label = pullLabel?.(dir, 'swipe');
       if (!label) return endPull();
-      const p = (Math.abs(dy) - 12) / (PULL - 12);
-      setPull({ dir, p, armed: Math.abs(dy) >= PULL, label });
+      setPull({ dir, p: (dist - 12) / (need - 12), armed: dist >= need, label });
     },
     { passive: true }
   );
@@ -143,10 +167,10 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
     const m = md;
     md = null;
     const st = pull;
+    // 넘기는 것이 먼저 — 끌려온 화면을 그 자리에서 이어 내보낼 수 있게(그다음 표시를 걷는다)
+    if (m && st?.armed && !isBlocked()) fire(st.dir, 900, 'drag');
     endPull();
-    if (!m) return;
-    if (m.moved) swallowClick();
-    if (st?.armed && !isBlocked()) fire(st.dir, 900);
+    if (m?.moved) swallowClick();
   };
   addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'mouse' || e.button !== 0 || isBlocked() || noDrag(e.target)) return;
@@ -172,23 +196,32 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
   addEventListener(
     'touchend',
     (e) => {
-      const armed = pull?.armed;
-      endPull();
-      if (isBlocked()) return;
+      const st0 = pull;
+      if (isBlocked()) return endPull();
       const t = e.changedTouches[0];
       const dx = t.clientX - sx;
       const dy = t.clientY - sy;
       const dt = performance.now() - st;
-      // 다 당겨 놓았으면 천천히 끌었어도 넘긴다
-      if (dt > 700 && !armed) return;
-      const horizontal = Math.abs(dx) > Math.abs(dy);
-      const dist = horizontal ? dx : dy;
-      if (Math.abs(dist) < (horizontal ? 55 : PULL)) return;
-      const dir = dist < 0 ? 1 : -1;
-      // 세로 스와이프가 패널 스크롤이었다면 장면을 넘기지 않는다
-      if (!horizontal && (couldScroll[dir] || scrollableAncestor(startEl, dir))) return;
-      if (horizontal && startEl && (scrollableX(startEl) || startEl.closest?.('.deck-stage'))) return;
-      fire(dir, 900);
+      const go = (dir, lockMs, how) => {
+        fire(dir, lockMs, how);
+        endPull();
+      };
+      if (Math.abs(dy) >= Math.abs(dx)) {
+        const dir = dy < 0 ? 1 : -1;
+        // 글을 끝까지 스크롤하고 이어 민 손가락: 끝에서부터 다 밀었을 때만
+        if (base !== null) return st0?.armed && st0.dir === dir ? go(dir, 650, 'swipe') : endPull();
+        // 세로 스와이프가 패널 스크롤이었다면 장면을 넘기지 않는다
+        if (couldScroll[dir] || scrollableAncestor(startEl, dir)) return endPull();
+        // 다 당겨 놓았거나(천천히 끌어도) · 빨리 밀었거나 · 짧아도 빠르게 튕겼으면
+        const flick = Math.abs(dy) >= FLICK && performance.now() - lt < 90 && Math.abs(vy) >= FLICK_V && Math.sign(vy) === Math.sign(dy);
+        if ((st0?.armed && st0.dir === dir) || (dt <= 700 && Math.abs(dy) >= PULL) || flick) return go(dir, 650, 'swipe');
+        return endPull();
+      }
+      endPull();
+      if (dt > 700 || Math.abs(dx) < 55) return;
+      // 덱 · 가로 스크롤 영역은 스스로 넘긴다
+      if (startEl && (scrollableX(startEl) || startEl.closest?.('.deck-stage'))) return;
+      fire(dx < 0 ? 1 : -1, 900);
     },
     { passive: true }
   );

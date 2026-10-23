@@ -855,16 +855,18 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     });
   }
 
-  function hide(i) {
+  // dir: 넘어가는 방향(다음이면 위로, 이전이면 아래로 빠진다) · from: 손가락에 끌려 와 있던 자리(px)에서 이어서
+  function hide(i, dir = 1, from = 0) {
     const el = panels[i];
     if (!el) return;
     el.inert = true;
     gsap.killTweensOf(el);
+    if (from) gsap.set(el, { y: from });
     // 흐림 필터는 화면 전체를 매 프레임 다시 그려 저사양에서 무겁다 — 보통 이하 단계에서는 투명도 · 위치만
     const lite = document.documentElement.classList.contains('q-lite');
     gsap.to(el, {
       autoAlpha: 0,
-      y: -18,
+      y: from - (from ? 30 : 18) * dir,
       ...(lite ? {} : { filter: 'blur(8px)' }),
       duration: 0.55 * D,
       ease: 'power2.in',
@@ -879,7 +881,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     }
   }
 
-  function show(i, delay = 0, back = false) {
+  // back: 다음 장면에서 거꾸로 돌아왔다(위에서 내려온다) · first: 덱은 첫 카드부터(휴대폰에서 위아래로 밀어 장면을 넘겼을 때)
+  function show(i, delay = 0, back = false, first = false) {
     const el = panels[i];
     el.hidden = false;
     el.inert = false;
@@ -891,7 +894,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     const titleSpans = own('.title .line > span, .hero-title .line > span');
     const heroChars = own('.hero-title i');
     const reveal = own('[data-r]');
-    set(reveal, { autoAlpha: 0, y: 22 });
+    set(reveal, { autoAlpha: 0, y: back ? -22 : 22 });
     if (heroChars.length) {
       set(heroChars, { yPercent: 115, rotate: 6 });
       tl.to(heroChars, { yPercent: 0, rotate: 0, duration: 1.3 * D, ease: 'expo.out', stagger: 0.045 * D }, 0.1);
@@ -905,7 +908,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       // 넘기는 동안 빈 카드가 보이지 않게 이 장면의 썸네일은 미리 모두 받는다
       el.querySelectorAll('.deck-stage img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
       // 바로 다음 장면에서 뒤로 돌아왔다면 마지막 카드부터 — 위로 스크롤하면 카드를 거꾸로 넘긴다
-      el.reel.set(back && el.reel.paged ? el.reel.count - 1 : 0, { animate: false, entry: true });
+      el.reel.set(back && !first && el.reel.paged ? el.reel.count - 1 : 0, { animate: false, entry: true });
       el.reel.intro(tl, 0.3);
     }
     // 루프: 고리가 드러날 때 펄스가 SENSE에서 출발한다
@@ -1139,13 +1142,14 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     // 지금 장면의 덱을 살짝 끌어 보인다(끌기 안내) — 움직였으면 방향
     peek: () => panels[current]?.reel?.peek() || 0,
     setLoopCenter,
-    go(i, prev, duration) {
-      if (prev >= 0) hide(prev);
+    // quick: 손으로 끌어 넘겼다(다음 장면을 더 빨리 들인다) · from: 끌려 와 있던 자리 · first: 덱은 첫 카드부터
+    go(i, prev, duration, { quick = false, from = 0, first = false } = {}) {
+      if (prev >= 0) hide(prev, i > prev ? 1 : -1, from);
       current = i;
       // 다음 장면의 릴 썸네일을 미리 받아 카드가 빈 상자로 날아들지 않게
       panels[i + 1]?.querySelectorAll('.deck-stage img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
-      const delay = prev < 0 ? 0.9 : Math.max(0.5, duration * 0.62);
-      show(i, delay, prev === i + 1);
+      const delay = prev < 0 ? 0.9 : quick ? Math.max(0.35, duration * 0.4) : Math.max(0.5, duration * 0.62);
+      show(i, delay, prev === i + 1, first);
     },
     get current() {
       return panels[current];
