@@ -290,6 +290,8 @@ function onTransition(i, prev, duration) {
     if (location.hash !== want) history.replaceState(history.state, '', `/${location.search}${want}`);
   }
   if (prev >= 0) audio.whoosh(Math.max(1.2, duration));
+  // 글을 읽는 장면(소개 · 이력)은 3D를 밝게 띄운다 — 크레인 이동과 함께 천천히
+  if (stage) gsap.to(stage.film.uniforms.uLift, { value: scenes[i]?.layout === 'beats' ? 1 : 0, duration: Math.max(0.6, duration * 0.8), ease: 'power2.inOut', overwrite: true });
 }
 
 function goTo(i, opts) {

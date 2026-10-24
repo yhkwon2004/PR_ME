@@ -7,7 +7,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { COLORS } from './materials.js';
 
-// 필름 패스: 색수차 · 전환 줌블러 · 비네팅 · 그레인 · 노출(페이드)
+// 필름 패스: 색수차 · 전환 줌블러 · 비네팅 · 그레인 · 노출(페이드) · 밝힘(글을 읽는 장면에서 화면을 밝게 띄운다)
 const FilmShader = {
   uniforms: {
     tDiffuse: { value: null },
@@ -20,6 +20,7 @@ const FilmShader = {
     uTint: { value: new THREE.Color(0x5ef2ff) },
     uTintAmt: { value: 0 },
     uPulse: { value: 0 },
+    uLift: { value: 0 },
   },
   vertexShader: /* glsl */ `
     varying vec2 vUv;
@@ -27,7 +28,7 @@ const FilmShader = {
   `,
   fragmentShader: /* glsl */ `
     uniform sampler2D tDiffuse;
-    uniform float uTime, uTransition, uGrain, uAberration, uExposure, uTintAmt, uPulse;
+    uniform float uTime, uTransition, uGrain, uAberration, uExposure, uTintAmt, uPulse, uLift;
     uniform vec2 uRes;
     uniform vec3 uTint;
     varying vec2 vUv;
@@ -55,7 +56,9 @@ const FilmShader = {
       col += uTint * uTintAmt * 0.012 * (1.0 - lum);
       col += uTint * uPulse * 0.12 * smoothstep(0.22, 0.85, d);
       float vig = smoothstep(0.92, 0.28, d);
-      col *= mix(0.55, 1.0, vig);
+      col *= mix(0.55 + 0.3 * uLift, 1.0, vig);
+      // 밝힘: 전체를 올리고 가장 어두운 곳은 검정 대신 남색으로 띄운다(밝은 곳은 덜 올려 하얗게 날리지 않게)
+      col = col * (1.0 + 0.5 * uLift * (1.0 - 0.5 * lum)) + vec3(0.03, 0.045, 0.07) * uLift;
       float g = rand(uv * uRes * 0.5 + fract(uTime * 13.7)) - 0.5;
       col += g * uGrain;
       col *= uExposure;

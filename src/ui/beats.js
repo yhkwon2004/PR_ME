@@ -166,8 +166,9 @@ function profileBeats(scene, i) {
   ];
 }
 
-// ── 이력: 연도마다 한 화면 — 위에 큰 연도 · 학년 · 그 해의 수, 아래에 항목 카드(큰 사진 + 기록 전문 + 근거) ──
-// 카드의 큰 그림: 이어진 프로젝트 사진(제목을 사진 위에) → 없으면 상장(최대 3장) → 기사 사진. 아무것도 없으면 글만.
+// ── 이력: 연도마다 한 화면 — 위에 큰 연도 · 학년 · 그 해의 수, 아래에 항목 카드 한 줄(해마다 같은 틀) ──
+// 카드는 모두 같은 모양: 위에 같은 높이의 그림, 아래에 분류 · 제목 · 기록 · 근거.
+// 그림: 이어진 프로젝트 사진(제목을 사진 위에) → 없으면 상장(최대 3장) → 기사 사진 → 아무것도 없으면 학년 색 글자판.
 // { html, project, certs } — 큰 그림에 쓴 프로젝트 · 상장은 아래 근거 줄에서 뺀다
 function heroOf(it) {
   const p = it.projects.find((x) => x.cover);
@@ -192,7 +193,7 @@ function heroOf(it) {
     return {
       html: `<a class="bt-ph" href="${esc(n.url)}" target="_blank" rel="noopener"><img src="${esc(n.image.thumb)}" alt="" loading="lazy" decoding="async" /><span class="bt-cap">${esc(n.publisher)} — ${esc(n.title)}</span></a>`,
     };
-  return { html: '' };
+  return { html: `<div class="bt-ph is-type" aria-hidden="true"><b>${esc(it.kind)}</b><small>${esc(it.year)}</small></div>` };
 }
 
 function historyBeats(scene, i) {
@@ -208,7 +209,7 @@ function historyBeats(scene, i) {
         ...(hero.certs ? [] : it.awards.map(certChip)),
         ...it.press.map(pressChip),
       ].filter(Boolean);
-      return `<li class="bt-item b-a${hero.html ? ' has-ph' : ''}${it.deep ? '' : ' is-plain'}">
+      return `<li class="bt-item b-a${it.deep ? '' : ' is-plain'}">
           ${hero.html}
           <div class="bt-tx">
             <p class="bt-k">${esc(it.kind)}</p>
@@ -239,7 +240,7 @@ function historyBeats(scene, i) {
                 : ''
             }
           </header>
-          <ol class="bt-items" data-n="${y.items.length}">${y.items.map(item).join('')}</ol>
+          <ol class="bt-items" style="--n: ${y.items.length}"${g ? ` data-stage="${esc(g.id)}"` : ''}>${y.items.map(item).join('')}</ol>
         </div>`,
     };
   });

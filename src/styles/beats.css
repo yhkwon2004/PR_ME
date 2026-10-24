@@ -10,17 +10,6 @@
 .beats {
   --u: clamp(0.8px, min(0.0694vw, 0.112vh), 1.5px);
 }
-/* 3D 위에서 글이 읽히도록 가운데를 어둡게 — 화면 가장자리의 3D는 그대로 비친다 */
-.beats::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 70% 64% at 50% 52%, rgba(3, 5, 9, 0.6), rgba(3, 5, 9, 0.28) 62%, rgba(3, 5, 9, 0) 100%);
-  pointer-events: none;
-}
-.beats[data-kind='history']::before {
-  background: radial-gradient(ellipse 78% 72% at 50% 52%, rgba(3, 5, 9, 0.78), rgba(3, 5, 9, 0.42) 66%, rgba(3, 5, 9, 0.1) 100%);
-}
 /* 제목(위)과 본문을 한 덩어리로 화면 가운데에 — 위 HUD와 아래 화면 칸 사이의 한가운데.
    위아래 auto 여백으로 가운데에 두어, 화면보다 길어지면 위로 넘치지 않고 위에서부터 놓인다 */
 .beat {
@@ -56,18 +45,21 @@
 }
 .beat .bt-top,
 .beat .bt-body {
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 2px 14px rgba(4, 10, 20, 0.6);
 }
-/* 글이 3D 위에서도 읽히도록 비치는 판 */
+/* 비치는 판: 검은 판이 아니라 밝은 남색 유리 — 뒤의 3D가 은은히 비치고, 위 가장자리에 빛이 맺힌다 */
 .bt-col,
 .bt-nums > div,
 .bt-pillars > li,
 .bt-item {
-  border: 1px solid var(--line);
+  border: 1px solid rgba(190, 222, 255, 0.18);
   border-radius: calc(18 * var(--u));
-  background: rgba(5, 7, 12, 0.78);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(165deg, rgba(70, 96, 134, 0.46), rgba(28, 40, 62, 0.56));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 20px 44px -28px rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
   text-shadow: none;
 }
 html.q-lite .bt-col,
@@ -76,7 +68,16 @@ html.q-lite .bt-pillars > li,
 html.q-lite .bt-item {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  background: rgba(5, 7, 12, 0.9);
+  background: linear-gradient(165deg, rgba(52, 72, 102, 0.9), rgba(30, 43, 66, 0.92));
+}
+/* 이력은 뒤의 지오펜스가 밝게 빛나므로 판을 조금 더 채운다 */
+.beats[data-kind='history'] .bt-item {
+  background: linear-gradient(165deg, rgba(66, 90, 126, 0.66), rgba(28, 40, 62, 0.74));
+}
+/* 판 위 글은 한 단계 밝게 */
+.beat .bt-body {
+  --fg-2: rgba(232, 240, 250, 0.84);
+  --muted: rgba(205, 220, 238, 0.66);
 }
 .bt-h {
   font-size: calc(56 * var(--u));
@@ -588,43 +589,31 @@ html.q-lite .bt-item {
 }
 .bt-items {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
+  grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+  align-items: stretch;
   gap: calc(16 * var(--u));
 }
-.bt-items > li:last-child:nth-child(odd) {
-  grid-column: span 2;
-}
+/* 카드는 해마다 같은 모양: 위에 같은 높이의 그림, 아래에 글 — 한 줄의 카드는 높이가 같고 근거 줄은 바닥에 맞춘다 */
 .bt-item {
-  display: grid;
-  align-content: start;
-  gap: calc(8 * var(--u));
-  padding: calc(20 * var(--u)) calc(22 * var(--u));
-}
-/* 사진이 있는 항목: 왼쪽에 큰 사진, 오른쪽에 글 */
-.bt-item.has-ph {
-  grid-template-columns: calc(204 * var(--u)) minmax(0, 1fr);
-  align-items: start;
-  gap: calc(20 * var(--u));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .bt-tx {
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   gap: calc(8 * var(--u));
   min-width: 0;
-}
-.bt-item.is-plain {
-  border-style: dashed;
-  background: rgba(5, 7, 12, 0.6);
+  padding: calc(18 * var(--u)) calc(20 * var(--u)) calc(20 * var(--u));
 }
 .bt-ph {
   position: relative;
   display: block;
+  flex: none;
   overflow: hidden;
-  aspect-ratio: 4 / 3;
-  border-radius: calc(12 * var(--u));
-  background: #0b0f16;
-  box-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.9);
+  height: calc(176 * var(--u));
+  background: #16202e;
 }
 .bt-ph img {
   width: 100%;
@@ -655,6 +644,30 @@ a.bt-ph:focus-visible img {
 a.bt-ph:focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 2px;
+}
+/* 그림이 없는 항목: 학년 색 글자판(분류 · 연도) — 카드 모양을 다른 항목과 맞춘다 */
+.bt-ph.is-type {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: calc(6 * var(--u));
+  background:
+    radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--gc, var(--cyan)) 34%, transparent), transparent 62%),
+    linear-gradient(150deg, color-mix(in srgb, var(--gc, var(--cyan)) 22%, #1d2a3d), #182233);
+}
+.bt-ph.is-type b {
+  font-size: calc(30 * var(--u));
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  word-break: keep-all;
+  text-align: center;
+}
+.bt-ph.is-type small {
+  font-family: var(--mono);
+  font-size: calc(13 * var(--u));
+  letter-spacing: 0.2em;
+  color: var(--gc, var(--cyan));
 }
 /* 상장이 큰 그림이면: 상장 1~3장을 겹쳐 펼친다(누르면 크게) */
 .bt-ph.is-certs {
@@ -728,26 +741,13 @@ a.bt-ph:focus-visible {
   word-break: keep-all;
 }
 .bt-item .bt-media {
-  margin-top: calc(4 * var(--u));
+  margin-top: auto;
+  padding-top: calc(4 * var(--u));
 }
-/* 이력 카드 안 근거는 조금 작게(사진은 왼쪽에 크게 있다) */
+/* 이력 카드 안 근거는 조금 작게(큰 그림은 카드 위에 있다) */
 .bt-item .bt-pi {
   width: calc(46 * var(--u));
   height: calc(34 * var(--u));
-}
-/* 세 항목인 해: 세 칸 — 사진은 위에 넓게, 글은 아래 */
-.bt-items[data-n='3'] {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.bt-items[data-n='3'] > li:last-child:nth-child(odd) {
-  grid-column: auto;
-}
-.bt-items[data-n='3'] .bt-item.has-ph {
-  grid-template-columns: minmax(0, 1fr);
-  gap: calc(14 * var(--u));
-}
-.bt-items[data-n='3'] .bt-ph {
-  aspect-ratio: 2.2 / 1;
 }
 .bt-item .bt-p b {
   max-width: 13em;
@@ -1025,39 +1025,37 @@ a.bt-ph:focus-visible {
     margin-left: 8px;
     font-size: 12px;
   }
-  .bt-items,
-  .bt-items[data-n='3'] {
+  /* 휴대폰은 해마다 한 줄씩 — 왼쪽 작은 그림 + 오른쪽 글(모든 카드 같은 모양) */
+  .bt-items {
     grid-template-columns: 1fr;
     gap: 6px;
   }
-  .bt-items > li:last-child:nth-child(odd) {
-    grid-column: auto;
+  .bt-item {
+    flex-direction: row;
+    align-items: stretch;
   }
-  .bt-items[data-n='3'] .bt-item.has-ph {
-    grid-template-columns: 78px minmax(0, 1fr);
-    gap: 10px;
+  .bt-ph {
+    width: 84px;
+    height: auto;
+    min-height: 64px;
   }
-  .bt-items[data-n='3'] .bt-ph {
-    aspect-ratio: 4 / 3;
+  .bt-ph.is-type b {
+    font-size: 13px;
+  }
+  .bt-ph.is-type small {
+    font-size: 10px;
+    letter-spacing: 0.1em;
   }
   .bt-cap {
     display: none;
   }
-  .bt-item {
-    gap: 3px;
-    padding: 10px 12px;
-  }
-  .bt-item.has-ph {
-    grid-template-columns: 78px minmax(0, 1fr);
-    gap: 10px;
-  }
   .bt-tx {
     gap: 3px;
-  }
-  .bt-ph {
-    border-radius: 8px;
+    padding: 9px 12px 10px;
   }
   .bt-ph.is-certs {
+    align-self: center;
+    height: 76px;
     padding: 4px;
   }
   .bt-ph.is-certs button + button {
