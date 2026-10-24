@@ -101,6 +101,11 @@ html.q-lite .bt-item {
 .beat-nav button i {
   display: none;
 }
+.beat-nav button em,
+.beat-nav button b {
+  font-style: normal;
+  font-weight: inherit;
+}
 .beat-nav button.is-past {
   color: var(--cyan);
 }
@@ -322,6 +327,55 @@ html.q-lite .bt-item {
   line-height: 1.65;
   color: var(--fg-2);
   word-break: keep-all;
+}
+
+/* ── 소개 4 · 5: 가치관 · 학년별 성장 — 핵심 역량과 같은 세 칸, 성장은 학년 색(growth.css의 --gc) ── */
+.bt-no em {
+  margin-left: 8px;
+  font-style: normal;
+  color: var(--muted);
+}
+.bt-growth .bt-pillars > li {
+  border-top: 2px solid var(--gc, var(--cyan));
+}
+.bt-growth .bt-no {
+  color: var(--gc, var(--cyan));
+}
+.bt-pillars .bt-hl {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg);
+}
+.bt-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.bt-more b {
+  margin-right: 4px;
+  font-family: var(--display);
+  color: var(--fg);
+}
+/* 이력 연도 옆: 그 해의 학년 · 단계(누르면 /growth의 그 학년) */
+.bt-g {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 4px 10px;
+  border: 1px solid var(--gc, var(--cyan));
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--gc, var(--cyan));
+  white-space: nowrap;
+  text-shadow: none;
+  transition: background 0.3s;
+}
+.bt-g:hover,
+.bt-g:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
 }
 
 /* 화면에 바로 보이는 근거: 프로젝트 사진 · 상장 · 기사 */
@@ -557,6 +611,10 @@ html.q-lite .bt-item {
     font-size: 10.5px;
     letter-spacing: 0.04em;
   }
+  /* 소개 다섯 칸: 지금 화면만 이름, 나머지는 번호 */
+  .beats[data-kind='profile'] .beat-nav button:not([aria-current]) b {
+    display: none;
+  }
   .bt-h {
     margin-top: 8px;
     font-size: 26px;
@@ -671,13 +729,15 @@ html.q-lite .bt-item {
     grid-template-columns: 1fr;
     gap: 10px;
   }
+  /* 큰 연도 옆에 학년 · 단계와 그 해의 수를 위아래로 */
   .bt-y {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    gap: 6px 14px;
   }
   .bt-y b {
+    grid-row: span 2;
     font-size: 64px;
   }
   .bt-y span {
@@ -732,6 +792,26 @@ html.q-lite .bt-item {
   .bt-more {
     margin-top: 6px;
     font-size: 11px;
+  }
+  /* 성장: 학년 · 단계 · 한 줄만 — 배운 것은 /growth에서 */
+  .bt-growth .bt-pillars p:not(.bt-hl) {
+    display: none;
+  }
+  .bt-pillars .bt-hl {
+    font-size: 13px;
+  }
+  .bt-meta {
+    font-size: 10px;
+  }
+  .bt-g {
+    justify-self: start;
+    margin-top: 0;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    letter-spacing: 0;
+    white-space: normal;
+    word-break: keep-all;
   }
 }
 

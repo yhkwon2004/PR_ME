@@ -13,6 +13,7 @@ export const profile = {
   role: 'Physical AI Developer',
   roleKo: 'AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자',
   motto: '제약을 이해하고, 작은 실험으로 해법을 검증합니다.',
+  summary: '현장의 제약을 문제로 정의하고, AI·소프트웨어·하드웨어를 연결해 작동하는 해결책으로 만듭니다.', // 한 줄 소개 — 필름 소개 첫 화면 · 이력서(/resume)
   // 학력 — 2026 Notion 포트폴리오의 Education(본인 기록 그대로)
   education: [
     { school: '원광대학교', major: '컴퓨터소프트웨어공학과', period: '2023 – 2029' },
@@ -47,15 +48,16 @@ export const scenes = [
     ko: '소개',
     code: 'PROLOGUE',
     label: 'Prologue',
-    // 세 화면(소개 → 학력 · 기록 → 핵심 역량) — 스크롤 없이 한 화면씩(src/ui/beats.js)
+    // 다섯 화면(소개 → 학력 · 기록 → 핵심 역량 → 가치관 → 성장 과정) — 스크롤 없이 한 화면씩(src/ui/beats.js).
+    // 가치관 · 학년별 성장은 data/growth.js(자세한 내용은 /growth) — 성장 과정 다음은 연도별 이력
     layout: 'beats',
     beats: 'profile',
-    hold: 9,
+    hold: 11,
     beatHold: 7, // 화면마다 머무는 초(자동 재생)
     kicker: 'PROLOGUE — WHO BUILDS THE MACHINE',
     title: ['제약을 이해하고, 작은 실험으로', '해법을 검증합니다.'],
     titleKo: true,
-    lead: '현장의 제약을 문제로 정의하고, AI·소프트웨어·하드웨어를 연결해 작동하는 해결책으로 만듭니다.',
+    lead: '1학년엔 넓게 탐색하고, 2학년엔 전공 밖으로 도전했고, 3학년엔 인턴십과 Physical AI에 집중했습니다.',
     // detail: 2026 Notion 포트폴리오의 핵심 역량 문장 그대로 · projects: 그 축을 보여 주는 대표 프로젝트
     pillars: [
       {
