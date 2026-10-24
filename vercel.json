@@ -4,6 +4,7 @@
   "installCommand": "npm ci --no-audit --no-fund",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "cleanUrls": true,
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -26,24 +27,32 @@
   ],
   "rewrites": [
     {
-      "source": "/awards",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/skills",
-      "destination": "/index.html"
+      "source": "/about",
+      "destination": "/"
     },
     {
       "source": "/growth",
-      "destination": "/index.html"
+      "destination": "/"
+    },
+    {
+      "source": "/history",
+      "destination": "/"
+    },
+    {
+      "source": "/awards",
+      "destination": "/"
+    },
+    {
+      "source": "/skills",
+      "destination": "/"
     },
     {
       "source": "/works",
-      "destination": "/index.html"
+      "destination": "/"
     },
     {
       "source": "/works/:path*",
-      "destination": "/index.html"
+      "destination": "/"
     }
   ]
 }

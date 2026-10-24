@@ -2398,9 +2398,9 @@ body.is-started[data-scene='intro'] .hint {
   opacity: 0;
   transform: translateY(28px);
   transition:
-    opacity 0.6s var(--ease),
-    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: calc(var(--i, 0) * 70ms);
+    opacity 0.3s var(--ease),
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i, 0) * 35ms);
 }
 .cb.is-on .cb-a {
   opacity: 1;
@@ -2408,7 +2408,7 @@ body.is-started[data-scene='intro'] .hint {
 }
 /* 비트가 떠날 때는 한꺼번에 빠르게 */
 .cb:not(.is-on) .cb-a {
-  transition-duration: 0.3s;
+  transition-duration: 0.15s;
   transition-delay: 0s;
 }
 .cb-role {

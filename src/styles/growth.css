@@ -104,20 +104,39 @@
     flex-basis: 100%;
   }
 }
-/* 세로 휴대폰: 학년 칸은 한 줄 머리(학년 · 연도) 아래에 제목 · 설명 · 숫자 */
+/* 세로 휴대폰: 학년 칸은 한 줄 머리(학년 · 연도 ↔ 숫자) 아래에 제목 · 설명 — 세 칸과 가치관이 한 화면에 들어오게 */
 @media (max-width: 599px) {
   .stage .pillars.is-growth .pillar {
-    display: block;
-    padding: 10px 12px 11px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 10px;
+    padding: 9px 12px 10px;
   }
   .stage .pillars.is-growth .pillar-no {
     margin: 0 0 3px;
   }
+  .stage .pillars.is-growth .pillar-meta {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    margin: 0;
+    font-size: 9.5px;
+    white-space: nowrap;
+  }
+  .stage .pillars.is-growth .pillar h3,
+  .stage .pillars.is-growth .pillar p {
+    grid-column: 1 / -1;
+  }
   .stage .pillars.is-growth .pillar h3 {
     font-size: 15px;
   }
-  .stage .pillars.is-growth .pillar-meta {
-    margin-top: 5px;
+  .values-row {
+    gap: 4px 10px;
+    padding: 8px 12px;
+  }
+  .vr-k {
+    flex-basis: auto;
   }
 }
 @media (min-width: 600px) and (max-width: 820px) {
@@ -451,6 +470,18 @@
   font-size: 11px;
   color: var(--dim);
 }
+.gr-sub-go {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--gc);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.gr-sub-go:hover,
+.gr-sub-go:focus-visible {
+  text-decoration: underline;
+}
 /* 주요 장면: 세로 타임라인 */
 .gr-ms {
   position: relative;
@@ -500,6 +531,15 @@
   font-size: 12px;
   color: var(--gc);
   white-space: nowrap;
+}
+.gr-ms-t em {
+  display: block;
+  margin-bottom: 2px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  color: var(--dim);
 }
 .gr-ms-t b {
   display: block;
@@ -801,5 +841,39 @@
   }
   .gr-alist li {
     grid-template-columns: 56px 56px minmax(0, 1fr) auto;
+  }
+}
+
+/* 연도별 이력(장면 · 페이지)에 붙는 학년 표시 — 성장 과정과 같은 색 */
+.hist-g {
+  margin: -2px 0 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  color: var(--gc);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hs-stage {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--gc) 55%, transparent);
+  border-radius: 99px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--gc);
+  text-decoration: none;
+  word-break: keep-all;
+}
+.hs-stage:hover,
+.hs-stage:focus-visible {
+  background: color-mix(in srgb, var(--gc) 12%, transparent);
+}
+@media (max-width: 820px) {
+  .hs-stage {
+    margin-top: 0;
   }
 }

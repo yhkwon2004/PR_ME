@@ -6,12 +6,43 @@
     <title>권용현 — Physical AI Portfolio</title>
     <meta name="description" content="드론 · 로봇 · 모빌리티 · AI. 권용현의 피지컬 AI 포트폴리오 — 한 편의 영화처럼 이어지는 3D 인터랙티브 포트폴리오." />
     <meta name="theme-color" content="#05070c" />
+    <link rel="canonical" href="%SITE%/" />
+    <!-- 링크 미리보기(카카오톡 · 링크드인 · 슬랙 · X): 주소마다 빌드할 때 제목 · 설명 · 이미지를 바꿔 쓴다(vite.config.js) -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="권용현 Physical AI Portfolio" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:url" content="%SITE%/" />
     <meta property="og:title" content="권용현 — Physical AI Portfolio" />
     <meta property="og:description" content="Drone · Robot · Mobility · AI — 한 편의 영화처럼 이어지는 3D 포트폴리오" />
-    <meta property="og:image" content="/og.jpg" />
+    <meta property="og:image" content="%SITE%/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="권용현 — Physical AI Portfolio" />
+    <meta name="twitter:description" content="Drone · Robot · Mobility · AI — 한 편의 영화처럼 이어지는 3D 포트폴리오" />
+    <meta name="twitter:image" content="%SITE%/og.jpg" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "권용현",
+        "alternateName": "Yonghyun Kwon",
+        "jobTitle": "Physical AI Developer",
+        "description": "AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자 — 드론 · 로봇 · 모빌리티 · AI",
+        "url": "%SITE%/",
+        "image": "%SITE%/og/about.jpg",
+        "email": "mailto:yhkwon2004@gmail.com",
+        "sameAs": [
+          "https://github.com/yhkwon2004",
+          "https://befitting-paper-753.notion.site/2026-1-3f3faf73802f80c7acf6f7c83e9c26e2",
+          "https://www.instagram.com/dydgus_.0802/",
+          "https://blog.naver.com/procmd"
+        ]
+      }
+    </script>
   </head>
   <body>
     <canvas id="gl" aria-hidden="true"></canvas>
@@ -103,7 +134,7 @@
       <button class="index-close" type="button" aria-label="장면 목록 닫기">×</button>
       <div class="index-inner">
         <p class="index-kicker">목차 — 보고 싶은 장면을 누르세요</p>
-        <nav class="index-archive" aria-label="아카이브 페이지"><span>모아 보기</span><a href="/works" data-link>프로젝트</a><a href="/awards" data-link>수상</a><a href="/skills" data-link>스킬</a><a href="/growth" data-link>성장 과정</a></nav>
+        <nav class="index-archive" aria-label="아카이브 페이지"><span>모아 보기</span><a href="/about" data-link>프로필</a><a href="/growth" data-link>성장 과정</a><a href="/works" data-link>프로젝트</a><a href="/awards" data-link>수상</a><a href="/skills" data-link>스킬</a></nav>
         <ol id="index-list"></ol>
       </div>
     </nav>
