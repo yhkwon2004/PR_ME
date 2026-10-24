@@ -4,7 +4,7 @@
   python3 scripts/og_cards.py
 
   public/og/<프로젝트 id>.jpg  프로젝트마다: 대표 사진 + 분야 · 연도 · 제목 · 한 줄 소개 · 수상
-  public/og/about.jpg · works.jpg · awards.jpg · skills.jpg  모아 보기 페이지
+  public/og/about.jpg · growth.jpg · history.jpg · works.jpg · awards.jpg · skills.jpg  모아 보기 페이지
   public/icons/apple-touch-icon.png · icon-192.png · icon-512.png  홈 화면 아이콘(favicon.svg와 같은 그림)
 모든 글은 src/data/*.json과 src/content.js에 이미 있는 기록에서 가져온다. 프로젝트 기록이 바뀌면 다시 돌린다.
 """
@@ -255,7 +255,7 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     projects = [p for p in load('projects.json') if not p.get('hidden')]
     for name in os.listdir(OUT):  # 합쳐지거나 숨긴 프로젝트의 지난 카드는 지운다
-        if name[:-4] not in {p['id'] for p in projects} | {'about', 'works', 'awards', 'skills', 'history'}:
+        if name[:-4] not in {p['id'] for p in projects} | {'about', 'works', 'awards', 'skills', 'history', 'growth'}:
             os.remove(os.path.join(OUT, name))
     awards = load('awards.json')
     press = load('press.json')
@@ -274,6 +274,11 @@ def main():
     section_card(os.path.join(OUT, 'about.jpg'), 'PROFILE — 한눈에 보는 권용현', '권용현 · Yonghyun Kwon',
                  'Physical AI Developer — AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자',
                  [(str(len(projects)), '프로젝트'), (str(len(awards)), '수상'), (str(n_certs), '자격증'), (str(len(press)), '보도')], covers[:4], '/about')
+    # 성장 과정: 학년마다 대표 프로젝트 한두 개의 사진(1학년 해커톤 로봇 → 2학년 자작차 → 3학년 링거폴대 · 4족보행)
+    grown = [by_id[i]['cover'] for i in ['robot-push-hackathon', 'baja-ev-formula', 'iot-iv-pole', 'quadruped-robot'] if i in by_id and by_id[i].get('cover')]
+    section_card(os.path.join(OUT, 'growth.jpg'), 'GROWTH STORY — 학년별 성장 과정과 가치관', 'Growth · 1학년 → 3학년',
+                 '전공 탐색(2023) → 도전(2024) → 인턴십 · Physical AI 집중(2025 — 2026), 그리고 일하는 방식 세 가지',
+                 [('3', '학년'), ('3', '가치관'), (str(len(projects)), '프로젝트')], grown, '/growth')
     section_card(os.path.join(OUT, 'history.jpg'), 'HISTORY — 연도별 이력', 'History · 2023 — 2026',
                  '연구실 · 동아리 · 전공 · 창업 · 수상 — 해마다 한 일과 이어진 프로젝트 · 상장 · 기사',
                  [('4', '연도'), (str(len(projects)), '프로젝트'), (str(len(awards)), '수상')], covers[:4], '/history')

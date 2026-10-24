@@ -8,6 +8,7 @@ import './styles/premium.css';
 import './styles/skills.css';
 import './styles/about.css';
 import './styles/history.css';
+import './styles/growth.css';
 import './styles/guide.css';
 import './styles/perf.css';
 import './styles/clarity.css';

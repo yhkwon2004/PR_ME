@@ -6,6 +6,7 @@ import { ORGS, WALL } from '../data/orgs.js';
 import { projectCard, awardCard, pressCard, orgMark, deckInfo, deckAwardInfo, deckPressInfo, deckAllCard, deckAllInfo } from '../pages/site.js';
 import { PRESS } from '../data/press.js';
 import { HISTORY } from '../data/history.js';
+import { stageOf } from '../data/growth.js';
 
 // 빈 선택자에 대한 GSAP 경고를 피한다
 const has = (t) => t && (t.length === undefined || t.length > 0);
@@ -112,6 +113,7 @@ function render(scene, i) {
         <div class="hist-years" role="list" aria-label="연도별 이력">${HISTORY.map(
           (y) => `<section class="hist-y" role="listitem" aria-label="${esc(y.year)}년">
             <a class="hist-yh" href="/history#y${esc(y.year)}" data-link><b>${esc(y.year)}</b><small>${count(y)}</small></a>
+            ${stageOf(y.year) ? `<p class="hist-g" data-stage="${stageOf(y.year).id}">${esc(stageOf(y.year).grade)} · ${esc(stageOf(y.year).title)}</p>` : ''}
             <ol>${y.items.map(item).join('')}</ol>
           </section>`
         ).join('')}</div>
@@ -244,6 +246,7 @@ function render(scene, i) {
         </dl>
         <div class="endcard-actions" data-r>
           <a class="btn-works" href="/about" data-link>프로필 · 이력서 <span aria-hidden="true">↗</span></a>
+          <a class="btn-works" href="/growth" data-link>성장 과정 · 가치관 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/works" data-link>모든 프로젝트 보기 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/awards" data-link>수상 기록 · 상장 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/skills" data-link>보유 스킬 <span aria-hidden="true">↗</span></a>
@@ -269,10 +272,19 @@ function render(scene, i) {
         .join('')}</p>`;
     }
     let foot = '';
-    if (scene.pillars)
-      foot += `<div class="pillars">${scene.pillars
-        .map((p) => `<article class="pillar" data-r><span class="pillar-no">${esc(p.no)}</span><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p></article>`)
+    // 소개: 학년별 성장 세 칸(stages)이 있으면 그것을, 없으면 핵심 역량(pillars)을
+    const cards = scene.stages || scene.pillars;
+    if (cards)
+      foot += `<div class="pillars${scene.stages ? ' is-growth' : ''}">${cards
+        .map(
+          (p) =>
+            `<article class="pillar" data-r><span class="pillar-no">${esc(p.no)}</span><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p>${p.meta ? `<small class="pillar-meta">${esc(p.meta)}</small>` : ''}</article>`
+        )
         .join('')}</div>`;
+    if (scene.values)
+      foot += `<div class="values-row" data-r><span class="vr-k">가치관</span>${scene.values
+        .map((v) => `<span class="vr-v"><b>${esc(v.no)}</b>${esc(v.title)}</span>`)
+        .join('')}<a class="vr-go" href="/growth" data-link>성장 과정 자세히 <i aria-hidden="true">↗</i></a></div>`;
     if (scene.highlights)
       foot += `<ol class="highlights">${scene.highlights
         .map((h) =>

@@ -72,6 +72,12 @@ function pageMeta() {
           type: 'profile',
         },
         {
+          path: '/growth',
+          title: `성장 과정 · 가치관 — ${NAME}`,
+          desc: '1학년 전공 탐색(2023) → 2학년 도전(2024) → 3학년 인턴십 · Physical AI 집중(2025 — 2026). 학년마다 한 일과 배운 것, 그리고 일하는 방식 세 가지.',
+          image: og('growth'),
+        },
+        {
           path: '/history',
           title: `연도별 이력 — ${NAME}`,
           desc: '2023 — 2026, 해마다 한 일 — 연구실 · 동아리 · 전공 · 창업 · 수상. 항목마다 이어진 프로젝트 · 상장 · 기사로 들어갑니다.',

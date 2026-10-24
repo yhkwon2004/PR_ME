@@ -4,6 +4,7 @@
 import projectData from './data/projects.json';
 import awardData from './data/awards.json';
 import pressData from './data/press.json';
+import { GROWTH_PILLARS, VALUES } from './data/growth.js';
 
 const M = (file) => `/media/${file}`;
 
@@ -13,6 +14,7 @@ export const profile = {
   role: 'Physical AI Developer',
   roleKo: 'AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자',
   motto: '제약을 이해하고, 작은 실험으로 해법을 검증합니다.',
+  summary: '현장의 제약을 문제로 정의하고, AI·소프트웨어·하드웨어를 연결해 작동하는 해결책으로 만듭니다.', // 프로필(/about)의 한 줄 소개
   // 학력 — 2026 Notion 포트폴리오의 Education(본인 기록 그대로)
   education: [
     { school: '원광대학교', major: '컴퓨터소프트웨어공학과', period: '2023 – 2029' },
@@ -48,11 +50,14 @@ export const scenes = [
     code: 'PROLOGUE',
     label: 'Prologue',
     layout: 'stage',
-    hold: 9,
-    kicker: 'PROLOGUE — WHO BUILDS THE MACHINE',
+    hold: 11,
+    kicker: 'PROLOGUE — 성장 과정과 가치관',
     title: ['제약을 이해하고, 작은 실험으로', '해법을 검증합니다.'],
     titleKo: true,
-    lead: '현장의 제약을 문제로 정의하고, AI·소프트웨어·하드웨어를 연결해 작동하는 해결책으로 만듭니다.',
+    lead: '1학년엔 넓게 탐색하고, 2학년엔 전공 밖으로 도전했고, 3학년엔 인턴십과 Physical AI에 집중했습니다.',
+    // 학년별 세 단계와 가치관 — data/growth.js(자세한 내용은 /growth). 핵심 역량(pillars)은 프로필(/about)이 쓴다
+    stages: GROWTH_PILLARS,
+    values: VALUES,
     pillars: [
       { no: '01', title: 'AI · 알고리즘 · 데이터', text: '비전 · LLM · 시뮬레이션' },
       { no: '02', title: '임베디드 · 제어 · 모빌리티', text: 'PCB · ESP32 · 드론 · 차량 · 로봇' },
