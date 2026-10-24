@@ -166,7 +166,35 @@ function profileBeats(scene, i) {
   ];
 }
 
-// ── 이력: 연도마다 한 화면 ──
+// ── 이력: 연도마다 한 화면 — 위에 큰 연도 · 학년 · 그 해의 수, 아래에 항목 카드(큰 사진 + 기록 전문 + 근거) ──
+// 카드의 큰 그림: 이어진 프로젝트 사진(제목을 사진 위에) → 없으면 상장(최대 3장) → 기사 사진. 아무것도 없으면 글만.
+// { html, project, certs } — 큰 그림에 쓴 프로젝트 · 상장은 아래 근거 줄에서 뺀다
+function heroOf(it) {
+  const p = it.projects.find((x) => x.cover);
+  if (p)
+    return {
+      project: p,
+      html: `<a class="bt-ph" href="${p.path}" data-link data-cat="${esc(p.category)}"><img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async" /><span class="bt-cap">${esc(p.title)}</span></a>`,
+    };
+  const certs = it.awards.filter((a) => a.certs.length || a.photo).slice(0, 3);
+  if (certs.length)
+    return {
+      certs: true,
+      html: `<div class="bt-ph is-certs">${certs
+        .map(
+          (a) =>
+            `<button type="button" data-film-cert="${a.filmAt}" data-tier="${TIER_KEY[a.tier]}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기"><img src="${esc(a.certs[0]?.thumb || a.photo.thumb)}" alt="" loading="lazy" decoding="async" /><i>${esc(a.grade)}</i></button>`
+        )
+        .join('')}</div>`,
+    };
+  const n = it.press.find((x) => x.image);
+  if (n)
+    return {
+      html: `<a class="bt-ph" href="${esc(n.url)}" target="_blank" rel="noopener"><img src="${esc(n.image.thumb)}" alt="" loading="lazy" decoding="async" /><span class="bt-cap">${esc(n.publisher)} — ${esc(n.title)}</span></a>`,
+    };
+  return { html: '' };
+}
+
 function historyBeats(scene, i) {
   return HISTORY.map((y, k) => {
     const awards = [...new Set(y.items.flatMap((it) => it.awards))];
@@ -174,12 +202,20 @@ function historyBeats(scene, i) {
     const tiers = [1, 2, 3, 4, 5].map((t) => [t, y.awards.filter((a) => a.tier === t).length]).filter(([, n]) => n);
     const g = stageOf(y.year);
     const item = (it) => {
-      const chips = [...it.projects.map(projChip), ...it.awards.map(certChip), ...it.press.map(pressChip)].filter(Boolean);
-      return `<li class="bt-item b-a${it.deep ? '' : ' is-plain'}">
-          <p class="bt-k">${esc(it.kind)}</p>
-          <h3>${esc(it.title)}</h3>
-          ${it.note ? `<p class="bt-note">${esc(it.note)}</p>` : ''}
-          ${chips.length ? `<div class="bt-media">${chips.join('')}</div>` : ''}
+      const hero = heroOf(it);
+      const chips = [
+        ...it.projects.filter((p) => p !== hero.project).map(projChip),
+        ...(hero.certs ? [] : it.awards.map(certChip)),
+        ...it.press.map(pressChip),
+      ].filter(Boolean);
+      return `<li class="bt-item b-a${hero.html ? ' has-ph' : ''}${it.deep ? '' : ' is-plain'}">
+          ${hero.html}
+          <div class="bt-tx">
+            <p class="bt-k">${esc(it.kind)}</p>
+            <h3>${esc(it.title)}</h3>
+            ${it.note ? `<p class="bt-note">${esc(it.note)}</p>` : ''}
+            ${chips.length ? `<div class="bt-media">${chips.join('')}</div>` : ''}
+          </div>
         </li>`;
     };
     return {
@@ -191,19 +227,19 @@ function historyBeats(scene, i) {
           ${kicker(i, `${scene.kicker} · ${pad(k + 1)}/${pad(HISTORY.length)}`)}
         </div>
         <div class="bt-body panel-content">
-          <div class="bt-yrow">
-            <div class="bt-y b-a"><b>${esc(y.year)}</b>${
-              g ? `<a class="bt-g" href="/growth#gr-${esc(g.id)}" data-link data-stage="${esc(g.id)}">${esc(g.grade)} · ${esc(g.title)}</a>` : ''
-            }<span><em>${y.items.length}</em>이력 <em>${y.projects.length}</em>프로젝트 <em>${y.awards.length}</em>수상</span></div>
-            <ol class="bt-items">${y.items.map(item).join('')}</ol>
-          </div>
-          ${
-            y.awards.length || y.projects.length
-              ? `<p class="bt-more b-a">${y.year}년 기록 — 프로젝트 ${y.projects.length} · 수상 ${y.awards.length}${tiers.length ? ` (${tiers.map(([t, n]) => `${TIER_LABEL[t]} ${n}`).join(' · ')})` : ''}${
-                  y.awards.length ? ` <a href="/awards#y${y.year}" data-link>그 해 상장 모두 보기 →</a>` : ''
-                }</p>`
-              : ''
-          }
+          <header class="bt-yh b-a">
+            <b class="bt-yy">${esc(y.year)}</b>
+            <div class="bt-ys">
+              ${g ? `<a class="bt-g" href="/growth#gr-${esc(g.id)}" data-link data-stage="${esc(g.id)}">${esc(g.grade)} · ${esc(g.title)}</a>` : ''}
+              <p class="bt-yn"><span><em>${y.items.length}</em>이력</span><span><em>${y.projects.length}</em>프로젝트</span><span><em>${y.awards.length}</em>수상</span></p>
+            </div>
+            ${
+              y.awards.length
+                ? `<p class="bt-more">${tiers.map(([t, n]) => `${TIER_LABEL[t]} ${n}`).join(' · ')}<a href="/awards#y${y.year}" data-link>${y.year}년 상장 ${y.awards.length}건 모두 보기 →</a></p>`
+                : ''
+            }
+          </header>
+          <ol class="bt-items" data-n="${y.items.length}">${y.items.map(item).join('')}</ol>
         </div>`,
     };
   });
