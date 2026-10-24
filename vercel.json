@@ -31,6 +31,10 @@
       "destination": "/"
     },
     {
+      "source": "/history",
+      "destination": "/"
+    },
+    {
       "source": "/awards",
       "destination": "/"
     },

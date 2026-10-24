@@ -57,7 +57,7 @@ function pageMeta() {
     closeBundle() {
       if (!build) return;
       const base = readFileSync(resolve(outDir, 'index.html'), 'utf8');
-      const projects = readJson('src/data/projects.json');
+      const projects = readJson('src/data/projects.json').filter((p) => !p.hidden); // 숨긴 기록은 주소 · 미리보기도 만들지 않는다
       const awards = readJson('src/data/awards.json');
       const press = readJson('src/data/press.json');
       const skills = (readFileSync(resolve(ROOT, 'src/data/skills.js'), 'utf8').match(/^\s*\{ d: '/gm) || []).length;
@@ -70,6 +70,12 @@ function pageMeta() {
           desc: `Physical AI Developer — AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자. 프로젝트 ${projects.length} · 수상 ${awards.length} · 보도 ${press.length} — 핵심 역량부터 연락처까지 한 장에(PDF 이력서 저장).`,
           image: og('about'),
           type: 'profile',
+        },
+        {
+          path: '/history',
+          title: `연도별 이력 — ${NAME}`,
+          desc: '2023 — 2026, 해마다 한 일 — 연구실 · 동아리 · 전공 · 창업 · 수상. 항목마다 이어진 프로젝트 · 상장 · 기사로 들어갑니다.',
+          image: og('history'),
         },
         {
           path: '/works',

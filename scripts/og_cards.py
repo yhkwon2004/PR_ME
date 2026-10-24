@@ -28,8 +28,7 @@ ORANGE = (255, 107, 26)
 
 # 분야 색 · 이름(src/styles/pages.css · src/data/projects.js와 같게)
 CATS = {
-    'drone': ((94, 242, 255), 'DRONE', '드론'),
-    'mobility': ((127, 168, 255), 'MOBILITY', '모빌리티'),
+    'mobility': ((127, 168, 255), 'DRONE · MOBILITY', '드론 · 모빌리티'),
     'robotics': ((255, 107, 26), 'ROBOTICS', '로봇'),
     'ai': ((196, 139, 255), 'AI', 'AI · 데이터'),
     'iot': ((61, 255, 154), 'IOT', '임베디드 · 하드웨어'),
@@ -158,7 +157,7 @@ def project_card(p, out):
     TX, TW = 64, 600
     y = 150
     # 분야(영문 · 한글 — 한글 이름에 영문이 들어 있으면 한글만) · 연도
-    label = ko if code in ko else f'{code}  ·  {ko}'
+    label = ko if (code in ko or '·' in code) else f'{code}  ·  {ko}'
     lf = font('SemiBold', 22)
     d.text((TX, y), label, font=lf, fill=col)
     year = p.get('year') or ''
@@ -254,7 +253,10 @@ def app_icons():
 def main():
     app_icons()
     os.makedirs(OUT, exist_ok=True)
-    projects = load('projects.json')
+    projects = [p for p in load('projects.json') if not p.get('hidden')]
+    for name in os.listdir(OUT):  # 합쳐지거나 숨긴 프로젝트의 지난 카드는 지운다
+        if name[:-4] not in {p['id'] for p in projects} | {'about', 'works', 'awards', 'skills', 'history'}:
+            os.remove(os.path.join(OUT, name))
     awards = load('awards.json')
     press = load('press.json')
     for p in projects:
@@ -272,6 +274,9 @@ def main():
     section_card(os.path.join(OUT, 'about.jpg'), 'PROFILE — 한눈에 보는 권용현', '권용현 · Yonghyun Kwon',
                  'Physical AI Developer — AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자',
                  [(str(len(projects)), '프로젝트'), (str(len(awards)), '수상'), (str(n_certs), '자격증'), (str(len(press)), '보도')], covers[:4], '/about')
+    section_card(os.path.join(OUT, 'history.jpg'), 'HISTORY — 연도별 이력', 'History · 2023 — 2026',
+                 '연구실 · 동아리 · 전공 · 창업 · 수상 — 해마다 한 일과 이어진 프로젝트 · 상장 · 기사',
+                 [('4', '연도'), (str(len(projects)), '프로젝트'), (str(len(awards)), '수상')], covers[:4], '/history')
     section_card(os.path.join(OUT, 'works.jpg'), 'PROJECT ARCHIVE — 권용현이 만든 것들', f'Works · 프로젝트 {len(projects)}',
                  '드론 · 모빌리티 · 로봇 · AI · 임베디드 · 창업 — 분야별로 모아 보는 프로젝트 아카이브',
                  [(str(len(projects)), '프로젝트'), (str(len(CATS)), '분야')], covers[:6], '/works')

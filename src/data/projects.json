@@ -144,7 +144,8 @@
     "label": "Notion 원문",
     "url": "https://www.notion.so/333faf73802f8000b265d7e04aeb385e"
    }
-  ]
+  ],
+  "hidden": true
  },
  {
   "id": "ai-pose-guide",
@@ -403,23 +404,36 @@
  },
  {
   "id": "airsim-driving",
-  "title": "AirSim 딥러닝 자율주행",
-  "titleEn": "AirSim Deep Learning Driving",
-  "year": "2026",
+  "title": "AirSim · CARLA 엔드투엔드 자율주행",
+  "titleEn": "End-to-End Driving — AirSim · CARLA",
+  "year": "2024–2026",
   "period": "",
   "category": "mobility",
-  "oneLiner": "가상환경에서 딥러닝으로 학습시킨 AirSim 자율주행",
-  "summary": "AirSim 가상 주행 환경에서 딥러닝 모델을 학습시켜 조향과 주차 신호 인식을 다룬 개인 프로젝트입니다.",
-  "role": [],
-  "team": "",
+  "oneLiner": "가상환경(AirSim · CARLA)에서 End-to-End 딥러닝으로 학습시킨 자율주행",
+  "summary": "AirSim 가상 주행 환경에서 딥러닝 모델을 학습시켜 조향과 주차 신호 인식을 다룬 개인 프로젝트입니다. 언리얼 엔진 기반 CARLA 시뮬레이터를 Python API로 제어했습니다. End-to-End 학습으로 카메라 화면의 도로 곡률에 맞춰 조향하도록 하고, 전이 학습으로 가중치를 보완했습니다.",
+  "role": [
+   "시뮬레이터 개발"
+  ],
+  "team": "1인 프로젝트 (학술동아리 성과 보고)",
   "tools": [
    "AirSim",
-   "딥러닝",
+   "CARLA",
+   "Unreal Engine",
    "Python",
-   "Keras"
+   "Keras",
+   "딥러닝"
   ],
   "awards": [],
-  "metrics": [],
+  "metrics": [
+   {
+    "value": "약 3회 → 1회 이하",
+    "label": "안정 주행 10회 중 충돌"
+   },
+   {
+    "value": "1인",
+    "label": "개발 인원"
+   }
+  ],
   "story": [
    {
     "label": "PROBLEM",
@@ -428,16 +442,37 @@
     "image": "media/projects/airsim-driving/03.webp"
    },
    {
+    "label": "IDEA",
+    "title": "End-to-End 조향 학습",
+    "text": "카메라 화면에서 도로 곡률을 수치화하고, 그 값에 맞춰 조향하도록 End-to-End 학습을 진행했습니다."
+   },
+   {
     "label": "BUILD",
     "title": "AirSim에서 딥러닝 학습",
     "text": "AirSim 주행 환경에서 딥러닝을 학습시키고, 조향과 주차 신호 인식 기능을 연결했습니다.",
     "image": "media/projects/airsim-driving/02.webp"
    },
    {
+    "label": "BUILD",
+    "title": "Python API 제어",
+    "text": "언리얼 엔진 기반 CARLA 시뮬레이터를 구성하고 Python API로 차량을 제어했습니다.",
+    "image": "media/projects/carla-e2e/01.webp"
+   },
+   {
     "label": "TEST",
     "title": "API 제어 주행",
     "text": "학습한 Keras 모델(model-010)을 불러와 API 제어 모드로 주택가 도로와 교차로를 주행했습니다.",
     "image": "media/projects/airsim-driving/04.webp"
+   },
+   {
+    "label": "TEST",
+    "title": "전이 학습으로 보완",
+    "text": "더 정밀한 주행을 위해 전이 학습을 추가하고, 과적합이 없도록 가중치를 계속 조정했습니다."
+   },
+   {
+    "label": "RESULT",
+    "title": "충돌 횟수 감소",
+    "text": "안정적 주행 환경 10회 동작 중 약 3회이던 충돌을 1회 이하로 줄였습니다."
    }
   ],
   "images": [
@@ -475,6 +510,13 @@
     "kind": "screenshot",
     "w": 640,
     "h": 360
+   },
+   {
+    "file": "media/projects/carla-e2e/01.webp",
+    "caption": "CARLA 0.9.14 공식 릴리스 이미지 (출처: CARLA)",
+    "kind": "screenshot",
+    "w": 606,
+    "h": 351
    }
   ],
   "cover": "media/projects/airsim-driving/01.webp",
@@ -488,7 +530,16 @@
     "caption": "YouTube 원본 (같은 영상)"
    }
   ],
-  "links": []
+  "links": [
+   {
+    "label": "Notion 프로젝트 기록",
+    "url": "https://www.notion.so/3e1faf73802f821a947c81458de18459"
+   },
+   {
+    "label": "Notion 프로젝트 기록 (이전 포트폴리오)",
+    "url": "https://www.notion.so/333faf73802f8099b798ca6b64f6b3c1"
+   }
+  ]
  },
  {
   "id": "av-competition",
@@ -836,80 +887,6 @@
   ]
  },
  {
-  "id": "carla-e2e",
-  "title": "CARLA 엔드투엔드 자율주행 시뮬레이터",
-  "titleEn": "CARLA End-to-End Driving Sim",
-  "year": "2024",
-  "period": "",
-  "category": "mobility",
-  "oneLiner": "Python API로 CARLA 차량을 제어한 엔드투엔드 자율주행",
-  "summary": "언리얼 엔진 기반 CARLA 시뮬레이터를 Python API로 제어했습니다. End-to-End 학습으로 카메라 화면의 도로 곡률에 맞춰 조향하도록 하고, 전이 학습으로 가중치를 보완했습니다.",
-  "role": [
-   "시뮬레이터 개발"
-  ],
-  "team": "1인 프로젝트 (학술동아리 성과 보고)",
-  "tools": [
-   "Python",
-   "Unreal Engine",
-   "CARLA"
-  ],
-  "awards": [],
-  "metrics": [
-   {
-    "value": "약 3회 → 1회 이하",
-    "label": "안정 주행 10회 중 충돌"
-   },
-   {
-    "value": "1인",
-    "label": "개발 인원"
-   }
-  ],
-  "story": [
-   {
-    "label": "BUILD",
-    "title": "Python API 제어",
-    "text": "언리얼 엔진 기반 CARLA 시뮬레이터를 구성하고 Python API로 차량을 제어했습니다.",
-    "image": "media/projects/carla-e2e/01.webp"
-   },
-   {
-    "label": "IDEA",
-    "title": "End-to-End 조향 학습",
-    "text": "카메라 화면에서 도로 곡률을 수치화하고, 그 값에 맞춰 조향하도록 End-to-End 학습을 진행했습니다."
-   },
-   {
-    "label": "TEST",
-    "title": "전이 학습으로 보완",
-    "text": "더 정밀한 주행을 위해 전이 학습을 추가하고, 과적합이 없도록 가중치를 계속 조정했습니다."
-   },
-   {
-    "label": "RESULT",
-    "title": "충돌 횟수 감소",
-    "text": "안정적 주행 환경 10회 동작 중 약 3회이던 충돌을 1회 이하로 줄였습니다."
-   }
-  ],
-  "images": [
-   {
-    "file": "media/projects/carla-e2e/01.webp",
-    "caption": "CARLA 0.9.14 공식 릴리스 이미지 (출처: CARLA)",
-    "kind": "screenshot",
-    "w": 606,
-    "h": 351
-   }
-  ],
-  "cover": "media/projects/carla-e2e/01.webp",
-  "videos": [],
-  "links": [
-   {
-    "label": "Notion 프로젝트 기록",
-    "url": "https://www.notion.so/3e1faf73802f821a947c81458de18459"
-   },
-   {
-    "label": "Notion 프로젝트 기록 (이전 포트폴리오)",
-    "url": "https://www.notion.so/333faf73802f8099b798ca6b64f6b3c1"
-   }
-  ]
- },
- {
   "id": "chiangmai-seminar",
   "title": "치앙마이 SW 교육 · 세미나",
   "titleEn": "Chiang Mai SW Class & Seminar",
@@ -1203,7 +1180,7 @@
   "titleEn": "Drone Soccer",
   "year": "2023",
   "period": "",
-  "category": "drone",
+  "category": "mobility",
   "oneLiner": "2023 인천 드론축구 대회 참여와 동아리 연습 활동",
   "summary": "드론축구 대회 참여와 동아리 연습으로 기체 조작, 경기 중 팀 역할 조율, 사전 점검과 안전 운용을 경험한 활동입니다.",
   "role": [
@@ -2813,7 +2790,7 @@
   "titleEn": "Pixhawk Autonomous Drone",
   "year": "2023–2024",
   "period": "",
-  "category": "drone",
+  "category": "mobility",
   "oneLiner": "Pixhawk와 Mission Planner로 만든 자율 비행 드론",
   "summary": "멀티콥터 기체에 Pixhawk 비행제어기를 적용하고, Mission Planner에서 설정한 비행 경로를 기체 제어와 연결해 자율 비행 흐름을 구성했습니다.",
   "role": [],

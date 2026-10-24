@@ -13,6 +13,11 @@ export const profile = {
   role: 'Physical AI Developer',
   roleKo: 'AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자',
   motto: '제약을 이해하고, 작은 실험으로 해법을 검증합니다.',
+  // 학력 — 2026 Notion 포트폴리오의 Education(본인 기록 그대로)
+  education: [
+    { school: '원광대학교', major: '컴퓨터소프트웨어공학과', period: '2023 – 2029' },
+    { school: 'JST 공유대학 (전북대학교)', major: '스마트 모빌리티 SW공학과 · 복수전공', period: '2024 – 2026' },
+  ],
   email: 'yhkwon2004@gmail.com',
   links: [
     { label: 'Email', value: 'yhkwon2004@gmail.com', url: 'mailto:yhkwon2004@gmail.com' },
@@ -53,43 +58,35 @@ export const scenes = [
       { no: '02', title: '임베디드 · 제어 · 모빌리티', text: 'PCB · ESP32 · 드론 · 차량 · 로봇' },
       { no: '03', title: '기획 · 제작 · 검증', text: '프로토타입부터 사업화까지' },
     ],
-    timeline: [
-      ['2018', '무인멀티콥터 1종'],
-      ['2023', 'LLM 연구실 · GAN-TTS'],
-      ['2024', '드론 교관 · 자작차 · 모빌리티 복수전공'],
-      ['2025', 'Re:cap 대표 · 전남대 인턴십 우수(1위)'],
-      ['2026', 'IoT 연구실 · 4족보행 로봇'],
-    ],
   },
   {
-    id: 'aerial',
-    ko: '드론',
-    code: 'AERIAL',
-    label: 'Aerial Autonomy',
+    // 연도별 이력(src/data/history.js) — 3D는 드론이 웨이포인트를 따라 나는 하늘 세트
+    id: 'history',
+    ko: '이력',
+    code: 'HISTORY',
+    label: 'History',
+    layout: 'history',
+    hold: 14,
+    kicker: 'HISTORY — 연도별 이력',
+    title: ['HISTORY', '2023—2026'],
+    subtitle: '연구실 · 동아리 · 전공 · 창업 · 수상 — 항목을 누르면 이어진 프로젝트 · 상장 · 기사로',
+  },
+  {
+    id: 'ground',
+    ko: '드론 · 모빌리티',
+    code: 'MOBILITY',
+    label: 'Drone & Mobility',
     layout: 'reel',
-    hold: 11,
-    category: 'drone',
-    kicker: 'AERIAL AUTONOMY — 드론',
-    title: ['AERIAL', 'AUTONOMY'],
-    subtitle: '조종에서 교육, 그리고 자율비행까지',
+    hold: 13,
+    category: 'mobility',
+    kicker: 'DRONE & MOBILITY — 드론 · 자율주행 · 차량',
+    title: ['DRONE &', 'MOBILITY'],
+    subtitle: '하늘과 땅의 자율 이동 — 조종 · 자율비행에서 시뮬레이터 · 실차까지',
     stats: [
       { value: '2018', label: '멀티콥터 1종' },
       { value: '2024', label: '지도조종자(교관)' },
     ],
-    projects: ['pixhawk-drone', 'drone-soccer'],
-  },
-  {
-    id: 'ground',
-    ko: '자율주행 · 차량',
-    code: 'GROUND',
-    label: 'Ground Mobility',
-    layout: 'reel',
-    hold: 12,
-    category: 'mobility',
-    kicker: 'GROUND MOBILITY — 자율주행 · 차량',
-    title: ['GROUND', 'MOBILITY'],
-    subtitle: '시뮬레이터에서 배우고, 실차에서 검증한다',
-    projects: ['airsim-driving', 'carla-e2e', 'av-competition', 'ros2-nav2', 'baja-ev-formula', 'ev-medical', 'manual-ev', 'ai-pedal-blackbox'],
+    projects: ['pixhawk-drone', 'drone-soccer', 'airsim-driving', 'av-competition', 'ros2-nav2', 'baja-ev-formula', 'ev-medical', 'manual-ev'],
   },
   {
     id: 'robotics',
@@ -165,7 +162,7 @@ export const scenes = [
     title: ['THE', 'RECORD'],
     counters: [
       { value: awardData.length, label: '수상 기록' }, // 수상 아카이브(/awards)와 같은 수
-      { value: projectData.length, label: '프로젝트' }, // 아카이브(/works)와 같은 수
+      { value: projectData.filter((p) => !p.hidden).length, label: '프로젝트' }, // 아카이브(/works)와 같은 수(숨긴 기록 제외)
       { value: 9, label: '자격증' },
       { value: pressData.length, label: '공식 보도' }, // 보도 장면(press.json)과 같은 수
     ],
@@ -180,7 +177,7 @@ export const scenes = [
     layout: 'finale',
     hold: 0,
     kicker: 'END CREDITS',
-    // 엔딩 크레딧: 네 장면(비트) — 한 장씩 가운데에 들어와 잠깐 머문 뒤 넘어간다(약 12초)
+    // 엔딩 크레딧: 네 장면(비트) — 한 장씩 가운데에 들어와 잠깐 머문 뒤 넘어간다(약 6초)
     credits: [
       { beat: 'lead', role: 'Written, Directed & Engineered by', name: '권용현', en: 'Yonghyun Kwon' },
       { beat: 'words', role: 'Featuring', words: ['Drone', 'Robot', 'Mobility', 'AI'] },

@@ -1,9 +1,9 @@
 // 프로젝트 상세 데이터. projects.json은 scripts/build-projects.mjs가 노션·기록 수집 결과로 만든다.
 import raw from './projects.json';
 
+// 드론과 모빌리티는 한 분야(하늘과 땅의 자율 이동)로 묶는다
 export const CATEGORIES = [
-  { id: 'drone', label: 'Drone', ko: '드론' },
-  { id: 'mobility', label: 'Mobility', ko: '모빌리티' },
+  { id: 'mobility', label: 'Drone · Mobility', ko: '드론 · 모빌리티' },
   { id: 'robotics', label: 'Robotics', ko: '로봇' },
   { id: 'ai', label: 'AI', ko: 'AI · 데이터' },
   { id: 'iot', label: 'IoT · H/W', ko: '임베디드 · 하드웨어' },
@@ -51,8 +51,12 @@ function normalize(p) {
   };
 }
 
-// 피지컬 AI(드론 → 모빌리티 → 로봇 → AI) 우선, 같은 분야 안에서는 최신순
+// 합쳐진 프로젝트의 예전 주소 → 지금 주소
+export const ALIAS = { 'carla-e2e': 'airsim-driving' };
+
+// 피지컬 AI(드론 · 모빌리티 → 로봇 → AI) 우선, 같은 분야 안에서는 최신순. hidden: 노출하지 않는 기록
 export const projects = raw
+  .filter((p) => !p.hidden)
   .map(normalize)
   .sort((a, b) => rank(a.category) - rank(b.category) || lastYear(b.year) - lastYear(a.year) || firstYear(b.year) - firstYear(a.year));
 

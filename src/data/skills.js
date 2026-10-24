@@ -7,7 +7,7 @@ import { AWARDS, awardsOf } from './awards.js';
 
 // 분야 — 필름의 장면 순서(하늘 → 땅 → 로봇 → 지능 → 제작 → 출시)를 따른다
 export const DOMAINS = [
-  { id: 'aerial', code: 'AERIAL', label: 'Drone & Flight', ko: '드론 · 비행', cat: 'drone', lead: '조종에서 교육, 그리고 자율비행까지' },
+  { id: 'aerial', code: 'AERIAL', label: 'Drone & Flight', ko: '드론 · 비행', cat: 'mobility', lead: '조종에서 교육, 그리고 자율비행까지' },
   { id: 'ground', code: 'GROUND', label: 'Autonomous Driving', ko: '자율주행 · 모빌리티', cat: 'mobility', lead: '시뮬레이터에서 배우고, 실차에서 검증한다' },
   { id: 'robotics', code: 'ROBOTICS', label: 'Robotics', ko: '로봇 · 제어', cat: 'robotics', lead: '기구 · 모터 · 제어 — 매니퓰레이터와 보행 로봇으로 넓히는 중' },
   { id: 'ai', code: 'INTELLIGENCE', label: 'AI · Vision · LLM', ko: 'AI · 비전 · 데이터', cat: 'ai', lead: '보고, 이해하고, 정리하는 지능' },

@@ -5,6 +5,7 @@ import { AWARDS, AWARD_REEL } from '../data/awards.js';
 import { ORGS, WALL } from '../data/orgs.js';
 import { projectCard, awardCard, pressCard, orgMark, deckInfo, deckAwardInfo, deckPressInfo, deckAllCard, deckAllInfo } from '../pages/site.js';
 import { PRESS } from '../data/press.js';
+import { HISTORY } from '../data/history.js';
 
 // 빈 선택자에 대한 GSAP 경고를 피한다
 const has = (t) => t && (t.length === undefined || t.length > 0);
@@ -91,6 +92,30 @@ function render(scene, i) {
           <p class="hero-lead">${esc(scene.lead)}</p>
         </div>
         <ul class="hero-tags" data-r>${scene.tags.map((t, j) => `<li><span>${pad(j + 1)}</span>${esc(t)}</li>`).join('')}</ul>
+      </div>
+    </div>`;
+  }
+  // 연도별 이력: 해마다 한 줄 — 세부 기록이 있는 항목은 누르면 이력 페이지의 그 항목으로(이어진 프로젝트 · 상장 · 기사)
+  if (L === 'history') {
+    const count = (y) => [y.projects.length && `프로젝트 ${y.projects.length}`, y.awards.length && `수상 ${y.awards.length}`].filter(Boolean).join(' · ');
+    const item = (it) =>
+      it.deep
+        ? `<li><a href="/history#h-${esc(it.id)}" data-link><span class="hist-k">${esc(it.kind)}</span><span class="hist-t">${esc(it.title)}</span><i aria-hidden="true">→</i></a></li>`
+        : `<li><span class="hist-k">${esc(it.kind)}</span><span class="hist-t">${esc(it.title)}</span></li>`;
+    return `<div class="history-scene">
+      <div class="reel-head panel-content">
+        ${kicker(scene, i)}
+        <h2 class="title">${lines(scene.title)}</h2>
+        ${scene.subtitle ? `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>` : ''}
+      </div>
+      <div class="hist-wrap panel-content" data-r>
+        <div class="hist-years" role="list" aria-label="연도별 이력">${HISTORY.map(
+          (y) => `<section class="hist-y" role="listitem" aria-label="${esc(y.year)}년">
+            <a class="hist-yh" href="/history#y${esc(y.year)}" data-link><b>${esc(y.year)}</b><small>${count(y)}</small></a>
+            <ol>${y.items.map(item).join('')}</ol>
+          </section>`
+        ).join('')}</div>
+        <p class="hist-foot"><span class="hist-dots" aria-hidden="true">${HISTORY.map(() => '<i></i>').join('')}</span><a class="hist-all" href="/history" data-link>연도별 이력 자세히 보기 <span aria-hidden="true">→</span></a></p>
       </div>
     </div>`;
   }
@@ -879,6 +904,18 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       (from, r) => from === panels[current] && onReelFocus?.(r),
       (from, card, dir, focus) => from === panels[current] && onCard?.(card, dir, focus)
     );
+    // 이력 장면(휴대폰): 옆으로 넘기는 연도 칸 — 지금 보이는 연도의 점을 밝힌다
+    const years = el.querySelector('.hist-years');
+    if (years) {
+      const dots = [...el.querySelectorAll('.hist-dots i')];
+      const sync = () => {
+        const max = years.scrollWidth - years.clientWidth;
+        const k = max > 0 ? Math.round((years.scrollLeft / max) * (dots.length - 1)) : 0;
+        dots.forEach((d, j) => d.classList.toggle('is-on', j === k));
+      };
+      years.addEventListener('scroll', sync, { passive: true });
+      sync();
+    }
     const sheet = el.querySelector('.stage-foot');
     if (sheet) {
       const end = () => sheet.classList.toggle('is-end', sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 4);
@@ -985,7 +1022,9 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
   // 엔딩 크레딧: 네 비트가 차례로 — 비트마다 가운데로 빠르게 들어와(글자 · 로고가 순서대로 켜지고) 잠깐 머문 뒤 넘어간다.
   // 휠 · 손가락으로 앞뒤로 넘겨 볼 수 있고(손을 떼면 2초 뒤 다시), 방향키 · 크레딧 밖 휠은 한 비트씩
   let creditsCtl = null;
-  const HOLD = { 'cb-lead': 2.1, 'cb-words': 2.2, 'cb-with': 2.6, 'cb-thanks': 2.3 }; // 비트마다 머무는 초
+  // 비트마다 머무는 초 · 비트 사이를 넘어가는 초(약 6초에 네 비트)
+  const HOLD = { 'cb-lead': 1.05, 'cb-words': 1.1, 'cb-with': 1.3, 'cb-thanks': 1.15 };
+  const MOVE = 0.45;
   function runCredits(el, delay) {
     const roll = el.querySelector('.credits-roll');
     const credits = el.querySelector('.credits');
@@ -1045,9 +1084,9 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       creditsTl = gsap.timeline({ delay: wait });
       marks.forEach((m, k) => {
         if (m <= st.p + 0.002) return;
-        creditsTl.to(st, { p: m, duration: 0.9, ease: 'power3.inOut', onUpdate: apply }).to({}, { duration: HOLD[beats[k].classList[1]] || 2.2 });
+        creditsTl.to(st, { p: m, duration: MOVE, ease: 'power3.inOut', onUpdate: apply }).to({}, { duration: HOLD[beats[k].classList[1]] || 1.1 });
       });
-      creditsTl.to(st, { p: 1, duration: 0.7, ease: 'power2.in', onUpdate: apply }).add(showCard);
+      creditsTl.to(st, { p: 1, duration: MOVE * 0.8, ease: 'power2.in', onUpdate: apply }).add(showCard);
     };
     // 손으로 넘기는 동안은 흐름을 멈추고, 손을 떼면 잠시 뒤 다시 흐른다
     const hold = () => {

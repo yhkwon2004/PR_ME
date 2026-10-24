@@ -254,7 +254,7 @@
 }
 
 /* 걸어온 길 */
-.ab-time li {
+.ab-time > li {
   display: grid;
   grid-template-columns: 80px minmax(0, 1fr) auto;
   align-items: baseline;
@@ -514,7 +514,7 @@
   .ab-aw {
     columns: 1;
   }
-  .ab-time li {
+  .ab-time > li {
     grid-template-columns: 62px minmax(0, 1fr);
     gap: 4px 12px;
   }
@@ -706,7 +706,7 @@
     font-size: 8.5pt;
     line-height: 1.4;
   }
-  .ab-time li {
+  .ab-time > li {
     grid-template-columns: 48px minmax(0, 1fr) auto;
     padding: 3px 0;
     gap: 10px;
