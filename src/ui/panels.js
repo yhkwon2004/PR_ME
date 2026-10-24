@@ -5,7 +5,7 @@ import { AWARDS, AWARD_REEL } from '../data/awards.js';
 import { ORGS, WALL } from '../data/orgs.js';
 import { projectCard, awardCard, pressCard, orgMark, deckInfo, deckAwardInfo, deckPressInfo, deckAllCard, deckAllInfo } from '../pages/site.js';
 import { PRESS } from '../data/press.js';
-import { HISTORY } from '../data/history.js';
+import { renderBeats, bindBeats } from './beats.js';
 
 // 빈 선택자에 대한 GSAP 경고를 피한다
 const has = (t) => t && (t.length === undefined || t.length > 0);
@@ -95,30 +95,8 @@ function render(scene, i) {
       </div>
     </div>`;
   }
-  // 연도별 이력: 해마다 한 줄 — 세부 기록이 있는 항목은 누르면 이력 페이지의 그 항목으로(이어진 프로젝트 · 상장 · 기사)
-  if (L === 'history') {
-    const count = (y) => [y.projects.length && `프로젝트 ${y.projects.length}`, y.awards.length && `수상 ${y.awards.length}`].filter(Boolean).join(' · ');
-    const item = (it) =>
-      it.deep
-        ? `<li><a href="/history#h-${esc(it.id)}" data-link><span class="hist-k">${esc(it.kind)}</span><span class="hist-t">${esc(it.title)}</span><i aria-hidden="true">→</i></a></li>`
-        : `<li><span class="hist-k">${esc(it.kind)}</span><span class="hist-t">${esc(it.title)}</span></li>`;
-    return `<div class="history-scene">
-      <div class="reel-head panel-content">
-        ${kicker(scene, i)}
-        <h2 class="title">${lines(scene.title)}</h2>
-        ${scene.subtitle ? `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>` : ''}
-      </div>
-      <div class="hist-wrap panel-content" data-r>
-        <div class="hist-years" role="list" aria-label="연도별 이력">${HISTORY.map(
-          (y) => `<section class="hist-y" role="listitem" aria-label="${esc(y.year)}년">
-            <a class="hist-yh" href="/history#y${esc(y.year)}" data-link><b>${esc(y.year)}</b><small>${count(y)}</small></a>
-            <ol>${y.items.map(item).join('')}</ol>
-          </section>`
-        ).join('')}</div>
-        <p class="hist-foot"><span class="hist-dots" aria-hidden="true">${HISTORY.map(() => '<i></i>').join('')}</span><a class="hist-all" href="/history" data-link>연도별 이력 자세히 보기 <span aria-hidden="true">→</span></a></p>
-      </div>
-    </div>`;
-  }
+  // 한 장면 안의 여러 화면(소개 · 이력) — 스크롤 없이 한 화면씩
+  if (L === 'beats') return renderBeats(scene, i);
   // 보도: 대학 · 기관 공식 기사를 오려 낸 지면처럼 한 장씩 — 누르면 기사 원문(새 창)
   if (L === 'reel' && scene.press) {
     return `<div class="reel-scene press-scene">
@@ -243,7 +221,7 @@ function render(scene, i) {
           <div><dt>With</dt><dd>${WALL.length}</dd></div>
         </dl>
         <div class="endcard-actions" data-r>
-          <a class="btn-works" href="/about" data-link>프로필 · 이력서 <span aria-hidden="true">↗</span></a>
+          <a class="btn-works" href="/resume" data-link>이력서 · PDF <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/works" data-link>모든 프로젝트 보기 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/awards" data-link>수상 기록 · 상장 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/skills" data-link>보유 스킬 <span aria-hidden="true">↗</span></a>
@@ -887,7 +865,7 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
   showInfo(0);
 }
 
-export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus, onCard }) {
+export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus, onCard, onBeat }) {
   const panels = scenes.map((scene, i) => {
     const el = document.createElement('section');
     el.className = `panel layout-${scene.layout}`;
@@ -904,18 +882,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       (from, r) => from === panels[current] && onReelFocus?.(r),
       (from, card, dir, focus) => from === panels[current] && onCard?.(card, dir, focus)
     );
-    // 이력 장면(휴대폰): 옆으로 넘기는 연도 칸 — 지금 보이는 연도의 점을 밝힌다
-    const years = el.querySelector('.hist-years');
-    if (years) {
-      const dots = [...el.querySelectorAll('.hist-dots i')];
-      const sync = () => {
-        const max = years.scrollWidth - years.clientWidth;
-        const k = max > 0 ? Math.round((years.scrollLeft / max) * (dots.length - 1)) : 0;
-        dots.forEach((d, j) => d.classList.toggle('is-on', j === k));
-      };
-      years.addEventListener('scroll', sync, { passive: true });
-      sync();
-    }
+    // 소개 · 이력: 한 장면 안의 화면(비트) — 손으로 옮긴 화면만 자동 재생 시계에 알린다
+    el.beats = el.querySelector('.beats') ? bindBeats(el, reducedMotion, (d) => el === panels[current] && onBeat?.(d)) : null;
     const sheet = el.querySelector('.stage-foot');
     if (sheet) {
       const end = () => sheet.classList.toggle('is-end', sheet.scrollTop + sheet.clientHeight >= sheet.scrollHeight - 4);
@@ -973,7 +941,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
   }
 
   // back: 다음 장면에서 거꾸로 돌아왔다(위에서 내려온다) · first: 덱은 첫 카드부터(휴대폰에서 위아래로 밀어 장면을 넘겼을 때)
-  function show(i, delay = 0, back = false, first = false) {
+  // beat: 이 화면(비트)부터(주소 · 목차에서 연도로 들어온 경우)
+  function show(i, delay = 0, back = false, first = false, beat = null) {
     const el = panels[i];
     el.hidden = false;
     el.inert = false;
@@ -995,6 +964,12 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     }
     if (has(reveal)) tl.to(reveal, { autoAlpha: 1, y: 0, duration: 0.8 * D, ease: 'power3.out', stagger: 0.055 * D }, heroChars.length ? 0.6 : 0.25);
     tl.add(() => countUp(el), 0.4);
+    if (el.beats) {
+      // 뒤로 돌아왔다면 마지막 화면부터 — 위로 스크롤하면 화면을 거꾸로 넘긴다.
+      // 화면은 휴대폰에서도 위아래로 넘기므로(덱과 달리) 밀어서 돌아와도 마지막 화면부터
+      el.beats.reset(beat != null ? el.beats.indexOf(beat) : back ? el.beats.count - 1 : 0);
+      el.beats.intro(tl, 0.25);
+    }
     if (el.reel) {
       // 넘기는 동안 빈 카드가 보이지 않게 이 장면의 썸네일은 미리 모두 받는다
       el.querySelectorAll('.deck-stage img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
@@ -1197,6 +1172,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
 
   // 장면 넘기기 전에 지금 장면의 프로젝트 릴을 한 장씩 넘긴다 — 넘겼으면 { focus, count }
   function step(dir) {
+    const beats = panels[current]?.beats;
+    if (beats) return beats.step(dir) ? { beat: beats.index } : null;
     if (creditsCtl && panels[current] === creditsCtl.el) {
       const r = creditsCtl.step(dir);
       if (r) return { credits: true };
@@ -1207,6 +1184,12 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
   }
   // 자동 재생: 장면 시간에 맞춰 초점이 다음 카드로 흐른다(뒤로는 돌아가지 않음)
   function autoFocus(progress) {
+    const beats = panels[current]?.beats;
+    if (beats) {
+      const k = Math.min(beats.count - 1, Math.floor(progress * beats.count));
+      if (k > beats.index) beats.set(k, { auto: true });
+      return;
+    }
     const reel = panels[current]?.reel;
     if (!reel || reel.count < 2) return;
     const k = Math.min(reel.count - 1, Math.floor(progress * reel.count));
@@ -1236,13 +1219,13 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     peek: () => panels[current]?.reel?.peek() || 0,
     setLoopCenter,
     // quick: 손으로 끌어 넘겼다(다음 장면을 더 빨리 들인다) · from: 끌려 와 있던 자리 · first: 덱은 첫 카드부터
-    go(i, prev, duration, { quick = false, from = 0, first = false } = {}) {
+    go(i, prev, duration, { quick = false, from = 0, first = false, beat = null } = {}) {
       if (prev >= 0) hide(prev, i > prev ? 1 : -1, from);
       current = i;
       // 다음 장면의 릴 썸네일을 미리 받아 카드가 빈 상자로 날아들지 않게
       panels[i + 1]?.querySelectorAll('.deck-stage img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
       const delay = prev < 0 ? 0.9 : quick ? Math.max(0.35, duration * 0.4) : Math.max(0.5, duration * 0.62);
-      show(i, delay, prev === i + 1, first);
+      show(i, delay, prev === i + 1, first, beat);
     },
     get current() {
       return panels[current];

@@ -1,0 +1,779 @@
+/* ── 한 장면 안의 화면(비트): 소개 · 이력 — 스크롤 없이 한 화면씩, 넘기면 줄들이 차례로 들고 난다 ── */
+.beats,
+.beat-stage,
+.beat {
+  position: absolute;
+  inset: 0;
+}
+.beat[hidden] {
+  display: none;
+}
+.bt-top {
+  position: absolute;
+  top: calc(var(--top) + 4px);
+  left: var(--pad);
+  right: var(--pad);
+  text-align: center;
+}
+.bt-top .kicker {
+  justify-content: center;
+}
+.bt-body {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--bottom) + 62px);
+  width: min(100% - 2 * var(--pad), 1240px);
+  transform: translateX(-50%);
+}
+.beat .bt-top,
+.beat .bt-body {
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85);
+}
+/* 글이 3D 위에서도 읽히도록 비치는 판 */
+.bt-col,
+.bt-nums > div,
+.bt-pillars > li,
+.bt-item {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(5, 7, 12, 0.72);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  text-shadow: none;
+}
+html.q-lite .bt-col,
+html.q-lite .bt-nums > div,
+html.q-lite .bt-pillars > li,
+html.q-lite .bt-item {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgba(5, 7, 12, 0.88);
+}
+.bt-h {
+  margin-top: 12px;
+  font-size: clamp(30px, 3.4vw, 54px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  word-break: keep-all;
+}
+.bt-h span {
+  margin-left: 0.35em;
+  font-family: var(--display);
+  font-size: 0.5em;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--fg-2);
+}
+
+/* 화면 고르기: 아래 가운데의 칸 — 지금 화면은 밝게, 지나온 화면은 청록 */
+.beat-nav {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--bottom) + 12px);
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: rgba(5, 7, 12, 0.66);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  transition: opacity 0.3s;
+}
+/* 다음 장면으로 당기는 동안에는 당김 표시가 앞선다 */
+#stage.is-pulling .beat-nav {
+  opacity: 0.12;
+}
+.beat-nav button {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--fg-2);
+  transition:
+    background 0.3s,
+    color 0.3s;
+}
+.beat-nav button i {
+  display: none;
+}
+.beat-nav button.is-past {
+  color: var(--cyan);
+}
+.beat-nav button[aria-current] {
+  background: var(--fg);
+  color: var(--bg);
+}
+.beat-nav button:hover:not([aria-current]) {
+  color: var(--fg);
+}
+.beat-nav button:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* ── 소개 1: 누구인가 — 제목은 위, 이름은 아래(가운데 띠는 드론) ── */
+.bt-who .title {
+  margin-top: 12px;
+}
+.bt-who .bt-body {
+  text-align: center;
+}
+.bt-name b {
+  display: block;
+  font-size: clamp(46px, 5.4vw, 84px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+.bt-name span {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--display);
+  font-size: clamp(15px, 1.5vw, 21px);
+  letter-spacing: 0.04em;
+  color: var(--fg-2);
+}
+.bt-role {
+  margin-top: 16px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg-2);
+  word-break: keep-all;
+}
+.bt-role b {
+  font-weight: 600;
+  color: var(--cyan);
+}
+.bt-lead {
+  max-width: 40em;
+  margin: 8px auto 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--fg-2);
+  word-break: keep-all;
+}
+
+/* ── 소개 2: 학력 · 기록 ── */
+.bt-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+.bt-col {
+  padding: 18px 20px;
+}
+.bt-sub {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--cyan);
+}
+.bt-sub ~ .bt-sub {
+  margin-top: 16px;
+}
+.bt-edu {
+  margin-top: 6px;
+}
+.bt-edu li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.bt-edu b {
+  font-size: 18px;
+  font-weight: 700;
+}
+.bt-edu span {
+  font-size: 14px;
+  color: var(--fg-2);
+  word-break: keep-all;
+}
+.bt-edu small {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.bt-certs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.bt-certs li {
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: var(--fg-2);
+}
+.bt-certs small {
+  margin-left: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+.bt-nums {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.bt-nums > div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 18px;
+}
+.bt-nums > div:last-child {
+  grid-column: span 2;
+}
+.bt-nums dd {
+  font-family: var(--display);
+  font-size: clamp(34px, 3.4vw, 54px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+.bt-nums dd small {
+  margin-left: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--orange);
+}
+.bt-nums dt {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.bt-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.bt-links a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: rgba(5, 7, 12, 0.66);
+  font-size: 13px;
+  text-shadow: none;
+  transition: border-color 0.3s;
+}
+.bt-links a span {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.bt-links a:hover,
+.bt-links a:focus-visible {
+  border-color: var(--cyan);
+  outline: none;
+}
+.bt-links a.is-pdf {
+  border-color: var(--orange);
+}
+
+/* ── 소개 3: 핵심 역량 — 세 축과 그 축을 보여 주는 프로젝트 ── */
+.bt-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.bt-pillars > li {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 20px;
+}
+.bt-no {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--cyan);
+}
+.bt-pillars h3 {
+  font-size: 19px;
+  font-weight: 700;
+  word-break: keep-all;
+}
+.bt-pillars p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--fg-2);
+  word-break: keep-all;
+}
+
+/* 화면에 바로 보이는 근거: 프로젝트 사진 · 상장 · 기사 */
+.bt-media {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.bt-p {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 4px 12px 4px 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(5, 7, 12, 0.6);
+  transition: border-color 0.3s;
+}
+.bt-p:hover,
+.bt-p:focus-visible {
+  border-color: var(--cc, var(--cyan));
+  outline: none;
+}
+.bt-pi {
+  flex: none;
+  overflow: hidden;
+  width: 46px;
+  height: 34px;
+  border-radius: 7px;
+  background: #0b0f16;
+}
+.bt-pi img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bt-pi i {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-family: var(--mono);
+  font-size: 7.5px;
+  font-style: normal;
+  color: var(--cc, var(--cyan));
+}
+.bt-p b {
+  overflow: hidden;
+  max-width: 15em;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.bt-c {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  width: 40px;
+  border-radius: 3px;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.9);
+  transition: transform 0.3s var(--ease);
+}
+.bt-c img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1132 / 1600;
+  object-fit: cover;
+  background: #f3efe6;
+}
+.bt-c i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1px 0;
+  background: rgba(5, 7, 12, 0.82);
+  font-size: 8.5px;
+  font-style: normal;
+  font-weight: 700;
+  text-align: center;
+  color: var(--tc, var(--fg));
+}
+.bt-c:hover,
+.bt-c:focus-visible {
+  transform: translateY(-2px) rotate(-3deg);
+  outline: none;
+}
+.bt-n {
+  display: grid;
+  gap: 1px;
+  max-width: 19em;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(5, 7, 12, 0.6);
+  transition: border-color 0.3s;
+}
+.bt-n small {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--muted);
+}
+.bt-n b {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.bt-n:hover,
+.bt-n:focus-visible {
+  border-color: var(--cyan);
+  outline: none;
+}
+
+/* ── 이력: 연도마다 한 화면 — 왼쪽에 큰 연도, 오른쪽에 그 해의 일 ── */
+.bt-yrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 32px;
+  align-items: end;
+}
+.bt-y b {
+  display: block;
+  font-family: var(--display);
+  font-size: clamp(96px, 9vw, 160px);
+  font-weight: 700;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+}
+.bt-y span {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.bt-y em {
+  margin-right: 4px;
+  font-size: 14px;
+  font-style: normal;
+  color: var(--fg);
+}
+.bt-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+}
+.bt-items > li:last-child:nth-child(odd) {
+  grid-column: span 2;
+}
+.bt-item {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 14px 16px;
+}
+.bt-item.is-plain {
+  border-style: dashed;
+  background: rgba(5, 7, 12, 0.5);
+}
+.bt-k {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--cyan);
+}
+.bt-item h3 {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+.bt-note {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--fg-2);
+  word-break: keep-all;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.bt-item .bt-media {
+  margin-top: 4px;
+}
+.bt-more {
+  margin-top: 12px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--fg-2);
+}
+.bt-more a {
+  margin-left: 6px;
+  color: var(--cyan);
+}
+
+/* 낮은 화면(노트북): 판을 줄여 3D가 숨 쉴 자리를 남긴다 */
+@media (min-width: 821px) and (max-height: 820px) {
+  .bt-y b {
+    font-size: clamp(84px, 8vw, 130px);
+  }
+  .bt-item {
+    padding: 10px 14px;
+  }
+  .bt-note {
+    -webkit-line-clamp: 2;
+  }
+  .bt-pillars > li {
+    padding: 14px 16px;
+  }
+  .bt-nums dd {
+    font-size: 36px;
+  }
+}
+
+/* 휴대폰: 한 줄씩 쌓고 글을 줄인다 — 화면은 위아래로 밀어 넘긴다 */
+@media (max-width: 820px) {
+  .bt-body {
+    bottom: calc(var(--bottom) + 52px);
+  }
+  .beat-nav {
+    bottom: calc(var(--bottom) + 8px);
+  }
+  .beat-nav button {
+    padding: 7px 11px;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+  }
+  .bt-h {
+    margin-top: 8px;
+    font-size: 26px;
+  }
+  .bt-h span {
+    display: block;
+    margin: 4px 0 0;
+    font-size: 14px;
+  }
+  .bt-who .title {
+    font-size: 25px;
+  }
+  .bt-name b {
+    font-size: 42px;
+  }
+  .bt-role {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  .bt-lead {
+    font-size: 13.5px;
+  }
+  .bt-cols {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .bt-col {
+    padding: 12px 14px;
+  }
+  .bt-edu li {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 2px 10px;
+    padding: 5px 0;
+  }
+  .bt-edu b {
+    font-size: 15px;
+  }
+  .bt-edu span {
+    font-size: 12.5px;
+  }
+  .bt-edu small {
+    grid-column: 1 / -1;
+    font-size: 10px;
+  }
+  .bt-sub ~ .bt-sub {
+    margin-top: 10px;
+  }
+  .bt-certs {
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .bt-certs li {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  .bt-certs small {
+    display: none;
+  }
+  .bt-nums {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .bt-nums > div {
+    grid-column: span 2;
+    padding: 8px 10px;
+    gap: 4px;
+  }
+  .bt-nums > div:nth-child(n + 4) {
+    grid-column: span 3;
+  }
+  .bt-nums dd {
+    font-size: 26px;
+  }
+  .bt-nums dd small {
+    margin-left: 4px;
+    font-size: 9.5px;
+  }
+  .bt-nums dt {
+    font-size: 9.5px;
+  }
+  .bt-links {
+    gap: 5px;
+    margin-top: 8px;
+  }
+  .bt-links a {
+    padding: 6px 10px;
+    font-size: 11.5px;
+  }
+  .bt-links a span {
+    display: none;
+  }
+  .bt-pillars {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .bt-pillars > li {
+    gap: 6px;
+    padding: 12px 14px;
+  }
+  .bt-pillars h3 {
+    font-size: 16px;
+  }
+  .bt-pillars p {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 12.5px;
+    line-height: 1.5;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .bt-yrow {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .bt-y {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .bt-y b {
+    font-size: 64px;
+  }
+  .bt-y span {
+    margin-top: 0;
+    font-size: 10px;
+  }
+  .bt-y em {
+    font-size: 12px;
+  }
+  .bt-items {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .bt-items > li:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+  .bt-item {
+    gap: 3px;
+    padding: 10px 12px;
+  }
+  .bt-item h3 {
+    font-size: 14px;
+  }
+  .bt-note {
+    font-size: 12px;
+    -webkit-line-clamp: 2;
+  }
+  .bt-media {
+    gap: 5px;
+  }
+  .bt-media > :nth-child(n + 4) {
+    display: none;
+  }
+  .bt-pi {
+    width: 36px;
+    height: 27px;
+  }
+  .bt-p {
+    padding: 3px 8px 3px 3px;
+  }
+  .bt-p b {
+    max-width: 8em;
+    font-size: 11px;
+  }
+  .bt-c {
+    width: 30px;
+  }
+  .bt-n b {
+    max-width: 9em;
+    font-size: 11px;
+  }
+  .bt-more {
+    margin-top: 6px;
+    font-size: 11px;
+  }
+}
+
+/* 이력서(/resume): 학력 · 걸어온 길(연도별 이력) */
+.ab-edu {
+  display: grid;
+  gap: 4px;
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--fg-2);
+}
+.ab-edu b {
+  color: var(--fg);
+}
+.ab-edu small {
+  margin-left: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.ab-tl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.ab-tl li {
+  font-size: 14.5px;
+  font-weight: 600;
+  word-break: keep-all;
+}
+.ab-tl li + li::before {
+  content: '·';
+  margin-right: 14px;
+  color: var(--muted);
+}
+
+@media print {
+  .ab-tl li {
+    font-size: 9.5pt;
+  }
+  .ab-edu {
+    margin-top: 4px;
+    font-size: 9.5pt;
+  }
+}

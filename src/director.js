@@ -96,7 +96,7 @@ export class Director {
       pos.copy(target).add(back);
       fov += 8;
       const reel = this.scenes.find((x) => x.id === id)?.layout === 'reel';
-      const stage = this.scenes.find((x) => x.id === id)?.layout === 'stage';
+      const stage = ['stage', 'beats'].includes(this.scenes.find((x) => x.id === id)?.layout);
       shift.set(0, id === 'finale' ? 0.45 : id === 'record' ? 0.12 : id === 'robotics' ? 0.2 : reel ? 0.06 : stage ? 0.02 : 0.2);
     } else if (aspect < 1.3) {
       const back = pos.clone().sub(target).multiplyScalar(1.15);

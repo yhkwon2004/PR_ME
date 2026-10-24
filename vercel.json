@@ -35,6 +35,10 @@
       "destination": "/"
     },
     {
+      "source": "/resume",
+      "destination": "/"
+    },
+    {
       "source": "/awards",
       "destination": "/"
     },

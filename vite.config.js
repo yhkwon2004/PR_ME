@@ -67,14 +67,20 @@ function pageMeta() {
         {
           path: '/about',
           title: `프로필 — ${NAME}`,
-          desc: `Physical AI Developer — AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자. 프로젝트 ${projects.length} · 수상 ${awards.length} · 보도 ${press.length} — 핵심 역량부터 연락처까지 한 장에(PDF 이력서 저장).`,
+          desc: `Physical AI Developer — AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자. 프로젝트 ${projects.length} · 수상 ${awards.length} · 보도 ${press.length} — 소개 · 학력 · 핵심 역량을 영화처럼 한 화면씩.`,
           image: og('about'),
           type: 'profile',
         },
         {
+          path: '/resume',
+          title: `이력서 — ${NAME}`,
+          desc: `한 장으로 보는 이력서 — 학력 · 숫자 · 핵심 역량 · 연도별 이력 · 대표 프로젝트 · 수상 ${awards.length}건 · 자격증 · 보도 · 기술 · 연락처. PDF로 저장할 수 있습니다.`,
+          image: og('about'),
+        },
+        {
           path: '/history',
           title: `연도별 이력 — ${NAME}`,
-          desc: '2023 — 2026, 해마다 한 일 — 연구실 · 동아리 · 전공 · 창업 · 수상. 항목마다 이어진 프로젝트 · 상장 · 기사로 들어갑니다.',
+          desc: '2023 — 2026, 해마다 한 일 — 연구실 · 동아리 · 전공 · 창업 · 수상. 연도마다 한 화면에 이어진 프로젝트 · 상장 · 기사까지.',
           image: og('history'),
         },
         {

@@ -47,16 +47,38 @@ export const scenes = [
     ko: '소개',
     code: 'PROLOGUE',
     label: 'Prologue',
-    layout: 'stage',
+    // 세 화면(소개 → 학력 · 기록 → 핵심 역량) — 스크롤 없이 한 화면씩(src/ui/beats.js)
+    layout: 'beats',
+    beats: 'profile',
     hold: 9,
+    beatHold: 7, // 화면마다 머무는 초(자동 재생)
     kicker: 'PROLOGUE — WHO BUILDS THE MACHINE',
     title: ['제약을 이해하고, 작은 실험으로', '해법을 검증합니다.'],
     titleKo: true,
     lead: '현장의 제약을 문제로 정의하고, AI·소프트웨어·하드웨어를 연결해 작동하는 해결책으로 만듭니다.',
+    // detail: 2026 Notion 포트폴리오의 핵심 역량 문장 그대로 · projects: 그 축을 보여 주는 대표 프로젝트
     pillars: [
-      { no: '01', title: 'AI · 알고리즘 · 데이터', text: '비전 · LLM · 시뮬레이션' },
-      { no: '02', title: '임베디드 · 제어 · 모빌리티', text: 'PCB · ESP32 · 드론 · 차량 · 로봇' },
-      { no: '03', title: '기획 · 제작 · 검증', text: '프로토타입부터 사업화까지' },
+      {
+        no: '01',
+        title: 'AI · 알고리즘 · 데이터',
+        text: '비전 · LLM · 시뮬레이션',
+        detail: '컴퓨터 비전, 생성형 AI·LLM, 시계열 분석과 시뮬레이션을 활용해 데이터를 실제 문제 해결 흐름으로 연결합니다.',
+        projects: ['huss-evidence-ai', 'ai-pose-guide'],
+      },
+      {
+        no: '02',
+        title: '임베디드 · 제어 · 모빌리티',
+        text: 'PCB · ESP32 · 드론 · 차량 · 로봇',
+        detail: 'PCB와 3D 설계, ESP32 기반 IoT, 로봇·차량·드론 프로젝트를 통해 하드웨어와 소프트웨어의 통합을 경험했습니다.',
+        projects: ['iot-iv-pole', 'pixhawk-drone'],
+      },
+      {
+        no: '03',
+        title: '기획 · 제작 · 검증',
+        text: '프로토타입부터 사업화까지',
+        detail: '사용자와 현장의 요구를 정리하고, 프로토타입 제작부터 테스트·개선, 협업과 사업화까지 이어가는 과정을 중요하게 생각합니다.',
+        projects: ['recap-jbmotors', 'givingplus-filament'],
+      },
     ],
   },
   {
@@ -65,11 +87,12 @@ export const scenes = [
     ko: '이력',
     code: 'HISTORY',
     label: 'History',
-    layout: 'history',
+    // 연도마다 한 화면 — 항목 · 기록 한 줄 · 이어진 프로젝트 사진 · 상장 · 기사가 그 화면에 바로(src/ui/beats.js)
+    layout: 'beats',
+    beats: 'history',
     hold: 14,
+    beatHold: 8,
     kicker: 'HISTORY — 연도별 이력',
-    title: ['HISTORY', '2023—2026'],
-    subtitle: '연구실 · 동아리 · 전공 · 창업 · 수상 — 항목을 누르면 이어진 프로젝트 · 상장 · 기사로',
   },
   {
     id: 'ground',

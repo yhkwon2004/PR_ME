@@ -451,9 +451,9 @@ function aboutPage() {
   return `<div class="pg pg-about">
     ${bar({ href: '/', label: '메인' })}
     <section class="works-head ab-head">
-      <p class="pg-kicker">PROFILE — 한눈에 보는 권용현</p>
-      <h1 class="works-title">Profile<sup>${from}–${to}</sup></h1>
-      ${tabs('about')}
+      <p class="pg-kicker">RÉSUMÉ — 한 장으로 보는 이력서 · PDF로 저장</p>
+      <h1 class="works-title">Résumé<sup>${from}–${to}</sup></h1>
+      ${tabs('resume')}
     </section>
 
     <section class="ab-id" aria-label="소개">
@@ -489,7 +489,7 @@ function aboutPage() {
         : ''
     }
 
-    <section class="ab-sec reveal">${h('02', '걸어온 길', 0, { href: '/history', label: '연도별 이력 자세히' })}<ol class="ab-time">${HISTORY.map((y) => {
+    <section class="ab-sec reveal">${h('02', '걸어온 길', 0, { href: '/history', label: '필름에서 연도별로 보기' })}<ol class="ab-time">${HISTORY.map((y) => {
       const n = inYear(y.year);
       const count = [n.p && `프로젝트 ${n.p}`, n.a && `수상 ${n.a}`].filter(Boolean).join(' · ');
       return `<li><time>${esc(y.year)}</time><ul class="ab-tl">${y.items.map((it) => `<li>${esc(it.title)}</li>`).join('')}</ul>${count ? `<small>${count}</small>` : ''}</li>`;
@@ -545,70 +545,6 @@ function aboutPage() {
     </section>
     ${footer()}
   </div>`;
-}
-
-// ── 연도별 이력(/history): 해마다 한 일 — 항목마다 이어진 프로젝트 · 상장 · 기사, 연도 아래에는 그 해의 다른 프로젝트 · 수상까지 ──
-function historyPage() {
-  const items = HISTORY.flatMap((y) => y.items);
-  const media = awardMedia([...new Set(items.flatMap((it) => it.awards))]);
-  const projRow = (p) =>
-    `<li><a class="hs-p" href="${p.path}" data-link data-cat="${esc(p.category)}">${
-      p.cover ? `<span class="hs-pi"><img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async" /></span>` : `<span class="hs-pi is-type">${esc(categoryOf(p.category).label)}</span>`
-    }<span class="hs-pt"><b>${esc(p.title)}</b><small>${esc(categoryOf(p.category).ko)} · ${esc(p.year)}</small></span><i aria-hidden="true">→</i></a></li>`;
-  const awRow = (a) =>
-    `<li class="hs-a" data-tier="${TIER_KEY[a.tier]}">${
-      a.certs.length || a.photo
-        ? `<button type="button" class="hs-cert" data-cert="${a.at}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기">${certSheet(a, { sizes: '72px' })}</button>`
-        : `<span class="hs-cert">${certSheet(a)}</span>`
-    }<span class="hs-at"><span class="hs-g">${LAUREL}${esc(a.grade)}</span><b>${esc(a.contest)}</b><small>${esc(dot(a.date))}${a.issuer ? ` · ${esc(a.issuer)}` : ''}</small></span></li>`;
-  const pressRow = (a) =>
-    `<li><a class="hs-press" href="${esc(a.url)}" target="_blank" rel="noopener"><small>${esc(a.publisher)} · ${a.date ? esc(dot(a.date)) : '인터뷰'}</small><b>${esc(a.title)}</b><i aria-hidden="true">↗</i></a></li>`;
-  const item = (it) => `<li class="hs-item${it.deep ? '' : ' is-plain'}" id="h-${esc(it.id)}">
-      <p class="hs-k">${esc(it.kind)}</p>
-      <h3 class="hs-t" tabindex="-1">${esc(it.title)}</h3>
-      ${it.note ? `<p class="hs-note">${esc(it.note)}</p>` : ''}
-      ${it.projects.length ? `<ul class="hs-ps" aria-label="이어진 프로젝트">${it.projects.map(projRow).join('')}</ul>` : ''}
-      ${it.awards.length ? `<ul class="hs-as" aria-label="이어진 수상">${it.awards.map(awRow).join('')}</ul>` : ''}
-      ${it.press.length ? `<ul class="hs-prs" aria-label="이어진 기사">${it.press.map(pressRow).join('')}</ul>` : ''}
-    </li>`;
-  const year = (y) => {
-    const linked = new Set(y.items.flatMap((it) => it.projects.map((p) => p.id)));
-    const more = y.projects.filter((p) => !linked.has(p.id));
-    const tiers = [1, 2, 3, 4, 5].map((t) => [t, y.awards.filter((a) => a.tier === t).length]).filter(([, n]) => n);
-    return `<section class="hs-year reveal" id="y${y.year}" aria-labelledby="hy-${y.year}">
-      <div class="hs-side">
-        <h2 class="hs-y" id="hy-${y.year}" tabindex="-1">${y.year}</h2>
-        <p class="hs-sum"><span><b>${y.items.length}</b>이력</span><span><b>${y.projects.length}</b>프로젝트</span><span><b>${y.awards.length}</b>수상</span></p>
-      </div>
-      <div class="hs-main">
-        <ol class="hs-items">${y.items.map(item).join('')}</ol>
-        ${
-          more.length || y.awards.length
-            ? `<div class="hs-more">
-          <p class="hs-more-k">${y.year}년의 다른 기록</p>
-          ${more.length ? `<ul class="hs-chips" aria-label="${y.year}년의 다른 프로젝트">${more.map((p) => `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}">${esc(p.title)}</a></li>`).join('')}</ul>` : ''}
-          ${y.awards.length ? `<a class="hs-aw-link" href="/awards#y${y.year}" data-link>${y.year}년 수상 ${y.awards.length}건 — ${tiers.map(([t, n]) => `${TIER_LABEL[t]} ${n}`).join(' · ')} <span aria-hidden="true">→</span></a>` : ''}
-        </div>`
-            : ''
-        }
-      </div>
-    </section>`;
-  };
-  return {
-    media,
-    html: `<div class="pg pg-history">
-    ${bar({ href: '/', label: '메인' })}
-    <section class="works-head hs-head">
-      <p class="pg-kicker">HISTORY — 연도별 이력</p>
-      <h1 class="works-title">History<sup>${HISTORY_YEARS[0]}–${HISTORY_YEARS[HISTORY_YEARS.length - 1]}</sup></h1>
-      ${tabs('history')}
-      <p class="sk-lead">해마다 한 일을 모았습니다. 항목마다 이어진 프로젝트 · 상장 · 기사로 들어가고, 연도 아래에는 그 해의 다른 프로젝트와 수상이 함께 있습니다.</p>
-      <nav class="hs-jump" aria-label="연도로 건너뛰기">${HISTORY.map((y) => `<a href="#y${y.year}" data-jump>${y.year}<sup>${y.items.length}</sup></a>`).join('')}</nav>
-    </section>
-    <div class="hs-list">${HISTORY.map(year).join('')}</div>
-    ${footer()}
-  </div>`,
-  };
 }
 
 function skillsPage() {
@@ -937,8 +873,10 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (path.toLowerCase() === '/awards') return { name: 'awards' };
     if (path.toLowerCase() === '/skills') return { name: 'skills' };
-    if (path.toLowerCase() === '/about') return { name: 'about' };
-    if (path.toLowerCase() === '/history') return { name: 'history' };
+    // 프로필 · 이력은 필름의 장면(한 화면씩) — /history#y2025는 그 해의 화면으로
+    if (path.toLowerCase() === '/about') return { name: 'film', scene: 'prologue' };
+    if (path.toLowerCase() === '/history') return { name: 'film', scene: 'history', beat: (location.hash.match(/^#y(\d{4})$/) || [])[1] ?? null };
+    if (path.toLowerCase() === '/resume') return { name: 'resume' };
     const m = path.match(/^\/works(?:\/([\w-]+))?$/);
     if (!m) return { name: 'film' };
     if (m[1]) {
@@ -990,12 +928,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     pageMedia = [];
     if (route.name === 'works') page.innerHTML = worksPage(route.cat);
     else if (route.name === 'skills') page.innerHTML = skillsPage();
-    else if (route.name === 'about') page.innerHTML = aboutPage();
-    else if (route.name === 'history') {
-      const h = historyPage();
-      pageMedia = h.media;
-      page.innerHTML = h.html;
-    }
+    else if (route.name === 'resume') page.innerHTML = aboutPage();
     else if (route.name === 'awards') {
       const a = awardsPage();
       pageMedia = a.media;
@@ -1006,7 +939,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     document.body.classList.add('page-open');
     bind(route);
     const p = route.name === 'detail' ? byId(route.id) : null;
-    const name = { awards: 'Awards', skills: 'Skills', about: 'Profile', history: 'History' }[route.name] || 'Works';
+    const name = { awards: 'Awards', skills: 'Skills', resume: 'Résumé' }[route.name] || 'Works';
     document.title = p ? `${p.title} — 권용현 Physical AI Portfolio` : `${name} — 권용현 Physical AI Portfolio`;
     page.focus({ preventScroll: true });
     // 주소에 자리가 있으면(필름의 이력 항목에서 들어온 경우 등) 그 자리로 — 그림이 자리 잡은 뒤에
@@ -1111,7 +1044,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     );
     page.querySelectorAll('.reveal, .w-item, .aw-cell, .sk-dcard').forEach((el) => observer.observe(el));
     // 상장 크게 보기(수상 아카이브 · 상세의 수상 칸)
-    const certs = route.name === 'awards' || route.name === 'history' ? pageMedia : JSON.parse(page.querySelector('.d-awards')?.dataset.media || '[]');
+    const certs = route.name === 'awards' ? pageMedia : JSON.parse(page.querySelector('.d-awards')?.dataset.media || '[]');
     // 수상 아카이브: 라이트박스도 화면에 보이는 순서(해마다 높은 등급부터)대로, 걸러 보는 중이면 보이는 수상만 넘긴다
     const showCert = (b) => {
       if (route.name !== 'awards') return lightbox.show({ media: certs }, +b.dataset.cert, b);
@@ -1170,16 +1103,13 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
         gsap.fromTo(items.filter((li) => !li.classList.contains('is-out')), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.03, ease: 'power3.out' });
       });
       gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .chips button'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'expo.out', delay: 0.2 });
-    } else if (route.name === 'about') {
+    } else if (route.name === 'resume') {
       page.querySelector('[data-print]')?.addEventListener('click', () => print());
       page.querySelectorAll('[data-copy]').forEach((b) =>
         b.addEventListener('click', async () => flash((await copyText(b.dataset.copy)) ? `이메일 주소를 복사했어요 — ${b.dataset.copy}` : '복사하지 못했어요'))
       );
       if (!reducedMotion)
         gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .ab-who > *, .ab-act > *, .ab-nums > div'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.035, ease: 'expo.out', delay: 0.2, clearProps: 'opacity,visibility,transform' });
-    } else if (route.name === 'history') {
-      if (!reducedMotion)
-        gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .sk-lead, .hs-jump a'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.035, ease: 'expo.out', delay: 0.2, clearProps: 'opacity,visibility,transform' });
     } else if (route.name === 'skills') {
       bindSkills();
       if (!reducedMotion)
@@ -1230,10 +1160,12 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     current = route.name === 'film' ? null : route;
     toTop.classList.remove('is-on');
     if (route.name === 'film') {
-      if (!prev) return onClose?.();
+      // 필름의 한 장면으로 가는 주소(/about · /history)는 필름 주소(/#prologue)로 바꿔 둔다
+      if (route.scene) history.replaceState(history.state, '', `/${location.search}#${route.scene}`);
+      if (!prev) return onClose?.(route);
       const back = () => {
         unmount();
-        onClose?.();
+        onClose?.(route);
         if (filmOpener?.isConnected) filmOpener.focus({ preventScroll: true });
         filmOpener = null;
       };
@@ -1241,7 +1173,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       else back();
       return;
     }
-    const label = route.name === 'detail' ? byId(route.id).title : route.name === 'about' ? 'PROFILE' : route.name.toUpperCase();
+    const label = route.name === 'detail' ? byId(route.id).title : route.name === 'resume' ? 'RÉSUMÉ' : route.name.toUpperCase();
     const doMount = () => {
       onOpen?.(route);
       mount(route);
@@ -1328,7 +1260,12 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   });
 
   return {
-    initial: parse(),
+    initial: (() => {
+      // 프로필 · 이력 주소로 바로 들어오면 필름 주소의 그 장면으로(부팅 뒤 그 장면에서 시작)
+      const r = parse();
+      if (r.name === 'film' && r.scene) history.replaceState(history.state, '', `/${location.search}#${r.scene}`);
+      return r;
+    })(),
     start(route) {
       if (route.name === 'film') return;
       // 바로 들어온 페이지도 깊이 1로 기록해 두면 그 안에서 이동한 뒤 닫기가 필름으로 간다

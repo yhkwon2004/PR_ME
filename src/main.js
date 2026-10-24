@@ -7,7 +7,7 @@ import './styles/pages.css';
 import './styles/premium.css';
 import './styles/skills.css';
 import './styles/about.css';
-import './styles/history.css';
+import './styles/beats.css';
 import './styles/guide.css';
 import './styles/perf.css';
 import './styles/clarity.css';
@@ -181,12 +181,22 @@ const panels = createPanels($('stage'), scenes, {
     mood.set(card, dir);
     if (dir) audio.pluck(focus, dir);
   },
+  // 소개 · 이력의 화면(비트)이 바뀌면: 손으로 옮긴 화면이면 자동 재생 시계를 맞추고, 마지막 화면이면 다음 장면 안내
+  onBeat: ({ index, prev, count, entry, auto: byAuto }) => {
+    const h = holdOf(director?.index);
+    if (h > 0 && !byAuto) elapsed = (h * index) / count;
+    if (entry) return;
+    if (!byAuto) takeOver();
+    audio.pluck(index, index > prev ? 1 : -1);
+    if (index === count - 1) hintNextScene(1600);
+  },
 });
 // 장면 길이: 카드 덱이 있으면 카드마다 1.5초는 머물도록 늘린다(수상 덱처럼 카드가 많은 장면)
 function holdOf(i) {
   const s = scenes[i];
   if (!(s?.hold > 0)) return 0;
-  return Math.max(s.hold, (panels.panels[i]?.reel?.count || 0) * 1.5);
+  const beats = panels.panels[i]?.beats;
+  return Math.max(s.hold, (panels.panels[i]?.reel?.count || 0) * 1.5, beats ? beats.count * (s.beatHold || 7) : 0);
 }
 const hud = createHud(scenes, {
   reducedMotion: reduced,
@@ -235,9 +245,12 @@ const site = createSite({
     video?.pause();
     if (!started) $('boot').hidden = true;
   },
-  onClose: () => {
+  // route.scene: 프로필(/about) · 이력(/history)처럼 필름의 한 장면으로 가는 주소
+  onClose: (route) => {
     pageCovered = false;
+    if (route?.scene && started) goScene(route.scene, route.beat);
     if (!started) {
+      if (route?.beat != null) pendingNav = { beat: route.beat };
       buildWorld();
       if (stage && !warmed) {
         stage.renderer.compile(stage.scene, stage.camera);
@@ -279,6 +292,19 @@ function goTo(i, opts) {
   return director.go(Math.max(0, Math.min(scenes.length - 1, i)), opts);
 }
 
+// 이름으로 장면(과 그 안의 화면)으로 — 이미 그 장면이면 화면만 옮긴다
+function goScene(id, beat) {
+  const i = scenes.findIndex((s) => s.id === id);
+  if (i < 0) return;
+  if (i === director.index) {
+    const beats = panels.current?.beats;
+    if (beats && beat != null) beats.set(beats.indexOf(beat));
+    return;
+  }
+  if (beat != null) pendingNav = { beat };
+  goTo(i);
+}
+
 // 스크롤 · 화살표 · 마우스로 끌기: 프로젝트 릴이 있으면 카드를 한 장씩 넘긴 뒤 다음 장면으로.
 // 휴대폰에서 위아래로 밀면(swipe) 카드는 건너뛰고 바로 다음 · 이전 장면 — 카드는 옆으로 넘긴다
 let pendingNav = null;
@@ -301,6 +327,11 @@ createInput({
     if (!started) return null;
     const i = director.index;
     if (scenes[i]?.layout === 'finale') return null;
+    const beats = panels.panels[i]?.beats;
+    if (beats) {
+      const k = beats.index + dir;
+      if (k >= 0 && k < beats.count) return `${dir > 0 ? '다음' : '이전'} · ${beats.label(k)}`;
+    }
     const reel = panels.panels[i]?.reel;
     if (reel?.paged && how !== 'swipe') {
       const k = reel.focus + dir;
@@ -349,6 +380,16 @@ createInput({
     }
     return false;
   },
+});
+
+// 이력 화면의 상장: 누르면 그 화면의 상장들을 크게(라이트박스)
+$('stage').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-film-cert]');
+  if (!b) return;
+  const media = JSON.parse(b.closest('[data-media]')?.dataset.media || '[]');
+  if (!media.length) return;
+  takeOver();
+  lightbox.show({ media }, +b.dataset.filmCert, b);
 });
 
 // 주소의 장면을 손으로 바꾸면(#robotics 등) 그 장면으로
@@ -587,6 +628,8 @@ function start(withSound) {
   }
   // 주소에 장면이 있으면(#robotics 등) 그 장면으로, 없으면 처음부터 — 지난번 멈춘 곳이 있으면 이어 보기를 권한다
   const deep = scenes.findIndex((s) => `#${s.id}` === location.hash);
+  // /history#y2025로 들어왔다면 그 해의 화면부터
+  if (deep > 0 && site.initial?.beat != null && !pendingNav) pendingNav = { beat: site.initial.beat };
   director.go(deep > 0 ? deep : 0);
   if (deep <= 0) setTimeout(() => !site.open && guide.offerResume(), reduced ? 600 : 3200);
   site.markFilm();
@@ -652,8 +695,15 @@ function idleHint() {
     guide.ghost('x', reel.card.getBoundingClientRect());
     return true;
   }
-  if (director.index >= scenes.length - 1) return false;
-  return guide.sceneHint(`다음 장면 · ${scenes[director.index + 1].ko}`, reel?.card?.getBoundingClientRect());
+  const label = nextLabel();
+  return label ? guide.sceneHint(label, reel?.card?.getBoundingClientRect()) : false;
+}
+// 아래로 넘기면 무엇이 오는지: 화면(비트)이 남았으면 다음 화면, 아니면 다음 장면
+function nextLabel() {
+  const beats = panels.current?.beats;
+  if (beats && beats.index < beats.count - 1) return `다음 · ${beats.label(beats.index + 1)}`;
+  const j = director.index + 1;
+  return j < scenes.length ? `다음 장면 · ${scenes[j].ko}` : null;
 }
 
 // 장면 넘김 안내: 덱의 마지막 카드에 손으로 닿았을 때 · 덱이 없는 장면에 들어와 머물 때 — 장면마다 한 번
@@ -662,7 +712,8 @@ let sceneHintT = 0;
 function hintNextScene(delay) {
   clearTimeout(sceneHintT);
   const i = director.index;
-  if (i >= scenes.length - 1 || hintedScenes.has(i)) return;
+  const key = `${i}:${panels.current?.beats?.index ?? ''}`;
+  if (i >= scenes.length - 1 || hintedScenes.has(key)) return;
   sceneHintT = setTimeout(() => {
     if (director.index !== i || director.trans || site.open || lightbox.open || hud.indexOpen) return;
     // 손으로 무언가 하는 중이면(카드를 넘기는 등) 손을 쉴 때까지 미룬다
@@ -673,8 +724,9 @@ function hintNextScene(delay) {
     if (guide.talking) return hintNextScene(900);
     const reel = panels.current?.reel;
     if (!coarse && reel && reel.focus < reel.count - 1) return; // 넘길 카드가 남았으면 카드 안내가 먼저(휴대폰은 위로 밀면 바로 다음 장면)
-    if (!guide.sceneHint(`다음 장면 · ${scenes[i + 1].ko}`, reel?.card?.getBoundingClientRect())) return;
-    hintedScenes.add(i);
+    const label = nextLabel();
+    if (!label || !guide.sceneHint(label, reel?.card?.getBoundingClientRect())) return;
+    hintedScenes.add(key);
     lastInput = performance.now(); // 손을 쉬는 안내(idleHint)가 곧바로 또 뜨지 않게
   }, delay);
 }
