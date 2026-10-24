@@ -221,6 +221,7 @@ function render(scene, i) {
           <a class="btn-works" href="/works" data-link>모든 프로젝트 보기 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/awards" data-link>수상 기록 · 상장 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/skills" data-link>보유 스킬 <span aria-hidden="true">↗</span></a>
+          <a class="btn-works" href="/growth" data-link>성장 과정 · 가치관 <span aria-hidden="true">↗</span></a>
           <button type="button" class="btn-replay" id="btn-replay"><span aria-hidden="true">↺</span> 처음부터 다시 보기</button>
           <span class="sig">${esc(profile.name)} · ${esc(profile.en)} — ${esc(profile.role)}</span>
         </div>
@@ -244,9 +245,16 @@ function render(scene, i) {
     }
     let foot = '';
     if (scene.pillars)
-      foot += `<div class="pillars">${scene.pillars
-        .map((p) => `<article class="pillar" data-r><span class="pillar-no">${esc(p.no)}</span><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p></article>`)
+      foot += `<div class="pillars${scene.growth ? ' is-growth' : ''}">${scene.pillars
+        .map(
+          (p) =>
+            `<article class="pillar" data-r><span class="pillar-no">${esc(p.no)}</span><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p>${p.meta ? `<small class="pillar-meta">${esc(p.meta)}</small>` : ''}</article>`
+        )
         .join('')}</div>`;
+    if (scene.values)
+      foot += `<div class="values-row" data-r><span class="vr-k">가치관</span>${scene.values
+        .map((v) => `<span class="vr-v"><b>${esc(v.no)}</b>${esc(v.title)}</span>`)
+        .join('')}<a class="vr-go" href="/growth" data-link>성장 과정 자세히 <i aria-hidden="true">↗</i></a></div>`;
     if (scene.highlights)
       foot += `<ol class="highlights">${scene.highlights
         .map((h) =>

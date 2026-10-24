@@ -5,6 +5,7 @@ import { ORGS, WALL, ORG_INDEX, orgsOf, awardOrgs } from '../data/orgs.js';
 import { AWARDS, awardsOf, bestOf, TIER_KEY } from '../data/awards.js';
 import { pressOf } from '../data/press.js';
 import { DOMAIN_SKILLS, SKILLS, CERTS, SKILL_COUNT } from '../data/skills.js';
+import { STAGES, VALUES, PRELUDE } from '../data/growth.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
@@ -289,6 +290,7 @@ const tabs = (on) => `<nav class="pg-tabs" aria-label="보기 전환">
     <a href="/works" data-link class="${on === 'works' ? 'is-on' : ''}"${on === 'works' ? ' aria-current="page"' : ''}>프로젝트<sup>${projects.length}</sup></a>
     <a href="/awards" data-link class="${on === 'awards' ? 'is-on' : ''}"${on === 'awards' ? ' aria-current="page"' : ''}>수상<sup>${AWARDS.length}</sup></a>
     <a href="/skills" data-link class="${on === 'skills' ? 'is-on' : ''}"${on === 'skills' ? ' aria-current="page"' : ''}>스킬<sup>${SKILL_COUNT}</sup></a>
+    <a href="/growth" data-link class="${on === 'growth' ? 'is-on' : ''}"${on === 'growth' ? ' aria-current="page"' : ''}>성장<sup>${STAGES.length}</sup></a>
   </nav>`;
 
 const TIER_OF_KEY = Object.fromEntries(TIER_KEY.map((k, t) => [k, t]).filter(([k]) => k));
@@ -439,6 +441,105 @@ function skillsPage() {
       <p class="wall-note">근거는 프로젝트 기록(도구 · 역할 · 요약 · 스토리)에 그 기술이 적힌 경우만 셉니다. NOTION 줄과 자격증은 2026 Notion 포트폴리오의 본인 기록이며, 취득 연도가 적혀 있지 않은 자격은 비워 두었습니다.</p>
     </section>
     ${withWall()}
+    ${footer()}
+  </div>`;
+}
+
+// ── 성장 과정(/growth): 1학년 전공 탐색 → 2학년 도전 → 3학년 인턴십 · Physical AI, 그리고 가치관 ──
+const grMonth = (d) => d.slice(0, 7).replace('-', '.');
+function grMilestone(m) {
+  const p = m.link && byId(m.link);
+  const inner = `<time>${esc(m.when)}</time><span class="gr-ms-t"><b>${esc(m.what)}</b>${m.note ? `<small>${esc(m.note)}</small>` : ''}</span>`;
+  return `<li>${p ? `<a href="${p.path}" data-link>${inner}<i aria-hidden="true">↗</i></a>` : `<div>${inner}</div>`}</li>`;
+}
+function grCard(p) {
+  const aw = awardsOf(p.id).length;
+  return `<li><a class="gr-card" href="${p.path}" data-link data-cat="${esc(p.category)}">
+    <span class="gr-card-ph">${p.cover ? `<img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async">` : ''}</span>
+    <span class="gr-card-t"><b>${esc(p.title)}</b><small>${esc(p.year)} · ${esc(categoryOf(p.category).ko)}</small></span>
+    ${aw ? `<span class="gr-card-aw" aria-label="수상 ${aw}">${LAUREL}${aw}</span>` : ''}
+  </a></li>`;
+}
+const grAward = (a) =>
+  `<li data-tier="${TIER_KEY[a.tier]}"><time>${esc(grMonth(a.date))}</time><em>${esc(a.grade)}</em><span>${esc(a.contest)}</span>${
+    a.project ? `<a href="${a.project.path}" data-link aria-label="${esc(a.project.title)} 프로젝트">↗</a>` : ''
+  }</li>`;
+function grStage(s, k) {
+  const next = STAGES[k + 1];
+  return `<section class="gr-stage reveal" id="gr-${s.id}" data-stage="${s.id}" aria-labelledby="gr-h-${s.id}">
+    <div class="gr-side">
+      <p class="gr-k"><span class="gr-no">${pad(k + 1)}</span>${esc(s.grade)} · ${esc(s.span)}<em>${esc(s.code)}</em></p>
+      <h2 class="gr-h" id="gr-h-${s.id}" tabindex="-1">${esc(s.title)}</h2>
+      <p class="gr-headline">${esc(s.headline)}</p>
+      <dl class="gr-num">
+        <div><dt>프로젝트</dt><dd>${s.projects.length}</dd></div>
+        <div><dt>수상</dt><dd>${s.awards.length}</dd></div>
+        <div><dt>대상</dt><dd>${s.grand}</dd></div>
+        <div><dt>자격</dt><dd>${s.certs.length}</dd></div>
+      </dl>
+      <blockquote class="gr-learned"><span>이 시기에 배운 것</span>${esc(s.learned)}</blockquote>
+    </div>
+    <div class="gr-main">
+      <p class="gr-story">${esc(s.story)}</p>
+      <h3 class="gr-sub">주요 장면</h3>
+      <ol class="gr-ms">${s.milestones.map(grMilestone).join('')}</ol>
+      <h3 class="gr-sub">대표 프로젝트<small>이 시기 프로젝트 ${s.projects.length}건 중</small></h3>
+      <ul class="gr-cards">${s.featuredProjects.map(grCard).join('')}</ul>
+      <details class="gr-more">
+        <summary>이 시기의 모든 기록 — 프로젝트 ${s.projects.length} · 수상 ${s.awards.length}${s.certs.length ? ` · 자격 ${s.certs.length}` : ''}</summary>
+        <div class="gr-more-in">
+          <ul class="gr-plist" aria-label="${esc(s.grade)} 프로젝트">${s.projects
+            .map((p) => `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}"><b>${esc(p.title)}</b><small>${esc(p.year)}</small></a></li>`)
+            .join('')}</ul>
+          <ul class="gr-alist" aria-label="${esc(s.grade)} 수상">${s.awards.map(grAward).join('')}</ul>
+          ${s.certs.length ? `<ul class="gr-clist" aria-label="${esc(s.grade)} 자격">${s.certs.map((c) => `<li><b>${esc(c.name)}</b><small>${esc(c.year)}</small></li>`).join('')}</ul>` : ''}
+        </div>
+      </details>
+    </div>
+    ${next ? `<p class="gr-bridge" aria-hidden="true"><span>${esc(next.grade)} · ${esc(next.title)}</span></p>` : ''}
+  </section>`;
+}
+function growthPage() {
+  const total = (k) => STAGES.reduce((n, s) => n + s[k].length, 0);
+  return `<div class="pg pg-growth">
+    ${bar({ href: '/', label: '메인' })}
+    <section class="works-head gr-head">
+      <p class="pg-kicker">GROWTH STORY — 학년별 성장 과정과 가치관</p>
+      <h1 class="works-title">Growth<sup>${pad(STAGES.length)}</sup></h1>
+      ${tabs('growth')}
+      <p class="gr-motto">${esc(profile.motto)}</p>
+      <ol class="gr-road">${STAGES.map(
+        (s, k) => `<li data-stage="${s.id}"><a href="#gr-${s.id}" data-jump>
+          <span class="gr-road-no">${pad(k + 1)}</span>
+          <span class="gr-road-g"><b>${esc(s.grade)}</b><small>${esc(s.span)}</small></span>
+          <span class="gr-road-t">${esc(s.title)}</span>
+          <span class="gr-road-n">프로젝트 ${s.projects.length} · 수상 ${s.awards.length}</span>
+        </a></li>`
+      ).join('')}</ol>
+      <p class="gr-prelude"><b>${esc(PRELUDE.year)}</b>${esc(PRELUDE.text)}</p>
+    </section>
+    <section class="gr-values reveal" aria-labelledby="gr-h-values">
+      <p class="pg-kicker">VALUES — 이렇게 일합니다</p>
+      <h2 class="ww-title" id="gr-h-values">가치관<sup>${pad(VALUES.length)}</sup></h2>
+      <ol class="gr-vgrid">${VALUES.map(
+        (v) => `<li class="gr-value">
+          <p class="gr-v-k"><span>${esc(v.no)}</span>${esc(v.en)}</p>
+          <h3>${esc(v.title)}</h3>
+          <p class="gr-v-t">${esc(v.text)}</p>
+          <ul class="gr-v-proof" aria-label="근거 프로젝트">${v.proof
+            .map(byId)
+            .filter(Boolean)
+            .map((p) => `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}">${esc(p.title)}</a></li>`)
+            .join('')}</ul>
+        </li>`
+      ).join('')}</ol>
+    </section>
+    <div class="gr-stages">${STAGES.map(grStage).join('')}</div>
+    <section class="gr-now reveal">
+      <p class="pg-kicker">NOW — 지금</p>
+      <p class="gr-now-t">탐색에서 도전으로, 도전에서 집중으로 — 프로젝트 ${total('projects')}개 · 수상 ${total('awards')}건을 지나 지금은 <b>Physical AI</b>에 집중하고 있습니다.</p>
+      <div class="gr-now-a"><a class="btn-works" href="/works" data-link>모든 프로젝트 <span aria-hidden="true">↗</span></a><a class="btn-works" href="/skills" data-link>보유 스킬 <span aria-hidden="true">↗</span></a></div>
+    </section>
     ${footer()}
   </div>`;
 }
@@ -699,6 +800,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (path.toLowerCase() === '/awards') return { name: 'awards' };
     if (path.toLowerCase() === '/skills') return { name: 'skills' };
+    if (path.toLowerCase() === '/growth') return { name: 'growth' };
     const m = path.match(/^\/works(?:\/([\w-]+))?$/);
     if (!m) return { name: 'film' };
     if (m[1]) {
@@ -745,6 +847,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     pageMedia = [];
     if (route.name === 'works') page.innerHTML = worksPage(route.cat);
     else if (route.name === 'skills') page.innerHTML = skillsPage();
+    else if (route.name === 'growth') page.innerHTML = growthPage();
     else if (route.name === 'awards') {
       const a = awardsPage();
       pageMedia = a.media;
@@ -755,7 +858,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     document.body.classList.add('page-open');
     bind(route);
     const p = route.name === 'detail' ? byId(route.id) : null;
-    const name = { awards: 'Awards', skills: 'Skills' }[route.name] || 'Works';
+    const name = { awards: 'Awards', skills: 'Skills', growth: 'Growth' }[route.name] || 'Works';
     document.title = p ? `${p.title} — 권용현 Physical AI Portfolio` : `${name} — 권용현 Physical AI Portfolio`;
     page.focus({ preventScroll: true });
   }
@@ -807,7 +910,10 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     // 포커스는 키보드로 옮겼을 때만(터치로 누른 버튼이 다른 줄을 계속 흐리게 하지 않게)
     matrix.addEventListener('focusin', (e) => e.target.matches(':focus-visible') && light(e.target));
     matrix.addEventListener('focusout', (e) => !matrix.contains(e.relatedTarget) && light(null));
-    // 분야 카드 · 자격 줄: 페이지 안의 그 구획으로(주소는 그대로)
+    bindJumps();
+  }
+  // 페이지 안의 구획으로(주소는 그대로) — 스킬의 분야 카드 · 자격 줄, 성장의 학년 길
+  function bindJumps() {
     page.querySelectorAll('[data-jump]').forEach((a) =>
       a.addEventListener('click', (e) => {
         const to = page.querySelector(a.getAttribute('href'));
@@ -900,6 +1006,10 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
         gsap.fromTo(items.filter((li) => !li.classList.contains('is-out')), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.03, ease: 'power3.out' });
       });
       gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .chips button'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04, ease: 'expo.out', delay: 0.2 });
+    } else if (route.name === 'growth') {
+      bindJumps();
+      if (!reducedMotion)
+        gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .gr-motto, .gr-road li'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.05, ease: 'expo.out', delay: 0.2, clearProps: 'opacity,visibility,transform' });
     } else if (route.name === 'skills') {
       bindSkills();
       if (!reducedMotion)
