@@ -82,7 +82,10 @@ function buildWorld() {
     let reframeTimer = 0;
     addEventListener('resize', () => {
       clearTimeout(reframeTimer);
-      reframeTimer = setTimeout(() => director.reframe(), 200);
+      reframeTimer = setTimeout(() => {
+        director.reframe();
+        frameBeat();
+      }, 200);
     });
 
     // 부팅 동안 보여줄 첫 프레임: 격납고 근접
@@ -184,6 +187,7 @@ const panels = createPanels($('stage'), scenes, {
   },
   // 소개 · 이력의 화면(비트)이 바뀌면: 손으로 옮긴 화면이면 자동 재생 시계를 맞추고, 마지막 화면이면 다음 장면 안내
   onBeat: ({ index, prev, count, entry, auto: byAuto }) => {
+    frameBeat();
     const h = holdOf(director?.index);
     if (h > 0 && !byAuto) elapsed = (h * index) / count;
     if (entry) return;
@@ -291,6 +295,21 @@ function onTransition(i, prev, duration) {
 function goTo(i, opts) {
   if (!started) return false;
   return director.go(Math.max(0, Math.min(scenes.length - 1, i)), opts);
+}
+
+// 화면(비트)은 글 · 카드가 가운데에 서므로 드론을 제목 위 빈 띠의 가운데로 올린다 —
+// 띠가 좁으면(세로 휴대폰의 카드 화면) 제자리(카드 뒤 가운데). 드론 제자리가 정해진 장면(소개)에서만 움직인다
+function frameBeat() {
+  if (!director) return;
+  const el = panels.current;
+  const top = el?.beats && el.querySelectorAll('.beat')[el.beats.index]?.querySelector('.bt-top');
+  let at = null;
+  if (top) {
+    const hud = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top')) || 0;
+    const room = top.getBoundingClientRect().top - hud;
+    if (room > 70) at = (hud + room / 2) / innerHeight;
+  }
+  director.frame(at);
 }
 
 // 이름으로 장면(과 그 안의 화면)으로 — 이미 그 장면이면 화면만 옮긴다
@@ -697,7 +716,16 @@ function idleHint() {
     return true;
   }
   const label = nextLabel();
-  return label ? guide.sceneHint(label, reel?.card?.getBoundingClientRect()) : false;
+  return label ? guide.sceneHint(label, hintRect()) : false;
+}
+// 넘김 안내(손끝)를 둘 자리: 카드가 있으면 카드 위, 화면(비트) 장면이면 글이 가운데를 차지하니 아래 화면 칸 바로 위
+function hintRect() {
+  const card = panels.current?.reel?.card;
+  if (card) return card.getBoundingClientRect();
+  const nav = panels.current?.beats && panels.current.querySelector('.beat-nav');
+  if (!nav) return undefined;
+  const r = nav.getBoundingClientRect();
+  return { left: r.left, width: r.width, top: r.top - 70, height: 0 };
 }
 // 아래로 넘기면 무엇이 오는지: 화면(비트)이 남았으면 다음 화면, 아니면 다음 장면
 function nextLabel() {
@@ -726,7 +754,7 @@ function hintNextScene(delay) {
     const reel = panels.current?.reel;
     if (!coarse && reel && reel.focus < reel.count - 1) return; // 넘길 카드가 남았으면 카드 안내가 먼저(휴대폰은 위로 밀면 바로 다음 장면)
     const label = nextLabel();
-    if (!label || !guide.sceneHint(label, reel?.card?.getBoundingClientRect())) return;
+    if (!label || !guide.sceneHint(label, hintRect())) return;
     hintedScenes.add(key);
     lastInput = performance.now(); // 손을 쉬는 안내(idleHint)가 곧바로 또 뜨지 않게
   }, delay);

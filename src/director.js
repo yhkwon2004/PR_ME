@@ -38,6 +38,10 @@ export class Director {
     this.camTarget = SHOTS.intro.target.clone().add(V(0, -1.2, 0));
     this.fov = 30;
     this.shift = new THREE.Vector2(0, 0.1);
+    // 비트 구도: 글만 있는 화면에서 드론이 머물 화면 높이(위에서부터 비율) · 그 장면에서 드론이 서는 자리
+    this.droneAt = null;
+    this.holdHome = null;
+    this.ndc = new THREE.Vector2();
     this.pointer = new THREE.Vector2();
     this.pointerSmooth = new THREE.Vector2();
     this.drag = new THREE.Vector2();
@@ -130,9 +134,18 @@ export class Director {
     const path = new THREE.CatmullRomCurve3([from.pos, mid, shot.pos]);
     this.trans = { t: 0, duration, from, to: shot, path, dist, cut: this.reducedMotion };
     if (duration === 0) this.finishTransition();
+    // 새 장면은 제자리에서 — 화면(비트)이 들어서며 다시 정한다(onTransition 안에서)
+    this.droneAt = null;
+    this.holdHome = null;
     this.enterScene(id, prev);
     this.onTransition?.(index, prev, duration);
     return true;
+  }
+
+  // 비트 구도: 드론을 화면 높이 y(위에서부터 0~1) 띠로 날려 보낸다 — 카메라 · 세트는 그대로, 드론만 오르내린다.
+  // null이면 그 장면의 제자리로. 제자리가 정해진 장면(holdHome)에서만 움직인다
+  frame(y) {
+    this.droneAt = y;
   }
 
   // 부팅(로딩) 중: 격납고 위에 떠 있는 드론 둘레를 천천히 돈다 — 시작하면 이 자리에서 첫 장면으로 날아간다.
@@ -233,7 +246,8 @@ export class Director {
         drone.hold(add(SETS.hangar, 0, 1.75, 0), 0);
         break;
       case 'prologue':
-        drone.hold(add(SETS.hangar, -0.4, 2.3, 0), 0.5);
+        this.holdHome = add(SETS.hangar, -0.4, 2.3, 0);
+        drone.hold(this.holdHome, 0.5);
         break;
       case 'aerial':
       case 'history':
@@ -326,6 +340,15 @@ export class Director {
     const w = window.innerWidth;
     const h = window.innerHeight;
     cam.setViewOffset(w, h, -this.shift.x * w, this.shift.y * h, w, h);
+    // 비트 구도: 카메라가 자리 잡은 뒤, 제자리까지의 거리에서 화면 높이 droneAt을 지나는 점으로(스프링이 부드럽게 따라간다)
+    if (this.holdHome && drone.mode === 'hold') {
+      if (this.droneAt != null && !this.trans) {
+        this.ndc.set(0, 1 - 2 * this.droneAt);
+        cam.updateMatrixWorld();
+        this.raycaster.setFromCamera(this.ndc, cam);
+        this.raycaster.ray.at(cam.position.distanceTo(this.holdHome), drone.target);
+      } else drone.target.copy(this.holdHome);
+    }
 
     // 드론 — 이동 중엔 부드럽게, 도착 후엔 단단하게 목표를 추종
     drone.stiffness = Math.min(drone.mode === 'path' ? 4 : 5, 1.4 + this.sceneTime * 1.1);

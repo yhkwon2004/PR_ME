@@ -5,25 +5,29 @@
   position: absolute;
   inset: 0;
 }
+/* 제목(위)과 본문을 한 덩어리로 화면 가운데에 — 위 HUD와 아래 화면 칸 사이의 한가운데.
+   위아래 auto 여백으로 가운데에 두어, 화면보다 길어지면 위로 넘치지 않고 위에서부터 놓인다 */
+.beat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(20px, 3.4vh, 40px);
+  padding: calc(var(--top) + 4px) var(--pad) calc(var(--bottom) + 62px);
+}
 .beat[hidden] {
   display: none;
 }
 .bt-top {
-  position: absolute;
-  top: calc(var(--top) + 4px);
-  left: var(--pad);
-  right: var(--pad);
+  width: 100%;
+  margin-top: auto;
   text-align: center;
 }
 .bt-top .kicker {
   justify-content: center;
 }
 .bt-body {
-  position: absolute;
-  left: 50%;
-  bottom: calc(var(--bottom) + 62px);
-  width: min(100% - 2 * var(--pad), 1240px);
-  transform: translateX(-50%);
+  width: min(100%, 1240px);
+  margin-bottom: auto;
 }
 .beat .bt-top,
 .beat .bt-body {
@@ -121,7 +125,7 @@ html.q-lite .bt-item {
   outline-offset: 2px;
 }
 
-/* ── 소개 1: 누구인가 — 제목은 위, 이름은 아래(가운데 띠는 드론) ── */
+/* ── 소개 1: 누구인가 — 제목 아래로 이름 · 역할 · 한 줄 소개를 가운데에 ── */
 .bt-who .title {
   margin-top: 12px;
 }
@@ -600,8 +604,9 @@ html.q-lite .bt-item {
 
 /* 휴대폰: 한 줄씩 쌓고 글을 줄인다 — 화면은 위아래로 밀어 넘긴다 */
 @media (max-width: 820px) {
-  .bt-body {
-    bottom: calc(var(--bottom) + 52px);
+  .beat {
+    gap: 16px;
+    padding-bottom: calc(var(--bottom) + 52px);
   }
   .beat-nav {
     bottom: calc(var(--bottom) + 8px);
