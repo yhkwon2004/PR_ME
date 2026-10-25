@@ -434,6 +434,13 @@ $('stage').addEventListener('click', (e) => {
   takeOver();
   lightbox.show({ media }, +b.dataset.filmCert, b);
 });
+// 표지의 발표 순서: 누르면 그 장의 첫 장면으로
+$('stage').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-scene-go]');
+  if (!b) return;
+  takeOver();
+  goTo(+b.dataset.sceneGo);
+});
 
 // 주소의 장면을 손으로 바꾸면(#robotics 등) 그 장면으로
 addEventListener('hashchange', () => {

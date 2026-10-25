@@ -48,14 +48,17 @@ export const scenes = [
     name: '권용현 · Yonghyun Kwon',
     lead: profile.roleKo,
     tags: ['Drone', 'Robot', 'Mobility', 'AI'],
+    // 표지 아래 발표 순서: 장(chapter)마다 첫 장면으로 바로 간다(panels.js)
+    agenda: true,
   },
   {
     id: 'prologue',
-    ko: '소개',
+    ko: '자기소개',
     code: 'PROLOGUE',
-    label: 'Prologue',
-    // 이력서처럼 세 화면(소개 → 학력 · 기록 → 기술 스택) — 스크롤 없이 한 화면씩(src/ui/beats.js).
-    // 다음 장면이 성장 · 이력(가치관 · 학년별 성장 · 연도별 이력)
+    label: 'About Me',
+    chapter: ['01', '자기소개'],
+    // 이력서처럼 두 화면(소개 → 학력 · 기록) — 스크롤 없이 한 화면씩(src/ui/beats.js).
+    // 다음 장면이 성장 과정(학년별 성장 · 가치관 · 연도별 이력), 그다음이 보유 역량
     layout: 'beats',
     beats: 'profile',
     hold: 11,
@@ -64,6 +67,34 @@ export const scenes = [
     title: ['제약을 이해하고, 작은 실험으로', '해법을 검증합니다.'],
     titleKo: true,
     lead: '1학년엔 넓게 탐색하고, 2학년엔 전공 밖으로 도전했고, 3학년엔 인턴십과 Physical AI에 집중했습니다.',
+  },
+  {
+    // 성장 · 이력(/growth) — 학년 길 → 가치관 → 학년마다 [이야기 → 그 학년의 연도별 이력](src/data/growth.js · history.js).
+    // 3D는 드론이 웨이포인트를 따라 나는 하늘 세트(읽는 동안 흐리게) — 끝나면 초점이 돌아오며 프로젝트 장면으로
+    id: 'growth',
+    ko: '성장 과정',
+    code: 'GROWTH',
+    label: 'Growth',
+    chapter: ['01', '자기소개'],
+    layout: 'beats',
+    beats: 'growth',
+    hold: 14,
+    beatHold: 8,
+    kicker: 'GROWTH — 성장 과정 · 연도별 이력',
+  },
+  {
+    // 보유 역량 분석: 핵심 역량 세 축 → 기술 스택 → SWOT(강점 · 보완 / 기회 · 위협) → 대응 전략 — 다음 장면부터 그 역량으로 만든 프로젝트.
+    // 3D는 세계 가운데의 지능 코어를 멀리서(읽는 동안 흐리게)
+    id: 'competency',
+    ko: '보유 역량',
+    code: 'COMPETENCY',
+    label: 'Competency',
+    chapter: ['02', '보유 역량 분석'],
+    layout: 'beats',
+    beats: 'competency',
+    hold: 12,
+    beatHold: 8,
+    kicker: 'COMPETENCY — 보유 역량 분석',
     // detail: 2026 Notion 포트폴리오의 핵심 역량 문장 그대로 · projects: 그 축을 보여 주는 대표 프로젝트
     pillars: [
       {
@@ -90,20 +121,8 @@ export const scenes = [
     ],
   },
   {
-    // 성장 · 이력(/growth) — 학년 길 → 가치관 → 학년마다 [이야기 → 그 학년의 연도별 이력](src/data/growth.js · history.js).
-    // 3D는 드론이 웨이포인트를 따라 나는 하늘 세트(읽는 동안 흐리게) — 끝나면 초점이 돌아오며 프로젝트 장면으로
-    id: 'growth',
-    ko: '성장 · 이력',
-    code: 'GROWTH',
-    label: 'Growth',
-    layout: 'beats',
-    beats: 'growth',
-    hold: 14,
-    beatHold: 8,
-    kicker: 'GROWTH — 성장 과정 · 연도별 이력',
-  },
-  {
     id: 'ground',
+    chapter: ['03', '프로젝트 경험'],
     ko: '드론 · 모빌리티',
     code: 'MOBILITY',
     label: 'Drone & Mobility',
@@ -121,6 +140,7 @@ export const scenes = [
   },
   {
     id: 'robotics',
+    chapter: ['03', '프로젝트 경험'],
     ko: '로봇',
     code: 'ROBOTICS',
     label: 'Embodied Robotics',
@@ -134,6 +154,7 @@ export const scenes = [
   },
   {
     id: 'intelligence',
+    chapter: ['03', '프로젝트 경험'],
     ko: 'AI',
     code: 'AI',
     label: 'Machine Intelligence',
@@ -151,6 +172,7 @@ export const scenes = [
   },
   {
     id: 'build',
+    chapter: ['03', '프로젝트 경험'],
     ko: '창업 · 제품',
     code: 'BUILD',
     label: 'Build & Launch',
@@ -168,6 +190,7 @@ export const scenes = [
   },
   {
     id: 'press',
+    chapter: ['03', '프로젝트 경험'],
     ko: '언론 보도',
     code: 'PRESS',
     label: 'In the Press',
@@ -184,6 +207,7 @@ export const scenes = [
   },
   {
     id: 'record',
+    chapter: ['03', '프로젝트 경험'],
     ko: '수상 기록',
     code: 'RECORD',
     label: 'The Record',
@@ -199,6 +223,20 @@ export const scenes = [
     ],
     // 프로젝트와 이어진 수상을 상장과 함께 릴로 보여 준다(awards.js의 AWARD_REEL)
     awardReel: true,
+  },
+  {
+    // 미래 계획: 지원 직무와 세 단계 길 → 지금 → 다음 단계 → 진로 목표(src/data/journey.js) — 다음 장면이 엔딩 · 연락처.
+    // 3D는 세계 전체를 높이서 내려다보며 드론이 세트 위를 지난다
+    id: 'future',
+    ko: '미래 계획',
+    code: 'FUTURE',
+    label: 'Future Plan',
+    chapter: ['04', '미래 계획'],
+    layout: 'beats',
+    beats: 'future',
+    hold: 12,
+    beatHold: 8,
+    kicker: 'FUTURE — 미래 계획',
   },
   {
     id: 'finale',

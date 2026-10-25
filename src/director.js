@@ -12,6 +12,8 @@ const SHOTS = {
   aerial: { pos: add(SETS.aerial, 11.15, 8.57, 16.22), target: add(SETS.aerial, 0, 3.4, 0), fov: 42, shift: [0, 0.1] },
   // 연도별 이력: 드론이 웨이포인트를 따라 나는 하늘 세트를 조금 높이서 — 연도 줄이 화면 가운데를 가로지른다
   growth: { pos: add(SETS.aerial, 12.4, 11.2, 18.6), target: add(SETS.aerial, 0, 3.0, 0), fov: 44, shift: [0, 0.04] },
+  // 보유 역량: 세계 가운데의 지능 코어를 하늘 세트 쪽에서 멀리 — 다음 장면(지상 세트)으로 가는 길목
+  competency: { pos: add(SETS.core, -26, 7.5, 22), target: add(SETS.core, -2, -3.5, -2), fov: 44, shift: [0, 0.04] },
   ground: { pos: add(SETS.ground, 15.35, 9.0, 18.35), target: add(SETS.ground, -2.2, 1.2, -2.2), fov: 44, shift: [0, 0.2] },
   // 로보틱스: 덱 양옆의 두 무리(휴머노이드 + 4족 · 매니퓰레이터 작업 셀)를 조금 낮고 가깝게
   robotics: { pos: add(SETS.robotics, 0.2, 5.6, 12.0), target: add(SETS.robotics, 0.3, 0.9, -0.9), fov: 40, shift: [0, 0.12] },
@@ -21,6 +23,8 @@ const SHOTS = {
   // 보도: 데이터 링크가 켜진 세계 전체를 높이서 — 소식이 세트마다 퍼져 나가는 장면
   press: { pos: V(0, 34, 52), target: V(0, 1, -8), fov: 44, shift: [0, 0.12] },
   record: { pos: add(SETS.record, -1.73, 6.05, 20.13), target: add(SETS.record, 0, 2.6, 0), fov: 40, shift: [0, 0.1] },
+  // 미래 계획: 세계 전체를 높이서 — 지나온 세트들을 내려다보며 앞을 본다
+  future: { pos: V(22, 30, 58), target: V(0, 2, 2), fov: 46, shift: [0, 0.04] },
   finale: { pos: add(SETS.hangar, 0, 7.5, 17), target: add(SETS.hangar, 0, 2.8, -4), fov: 40, shift: [0, -0.085] },
 };
 
@@ -231,8 +235,8 @@ export class Director {
     hangar.floorLevel = 0;
     this.a.aerial.floorLevel = 0;
     // 보도 장면: 세트를 잇는 데이터 링크가 켜져 소식이 퍼져 나가듯
-    links.level = id === 'press' ? 1 : id === 'finale' ? 0.35 : 0;
-    core.energy = id === 'intelligence' ? 1 : id === 'press' ? 0.5 : 0.15;
+    links.level = id === 'press' ? 1 : id === 'future' ? 0.7 : id === 'finale' ? 0.35 : 0;
+    core.energy = id === 'intelligence' ? 1 : id === 'competency' ? 0.7 : id === 'press' ? 0.5 : 0.15;
     if (id === 'record') {
       records.reveal = 0;
       records.revealTarget = 1;
@@ -267,6 +271,12 @@ export class Director {
         break;
       case 'press':
         drone.fly(this.flyover, 0.022, 0.0);
+        break;
+      case 'competency':
+        drone.fly(this.coreOrbit, 0.03, 0.5);
+        break;
+      case 'future':
+        drone.fly(this.flyover, 0.02, 0.5);
         break;
       case 'record':
         drone.hold(add(SETS.record, 6.2, 4.0, 1.4));

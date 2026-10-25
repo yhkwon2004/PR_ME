@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { profile } from '../content.js';
+import { profile, scenes } from '../content.js';
 import { byId, projects as ALL_PROJECTS, categoryOf } from '../data/projects.js';
 import { AWARDS, AWARD_REEL } from '../data/awards.js';
 import { ORGS, WALL } from '../data/orgs.js';
@@ -16,9 +16,18 @@ const pad = (n) => String(n).padStart(2, '0');
 
 const lines = (arr, cls = '') => arr.map((l) => `<span class="line ${cls}"><span>${esc(l)}</span></span>`).join('');
 
+// 장면 표시: 장면 번호 · 장(발표 순서: 01 자기소개 · 02 보유 역량 분석 · 03 프로젝트 경험 · 04 미래 계획) · 장면 이름
 function kicker(scene, i) {
-  return `<p class="kicker" data-r><span class="kicker-no">SC ${pad(i)}</span><span class="kicker-txt">${esc(scene.kicker)}</span></p>`;
+  const ch = scene.chapter ? `<span class="kicker-ch">CH ${esc(scene.chapter[0])}<span class="kicker-chn"> · ${esc(scene.chapter[1])}</span></span>` : '';
+  return `<p class="kicker" data-r><span class="kicker-no">SC ${pad(i)}</span>${ch}<span class="kicker-txt">${esc(scene.kicker)}</span></p>`;
 }
+// 발표 순서(장마다 첫 장면) — 표지 아래, 누르면 그 장의 첫 장면으로
+const agendaOf = () => {
+  const seen = new Map();
+  scenes.forEach((s, i) => s.chapter && !seen.has(s.chapter[0]) && seen.set(s.chapter[0], { no: s.chapter[0], ko: s.chapter[1], i, names: [] }));
+  scenes.forEach((s) => s.chapter && seen.get(s.chapter[0]).names.push(s.ko));
+  return [...seen.values()];
+};
 
 function stats(list = []) {
   if (!list.length) return '';
@@ -91,7 +100,13 @@ function render(scene, i) {
           <p class="hero-name">${esc(scene.name)}</p>
           <p class="hero-lead">${esc(scene.lead)}</p>
         </div>
-        <ul class="hero-tags" data-r>${scene.tags.map((t, j) => `<li><span>${pad(j + 1)}</span>${esc(t)}</li>`).join('')}</ul>
+        ${
+          scene.agenda
+            ? `<ol class="hero-agenda" data-r aria-label="발표 순서">${agendaOf()
+                .map((c) => `<li><button type="button" data-scene-go="${c.i}" aria-label="${esc(c.no)} ${esc(c.ko)} — ${esc(c.names.join(', '))}"><span>${esc(c.no)}</span><b>${esc(c.ko)}</b></button></li>`)
+                .join('')}</ol>`
+            : `<ul class="hero-tags" data-r>${scene.tags.map((t, j) => `<li><span>${pad(j + 1)}</span>${esc(t)}</li>`).join('')}</ul>`
+        }
       </div>
     </div>`;
   }
@@ -222,7 +237,7 @@ function render(scene, i) {
         </dl>
         <div class="endcard-actions" data-r>
           <a class="btn-works" href="/resume" data-link>이력서 · PDF <span aria-hidden="true">↗</span></a>
-          <a class="btn-works" href="/growth/detail" data-link>성장 · 이력 · SWOT · 미래 계획 <span aria-hidden="true">↗</span></a>
+          <a class="btn-works" href="/present" data-link>발표 자료 — 자기소개 · 역량 · 프로젝트 · 미래 계획 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/works" data-link>모든 프로젝트 보기 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/awards" data-link>수상 기록 · 상장 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/skills" data-link>보유 스킬 <span aria-hidden="true">↗</span></a>

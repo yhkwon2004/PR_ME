@@ -1,4 +1,4 @@
-// ── 화면 넘김 덱: 스크롤 없이 한 화면씩(성장 · 이력 상세 /growth/detail) ──
+// ── 화면 넘김 덱: 스크롤 없이 한 화면씩(발표 자료 /present) ──
 // 내용은 쪽(data-sec) → 묶음(data-grp) → 블록으로 적어 두고, 지금 화면 크기에서 블록 높이를 재어 화면마다 넘치지 않게 나눠 담는다.
 // - 'cols' 묶음은 넓은 화면에서 두 단(높이를 고르게), 좁은 화면에서는 한 단
 // - 목록 블록(data-split)은 줄 단위로 다음 단 · 다음 화면에 이어지고, 이어진 쪽 위에 data-cont 한 줄을 단다
@@ -26,6 +26,7 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
   const tabBtns = [...root.querySelectorAll('[data-go]')];
   const navBtns = [...root.querySelectorAll('.jr-nav')];
   const srcEl = root.querySelector('.jr-src');
+  const fullBtn = root.querySelector('[data-full]');
 
   const SECS = [...srcEl.querySelectorAll('[data-sec]')].map((s) => ({ id: s.dataset.sec, no: s.dataset.no || '', title: s.dataset.title || '', short: s.dataset.short || s.dataset.title || '' }));
   const GROUPS = [...srcEl.querySelectorAll('[data-grp]')].map((g) => ({
@@ -648,17 +649,48 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     { passive: false }
   );
 
+  // 발표: F 전체 화면 · B(또는 .) 화면 가리기 · 전체 화면에서 마우스를 멈추면 커서를 숨긴다
+  const canFull = !!document.fullscreenEnabled;
+  if (fullBtn && !canFull) fullBtn.hidden = true;
+  const toggleFull = () => {
+    if (!canFull) return;
+    if (document.fullscreenElement) document.exitFullscreen?.();
+    else document.documentElement.requestFullscreen?.().catch(() => {});
+  };
+  const onFull = () => {
+    fullBtn?.setAttribute('aria-pressed', String(!!document.fullscreenElement));
+    root.classList.toggle('is-full', !!document.fullscreenElement);
+  };
+  document.addEventListener('fullscreenchange', onFull);
+  let idleT = 0;
+  const wake = () => {
+    root.classList.remove('is-idle');
+    clearTimeout(idleT);
+    idleT = setTimeout(() => document.fullscreenElement && root.classList.add('is-idle'), 2600);
+  };
+  root.addEventListener('pointermove', wake);
+  const black = (on = !root.classList.contains('is-black')) => root.classList.toggle('is-black', on);
+
   // 탭 · 진행 막대 · 이전/다음 · 화면 안의 이동 링크(학년 → 그 해, 목차 → 쪽, SWOT 칸 → 그 칸)
   root.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-jr-go], [data-go], [data-seg], .jr-nav');
+    const t = e.target.closest('[data-jr-go], [data-go], [data-seg], .jr-nav, [data-full]');
     if (!t || !root.contains(t)) return;
     e.preventDefault();
+    if (t.hasAttribute('data-full')) return toggleFull();
     if (t.classList.contains('jr-nav')) return go(index + +t.dataset.dir);
     goAnchor(t.dataset.jrGo || t.dataset.go || t.dataset.seg);
   });
 
   function key(e) {
     if (e.altKey || e.ctrlKey || e.metaKey || !slides.length) return false;
+    // 가린 화면: 아무 키나 누르면 다시(Esc로 페이지가 닫히지 않게)
+    if (root.classList.contains('is-black')) {
+      e.preventDefault();
+      black(false);
+      return true;
+    }
+    if (e.key === 'f' || e.key === 'F') return toggleFull(), true;
+    if (e.key === 'b' || e.key === 'B' || e.key === '.') return black(true), true;
     if (e.key === 'Home') return go(0), true;
     if (e.key === 'End') return go(slides.length - 1), true;
     if (e.key === ' ' && e.target.closest?.('button, a')) return false; // 버튼 · 링크의 Space는 그 동작
@@ -720,6 +752,9 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     },
     destroy() {
       alive = false;
+      document.removeEventListener('fullscreenchange', onFull);
+      clearTimeout(idleT);
+      if (document.fullscreenElement) document.exitFullscreen?.();
       ro.disconnect();
       clearTimeout(rt);
       gsap.killTweensOf(state);

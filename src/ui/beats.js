@@ -1,5 +1,8 @@
 // 한 장면 안의 여러 화면(비트): 스크롤 없이 영화처럼 한 화면씩 바뀐다 — 휠 · 스와이프 · 방향키 · 아래 칸 · 자동 재생.
-// 소개(이력서): 인적 사항(사진) → 학력 · 기록 → 기술 스택
+// 발표 순서: 01 자기소개(소개 → 성장 과정) → 02 보유 역량 분석 → 03 프로젝트 경험(분야별 장면) → 04 미래 계획
+// 자기소개(이력서): 인적 사항(사진) → 학력 · 기록
+// 보유 역량: 핵심 역량 세 축 → 기술 스택 → SWOT(강점 · 보완 / 기회 · 위협) → 대응 전략
+// 미래 계획: 지원 직무와 세 단계 길 → 지금 → 다음 단계 → 진로 목표
 // 성장 · 이력(/growth): 학년 길 → 가치관 → 학년마다 [이야기 → 그 학년의 연도별 이력] — 연도 화면은 파노라마 창이
 // 가는 틈에서 열리며 그 해의 사진들이 펼쳐지고, 아래에 항목이 같은 칸에 맞춰 선다
 // 상세에 들어가지 않아도 화면에서 바로 읽히도록 — 글은 짧게(항목마다 한 줄), 사진은 누르면 프로젝트, 상장은 누르면 크게
@@ -11,6 +14,7 @@ import { PRESS } from '../data/press.js';
 import { CERTS, STACK } from '../data/skills.js';
 import { HISTORY } from '../data/history.js';
 import { STAGES, VALUES, PRELUDE, stageOf } from '../data/growth.js';
+import { SWOT, STRATEGY, PLAN, TARGET } from '../data/journey.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
@@ -41,11 +45,13 @@ const certChip = (a) => {
 const pressChip = (a) =>
   `<a class="bt-n" href="${esc(a.url)}" target="_blank" rel="noopener"><small>${esc(a.publisher)}${a.date ? ` · ${esc(dot(a.date))}` : ''}</small><b>${esc(a.title)}</b></a>`;
 
+// 장면 표시: 장면 번호 · 장(발표 순서) · 이 화면 — 장은 renderBeats가 그 장면의 것으로 정해 둔다
+let chapter = null;
 function kicker(i, text) {
-  return `<p class="kicker b-a"><span class="kicker-no">SC ${pad(i)}</span><span class="kicker-txt">${esc(text)}</span></p>`;
+  return `<p class="kicker b-a"><span class="kicker-no">SC ${pad(i)}</span>${chapter ? `<span class="kicker-ch">CH ${esc(chapter[0])}<span class="kicker-chn"> · ${esc(chapter[1])}</span></span>` : ''}<span class="kicker-txt">${esc(text)}</span></p>`;
 }
 
-// ── 소개: 실제 이력서처럼 세 화면 — 다음 장면이 성장 과정 · 연도별 이력 ──
+// ── 자기소개: 실제 이력서처럼 두 화면 — 다음 장면이 성장 과정 · 연도별 이력 ──
 function profileBeats(scene, i) {
   const email = profile.links.find((l) => l.url.startsWith('mailto:'));
   const grand = AWARDS.filter((a) => a.tier === 1).length;
@@ -115,24 +121,6 @@ function profileBeats(scene, i) {
         </div>`,
       email: email?.value,
     },
-    {
-      key: 'stack',
-      label: '기술 스택',
-      cls: 'bt-stack',
-      html: `<div class="bt-top panel-content">
-          ${kicker(i, 'SKILLS — 기술 스택')}
-          <h2 class="bt-h b-a">다룰 수 있는 언어 · 툴</h2>
-        </div>
-        <div class="bt-body panel-content">
-          <div class="rs-sec rs-stack">${STACK.map(
-            (g) => `<div class="rs-row b-a">
-              <h3>${esc(g.ko)}<small>${esc(g.en)}</small></h3>
-              <ul>${g.items.map((s) => `<li${s.state === 'explore' ? ' class="is-explore"' : ''}>${esc(s.name)}${s.evidence.length ? `<sup title="이 기술을 쓴 프로젝트">${s.evidence.length}</sup>` : ''}</li>`).join('')}</ul>
-            </div>`
-          ).join('')}</div>
-          <p class="rs-note b-a">숫자는 그 기술을 쓴 프로젝트 수 · <a href="/skills" data-link>근거와 함께 전체 보기 →</a></p>
-        </div>`,
-    },
   ];
 }
 
@@ -201,8 +189,8 @@ function yearBeat(y, i) {
           </div>
           ${
             y.awards.length
-              ? `<p class="bt-more">${tiers.map(([t, n]) => `${TIER_LABEL[t]} ${n}`).join(' · ')}<a href="/awards#y${y.year}" data-link>${y.year}년 상장 ${y.awards.length}건 모두 보기 →</a><a href="/growth/detail#y${y.year}" data-link>${y.year}년 이력 자세히 →</a></p>`
-              : `<p class="bt-more"><a href="/growth/detail#y${y.year}" data-link>${y.year}년 이력 자세히 →</a></p>`
+              ? `<p class="bt-more">${tiers.map(([t, n]) => `${TIER_LABEL[t]} ${n}`).join(' · ')}<a href="/awards#y${y.year}" data-link>${y.year}년 상장 ${y.awards.length}건 모두 보기 →</a><a href="/present#y${y.year}" data-link>${y.year}년 이력 자세히 →</a></p>`
+              : `<p class="bt-more"><a href="/present#y${y.year}" data-link>${y.year}년 이력 자세히 →</a></p>`
           }
         </header>
         <div class="pano" style="--n: ${y.items.length}"${g ? ` data-stage="${esc(g.id)}"` : ''}>
@@ -240,7 +228,7 @@ function storyBeat(s, k, i) {
             .map((p) => `<a class="gw-m" href="${p.path}" data-link data-cat="${esc(p.category)}">${photoOf(p)}<span>${esc(p.title)}</span></a>`)
             .join('')}</div>
           <div class="gw-copy">
-            <p class="gw-k b-a"><span class="gw-badge">${esc(s.code)}</span>${esc(s.grade)} · ${esc(s.span)}<a class="gw-more" href="/growth/detail#s-${esc(s.id)}" data-link>이 시기 자세히 →</a></p>
+            <p class="gw-k b-a"><span class="gw-badge">${esc(s.code)}</span>${esc(s.grade)} · ${esc(s.span)}<a class="gw-more" href="/present#s-${esc(s.id)}" data-link>이 시기 자세히 →</a></p>
             <h2 class="gw-h b-a">${esc(s.title)}</h2>
             <p class="gw-hl b-a">${esc(s.headline)}</p>
             <dl class="gw-nums b-a">
@@ -281,7 +269,7 @@ function growthBeats(scene, i) {
           </li>`;
         }).join('')}</ol>
         <p class="bt-more b-a"><b>${esc(PRELUDE.year)}</b>${esc(PRELUDE.text)} · 3년 동안 프로젝트 ${projects.length} · 수상 ${AWARDS.length}</p>
-        <nav class="gw-links b-a" aria-label="성장 · 이력 자세히"><a href="/growth/detail" data-link>성장 과정 자세히</a><a href="/growth/detail#years" data-link>연도별 이력 전체</a><a href="/growth/detail#swot" data-link>SWOT 분석</a><a href="/growth/detail#plan" data-link>미래 계획</a></nav>
+        <nav class="gw-links b-a" aria-label="성장 과정 자세히"><a href="/present#overview" data-link>성장 과정 자세히</a><a href="/present#years" data-link>연도별 이력 전체</a></nav>
       </div>`,
   };
   const values = {
@@ -318,8 +306,130 @@ function growthBeats(scene, i) {
   ];
 }
 
+
+// 기술 스택(보유 역량의 둘째 화면): 분야마다 언어 · 툴 — 숫자는 그 기술을 쓴 프로젝트 수
+const stackBeat = (i) => ({
+  key: 'stack',
+  label: '기술 스택',
+  cls: 'bt-stack',
+  html: `<div class="bt-top panel-content">
+      ${kicker(i, 'SKILLS — 기술 스택')}
+      <h2 class="bt-h b-a">다룰 수 있는 언어 · 툴</h2>
+    </div>
+    <div class="bt-body panel-content">
+      <div class="rs-sec rs-stack">${STACK.map(
+        (g) => `<div class="rs-row b-a">
+          <h3>${esc(g.ko)}<small>${esc(g.en)}</small></h3>
+          <ul>${g.items.map((s) => `<li${s.state === 'explore' ? ' class="is-explore"' : ''}>${esc(s.name)}${s.evidence.length ? `<sup title="이 기술을 쓴 프로젝트">${s.evidence.length}</sup>` : ''}</li>`).join('')}</ul>
+        </div>`
+      ).join('')}</div>
+      <p class="rs-note b-a">숫자는 그 기술을 쓴 프로젝트 수 · <a href="/skills" data-link>근거와 함께 전체 보기 →</a></p>
+    </div>`,
+});
+
+// ── 보유 역량 분석: 핵심 역량 세 축 → 기술 스택 → SWOT → 대응 전략 — 다음 장면부터 그 역량으로 만든 프로젝트 ──
+const topOf = (i, k, h) => `<div class="bt-top panel-content">${kicker(i, k)}<h2 class="bt-h b-a">${esc(h)}</h2></div>`;
+function quadrant(q) {
+  return `<section class="cp-q b-a" data-q="${q.key}">
+    <header><b class="cp-ql">${q.key}</b><h3>${esc(q.title)}<small>${esc(q.en)}</small></h3><em>${q.items.length}</em></header>
+    <ol>${q.items.map((it) => `<li><b>${esc(it.h)}</b><span class="cp-t">${esc(it.t)}</span>${it.fix ? `<span class="cp-fix"><i>대응</i>${esc(it.fix)}</span>` : ''}</li>`).join('')}</ol>
+  </section>`;
+}
+function competencyBeats(scene, i) {
+  const q = (k) => SWOT.find((x) => x.key === k);
+  return [
+    {
+      key: 'core',
+      label: '핵심 역량',
+      cls: 'bt-core',
+      html: `${topOf(i, 'CORE — 핵심 역량 세 축', 'AI · 하드웨어 · 기획을 한 시스템으로 잇습니다')}
+        <div class="bt-body panel-content">
+          <ol class="cp-axes">${(scene.pillars || [])
+            .map(
+              (p) => `<li class="b-a">
+              <p class="cp-no">${esc(p.no)}</p>
+              <h3>${esc(p.title)}</h3>
+              <p class="cp-tag">${esc(p.text)}</p>
+              <p class="cp-d">${esc(p.detail)}</p>
+              <div class="cp-proof">${p.projects.map(byId).filter(Boolean).map(projChip).join('')}</div>
+            </li>`
+            )
+            .join('')}</ol>
+        </div>`,
+    },
+    stackBeat(i),
+    {
+      key: 'sw',
+      label: '강점 · 보완',
+      cls: 'bt-swot',
+      html: `${topOf(i, 'SWOT — 강점 · 보완할 점', '기록으로 본 강점과 보완할 점')}
+        <div class="bt-body panel-content"><div class="cp-swot">${quadrant(q('S'))}${quadrant(q('W'))}</div></div>`,
+    },
+    {
+      key: 'ot',
+      label: '기회 · 위협',
+      cls: 'bt-swot',
+      html: `${topOf(i, 'SWOT — 기회 · 위협', '닿을 수 있는 기회와 대비할 위협')}
+        <div class="bt-body panel-content"><div class="cp-swot">${quadrant(q('O'))}${quadrant(q('T'))}</div></div>`,
+    },
+    {
+      key: 'strategy',
+      label: '대응 전략',
+      cls: 'bt-strat',
+      html: `${topOf(i, 'STRATEGY — 대응 전략', '강점은 키우고, 보완할 점은 줄이는 네 방향')}
+        <div class="bt-body panel-content">
+          <ol class="cp-strat">${STRATEGY.map((x) => `<li class="b-a" data-q="${x.key[0]}"><b>${esc(x.key)}</b><span>${esc(x.h)}</span><p>${esc(x.t)}</p></li>`).join('')}</ol>
+          <p class="bt-more b-a">다음 장면부터 — 이 역량으로 만든 프로젝트 ${projects.length}개<a href="/present#swot" data-link>SWOT 자세히 →</a></p>
+        </div>`,
+    },
+  ];
+}
+
+// ── 미래 계획: 지원 직무와 세 단계 길 → 지금 → 다음 단계 → 진로 목표 — 다음 장면이 엔딩 · 연락처 ──
+const STEP_LABEL = { now: '지금', next: '다음 단계', goal: '진로 목표' };
+function futureBeats(scene, i) {
+  const target = {
+    key: 'target',
+    label: '지원 직무',
+    cls: 'bt-target',
+    html: `${topOf(i, 'TARGET — 지원 직무', '이런 개발자가 되려 합니다')}
+      <div class="bt-body panel-content">
+        <div class="fp-target b-a">
+          <p class="fp-role"><span>지원 직무</span>${esc(TARGET.role)}</p>
+          <p class="fp-line">${esc(TARGET.line)}</p>
+          <ul class="fp-dom">${TARGET.domains.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>
+        </div>
+        <ol class="fp-road">${PLAN.map(
+          (c) => `<li class="b-a" data-step="${c.key}"><button type="button" data-goto="${c.key}" aria-label="${esc(c.when)} ${esc(c.title)}"><span class="fp-when">${esc(c.when)}</span><b>${esc(c.title)}</b><span class="fp-hs">${c.items.map((it) => `<i>${esc(it.h)}</i>`).join('')}</span></button></li>`
+        ).join('')}</ol>
+      </div>`,
+  };
+  const steps = PLAN.map((c) => ({
+    key: c.key,
+    label: STEP_LABEL[c.key] || c.title,
+    cls: `bt-step is-${c.key}`,
+    html: `${topOf(i, `${c.when} — ${c.title}`, c.title)}
+      <div class="bt-body panel-content">
+        <ol class="fp-items">${c.items
+          .map((it, k) => {
+            const p = it.proof && byId(it.proof);
+            const ph = c.key === 'now' && p?.cover;
+            return `<li class="b-a${ph ? ' has-ph' : ''}">${
+              ph ? `<a class="fp-ph" href="${p.path}" data-link data-cat="${esc(p.category)}">${photoOf(p)}<span>${esc(p.title)}</span></a>` : `<span class="fp-no">${pad(k + 1)}</span>`
+            }<div class="fp-in"><h3>${esc(it.h)}</h3><p>${esc(it.t)}</p>${p && !ph ? `<div class="fp-proof">${projChip(p)}</div>` : ''}</div></li>`;
+          })
+          .join('')}</ol>
+        ${c.key === 'goal' ? `<p class="fp-close b-a">${esc(profile.motto)}<a href="/present#plan" data-link>미래 계획 자세히 →</a></p>` : ''}
+      </div>`,
+  }));
+  return [target, ...steps];
+}
+
+const BUILDERS = { growth: growthBeats, competency: competencyBeats, future: futureBeats };
 export function renderBeats(scene, i) {
-  const beats = scene.beats === 'growth' ? growthBeats(scene, i) : profileBeats(scene, i);
+  chapter = scene.chapter || null;
+  const beats = (BUILDERS[scene.beats] || profileBeats)(scene, i);
+  chapter = null;
   return `<div class="beats" data-kind="${esc(scene.beats)}">
     <div class="beat-stage">${beats
       .map(

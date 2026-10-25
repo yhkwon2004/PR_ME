@@ -1507,6 +1507,20 @@ body.is-started[data-scene='intro'] .hint {
   border: 1px solid rgba(94, 242, 255, 0.5);
   color: var(--fg);
 }
+/* 장(발표 순서): 장면 번호 옆의 밝은 칩 — 지금 발표의 어디쯤인지 */
+.kicker-ch {
+  flex: none;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 107, 26, 0.16);
+  font-family: var(--sans);
+  font-size: 1em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  white-space: nowrap;
+  color: #ffb27f;
+}
 .title {
   font-family: var(--display);
   font-weight: 600;
@@ -1960,6 +1974,52 @@ body.is-started[data-scene='intro'] .hint {
 }
 .hero-tags span {
   color: var(--orange);
+}
+/* 표지의 발표 순서: 네 장 — 누르면 그 장의 첫 장면으로 */
+.hero-agenda {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.hero-agenda li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-agenda li + li::before {
+  content: '→';
+  font-size: 12px;
+  color: var(--muted);
+}
+.hero-agenda button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: rgba(5, 7, 12, 0.45);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--fg);
+  transition:
+    border-color 0.3s,
+    background 0.3s;
+}
+.hero-agenda button span {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--orange);
+}
+.hero-agenda button:hover,
+.hero-agenda button:focus-visible {
+  border-color: var(--cyan);
+  background: rgba(94, 242, 255, 0.1);
+  outline: none;
 }
 
 /* ── 루프 레이아웃 ───────────────────────── */
@@ -3200,6 +3260,26 @@ body.is-started.has-pointer .cursor {
   .hero-tags li {
     padding: 6px 10px;
     font-size: 11px;
+  }
+  .hero-agenda {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    justify-content: center;
+    gap: 6px;
+  }
+  .hero-agenda button {
+    width: 100%;
+  }
+  /* 장면 표시줄이 한 줄에 들도록 장은 번호만 */
+  .kicker-chn {
+    display: none;
+  }
+  .hero-agenda li + li::before {
+    display: none;
+  }
+  .hero-agenda button {
+    padding: 7px 11px;
+    font-size: 13px;
   }
   .loop-head {
     bottom: auto;
