@@ -190,7 +190,7 @@ small { font-size: .8em; }
 .bd { flex: 1; min-height: 0; margin-top: 1.9em; display: flex; flex-direction: column; gap: 1.1em; }
 .ft { margin-top: 1em; display: flex; flex-direction: column; gap: .5em; }
 .take { text-align: center; font-size: 1.32em; font-weight: 700; letter-spacing: -.015em; }
-.src { font-size: .7em; color: var(--mute); line-height: 1.5; }
+.src { font-size: .75em; color: var(--mute); line-height: 1.5; }
 .src::first-letter { color: var(--cream-2); }
 .light .src { color: var(--ink-mute); }
 
@@ -269,7 +269,7 @@ small { font-size: .8em; }
   box-shadow: 0 1.6em 3.6em rgba(18, 13, 10, .38);
 }
 .cover-module img { width: 76%; }
-.cover-module figcaption { position: absolute; top: calc(100% + 1em); left: 52%; white-space: nowrap; color: var(--cream); font-size: .8em; font-weight: 650; letter-spacing: .04em; }
+.cover-module figcaption { position: absolute; top: calc(100% + 1em); left: 52%; white-space: nowrap; color: rgba(243, 236, 226, .82); font-size: .8em; font-weight: 650; letter-spacing: .04em; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
 
 .s-end .frame { align-items: center; text-align: center; }
 .end-mid { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.3em; }
@@ -296,7 +296,7 @@ small { font-size: .8em; }
 .scene-sub em { font-weight: 740; }
 .gaps { display: flex; gap: .7em; }
 .gaps li { padding: .55em 1.2em; border-radius: 99em; background: rgba(243, 236, 226, .08); border: 1px solid var(--line); font-weight: 680; }
-.scene-src { position: absolute; left: 6em; bottom: 2.4em; font-size: .7em; color: var(--mute); }
+.scene-src { position: absolute; left: 6em; bottom: 2.4em; font-size: .75em; color: var(--mute); }
 
 /* ================= 3 hook number ================= */
 .hook { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
@@ -432,10 +432,11 @@ small { font-size: .8em; }
 .chart { width: 100%; height: 100%; min-width: 0; }
 .sx-out { font-size: 1.02em; font-weight: 720; line-height: 1.45; }
 .sx-out em { font-weight: 800; }
+.sx-out small { display: block; margin-top: .15em; font-size: .78em; font-weight: 600; color: var(--mute); }
 .sx-pcb { flex: 1; min-height: 0; display: grid; grid-template-rows: 1fr 1fr; gap: .5em; }
 .sx-pcb .ph { background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
 .sx-pcb .ph img { object-fit: contain; padding: .4em; }
-.sx-pcb .cap { font-size: .68em; }
+.sx-pcb .cap { font-size: .74em; }
 .sx-res { display: grid; grid-template-columns: 1fr 1fr; gap: .8em; padding-top: .85em; border-top: 1px dashed #E2BF98; }
 .sx-res b { display: block; font-size: 2.6em; font-weight: 800; letter-spacing: -.04em; line-height: 1.05; color: var(--honey); font-variant-numeric: tabular-nums; }
 .sx-res b small { font-size: .45em; letter-spacing: 0; }
@@ -446,6 +447,10 @@ small { font-size: .8em; }
 .video video { width: 100%; height: auto; max-height: 100%; aspect-ratio: 16 / 9; border-radius: .8em; background: #000000; object-fit: contain; box-shadow: 0 1.4em 3.4em rgba(92, 62, 36, .22); }
 .video figcaption { font-size: .78em; color: var(--mute); }
 .chap { display: flex; flex-direction: column; gap: .8em; }
+.demo-pts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1em; margin-top: 1.1em; }
+.demo-pts li { display: flex; align-items: baseline; gap: .8em; padding: .9em 1.2em; border-radius: .8em; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.demo-pts b { flex: none; font-size: 1.5em; font-weight: 800; letter-spacing: -.02em; color: var(--honey); }
+.demo-pts span { font-size: 1em; font-weight: 600; color: var(--cream-2); }
 .chap-l { font-size: .84em; font-weight: 720; letter-spacing: .06em; color: var(--honey); }
 .chap ol { display: grid; gap: .45em; }
 .chap button { width: 100%; display: flex; align-items: center; gap: .9em; text-align: left; padding: .5em .9em .5em .5em; border-radius: .6em; border: 1px solid var(--line); background: var(--panel); color: var(--cream); font-size: 1em; font-weight: 600; cursor: pointer; transition: background .25s, border-color .25s; }
@@ -485,10 +490,15 @@ small { font-size: .8em; }
 /* ================= 9 results ================= */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; flex: 1.25; min-height: 0; }
 .stat { display: flex; flex-direction: column; justify-content: space-between; gap: .7em; padding: 1.5em 1.6em; }
-.stat .num { font-size: 6em; }
+.stat .num { font-size: 5.8em; }
 .stat .num.ac { color: var(--honey); }
 .stat div p:not(.num) { margin-top: .5em; font-size: 1.2em; font-weight: 700; line-height: 1.4; }
-.stat .cond { padding-top: .9em; border-top: 1px dashed var(--line); font-size: .9em; color: var(--mute); line-height: 1.5; }
+.stat .cond { display: grid; gap: .35em; padding-top: .9em; border-top: 1px dashed var(--line); font-size: .9em; color: var(--cream-2); line-height: 1.45; }
+.stat .cond span { display: grid; grid-template-columns: 2.6em 1fr; gap: .4em; }
+.stat .cond b { font-weight: 720; color: var(--mute); }
+.pf.pf-next { flex-direction: column; align-items: stretch; justify-content: center; gap: .5em; }
+.pf-next p { text-align: left; }
+.pf-k { font-size: .84em !important; font-weight: 760; letter-spacing: .04em; color: var(--honey) !important; }
 .proof { display: grid; grid-template-columns: auto 1.5fr 1fr 1fr; align-items: center; gap: 1.4em; padding: 1.15em 1.5em; }
 .drops { display: grid; grid-template-columns: repeat(5, 1fr); gap: .35em; color: var(--honey); }
 .drops .ico { width: 1.5em; height: 1.5em; stroke-width: 1.8; }
@@ -503,7 +513,7 @@ small { font-size: .8em; }
 .ep i:nth-child(n+4) { background: var(--honey); }
 .slide.on .ep i { animation: grow 1s var(--ease) both; animation-delay: .5s; }
 .stat .ep + .cond { padding-top: .6em; }
-.proof2 { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 1em; }
+.proof2 { flex: .72; min-height: 0; display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 1em; }
 .pf { display: flex; align-items: center; gap: 1.4em; padding: 1.2em 1.5em; }
 .pf .drops { grid-template-columns: repeat(5, 1fr); gap: .5em; }
 .pf .drops .ico { width: 2.1em; height: 2.1em; }
@@ -536,7 +546,9 @@ small { font-size: .8em; }
 .mb span { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: .3em; }
 .mb i { display: block; height: calc(var(--v) / 353 * 74%); border-radius: .25em .25em 0 0; background: #E2D6C7; transform-origin: 50% 100%; }
 .mb .hl i { background: var(--honey); }
-.mb em { font-style: normal; font-size: .72em; font-weight: 650; color: var(--mute); text-align: center; }
+.mb em { font-style: normal; font-size: .78em; font-weight: 650; color: var(--mute); text-align: center; }
+.mb b { font-size: .82em; font-weight: 750; text-align: center; color: var(--cream-2); font-variant-numeric: tabular-nums; }
+.mb .hl b { color: var(--honey); }
 .slide.on .mb i { animation: grow 1s var(--ease) both; }
 
 /* ================= 11 compare ================= */
@@ -622,6 +634,15 @@ small { font-size: .8em; }
 .mini .num { font-size: 2.6em; margin-top: .25em; }
 .mini .num small { font-size: .4em; }
 .mini p { margin-top: .4em; font-size: .86em; color: var(--cream-2); line-height: 1.45; }
+.mini2 { display: flex; flex-direction: column; justify-content: space-between; gap: .6em; }
+.mini2 .big3 { display: flex; align-items: baseline; gap: .4em; font-size: .9em; font-weight: 650; color: var(--mute); }
+.mini2 .big3 b { font-size: 2.4em; font-weight: 800; letter-spacing: -.03em; color: var(--honey); }
+.rev { display: grid; gap: .8em; margin-top: .4em; }
+.rev div { display: grid; gap: .1em; padding-bottom: .7em; border-bottom: 1px dashed var(--line); }
+.rev dt { font-size: .9em; font-weight: 700; color: var(--cream-2); }
+.rev dt small { display: block; font-size: .85em; font-weight: 500; color: var(--mute); }
+.rev dd { margin: 0; font-size: 1.7em; font-weight: 800; letter-spacing: -.02em; color: var(--cream); font-variant-numeric: tabular-nums; }
+.rev div:first-child dd { color: var(--honey); }
 .cmpbar { display: grid; grid-template-columns: 6.8em 1fr; gap: .7em .8em; align-items: center; margin-top: .9em; font-size: .9em; }
 .cmpbar .lab2 { font-weight: 650; color: var(--cream-2); }
 .cmpbar .row { display: flex; align-items: center; gap: .6em; min-width: 0; }
@@ -725,8 +746,11 @@ small { font-size: .8em; }
 .squad-h b { font-size: 1.25em; }
 .squad-h span { font-size: .84em; color: var(--mute); }
 .members { flex: 1; display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 1em; align-content: center; }
+.duty { display: grid; gap: .5em; padding-top: 1em; border-top: 1px dashed var(--line); }
+.duty li { position: relative; padding-left: 1.1em; font-size: 1em; font-weight: 600; color: var(--cream-2); }
+.duty li::before { content: ""; position: absolute; left: 0; top: .6em; width: .45em; height: .45em; border-radius: 50%; background: var(--honey); }
 .members li { display: flex; flex-direction: column; align-items: center; gap: .45em; text-align: center; }
-.avatar { width: 9.6em; height: 9.6em; border-radius: 50%; overflow: hidden; background: var(--panel-2); box-shadow: 0 0 0 .22em var(--panel), 0 0 0 .32em var(--line); }
+.avatar { width: 10em; height: 10em; border-radius: 50%; overflow: hidden; background: var(--panel-2); box-shadow: 0 0 0 .22em var(--panel), 0 0 0 .32em var(--line); }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
 .members .nm { margin-top: .5em; font-size: 1.45em; font-weight: 780; }
 .members .role { font-size: .92em; font-weight: 650; color: var(--honey); }
@@ -765,6 +789,13 @@ small { font-size: .8em; }
 .shot .ph { flex: 1; width: 100%; display: grid; place-items: center; background: transparent; }
 .shot .ph img { width: auto; height: auto; max-height: 100%; object-fit: contain; border-radius: .4em; }
 .shot figcaption { font-weight: 700; font-size: .95em; }
+.rtl { display: grid; gap: 0; margin-top: 1em; }
+.rtl li { position: relative; display: grid; grid-template-columns: 5.2em 1fr; gap: 1em; padding: .75em 0 .75em 1.4em; border-left: 2px solid #EAD9C3; }
+.rtl li::before { content: ""; position: absolute; left: -.42em; top: 1.05em; width: .7em; height: .7em; border-radius: 50%; background: #FFFFFF; border: 2px solid var(--honey); }
+.rtl li.hl::before { background: var(--honey); }
+.rtl time { font-weight: 800; color: var(--honey); font-variant-numeric: tabular-nums; }
+.rtl p { display: grid; gap: .2em; font-size: .9em; color: var(--mute); line-height: 1.45; }
+.rtl p b { font-size: 1.1em; color: var(--cream); }
 .news .press { font-size: .8em; color: var(--mute); }
 .news .press b { color: var(--honey); }
 .news h4 { margin-top: .45em; font-size: 1.02em; font-weight: 700; line-height: 1.5; }
@@ -782,7 +813,8 @@ small { font-size: .8em; }
 .ev { display: flex; flex-direction: column; gap: .9em; }
 .ev .k { font-size: .9em; font-weight: 760; color: var(--honey); }
 .ev h3 { font-size: 1.02em; color: var(--cream-2); }
-.ev .facts { gap: .65em; font-size: .92em; }
+.ev .facts { gap: 1em; font-size: 1.16em; }
+.ev .cs { margin-top: auto; padding-top: .8em; border-top: 1px dashed var(--line); font-size: .92em; }
 .ev .facts li { grid-template-columns: 3.2em 1fr; }
 .ev .num { font-size: 4.4em; color: var(--honey); }
 .ev .num small { font-size: .3em; }
@@ -974,7 +1006,7 @@ small { font-size: .8em; }
         <p class="big-sub b"><mark>4마리 중 1마리</mark>꼴로 카테터 합병증
           <svg class="scribble" viewBox="0 0 600 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12 C 160 4, 330 10, 596 6"/><path d="M70 24 C 240 18, 420 22, 560 16"/></svg>
         </p>
-        <p class="big-note b">입원한 개 · 고양이 정맥 카테터 — 빠짐 · 막힘 · 줄 끊김 · 정맥염<br>美 CSU 연구에서도 19.9%</p>
+        <p class="big-note b">영국 19개 기관 · 입원 개 · 고양이 382마리 다기관 연구(2024)<br>빠짐 · 막힘 · 줄 끊김 · 정맥염 — 미국 CSU 연구(2023)에서도 19.9%</p>
       </div>
       <figure class="pet b"><img src="media/pet-cat-iv.webp" alt="입원장에서 수액 줄을 단 채 잠든 고양이" decoding="async"></figure>
     </div>
@@ -1152,7 +1184,7 @@ small { font-size: .8em; }
   <div class="note" hidden><p>해법은 INFU RETRO, 링거폴대에 거는 무게센서 모듈 하나입니다. 1초마다 수액 무게를 재고, 칼만필터로 흔들림을 거르고, CNN이 이상을 판별합니다.</p><p>걸고, 재고, 알립니다. 폴대 교체도, 공구도 필요 없습니다.</p></div>
 </section>
 
-<section class="slide" id="sensor" data-sec="3" data-time="21" data-title="센서는 줄이고, 학습으로 채웠습니다">
+<section class="slide" id="sensor" data-sec="3" data-time="18" data-title="센서는 줄이고, 학습으로 채웠습니다">
   <div class="frame">
     <p class="lab b">Core Tech <span>센서 절감 설계</span></p>
     <h2 class="h b">센서는 줄이고, <mark>학습</mark>으로 채웠습니다</h2>
@@ -1174,7 +1206,7 @@ small { font-size: .8em; }
           <ul class="sx-pair"><li><svg class="ico"><use href="#i-scale"/></svg>무게센서</li><li class="plus">+</li><li><svg class="ico"><use href="#i-gyro"/></svg>자이로</li></ul>
           <figure class="ph sx-ph"><img src="media/field-bag.webp" alt="실제 수액백을 건 폴대에서 흔들림 데이터를 모으는 팀원" data-zoom decoding="async"><figcaption class="cap">모의 병실 · 실제 수액으로 데이터 수집</figcaption></figure>
           <figure class="ph sx-team"><img src="media/team-pole.webp" alt="INFUTECH 팀이 수액백을 건 시제품 폴대와 앱 화면을 띄운 휴대폰 곁에서 엄지를 세운 모습" data-zoom decoding="async"><figcaption class="cap">팀 · 시제품과 앱 연동</figcaption></figure>
-          <p class="sx-out">흔들림 ↔ 무게 편차 학습 → 편차 <em>2.1 g → 0.5 g</em></p>
+          <p class="sx-out">흔들림 ↔ 무게 편차 학습 → 편차 <em>2.1 g → 0.5 g</em><small>학습 장비 모의 신호 기준 · 부록 A2</small></p>
         </div>
         <svg class="ico sx-arr b" aria-hidden="true"><use href="#i-arrow"/></svg>
         <div class="card hi sx-prod b">
@@ -1190,9 +1222,9 @@ small { font-size: .8em; }
         </div>
       </div>
     </div>
-    <div class="ft"><p class="src b">※ 기존 스마트 폴대 제작비는 INFUTECH 시장조사 기준 · 자이로는 개발 · 학습 장비에만 달고 제품에는 넣지 않습니다 · 학습 장비 신호 그래프는 부록 A2</p></div>
+    <div class="ft"><p class="src b">※ 기존 스마트 폴대 제작비는 INFUTECH 시장조사 기준 · 자이로는 개발 · 학습 장비에만 달고 제품에는 넣지 않습니다</p></div>
   </div>
-  <div class="note" hidden><p>기존 스마트 폴대는 자이로, 가속도 센서를 더해 제작비가 100만 원을 넘습니다.</p><p>저희는 학습할 때만 자이로를 달아, 흔들릴 때 무게가 얼마나 틀어지는지 배우게 했습니다. 편차는 2.1그램에서 0.5그램으로 줄었고, 제품에는 무게센서 하나만 남았습니다.</p></div>
+  <div class="note" hidden><p>기존 스마트 폴대는 자이로, 가속도 센서를 더해 제작비가 100만 원을 넘습니다.</p><p>저희는 학습할 때만 자이로를 달아, 흔들릴 때 무게가 얼마나 틀어지는지 배우게 했습니다. 그 보정 덕분에 제품에는 무게센서 하나만 남았습니다.</p></div>
 </section>
 
 <!-- ================= 04 시연 ================= -->
@@ -1218,6 +1250,11 @@ small { font-size: .8em; }
           </ol>
         </div>
       </div>
+      <ul class="demo-pts b">
+        <li><b>1초</b><span>무게 측정 → 잔량 · 유속 계산</span></li>
+        <li><b>2화면</b><span>모니터 대시보드 · 휴대폰 앱 동시 표시</span></li>
+        <li><b>3종 알림</b><span>유속 과다 · 느림 · 정지</span></li>
+      </ul>
     </div>
   </div>
   <div class="note" hidden><p>실제 시연입니다. 수액백을 걸고 유속을 바꾸면, 빠를 때도 느릴 때도 대시보드와 휴대폰에 바로 알림이 뜹니다.</p></div>
@@ -1258,28 +1295,28 @@ small { font-size: .8em; }
   <div class="note" hidden><p>알고리즘은 논문으로 검증했습니다. 유속을 느림, 정상, 빠름 세 상태로 바꾸고, 16개를 4×4 패턴으로 만들어 CNN이 봅니다. 순간 흔들림과 진짜 이상을 구분합니다.</p><p>경량 모델이라 기기 안에서 바로 판정합니다.</p></div>
 </section>
 
-<section class="slide" id="results" data-sec="4" data-time="14" data-title="검증 성과 — 숫자로 증명">
+<section class="slide" id="results" data-sec="4" data-time="17" data-title="검증 성과 — 숫자로 증명">
   <div class="frame">
     <p class="lab b">Validation <span>검증 성과</span></p>
     <h2 class="h b">흔들리는 모의 병실에서, <mark>숫자로</mark> 증명했습니다</h2>
     <div class="bd">
       <div class="stats">
-        <div class="card stat b"><div><p class="num">±<span data-count="3">3</span><small>%</small></p><p>잔량 측정 오차</p></div><p class="cond">500 mL · 이동 · 흔들림 반복</p></div>
-        <div class="card stat b"><div><p class="num">±<span data-count="5">5</span><small>분</small></p><p>종료시점 예측 오차</p></div><p class="cond">초기 감소량 + 방울 수(GTT)</p></div>
-        <div class="card stat b"><div><p class="num"><span data-count="5">5</span><small>초</small></p><p>이내 이상 감지</p></div><p class="cond">흔들림 보정 포함 최대 시간</p></div>
+        <div class="card stat b"><div><p class="num">±<span data-count="3">3</span><small>%</small></p><p>잔량 측정 오차</p></div><p class="cond"><span><b>조건</b>500 mL · 이동 · 흔들림 · 기울어짐 · 당겨짐</span><span><b>환산</b>500 mL 중 ±15 mL</span></p></div>
+        <div class="card stat b"><div><p class="num">±<span data-count="5">5</span><small>분</small></p><p>종료시점 예측 오차</p></div><p class="cond"><span><b>방법</b>초기 감소량 + 방울 수(GTT)로 유속 추정</span><span><b>기준</b>보정 포함 최대 오차</span></p></div>
+        <div class="card stat b"><div><p class="num"><span data-count="5">5</span><small>초</small></p><p>이내 이상 감지</p></div><p class="cond"><span><b>조건</b>흔들림 · 당겨짐 보정 포함</span><span><b>기준</b>최대 검측 시간</span></p></div>
         <div class="card hi stat b"><div><p class="num ac"><span data-count="97.3">97.3</span><small>%</small></p><p>CNN 검증 정확도</p></div>
           <div class="ep" role="img" aria-label="최근 6 epoch 검증 정확도 95.7, 99.0, 95.2, 97.3, 97.4, 99.0%"><i style="--v: 95.66"></i><i style="--v: 99"></i><i style="--v: 95.24"></i><i style="--v: 97.29"></i><i style="--v: 97.41"></i><i style="--v: 99"></i></div>
-          <p class="cond">최근 6 epoch 평균 · 95.2~99.0%</p></div>
+          <p class="cond"><span><b>기준</b>검증셋(val_acc) 최근 6 epoch 평균</span><span><b>범위</b>95.2 ~ 99.0% · 학습 로그 부록 A1</span></p></div>
       </div>
       <div class="proof2 b">
         <div class="card pf"><div class="drops" aria-hidden="true"><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg><svg class="ico"><use href="#i-drop"/></svg></div><p><b>수액 10종 보정</b>점도별 감소 패턴으로 테스트 성공</p></div>
-        <div class="card pf"><figure class="pf-curve"><img src="media/cnn-curve.webp" alt="CNN 학습 곡선 — 80 epoch 동안 손실은 0 근처로 떨어지고 검증 정확도는 1.0 근처로 수렴" data-zoom></figure><p><b>CNN 학습 곡선</b>80 epoch · 손실 ↓ · 정확도 수렴</p></div>
         <div class="card pf"><p class="pat3" aria-hidden="true"><svg class="ico"><use href="#i-cert"/></svg>×3</p><p><b>특허 3건 심사 중</b>하드웨어 · 소프트웨어 · 실용신안</p></div>
+        <div class="card hi pf pf-next"><p class="pf-k">다음 검증</p><p><b>동물병원 입원실 실증</b>모의 병실 결과를 실제 입원 환경에서 다시 확인 — 전북 병원 (진입 전략 STEP 1)</p></div>
       </div>
     </div>
     <div class="ft"><p class="src b">※ 모의 병실 반복시험(폴대 이동 · 흔들림 · 기울어짐 · 당겨짐, 500 mL) · ±5분 · 5초는 보정을 포함한 최대 검측 시간 기준</p></div>
   </div>
-  <div class="note" hidden><p>모의 병실에서 반복 시험한 결과, 잔량 오차 3% 이내, 이상 감지 5초 이내, 판별 정확도 97.3%입니다.</p><p>수액 10종으로 보정을 마쳤고, 특허 3건이 심사 중입니다.</p></div>
+  <div class="note" hidden><p>흔들리는 모의 병실 시험에서, 잔량 오차 3% 이내, 이상 감지 5초 이내, 판별 정확도 97.3%를 확인했습니다.</p><p>특허 3건이 심사 중이고, 다음은 전북 동물병원 입원실에서 실제 환경으로 다시 검증합니다.</p></div>
 </section>
 
 <!-- ================= 05 시장분석 ================= -->
@@ -1318,8 +1355,8 @@ small { font-size: .8em; }
             <li><time>2026.09</time><span>진료기록 발급 의무화 추진</span></li>
           </ol>
           <div class="rx2">
-            <p class="k">동물병원 마약류 처방량<b>+37%</b></p>
-            <div class="mb" role="img" aria-label="동물병원 의료용 마약류 처방량 2022년 257.6만 개, 2023년 299.2만 개, 2024년 323.6만 개, 2025년 353만 개"><span style="--v: 257.6"><i></i><em>2022</em></span><span style="--v: 299.2"><i></i><em>2023</em></span><span style="--v: 323.6"><i></i><em>2024</em></span><span class="hl" style="--v: 353"><i></i><em>2025 · 353만</em></span></div>
+            <p class="k">동물병원 의료용 마약류 처방량 (개)<b>+37%</b></p>
+            <div class="mb" role="img" aria-label="동물병원 의료용 마약류 처방량 2022년 257.6만 개, 2023년 299.2만 개, 2024년 323.6만 개, 2025년 353만 개"><span style="--v: 257.6"><b>257.6만</b><i></i><em>2022</em></span><span style="--v: 299.2"><b>299.2만</b><i></i><em>2023</em></span><span style="--v: 323.6"><b>323.6만</b><i></i><em>2024</em></span><span class="hl" style="--v: 353"><b>353만</b><i></i><em>2025</em></span></div>
           </div>
         </div>
       </div>
@@ -1462,18 +1499,22 @@ small { font-size: .8em; }
             <p class="num">12<small>만 원 / 대 · 월</small></p>
             <p>대당 연 144만 원 · 대시보드 · 투약 기록 · 유지관리</p>
           </div>
-          <div class="card mini">
-            <p class="k">병원 1곳 · 입원장 5대</p>
+          <div class="card mini mini2">
+            <p class="k">병원 1곳 · 입원장 5대 도입비</p>
             <div class="cmpbar">
-              <span class="lab2">펌프</span><span class="row"><i style="--v: 100"></i><b>550만</b></span>
-              <span class="lab2" style="color: var(--honey)">INFU RETRO</span><span class="row"><i class="ac" style="--v: 22.7; --j: 1"></i><b>125만</b></span>
+              <span class="lab2">펌프 5대</span><span class="row"><i style="--v: 100"></i><b>550만</b></span>
+              <span class="lab2" style="color: var(--honey)">INFU RETRO 5대</span><span class="row"><i class="ac" style="--v: 22.7; --j: 1"></i><b>125만</b></span>
             </div>
-            <p>+ 구독 월 60만 원 · 병원당 5대는 SOM 평균 가정</p>
+            <p class="big3"><b>−77%</b>도입비</p>
+            <p>+ 관제 구독 월 60만 원 (대시보드 · 투약 기록 · 유지관리)</p>
           </div>
-          <div class="card mini">
+          <div class="card mini mini2">
             <p class="k">3년 목표 · 50곳 250대</p>
-            <p class="num">3.6<small>억 원 / 년</small></p>
-            <p>구독 반복 매출 · 하드웨어 6,250만 원 별도</p>
+            <dl class="rev">
+              <div><dt>구독 <small>250대 × 12만 원 × 12개월</small></dt><dd>3.6억 원 / 년</dd></div>
+              <div><dt>하드웨어 <small>250대 × 25만 원 · 1회</small></dt><dd>6,250만 원</dd></div>
+            </dl>
+            <p>설치가 늘수록 구독 매출이 쌓이는 구조 · 병원당 5대는 SOM 평균 가정</p>
           </div>
         </div>
       </div>
@@ -1584,6 +1625,11 @@ small { font-size: .8em; }
             <li><span class="avatar"><img src="media/team-han-woojin.webp" alt=""></span><span class="nm">한우진</span><span class="role">Developer</span></li>
             <li><span class="avatar"><img src="media/team-choi-iji.webp" alt=""></span><span class="nm">최이지</span><span class="role">Developer</span></li>
           </ul>
+          <ul class="duty">
+            <li>자체 PCB · 펌웨어 (ESP · MQTT)</li>
+            <li>칼만필터 · CNN 판별 알고리즘 · 학술 발표 논문</li>
+            <li>대시보드 · 휴대폰 앱 · 서버</li>
+          </ul>
         </div>
         <div class="card hi squad b">
           <p class="squad-h"><b>의료실증 · 임상 테스트</b><span>모의 병실 · 현장 실증</span></p>
@@ -1591,6 +1637,11 @@ small { font-size: .8em; }
             <li><span class="avatar"><img src="media/team-kim-eungang.webp" alt=""></span><span class="nm">김은강</span><span class="role">Clinical Tester</span></li>
             <li><span class="avatar"><img src="media/team-han-yerin.webp" alt=""></span><span class="nm">한예린</span><span class="role">Medical Validation</span></li>
             <li><span class="avatar"><img src="media/team-han-byeol.webp" alt=""></span><span class="nm">한별</span><span class="role">Field Demonstration</span></li>
+          </ul>
+          <ul class="duty">
+            <li>원광대 간호학과와 모의 병실 반복 시험</li>
+            <li>수액 10종 점도별 보정 테스트</li>
+            <li>전북 병원 인터뷰 · 현장 시연</li>
           </ul>
         </div>
       </div>
@@ -1830,16 +1881,22 @@ small { font-size: .8em; }
             <div class="xl" style="gap: 1.4em"><span>2022</span><span>2023</span><span>2024</span><span>2025</span></div>
           </div>
         </div>
-        <div class="stack">
-          <article class="card news b" style="flex: 1"><p class="press"><b>정책브리핑</b> · 2026.04.27</p><h4>「동물병원 의료용 마약류 관리 강화…정보관리 의무화 · 합동점검」</h4></article>
-          <article class="card news b" style="flex: 1"><p class="press"><b>중앙일보</b> · 2026.09.02</p><h4>「동물병원 진료비 공개 · 진료기록 발급 의무화…수의계는 반발」</h4></article>
-          <article class="card news b" style="flex: 1"><p class="press"><b>데일리벳</b> · 2026.08.05</p><h4>합동점검 46곳 중 28곳 위반 적발</h4></article>
+        <div class="card b">
+          <h3>기록을 요구하는 흐름</h3>
+          <ol class="rtl">
+            <li><time>2023.01</time><p><b>동물병원 진료비 게시 의무 시행</b></p></li>
+            <li><time>2025.04</time><p><b>진료항목 표준화 시행</b>진료행위 4,930종</p></li>
+            <li><time>2025.12</time><p><b>진료비 공개 항목 11종 → 20종 확대</b>농식품부 · 식약처 보도자료</p></li>
+            <li><time>2026.04</time><p><b>의료용 마약류 관리 강화 — 투약 시 소유자 정보 기록 추진</b>정책브리핑 2026.04.27</p></li>
+            <li><time>2026.08</time><p><b>합동점검 46곳 중 28곳 위반 적발</b>데일리벳 2026.08.05</p></li>
+            <li class="hl"><time>2026.09</time><p><b>진료기록 발급 의무화 추진 — 국회 의결 단계</b>중앙일보 2026.09.02 · 시행일 미확정</p></li>
+          </ol>
         </div>
       </div>
     </div>
-    <div class="ft"><p class="src b">출처: 연합뉴스 2026.05.31(NIMS 처방량) · 정책브리핑 · 중앙일보 · 데일리벳 · 진료기록 발급 의무화는 국회 의결 단계(시행일 미확정)</p></div>
+    <div class="ft"><p class="src b">출처: 연합뉴스 2026.05.31(NIMS 처방량) · 농식품부 · 식약처 보도자료(2025.12, 2026.4) · 농식품부 진료항목 표준화(2025.4) · 정책브리핑 · 중앙일보 · 데일리벳</p></div>
   </div>
-  <div class="note" hidden><p>질의응답용: 마약류 처방량 추이와 관련 보도입니다.</p></div>
+  <div class="note" hidden><p>질의응답용: 마약류 처방량 추이와 기록을 요구하는 규제 흐름입니다. 진료기록 발급 의무화는 아직 국회 의결 단계라 시행일이 정해지지 않았습니다.</p></div>
 </section>
 
 
