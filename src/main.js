@@ -148,7 +148,7 @@ let bootFocusY = 0.42;
 let bootFocusX = 0.5;
 let bootFit = 0.3; // 레티클 지름 / 화면 높이 — 드론이 레티클을 알맞게 채우는 거리
 let bootPin = -1; // 검증용: 진행률을 이 값에 고정(-1이면 실제 진행)
-let leaveTl = null; // 시작할 때의 아이리스 아웃
+let leaveTl = null; // 시작할 때 부팅 화면이 위로 걷히는 움직임
 const bootLeader = document.querySelector('.boot-leader');
 // 레티클의 화면 위치를 재고, 부팅 화면의 어둠(가운데 빈 원)도 그 자리에 맞춘다
 function measureLeader(ease = 1) {
@@ -518,15 +518,25 @@ async function boot() {
   const t0 = performance.now();
   booting = true;
   let ready = false;
-  // 로딩 중 화면을 누르면 그 순간 오디오를 깨워 두고, 준비가 끝났다면 바로 시작
+  // 화면을 누르면 그 순간 오디오를 깨워 두고, 준비가 끝났으면 바로 · 아직이면 준비되는 즉시 시작
   const bootEl = $('boot');
-  const poke = () => {
-    if (pageCovered) return; // 작품 · 수상 페이지가 덮고 있으면 키를 눌러도 필름을 열지 않는다
-    audio.unlock();
-    if (ready) start(true);
+  // 준비 전에 걷어 올렸다면 준비되는 즉시 들어간다
+  let queued = false;
+  const go = () => {
+    if (pageCovered || started) return; // 작품 · 수상 페이지가 덮고 있으면 필름을 열지 않는다
+    if (ready) return start(true);
+    queued = true;
+    $('boot-status').textContent = 'STARTING…';
   };
-  bootEl.addEventListener('pointerdown', poke);
+  const poke = () => {
+    if (pageCovered) return;
+    audio.unlock();
+    go();
+  };
+  bootEl.addEventListener('pointerdown', () => !pageCovered && audio.unlock());
+  bootEl.addEventListener('click', (e) => !e.target.closest('button') && poke());
   addEventListener('keydown', (e) => !started && booting && !e.repeat && poke(), { capture: true });
+  bindLift(bootEl, go);
   let progress = 0;
   let shown = 0;
   const clockTimer = setInterval(() => {
@@ -591,6 +601,7 @@ async function boot() {
   const actions = $('boot-actions');
   if (started || !actions) return;
   ready = true;
+  if (queued && !pageCovered) return start(true);
   $('boot').classList.add('is-ready');
   $('boot-status').textContent = 'READY';
   $('boot-lock').textContent = 'LOCKED';
@@ -634,7 +645,7 @@ function start(withSound) {
   audio.set(withSound);
   hud.setSound(withSound);
   document.body.classList.add('is-started');
-  leaveTl = irisOut($('boot'));
+  leaveTl = splashUp($('boot'));
   // 느린 기기에서 프레임이 밀려도 부팅 화면이 오래 남지 않게(멈춰 둔 검증용 재생은 그대로)
   setTimeout(() => leaveTl?.isActive() && leaveTl.progress(1), 4000);
   if (stage) {
@@ -659,35 +670,66 @@ function start(withSound) {
   setTimeout(syncSoundHint, 900);
 }
 
-// 부팅 화면 걷기: 글자가 먼저 빠지고, 레티클이 화면 끝까지 열리며(아이리스 아웃) 필름이 드러난다
-function irisOut(bootEl) {
+// 부팅 화면 걷기(스플래시 업): 글자가 위로 빠지고, 화면 전체가 빛나는 아래 끝을 끌며 위로 걷혀 필름이 드러난다
+function splashUp(bootEl) {
   if (!bootEl) return null;
-  const lr = bootLeader?.getBoundingClientRect();
-  // 움직임을 줄이는 설정 · 레티클이 없으면 짧게 사라지기만
-  if (reduced || !lr?.width) {
-    return gsap.to(bootEl, { autoAlpha: 0, duration: reduced ? 0.25 : 0.8, ease: 'power2.inOut', onComplete: () => bootEl.remove() });
-  }
-  const cx = lr.left + lr.width / 2;
-  const cy = lr.top + lr.height / 2;
-  const r0 = lr.width * 0.46; // 진행 고리의 반지름(viewBox 92/200)
-  const r1 = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy)) + 60;
-  bootEl.style.setProperty('--ix', `${cx.toFixed(1)}px`);
-  bootEl.style.setProperty('--iy', `${cy.toFixed(1)}px`);
-  bootEl.style.setProperty('--ir', `${r0.toFixed(1)}px`);
   bootEl.classList.add('is-leaving');
-  const copy = bootEl.querySelectorAll('.boot-copy > *, .boot-actions, .boot-lock, .boot-pct');
-  const chrome = bootEl.querySelectorAll('.boot-top, .boot-bottom, .boot-log, .boot-corners');
-  const tl = gsap.timeline({ onComplete: () => bootEl.remove() });
+  if (reduced) return gsap.to(bootEl, { autoAlpha: 0, duration: 0.25, ease: 'power1.out', onComplete: () => bootEl.remove() });
+  const copy = bootEl.querySelectorAll('.boot-copy > *, .boot-actions, .boot-lift');
   const lite = document.documentElement.classList.contains('q-lite'); // 저사양: 흐림 없이
-  tl.to(copy, { autoAlpha: 0, y: -10, ...(lite ? {} : { filter: 'blur(4px)' }), duration: 0.45, stagger: 0.04, ease: 'power2.in' }, 0)
-    .to(chrome, { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, 0)
-    // 레티클 고리가 한 번 조여졌다가(숨 고르기) 화면 밖까지 열린다
-    .to(bootLeader, { scale: 0.94, duration: 0.3, ease: 'power2.out' }, 0)
-    .to(bootLeader, { autoAlpha: 0, duration: 0.25, ease: 'power1.in' }, 0.3)
-    .set(bootEl.querySelector('.boot-iris'), { opacity: 1 }, 0.3)
-    .fromTo(bootEl, { '--ir': `${r0 * 0.94}px` }, { '--ir': `${r1}px`, duration: 1.15, ease: 'power2.in' }, 0.3)
-    .to(bootEl.querySelector('.boot-iris'), { opacity: 0, duration: 0.35, ease: 'power1.in' }, 1.1);
+  const tl = gsap.timeline({ onComplete: () => bootEl.remove() });
+  tl.to(copy, { autoAlpha: 0, y: -28, ...(lite ? {} : { filter: 'blur(3px)' }), duration: 0.42, stagger: 0.04, ease: 'power2.in' }, 0)
+    .to(bootLeader, { scale: 1.08, autoAlpha: 0, duration: 0.45, ease: 'power2.in' }, 0)
+    .to(bootEl, { y: -(innerHeight + 48), duration: 1.05, ease: 'power3.inOut' }, 0.1);
   return tl;
+}
+
+// 부팅 화면을 위로 걷어 올려 시작: 휠을 내리거나 손가락으로 밀어 올리면(손가락을 따라 올라온다)
+function bindLift(bootEl, go) {
+  let wheel = 0;
+  let wheelAt = 0;
+  bootEl.addEventListener('wheel', (e) => {
+    if (started || bootEl.scrollHeight > bootEl.clientHeight + 2) return; // 낮은 화면에서 스크롤되는 부팅 화면은 그대로
+    const now = performance.now();
+    if (now - wheelAt > 300) wheel = 0;
+    wheelAt = now;
+    wheel += e.deltaY;
+    if (wheel > 40) go();
+  }, { passive: true });
+  let y0 = null;
+  let dy = 0;
+  let t0 = 0;
+  // 스크롤되는 부팅 화면(가로로 눕힌 휴대폰)은 끝까지 내린 뒤에만 걷는다
+  const atEnd = () => bootEl.scrollTop + bootEl.clientHeight >= bootEl.scrollHeight - 2;
+  bootEl.addEventListener('touchstart', (e) => {
+    if (started || e.touches.length > 1 || e.target.closest('button')) return (y0 = null);
+    y0 = atEnd() ? e.touches[0].clientY : null;
+    dy = 0;
+    t0 = performance.now();
+  }, { passive: true });
+  bootEl.addEventListener('touchmove', (e) => {
+    if (y0 == null || started) return;
+    dy = Math.min(0, e.touches[0].clientY - y0);
+    if (dy < -6) {
+      e.preventDefault();
+      bootEl.classList.add('is-lifting');
+      gsap.set(bootEl, { y: reduced ? 0 : dy * 0.85 });
+    }
+  }, { passive: false });
+  const end = () => {
+    if (y0 == null || started) return;
+    y0 = null;
+    const fast = dy < -40 && dy / Math.max(1, performance.now() - t0) < -0.5;
+    if (dy < -Math.min(140, innerHeight * 0.16) || fast) {
+      audio.unlock(); // 손을 떼는 순간은 브라우저가 소리를 허락하는 몸짓
+      go();
+      if (started) return;
+    }
+    bootEl.classList.remove('is-lifting');
+    gsap.to(bootEl, { y: 0, duration: 0.5, ease: 'power3.out' });
+  };
+  bootEl.addEventListener('touchend', end);
+  bootEl.addEventListener('touchcancel', end);
 }
 
 // 자동 진입이라 브라우저가 소리를 막아 둔 경우: 한 번 누르면 켜진다는 안내를 띄운다
@@ -880,7 +922,7 @@ if (stage && new URLSearchParams(location.search).has('capture')) {
     bootAt: (p) => (bootPin = p),
     // 카운트다운 화면(n = 3 · 2 · 1, 그 초의 중간)
     bootCount: (n = 2) => countdown(n - 0.5, 3),
-    // 아이리스 아웃을 멈추고 sec초 지점을 보여 준다
+    // 걷히는 움직임을 멈추고 sec초 지점을 보여 준다
     leaveAt: (sec) => leaveTl?.pause().seek(sec),
     freeze: () => (frozen = true),
     go: (i) => director.go(i, { instant: true }),

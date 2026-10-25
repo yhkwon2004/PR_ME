@@ -14,10 +14,16 @@ export const profile = {
   roleKo: 'AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자',
   motto: '제약을 이해하고, 작은 실험으로 해법을 검증합니다.',
   summary: '현장의 제약을 문제로 정의하고, AI·소프트웨어·하드웨어를 연결해 작동하는 해결책으로 만듭니다.', // 한 줄 소개 — 필름 소개 첫 화면 · 이력서(/resume)
-  // 학력 — 2026 Notion 포트폴리오의 Education(본인 기록 그대로)
+  born: 2004,
+  // 증명사진(본인 제공) — 4:5
+  photo: { src: M('profile/kwon.webp'), thumb: M('profile/kwon.thumb.webp'), w: 960, h: 1200 },
+  // 이 포트폴리오가 담는 기간 — 대학 시절
+  span: '2023 – 2026',
+  // 학력 — 본인이 알려 준 순서 그대로(입학 → 소속 변경 → 복수전공)
   education: [
-    { school: '원광대학교', major: '컴퓨터소프트웨어공학과', period: '2023 – 2029' },
-    { school: 'JST 공유대학 (전북대학교)', major: '스마트 모빌리티 SW공학과 · 복수전공', period: '2024 – 2026' },
+    { period: '2023', school: '원광대학교', major: '인공지능학과', note: '입학' },
+    { period: '2024', school: '원광대학교', major: '컴퓨터소프트웨어공학과', note: '소속 변경 · 재학' },
+    { period: '2024 2학기 –', school: 'JST 공유대학 (전북대학교)', major: '스마트 모빌리티 SW공학', note: '복수전공' },
   ],
   email: 'yhkwon2004@gmail.com',
   links: [

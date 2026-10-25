@@ -687,3 +687,219 @@
     grid-template-columns: 56px 56px minmax(0, 1fr) auto;
   }
 }
+
+/* ── /growth 슬라이드: 스크롤 대신 한 화면씩 바뀐다(site.js bindDeck) ──
+   페이지는 움직이지 않고, 막대 아래 전체가 한 장의 화면 — 화면마다 가운데에 모은다 */
+.page.is-deck {
+  overflow: hidden;
+  touch-action: none;
+}
+.pg-growth.is-deck {
+  position: relative;
+  height: 100%;
+  background:
+    radial-gradient(90% 70% at 50% 0%, rgba(94, 242, 255, 0.07), transparent 60%),
+    var(--bg);
+}
+.pg-growth.is-deck .pg-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.gd {
+  position: absolute;
+  inset: 72px 0 0;
+}
+.gd-s {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2vh calc(var(--pad) + 56px) 9vh var(--pad);
+  visibility: hidden;
+}
+.gd-in {
+  width: min(100%, 1240px);
+  max-height: 100%;
+}
+/* 표지 · 가치관 · 지금: 가운데 정렬 */
+.gd-cover .gd-in,
+.gd-values .gd-in,
+.gd-now .gd-in {
+  text-align: center;
+}
+.gd-cover .pg-tabs {
+  justify-content: center;
+}
+.gd-cover .gr-road {
+  margin-top: 4vh;
+}
+.gd-values .gr-vgrid {
+  margin-top: 3vh;
+  text-align: left;
+}
+/* 학년 이야기: 왼쪽 학년 · 제목 · 수, 오른쪽 이야기 · 배운 것 */
+.gd-story .gd-in {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.4fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 80px);
+}
+.gd-story .gr-story {
+  font-size: clamp(16px, 1.25vw, 19px);
+  line-height: 1.85;
+  color: var(--fg);
+}
+.gd-story .gr-learned {
+  font-size: clamp(15px, 1.1vw, 17px);
+}
+.gd-story .gr-h {
+  font-size: clamp(38px, 4.4vw, 64px);
+}
+/* 학년 주요 장면: 왼쪽 타임라인, 오른쪽 대표 프로젝트 */
+.gd-moments .gd-in {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(24px, 4vw, 64px);
+}
+.gd-moments .gr-sub {
+  margin-top: 0;
+}
+.gd-moments .gr-cards {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gd-now .gr-now-t {
+  max-width: 820px;
+  margin: 3vh auto 0;
+  font-size: clamp(22px, 2.4vw, 34px);
+  line-height: 1.5;
+}
+.gd-now .gr-now-a {
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 4vh;
+}
+/* 오른쪽 점: 지금 화면은 길게, 학년 화면은 학년 색 — 마우스를 올리면 화면 이름 */
+.gd-dots {
+  position: absolute;
+  right: calc(var(--pad) - 6px);
+  top: 50%;
+  z-index: 5;
+  display: grid;
+  gap: 4px;
+  transform: translateY(-50%);
+}
+.gd-dots button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 22px;
+}
+.gd-dots button::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gc, rgba(238, 242, 247, 0.4));
+  opacity: 0.55;
+  transition:
+    height 0.35s var(--ease),
+    opacity 0.3s;
+}
+.gd-dots button[aria-current]::before {
+  height: 20px;
+  border-radius: 3px;
+  opacity: 1;
+}
+.gd-dots span {
+  position: absolute;
+  right: 32px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(20, 30, 46, 0.92);
+  font-size: 12.5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.gd-dots button:hover span,
+.gd-dots button:focus-visible span {
+  opacity: 1;
+}
+.gd-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  z-index: 5;
+  font-size: 13px;
+  color: var(--muted);
+  transform: translateX(-50%);
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+.gd-hint span {
+  margin-right: 6px;
+  color: var(--fg-2);
+}
+.gd-hint.is-end {
+  opacity: 0;
+  pointer-events: none;
+}
+/* 낮은 화면: 표지의 학년 길 · 이야기 글을 조금 줄인다 */
+@media (min-width: 821px) and (max-height: 820px) {
+  .gd-story .gr-story {
+    font-size: 15.5px;
+    line-height: 1.75;
+  }
+  .gd-moments .gr-ms li:nth-child(n + 6) {
+    display: none;
+  }
+}
+@media (max-width: 820px) {
+  .gd {
+    inset: 60px 0 0;
+  }
+  .gd-s {
+    align-items: flex-start;
+    padding: 1vh var(--pad) 64px;
+  }
+  .gd-story .gd-in,
+  .gd-moments .gd-in {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .gd-story .gr-h {
+    font-size: 32px;
+  }
+  .gd-story .gr-story {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .gd-story .gr-learned {
+    font-size: 13.5px;
+  }
+  .gd-moments .gr-ms li:nth-child(n + 5) {
+    display: none;
+  }
+  .gd-moments .gr-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gd-dots {
+    right: 2px;
+  }
+  .gd-dots button {
+    width: 18px;
+    height: 16px;
+  }
+  .gd-dots span {
+    display: none;
+  }
+  .gd-hint {
+    bottom: 14px;
+    font-size: 12px;
+  }
+}

@@ -357,27 +357,75 @@ body.no-webgl #boot {
   background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 3px);
   mix-blend-mode: overlay;
 }
-/* 시작: 레티클 자리에서 둥글게 열리며(아이리스 아웃) 필름이 드러난다 */
+/* 시작(스플래시 업): 화면 전체가 위로 걷히고, 빛나는 아래 끝이 필름 위를 쓸고 올라간다 */
+#boot::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(94, 242, 255, 0.9) 18%, #fff 50%, rgba(94, 242, 255, 0.9) 82%, transparent);
+  box-shadow: 0 0 22px rgba(94, 242, 255, 0.75), 0 -26px 70px rgba(94, 242, 255, 0.22);
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+#boot.is-leaving,
+#boot.is-lifting {
+  background-color: rgba(3, 4, 9, 0.38);
+}
 #boot.is-leaving {
   pointer-events: none;
-  -webkit-mask-image: radial-gradient(circle at var(--ix) var(--iy), transparent calc(var(--ir) - 48px), #000 var(--ir));
-  mask-image: radial-gradient(circle at var(--ix) var(--iy), transparent calc(var(--ir) - 48px), #000 var(--ir));
+}
+#boot.is-leaving::after,
+#boot.is-lifting::after {
+  opacity: 1;
 }
 #boot.is-leaving * {
   animation: none !important;
 }
-.boot-iris {
+/* 걷어 올리는 안내: 아래 글줄 가운데의 갈매기표 — 준비되면 위로 떠오르기를 되풀이 */
+.boot-lift {
   position: absolute;
-  left: var(--ix, 50%);
-  top: var(--iy, 50%);
-  width: calc(var(--ir, 0px) * 2);
-  height: calc(var(--ir, 0px) * 2);
-  border: 1.5px solid rgba(94, 242, 255, 0.85);
-  border-radius: 50%;
-  box-shadow: 0 0 26px rgba(94, 242, 255, 0.45), inset 0 0 26px rgba(94, 242, 255, 0.25);
-  transform: translate(-50%, -50%);
+  left: 50%;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-50%);
+  font-weight: 400;
+  white-space: nowrap;
+  color: rgba(214, 246, 255, 0.8);
+  transition: opacity 0.6s;
+}
+.boot-lift i {
+  width: 9px;
+  height: 9px;
+  margin-top: 4px;
+  border-left: 1.5px solid var(--cyan);
+  border-top: 1.5px solid var(--cyan);
+  transform: rotate(45deg);
+  filter: drop-shadow(0 0 5px rgba(94, 242, 255, 0.8));
+}
+#boot:not(.is-ready) .boot-lift {
   opacity: 0;
-  pointer-events: none;
+}
+#boot.is-ready .boot-lift i {
+  animation: boot-lift 1.6s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+}
+@keyframes boot-lift {
+  0% {
+    opacity: 0;
+    translate: 0 6px;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -7px;
+  }
 }
 /* 모서리 · 위아래 글줄은 흐름 밖에 — 가운데 내용만 격자의 한 칸을 차지한다 */
 .boot-corners {

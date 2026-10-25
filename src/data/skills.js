@@ -172,6 +172,17 @@ export const DOMAIN_SKILLS = DOMAINS.map((d) => {
   return { ...d, skills, projects: list, awards: awards.size, certs };
 });
 
+// 이력서용 기술 스택 — 다룰 수 있는 언어 · 툴을 분야별 한 줄로(이름은 위 기술 목록 그대로, 근거 수는 SKILLS에서 센다)
+const STACK_DEFS = [
+  { id: 'lang', ko: '언어', en: 'Languages', of: ['Python', 'C / C++', 'Java', 'TypeScript', 'C# · Unity', 'Swift', 'SQL'] },
+  { id: 'ai', ko: 'AI · 데이터', en: 'AI · Data', of: ['Deep Learning', 'YOLO', 'LLM · NLP', 'Pose Estimation', 'Segmentation', 'Data Analysis'] },
+  { id: 'hw', ko: '임베디드 · 회로', en: 'Embedded', of: ['ESP32', 'Arduino', 'Altium PCB', 'Sensors', 'Firmware', 'IoT'] },
+  { id: 'robot', ko: '로봇 · 자율주행 · 드론', en: 'Robotics', of: ['ROS 2', 'Nav2', 'Simulation', 'CARLA', 'AirSim', 'Pixhawk', 'Mission Planner'] },
+  { id: 'web', ko: '웹 · 앱 · 서버', en: 'Web · App', of: ['Next.js', 'Supabase', 'FastAPI', 'Mobile App', 'Streamlit', 'AWS', 'Linux', 'Git'] },
+  { id: 'cad', ko: '설계 · 제작 툴', en: 'CAD · Tools', of: ['Fusion 360', 'Inventor', 'CATIA', '3D Printing', 'UI/UX', 'Office'] },
+];
+export const STACK = STACK_DEFS.map((g) => ({ ...g, items: g.of.map((en) => SKILLS.find((s) => s.en === en)).filter(Boolean) }));
+
 export const skillsOf = (id) => SKILLS.filter((s) => s.evidence.some((e) => e.project.id === id));
 export const SKILL_COUNT = SKILLS.length;
 // 근거 프로젝트가 하나라도 있는 기술 수

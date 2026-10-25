@@ -1,20 +1,19 @@
 // 한 장면 안의 여러 화면(비트): 스크롤 없이 영화처럼 한 화면씩 바뀐다 — 휠 · 스와이프 · 방향키 · 아래 칸 · 자동 재생.
-// 소개(프로필): 소개 → 학력 · 기록 → 핵심 역량 → 가치관 → 학년별 성장 / 이력: 연도마다 한 화면(학년 · 항목 · 기록 한 줄 · 이어진 프로젝트 · 상장 · 기사)
-// 상세에 들어가지 않아도 화면에서 바로 읽히도록 — 사진은 누르면 프로젝트, 상장은 누르면 크게(필름의 라이트박스)
+// 소개(이력서): 인적 사항(사진) → 학력 · 기록 → 기술 스택 → 가치관 → 학년별 성장
+// 이력: 연도마다 한 화면 — 파노라마 창이 가는 틈에서 열리며 그 해의 사진들이 펼쳐지고, 아래에 항목이 같은 칸에 맞춰 선다
+// 상세에 들어가지 않아도 화면에서 바로 읽히도록 — 글은 짧게(항목마다 한 줄), 사진은 누르면 프로젝트, 상장은 누르면 크게
 import gsap from 'gsap';
 import { profile } from '../content.js';
 import { projects, byId, categoryOf } from '../data/projects.js';
 import { AWARDS, TIER_KEY, TIER_LABEL } from '../data/awards.js';
 import { PRESS } from '../data/press.js';
-import { CERTS } from '../data/skills.js';
+import { CERTS, STACK } from '../data/skills.js';
 import { HISTORY } from '../data/history.js';
 import { STAGES, VALUES, PRELUDE, stageOf } from '../data/growth.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
 const dot = (d = '') => d.replace(/-/g, '.');
-const lines = (arr) => arr.map((l) => `<span class="line"><span>${esc(l)}</span></span>`).join('');
-const yearsOf = (y = '') => (String(y).match(/20\d{2}/g) || []).map(Number);
 
 // 상장 한 장 → 라이트박스 미디어(상장이 없으면 시상 사진)
 const certCaption = (a) => `${a.contest} — ${a.grade}${a.date ? ` (${dot(a.date)})` : ''}`;
@@ -45,32 +44,44 @@ function kicker(i, text) {
   return `<p class="kicker b-a"><span class="kicker-no">SC ${pad(i)}</span><span class="kicker-txt">${esc(text)}</span></p>`;
 }
 
-// ── 소개(프로필): 다섯 화면 — 성장 과정이 마지막이라 바로 연도별 이력(1학년 2023)으로 이어진다 ──
+// ── 소개: 실제 이력서처럼 다섯 화면 — 성장 과정이 마지막이라 바로 연도별 이력(2023)으로 이어진다 ──
 function profileBeats(scene, i) {
   const email = profile.links.find((l) => l.url.startsWith('mailto:'));
-  const years = [...projects.flatMap((p) => yearsOf(p.year)), ...AWARDS.map((a) => +a.year), ...CERTS.map((c) => +c.year)].filter(Boolean);
   const grand = AWARDS.filter((a) => a.tier === 1).length;
   const nums = [
     [projects.length, '프로젝트'],
     [AWARDS.length, '수상', `대상 ${grand}`],
     [CERTS.length, '자격증'],
     [PRESS.length, '공식 보도'],
-    [`${Math.min(...years)}`, '활동', `— ${Math.max(...years)}`],
   ];
   const certs = [...CERTS].sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999'));
+  const edu = profile.education || [];
+  const now = edu.filter((e) => e.note !== '입학');
+  const link = (l) => `<li><a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}><span>${esc(l.label)}</span>${esc(l.value)}</a></li>`;
   return [
     {
       key: 'who',
       label: '소개',
       cls: 'bt-who',
       html: `<div class="bt-top panel-content">
-          ${kicker(i, scene.kicker)}
-          <h2 class="title title-ko b-a">${lines(scene.title)}</h2>
+          ${kicker(i, `PROFILE — 대학 시절 포트폴리오 ${profile.span}`)}
         </div>
         <div class="bt-body panel-content">
-          <p class="bt-name b-a"><b>${esc(profile.name)}</b><span>${esc(profile.en)}</span></p>
-          <p class="bt-role b-a"><b>${esc(profile.role)}</b> — ${esc(profile.roleKo)}</p>
-          <p class="bt-lead b-a">${esc(scene.lead)}</p>
+          <article class="rs-card">
+            ${profile.photo ? `<figure class="rs-photo b-a"><img src="${esc(profile.photo.src)}" width="${profile.photo.w}" height="${profile.photo.h}" alt="${esc(profile.name)} 증명사진" decoding="async" /></figure>` : ''}
+            <div class="rs-id">
+              <p class="rs-role b-a">${esc(profile.role)}</p>
+              <h2 class="rs-name b-a">${esc(profile.name)}<span>${esc(profile.en)}</span></h2>
+              <p class="rs-motto b-a">${esc(profile.motto)}</p>
+              <p class="rs-sum b-a">${esc(profile.summary)}</p>
+              <dl class="rs-facts b-a">
+                <div><dt>출생</dt><dd>${esc(profile.born)}년</dd></div>
+                <div><dt>기간</dt><dd>${esc(profile.span)} 대학 시절</dd></div>
+                ${now.map((e) => `<div><dt>${esc(e.note.includes('복수') ? '복수전공' : '소속')}</dt><dd>${esc(e.school)} ${esc(e.major)}</dd></div>`).join('')}
+              </dl>
+              <ul class="rs-links b-a">${[email, ...profile.links.filter((l) => l !== email && /GitHub|Notion/.test(l.label))].filter(Boolean).map(link).join('')}<li><a class="is-pdf" href="/resume" data-link><span>PDF</span>이력서 한 장</a></li></ul>
+            </div>
+          </article>
         </div>`,
     },
     {
@@ -78,48 +89,47 @@ function profileBeats(scene, i) {
       label: '학력 · 기록',
       cls: 'bt-prof',
       html: `<div class="bt-top panel-content">
-          ${kicker(i, 'PROFILE — 학력 · 기록')}
-          <h2 class="bt-h b-a">${esc(profile.name)} <span>${esc(profile.en)}</span></h2>
+          ${kicker(i, 'EDUCATION — 학력 · 기록')}
+          <h2 class="bt-h b-a">학력과 숫자로 본 기록</h2>
         </div>
         <div class="bt-body panel-content">
-          <div class="bt-cols">
-            <div class="bt-col">
-              <p class="bt-sub b-a">학력</p>
-              <ul class="bt-edu">${(profile.education || [])
-                .map((e) => `<li class="b-a"><b>${esc(e.school)}</b><span>${esc(e.major)}</span><small>${esc(e.period)}</small></li>`)
-                .join('')}</ul>
-              <p class="bt-sub b-a">자격 ${CERTS.length}</p>
-              <ul class="bt-certs b-a">${certs.map((c) => `<li>${esc(c.name)}${c.year ? `<small>${esc(c.year)}</small>` : ''}</li>`).join('')}</ul>
-            </div>
-            <dl class="bt-nums">${nums
-              .map(([n, l, s]) => `<div class="b-a"><dt>${esc(l)}</dt><dd>${esc(n)}${s ? `<small>${esc(s)}</small>` : ''}</dd></div>`)
-              .join('')}</dl>
+          <div class="rs-grid">
+            <section class="rs-sec b-a">
+              <h3 class="rs-h">학력</h3>
+              <ol class="rs-tl">${edu
+                .map((e) => `<li><time>${esc(e.period)}</time><b>${esc(e.school)}</b><span>${esc(e.major)}</span><em>${esc(e.note)}</em></li>`)
+                .join('')}</ol>
+            </section>
+            <section class="rs-sec b-a">
+              <h3 class="rs-h">기록</h3>
+              <dl class="rs-nums">${nums
+                .map(([n, l, s]) => `<div><dt>${esc(l)}</dt><dd>${esc(n)}${s ? `<small>${esc(s)}</small>` : ''}</dd></div>`)
+                .join('')}</dl>
+            </section>
+            <section class="rs-sec rs-wide b-a">
+              <h3 class="rs-h">자격증 <span>${CERTS.length}</span></h3>
+              <ul class="rs-certs">${certs.map((c) => `<li>${esc(c.name)}${c.year ? `<time>${esc(c.year)}</time>` : ''}</li>`).join('')}</ul>
+            </section>
           </div>
-          <ul class="bt-links b-a">${profile.links
-            .map((l) => `<li><a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}><span>${esc(l.label)}</span>${esc(l.value)}</a></li>`)
-            .join('')}<li><a class="is-pdf" href="/resume" data-link><span>PDF</span>이력서 한 장</a></li></ul>
         </div>`,
       email: email?.value,
     },
     {
-      key: 'core',
-      label: '핵심 역량',
-      cls: 'bt-core',
+      key: 'stack',
+      label: '기술 스택',
+      cls: 'bt-stack',
       html: `<div class="bt-top panel-content">
-          ${kicker(i, 'CORE — 핵심 역량')}
-          <h2 class="bt-h b-a">세 가지 축으로 일합니다</h2>
+          ${kicker(i, 'SKILLS — 기술 스택')}
+          <h2 class="bt-h b-a">다룰 수 있는 언어 · 툴</h2>
         </div>
         <div class="bt-body panel-content">
-          <ol class="bt-pillars">${scene.pillars
-            .map(
-              (p) => `<li class="b-a">
-              <span class="bt-no">${esc(p.no)}</span>
-              <h3>${esc(p.title)}</h3>
-              <p>${esc(p.detail || p.text)}</p>
-              ${p.projects?.length ? `<div class="bt-media">${p.projects.map(byId).filter(Boolean).map(projChip).join('')}</div>` : ''}
-            </li>`
-            )
-            .join('')}</ol>
+          <div class="rs-sec rs-stack">${STACK.map(
+            (g) => `<div class="rs-row b-a">
+              <h3>${esc(g.ko)}<small>${esc(g.en)}</small></h3>
+              <ul>${g.items.map((s) => `<li${s.state === 'explore' ? ' class="is-explore"' : ''}>${esc(s.name)}${s.evidence.length ? `<sup title="이 기술을 쓴 프로젝트">${s.evidence.length}</sup>` : ''}</li>`).join('')}</ul>
+            </div>`
+          ).join('')}</div>
+          <p class="rs-note b-a">숫자는 그 기술을 쓴 프로젝트 수 · <a href="/skills" data-link>근거와 함께 전체 보기 →</a></p>
         </div>`,
     },
     {
@@ -133,7 +143,7 @@ function profileBeats(scene, i) {
         <div class="bt-body panel-content">
           <ol class="bt-pillars">${VALUES.map(
             (v) => `<li class="b-a">
-              <span class="bt-no">${esc(v.no)} · ${esc(v.en)}</span>
+              <span class="bt-no">${esc(v.no)}<em>${esc(v.en)}</em></span>
               <h3>${esc(v.title)}</h3>
               <p>${esc(v.text)}</p>
               <div class="bt-media">${v.proof.map(byId).filter(Boolean).slice(0, 2).map(projChip).join('')}</div>
@@ -155,7 +165,6 @@ function profileBeats(scene, i) {
               <span class="bt-no">${esc(g.grade)} · ${esc(g.span)}<em>${esc(g.code)}</em></span>
               <h3>${esc(g.title)}</h3>
               <p class="bt-hl">${esc(g.headline)}</p>
-              <p>${esc(g.learned)}</p>
               <small class="bt-meta">프로젝트 ${g.projects.length} · 수상 ${g.awards.length}${g.grand ? ` (대상 ${g.grand})` : ''}${g.certs.length ? ` · 자격 ${g.certs.length}` : ''}</small>
               <div class="bt-media">${g.featuredProjects.slice(0, 2).map(projChip).join('')}</div>
             </li>`
@@ -166,10 +175,9 @@ function profileBeats(scene, i) {
   ];
 }
 
-// ── 이력: 연도마다 한 화면 — 위에 큰 연도 · 학년 · 그 해의 수, 아래에 항목 카드 한 줄(해마다 같은 틀) ──
-// 카드는 모두 같은 모양: 위에 같은 높이의 그림, 아래에 분류 · 제목 · 기록 · 근거.
-// 그림: 이어진 프로젝트 사진(제목을 사진 위에) → 없으면 상장(최대 3장) → 기사 사진 → 아무것도 없으면 학년 색 글자판.
-// { html, project, certs } — 큰 그림에 쓴 프로젝트 · 상장은 아래 근거 줄에서 뺀다
+// ── 이력: 연도마다 한 화면 — 파노라마 창(그 해의 사진이 항목 수만큼 나란히) + 같은 칸에 맞춘 항목 글 ──
+// 칸의 그림: 이어진 프로젝트 사진(이름을 사진 위에) → 없으면 상장(최대 3장) → 기사 사진 → 아무것도 없으면 학년 색 글자판.
+// { html, project, certs } — 그림에 쓴 프로젝트 · 상장은 아래 근거 줄에서 뺀다
 function heroOf(it) {
   const p = it.projects.find((x) => x.cover);
   if (p) {
@@ -177,14 +185,14 @@ function heroOf(it) {
     const im = (it.photo && p.images.find((x) => x.file === it.photo)) || p.cover;
     return {
       project: p,
-      html: `<a class="bt-ph" href="${p.path}" data-link data-cat="${esc(p.category)}"><img src="${esc(im.thumb)}" alt="" loading="lazy" decoding="async" /><span class="bt-cap">${esc(p.title)}</span></a>`,
+      html: `<a class="pn-col" href="${p.path}" data-link data-cat="${esc(p.category)}"><img src="${esc(im.thumb)}" alt="" loading="lazy" decoding="async" /><span class="pn-cap">${esc(p.title)}</span></a>`,
     };
   }
   const certs = it.awards.filter((a) => a.certs.length || a.photo).slice(0, 3);
   if (certs.length)
     return {
       certs: true,
-      html: `<div class="bt-ph is-certs">${certs
+      html: `<div class="pn-col is-certs">${certs
         .map(
           (a) =>
             `<button type="button" data-film-cert="${a.filmAt}" data-tier="${TIER_KEY[a.tier]}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기"><img src="${esc(a.certs[0]?.thumb || a.photo.thumb)}" alt="" loading="lazy" decoding="async" /><i>${esc(a.grade)}</i></button>`
@@ -194,9 +202,9 @@ function heroOf(it) {
   const n = it.press.find((x) => x.image);
   if (n)
     return {
-      html: `<a class="bt-ph" href="${esc(n.url)}" target="_blank" rel="noopener"><img src="${esc(n.image.thumb)}" alt="" loading="lazy" decoding="async" /><span class="bt-cap">${esc(n.publisher)} — ${esc(n.title)}</span></a>`,
+      html: `<a class="pn-col" href="${esc(n.url)}" target="_blank" rel="noopener"><img src="${esc(n.image.thumb)}" alt="" loading="lazy" decoding="async" /><span class="pn-cap">${esc(n.publisher)}</span></a>`,
     };
-  return { html: `<div class="bt-ph is-type" aria-hidden="true"><b>${esc(it.kind)}</b><small>${esc(it.year)}</small></div>` };
+  return { html: `<div class="pn-col is-type" aria-hidden="true"><b>${esc(it.kind)}</b><small>${esc(it.year)}</small></div>` };
 }
 
 function historyBeats(scene, i) {
@@ -205,23 +213,16 @@ function historyBeats(scene, i) {
     const media = mediaOf(awards);
     const tiers = [1, 2, 3, 4, 5].map((t) => [t, y.awards.filter((a) => a.tier === t).length]).filter(([, n]) => n);
     const g = stageOf(y.year);
-    const item = (it) => {
+    const cols = y.items.map((it) => {
       const hero = heroOf(it);
+      // 근거는 한두 개만(그림에 쓴 것은 빼고) — 글이 길어지지 않게
       const chips = [
         ...it.projects.filter((p) => p !== hero.project).map(projChip),
         ...(hero.certs ? [] : it.awards.map(certChip)),
         ...it.press.map(pressChip),
       ].filter(Boolean);
-      return `<li class="bt-item b-a${it.deep ? '' : ' is-plain'}">
-          ${hero.html}
-          <div class="bt-tx">
-            <p class="bt-k">${esc(it.kind)}</p>
-            <h3>${esc(it.title)}</h3>
-            ${it.note ? `<p class="bt-note">${esc(it.note)}</p>` : ''}
-            ${chips.length ? `<div class="bt-media">${chips.join('')}</div>` : ''}
-          </div>
-        </li>`;
-    };
+      return { it, hero, chips };
+    });
     return {
       key: y.year,
       label: y.year,
@@ -243,7 +244,19 @@ function historyBeats(scene, i) {
                 : ''
             }
           </header>
-          <ol class="bt-items" style="--n: ${y.items.length}"${g ? ` data-stage="${esc(g.id)}"` : ''}>${y.items.map(item).join('')}</ol>
+          <div class="pano" style="--n: ${y.items.length}"${g ? ` data-stage="${esc(g.id)}"` : ''}>
+            <div class="pn-win" data-pano>${cols.map((c) => c.hero.html).join('')}</div>
+            <ol class="pn-items">${cols
+              .map(
+                ({ it, chips }) => `<li class="pn-item b-a">
+                <p class="pn-k">${esc(it.kind)}</p>
+                <h3>${esc(it.title)}</h3>
+                ${it.brief ? `<p class="pn-brief" title="${esc(it.note)}">${esc(it.brief)}</p>` : ''}
+                ${chips.length ? `<div class="bt-media">${chips.slice(0, 2).join('')}</div>` : ''}
+              </li>`
+              )
+              .join('')}</ol>
+          </div>
         </div>`,
     };
   });
@@ -276,6 +289,22 @@ export function bindBeats(el, reducedMotion, onBeat) {
   const nav = [...el.querySelectorAll('.beat-nav button')];
   let index = 0;
   const parts = (b) => b.querySelectorAll('.b-a');
+  // 파노라마 창(이력): 가는 틈에서 위아래로 열리고, 안의 사진이 조금 크게 시작해 제자리로 — 나갈 때는 다시 틈으로 닫힌다
+  const SLIT = 'inset(47% 0% 47% 0% round 18px)';
+  const OPEN = 'inset(0% 0% 0% 0% round 18px)';
+  const pano = (b) => b.querySelector('[data-pano]');
+  const openPano = (b, delay = 0, tl = null) => {
+    const w = pano(b);
+    if (!w || reducedMotion) return;
+    const imgs = w.querySelectorAll('img');
+    gsap.set(w, { clipPath: SLIT });
+    gsap.set(imgs, { scale: 1.16 });
+    const t = tl || gsap;
+    const at = tl ? delay : undefined;
+    const d = tl ? {} : { delay };
+    t.to(w, { clipPath: OPEN, duration: 1.15, ease: 'expo.inOut', ...d }, at);
+    t.to(imgs, { scale: 1, duration: 1.8, ease: 'power3.out', ...d }, at);
+  };
   const mark = () =>
     nav.forEach((n, k) => {
       n.toggleAttribute('aria-current', k === index);
@@ -301,7 +330,11 @@ export function bindBeats(el, reducedMotion, onBeat) {
       gsap.killTweensOf(list.flatMap((b) => [b, ...parts(b)]));
       index = Math.max(0, Math.min(list.length - 1, k));
       only(index);
-      list.forEach((b) => gsap.set([b, ...parts(b)], { clearProps: 'opacity,visibility,transform' }));
+      list.forEach((b) => {
+        gsap.set([b, ...parts(b)], { clearProps: 'opacity,visibility,transform' });
+        const w = pano(b);
+        if (w) gsap.set([w, ...w.querySelectorAll('img')], { clearProps: 'clipPath,transform' });
+      });
       mark();
       onBeat?.({ index, prev: index, count: list.length, entry: true });
     },
@@ -310,6 +343,7 @@ export function bindBeats(el, reducedMotion, onBeat) {
       const p = parts(list[index]);
       gsap.set(p, { autoAlpha: 0, y: 26 });
       tl.to(p, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.06 }, at);
+      openPano(list[index], at, tl);
     },
     set(k, { auto = false } = {}) {
       k = Math.max(0, Math.min(list.length - 1, k));
@@ -320,7 +354,7 @@ export function bindBeats(el, reducedMotion, onBeat) {
       const to = list[k];
       index = k;
       mark();
-      gsap.killTweensOf([from, to, ...parts(from), ...parts(to)]);
+      gsap.killTweensOf([from, to, ...parts(from), ...parts(to), pano(from), pano(to)].filter(Boolean));
       if (reducedMotion) {
         only(k);
       } else {
@@ -338,10 +372,13 @@ export function bindBeats(el, reducedMotion, onBeat) {
             }
           },
         });
+        const fw = pano(from);
+        if (fw) gsap.to(fw, { clipPath: SLIT, duration: 0.32, ease: 'power2.in' });
         from.inert = true;
         to.hidden = false;
         to.inert = false;
         gsap.fromTo(parts(to), { autoAlpha: 0, y: 38 * dir }, { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.05, delay: 0.22 });
+        openPano(to, 0.18);
       }
       onBeat?.({ index, prev, count: list.length, auto, entry: false });
       return true;
