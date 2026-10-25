@@ -6,7 +6,7 @@ import { AWARDS, awardsOf, bestOf, TIER_KEY, TIER_LABEL } from '../data/awards.j
 import { HISTORY, HISTORY_YEARS, historyItem } from '../data/history.js';
 import { PRESS, pressOf } from '../data/press.js';
 import { DOMAIN_SKILLS, SKILLS, CERTS, SKILL_COUNT } from '../data/skills.js';
-import { STAGES, VALUES, PRELUDE } from '../data/growth.js';
+import { STAGES } from '../data/growth.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
@@ -342,8 +342,7 @@ export function awardCard(a) {
 
 const tabs = (on) => `<nav class="pg-tabs" aria-label="보기 전환">
     <a href="/about" data-link class="${on === 'about' ? 'is-on' : ''}"${on === 'about' ? ' aria-current="page"' : ''}>프로필</a>
-    <a href="/growth" data-link class="${on === 'growth' ? 'is-on' : ''}"${on === 'growth' ? ' aria-current="page"' : ''}>성장<sup>${STAGES.length}</sup></a>
-    <a href="/history" data-link class="${on === 'history' ? 'is-on' : ''}"${on === 'history' ? ' aria-current="page"' : ''}>이력</a>
+    <a href="/growth" data-link>성장 · 이력</a>
     <a href="/works" data-link class="${on === 'works' ? 'is-on' : ''}"${on === 'works' ? ' aria-current="page"' : ''}>프로젝트<sup>${projects.length}</sup></a>
     <a href="/awards" data-link class="${on === 'awards' ? 'is-on' : ''}"${on === 'awards' ? ' aria-current="page"' : ''}>수상<sup>${AWARDS.length}</sup></a>
     <a href="/skills" data-link class="${on === 'skills' ? 'is-on' : ''}"${on === 'skills' ? ' aria-current="page"' : ''}>스킬<sup>${SKILL_COUNT}</sup></a>
@@ -495,7 +494,7 @@ function aboutPage() {
         : ''
     }
 
-    <section class="ab-sec reveal">${h('02', '걸어온 길', 0, { href: '/history', label: '필름에서 연도별로 보기' })}<ol class="ab-time">${HISTORY.map((y) => {
+    <section class="ab-sec reveal">${h('02', '걸어온 길', 0, { href: '/growth#y2023', label: '필름에서 연도별로 보기' })}<ol class="ab-time">${HISTORY.map((y) => {
       const n = inYear(y.year);
       const count = [n.p && `프로젝트 ${n.p}`, n.a && `수상 ${n.a}`].filter(Boolean).join(' · ');
       return `<li><time>${esc(y.year)}</time><ul class="ab-tl">${y.items.map((it) => `<li>${esc(it.title)}</li>`).join('')}</ul>${count ? `<small>${count}</small>` : ''}</li>`;
@@ -619,111 +618,6 @@ function skillsPage() {
     </section>
     ${withWall()}
     ${footer()}
-  </div>`;
-}
-
-// ── 성장 과정(/growth): 1학년 전공 탐색 → 2학년 도전 → 3학년 인턴십 · Physical AI, 그리고 가치관 ──
-const grMonth = (d) => d.slice(0, 7).replace('-', '.');
-// 이력 항목은 /history의 그 항목으로(→), 덧붙인 기록은 프로젝트로(↗)
-function grMilestone(m) {
-  const inner = `<time>${esc(m.when)}</time><span class="gr-ms-t">${m.kind ? `<em>${esc(m.kind)}</em>` : ''}<b>${esc(m.what)}</b>${m.note ? `<small>${esc(m.note)}</small>` : ''}</span>`;
-  return `<li>${m.href ? `<a href="${m.href}" data-link>${inner}<i aria-hidden="true">${m.href.startsWith('/history') ? '→' : '↗'}</i></a>` : `<div>${inner}</div>`}</li>`;
-}
-function grCard(p) {
-  const aw = awardsOf(p.id).length;
-  return `<li><a class="gr-card" href="${p.path}" data-link data-cat="${esc(p.category)}">
-    <span class="gr-card-ph">${p.cover ? `<img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async">` : ''}</span>
-    <span class="gr-card-t"><b>${esc(p.title)}</b><small>${esc(p.year)} · ${esc(categoryOf(p.category).ko)}</small></span>
-    ${aw ? `<span class="gr-card-aw" aria-label="수상 ${aw}">${LAUREL}${aw}</span>` : ''}
-  </a></li>`;
-}
-// 성장 과정은 스크롤하지 않는다 — 화면(슬라이드) 하나씩: 표지 → 가치관 → 학년마다 [이야기 · 주요 장면] → 지금.
-// 휠 · 스와이프 · 방향키 · 오른쪽 점으로 넘기고(bindDeck), 주소의 #gr-<학년>은 그 학년 화면으로
-function grStory(s, k) {
-  return `<section class="gd-s gd-story" id="gr-${s.id}" data-stage="${s.id}" data-title="${esc(s.grade)} · ${esc(s.title)}" aria-labelledby="gr-h-${s.id}">
-    <div class="gd-in">
-      <div class="gr-side">
-        <p class="gr-k gd-a"><span class="gr-no">${pad(k + 1)}</span>${esc(s.grade)} · ${esc(s.span)}<em>${esc(s.code)}</em></p>
-        <h2 class="gr-h gd-a" id="gr-h-${s.id}" tabindex="-1">${esc(s.title)}</h2>
-        <p class="gr-headline gd-a">${esc(s.headline)}</p>
-        <dl class="gr-num gd-a">
-          <div><dt>프로젝트</dt><dd>${s.projects.length}</dd></div>
-          <div><dt>수상</dt><dd>${s.awards.length}</dd></div>
-          <div><dt>대상</dt><dd>${s.grand}</dd></div>
-          <div><dt>자격</dt><dd>${s.certs.length}</dd></div>
-        </dl>
-      </div>
-      <div class="gr-main">
-        <p class="gr-story gd-a">${esc(s.story)}</p>
-        <blockquote class="gr-learned gd-a"><span>이 시기에 배운 것</span>${esc(s.learned)}</blockquote>
-      </div>
-    </div>
-  </section>`;
-}
-function grMoments(s) {
-  return `<section class="gd-s gd-moments" id="gr-${s.id}-more" data-stage="${s.id}" data-title="${esc(s.grade)} · 주요 장면">
-    <div class="gd-in">
-      <div class="gd-col">
-        <h3 class="gr-sub gd-a">${esc(s.grade)} 주요 장면<a class="gr-sub-go" href="/history#y${s.years[0]}" data-link>연도별 이력에서 보기 <span aria-hidden="true">→</span></a></h3>
-        <ol class="gr-ms gd-a">${s.milestones.map(grMilestone).join('')}</ol>
-      </div>
-      <div class="gd-col">
-        <h3 class="gr-sub gd-a">대표 프로젝트<small>이 시기 프로젝트 ${s.projects.length}건 · 수상 ${s.awards.length}건 중</small></h3>
-        <ul class="gr-cards gd-a">${s.featuredProjects.slice(0, 4).map(grCard).join('')}</ul>
-      </div>
-    </div>
-  </section>`;
-}
-function growthPage() {
-  return `<div class="pg pg-growth is-deck">
-    ${bar({ href: '/', label: '메인' })}
-    <div class="gd" data-deck>
-      <section class="gd-s gd-cover" id="gr-top" data-title="성장 과정">
-        <div class="gd-in">
-          <p class="pg-kicker gd-a">GROWTH STORY — 대학 시절 ${esc(profile.span || '')} · 학년별 성장 과정과 가치관</p>
-          <h1 class="works-title gd-a">Growth<sup>${pad(STAGES.length)}</sup></h1>
-          <div class="gd-a">${tabs('growth')}</div>
-          <p class="gr-motto gd-a">${esc(profile.motto)}</p>
-          <ol class="gr-road gd-a">${STAGES.map(
-            (s, k) => `<li data-stage="${s.id}"><a href="#gr-${s.id}" data-jump>
-              <span class="gr-road-no">${pad(k + 1)}</span>
-              <span class="gr-road-g"><b>${esc(s.grade)}</b><small>${esc(s.span)}</small></span>
-              <span class="gr-road-t">${esc(s.title)}</span>
-              <span class="gr-road-n">프로젝트 ${s.projects.length} · 수상 ${s.awards.length}</span>
-            </a></li>`
-          ).join('')}</ol>
-          <p class="gr-prelude gd-a"><b>${esc(PRELUDE.year)}</b>${esc(PRELUDE.text)}</p>
-        </div>
-      </section>
-      <section class="gd-s gd-values" id="gr-values" data-title="가치관" aria-labelledby="gr-h-values">
-        <div class="gd-in">
-          <p class="pg-kicker gd-a">VALUES — 이렇게 일합니다</p>
-          <h2 class="ww-title gd-a" id="gr-h-values">가치관<sup>${pad(VALUES.length)}</sup></h2>
-          <ol class="gr-vgrid">${VALUES.map(
-            (v) => `<li class="gr-value gd-a">
-              <p class="gr-v-k"><span>${esc(v.no)}</span>${esc(v.en)}</p>
-              <h3>${esc(v.title)}</h3>
-              <p class="gr-v-t">${esc(v.text)}</p>
-              <ul class="gr-v-proof" aria-label="근거 프로젝트">${v.proof
-                .map(byId)
-                .filter(Boolean)
-                .map((p) => `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}">${esc(p.title)}</a></li>`)
-                .join('')}</ul>
-            </li>`
-          ).join('')}</ol>
-        </div>
-      </section>
-      ${STAGES.map((s, k) => grStory(s, k) + grMoments(s)).join('')}
-      <section class="gd-s gd-now" id="gr-now" data-title="지금">
-        <div class="gd-in">
-          <p class="pg-kicker gd-a">NOW — 지금</p>
-          <p class="gr-now-t gd-a">탐색에서 도전으로, 도전에서 집중으로 — 프로젝트 ${projects.length}개 · 수상 ${AWARDS.length}건을 지나 지금은 <b>Physical AI</b>에 집중하고 있습니다.</p>
-          <div class="gr-now-a gd-a"><a class="btn-works" href="/history" data-link>연도별 이력 <span aria-hidden="true">↗</span></a><a class="btn-works" href="/works" data-link>모든 프로젝트 <span aria-hidden="true">↗</span></a><a class="btn-works" href="/skills" data-link>보유 스킬 <span aria-hidden="true">↗</span></a><a class="btn-works" href="/resume" data-link>이력서 · PDF <span aria-hidden="true">↗</span></a></div>
-        </div>
-      </section>
-    </div>
-    <nav class="gd-dots" aria-label="성장 과정 화면"></nav>
-    <p class="gd-hint" aria-hidden="true"><span>스크롤 · 위로 밀기 · ↓</span> 다음 화면</p>
   </div>`;
 }
 
@@ -960,7 +854,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   let filmEntered = false;
   let busy = false;
   let observer = null;
-  let deck = null; // 성장 과정 슬라이드(스크롤 대신 화면 전환)
   let gridCols = 0;
   let revealTimer = 0;
   let backPending = false; // history.back()을 보냈고 popstate를 기다리는 중
@@ -981,21 +874,26 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (cols !== gridCols) gridCols = layoutGrid(grid);
   });
 
-  // 이력 주소의 자리(#y2025 · #h-<항목>) → 필름 이력 장면의 그 해 화면
-  const historyBeat = (hash) => {
+  // 성장 · 이력 주소의 자리 → 필름 '성장 · 이력' 장면의 그 화면:
+  // /growth#gr-<학년>(그 학년 이야기) · #gr-values · #y2025 · #h-<이력 항목>(그 해) — 예전 /growth#gr-<학년>-more는 그 학년의 첫 해
+  const growthBeat = (hash) => {
     const y = hash.match(/^#y(\d{4})$/);
     if (y) return y[1];
     const h = hash.match(/^#h-([\w-]+)$/);
-    return (h && historyItem(h[1])?.year) || null;
+    if (h) return historyItem(h[1])?.year || null;
+    const g = hash.match(/^#gr-([\w-]+?)(-more)?$/);
+    if (!g) return null;
+    if (g[1] === 'values') return 'values';
+    const st = STAGES.find((x) => x.id === g[1]);
+    return st ? (g[2] ? st.years[0] : st.id) : null;
   };
   const parse = () => {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (path.toLowerCase() === '/awards') return { name: 'awards' };
     if (path.toLowerCase() === '/skills') return { name: 'skills' };
-    if (path.toLowerCase() === '/growth') return { name: 'growth' };
-    // 프로필 · 이력은 필름의 장면(한 화면씩) — /history#y2025는 그 해의 화면, #h-<항목>은 그 항목이 있는 해의 화면으로
+    // 프로필 · 성장 · 이력은 필름의 장면(한 화면씩) — /growth#gr-challenge는 2학년 이야기, /history#y2025는 그 해의 화면
     if (path.toLowerCase() === '/about') return { name: 'film', scene: 'prologue' };
-    if (path.toLowerCase() === '/history') return { name: 'film', scene: 'history', beat: historyBeat(location.hash) };
+    if (path.toLowerCase() === '/growth' || path.toLowerCase() === '/history') return { name: 'film', scene: 'growth', beat: growthBeat(location.hash) };
     if (path.toLowerCase() === '/resume') return { name: 'resume' };
     const m = path.match(/^\/works(?:\/([\w-]+))?$/);
     if (!m) return { name: 'film' };
@@ -1046,11 +944,8 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   let pageMedia = [];
   function mount(route) {
     pageMedia = [];
-    deck?.destroy();
-    deck = null;
     if (route.name === 'works') page.innerHTML = worksPage(route.cat);
     else if (route.name === 'skills') page.innerHTML = skillsPage();
-    else if (route.name === 'growth') page.innerHTML = growthPage();
     else if (route.name === 'resume') page.innerHTML = aboutPage();
     else if (route.name === 'awards') {
       const a = awardsPage();
@@ -1059,11 +954,10 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     } else page.innerHTML = detailPage(byId(route.id));
     page.hidden = false;
     page.scrollTop = 0;
-    page.classList.toggle('is-deck', route.name === 'growth');
     document.body.classList.add('page-open');
     bind(route);
     const p = route.name === 'detail' ? byId(route.id) : null;
-    const name = { awards: 'Awards', skills: 'Skills', resume: 'Résumé', growth: 'Growth' }[route.name] || 'Works';
+    const name = { awards: 'Awards', skills: 'Skills', resume: 'Résumé' }[route.name] || 'Works';
     document.title = p ? `${p.title} — 권용현 Physical AI Portfolio` : `${name} — 권용현 Physical AI Portfolio`;
     page.focus({ preventScroll: true });
     // 주소에 자리가 있으면(필름의 이력 항목에서 들어온 경우 등) 그 자리로 — 그림이 자리 잡은 뒤에
@@ -1076,9 +970,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
 
   function unmount() {
     page.hidden = true;
-    deck?.destroy();
-    deck = null;
-    page.classList.remove('is-deck');
     page.innerHTML = '';
     observer?.disconnect();
     document.body.classList.remove('page-open');
@@ -1130,9 +1021,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   // 그 자리를 잠깐 밝혀 어디인지 알린다(이력 항목 등)
   function jumpTo(to, smooth = true) {
     if (!to) return;
-    // 슬라이드 페이지(성장 과정): 스크롤하지 않고 그 화면으로
-    const slide = deck && to.closest('.gd-s');
-    if (slide) return deck.go(deck.indexOf(slide), { instant: !smooth });
     // 등장 전이거나 막 등장하는 중인 구획은 움직임 없이 제자리에 세운 뒤 잰다(아래로 밀린 만큼 어긋나지 않게)
     const rv = to.closest('.reveal');
     if (rv) {
@@ -1148,132 +1036,13 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     void to.offsetWidth;
     to.classList.add('is-hit');
   }
-  // 주소의 #자리(/history#h-gan-tts · /awards#y2025)로
+  // 주소의 #자리(/awards#y2025 · /skills#… )로
   const jumpHash = (smooth) => {
     const id = decodeURIComponent(location.hash.slice(1));
     if (id) jumpTo(page.querySelector(`#${CSS.escape(id)}`), smooth);
   };
 
-  // ── 슬라이드 페이지: 한 번 굴리거나 밀면 바로 다음 화면 ──
-  // 휠은 한 몸짓에 한 화면(트랙패드 관성이 이어지는 동안은 기다린다), 손가락은 50px 넘게 밀면, 방향키 · PageUp/Down · Space · Home/End, 오른쪽 점.
-  // 화면이 바뀌면 주소의 #도 그 화면으로(공유 · 새로 고침)
-  function bindDeck(root) {
-    const slides = [...root.querySelectorAll('.gd-s')];
-    const dotsNav = page.querySelector('.gd-dots');
-    dotsNav.innerHTML = slides
-      .map((sl, k) => `<button type="button" data-k="${k}" aria-label="${esc(sl.dataset.title)}"${sl.dataset.stage ? ` data-stage="${sl.dataset.stage}"` : ''}><span>${esc(sl.dataset.title)}</span></button>`)
-      .join('');
-    const dots = [...dotsNav.children];
-    const hint = page.querySelector('.gd-hint');
-    let at = -1;
-    let lockUntil = 0;
-    const parts = (sl) => sl.querySelectorAll('.gd-a');
-    const mark = () => {
-      dots.forEach((d, k) => d.toggleAttribute('aria-current', k === at));
-      slides.forEach((sl, k) => {
-        sl.inert = k !== at;
-        sl.setAttribute('aria-hidden', k === at ? 'false' : 'true');
-      });
-      hint?.classList.toggle('is-end', at === slides.length - 1);
-    };
-    const go = (k, { instant = false } = {}) => {
-      k = Math.max(0, Math.min(slides.length - 1, k));
-      page.scrollTop = 0; // 주소의 #자리로 브라우저가 페이지를 밀어 두었을 수 있다
-      if (k === at) return false;
-      const prev = at;
-      const dir = k > prev ? 1 : -1;
-      at = k;
-      mark();
-      const to = slides[k];
-      const from = slides[prev];
-      gsap.killTweensOf([...slides, ...slides.flatMap((sl) => [...parts(sl)])]);
-      if (instant || reducedMotion || prev < 0) {
-        slides.forEach((sl, j) => gsap.set(sl, { autoAlpha: j === k ? 1 : 0, y: 0 }));
-        gsap.set(parts(to), { clearProps: 'opacity,visibility,transform' });
-        if (prev < 0 && !reducedMotion) gsap.fromTo(parts(to), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.06, ease: 'expo.out', delay: 0.15 });
-      } else {
-        lockUntil = performance.now() + 800;
-        gsap.to(from, { autoAlpha: 0, y: -60 * dir, duration: 0.45, ease: 'power2.in' });
-        gsap.fromTo(to, { autoAlpha: 0, y: 70 * dir }, { autoAlpha: 1, y: 0, duration: 0.75, ease: 'expo.out', delay: 0.18 });
-        gsap.fromTo(parts(to), { autoAlpha: 0, y: 34 * dir }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.05, ease: 'expo.out', delay: 0.26 });
-      }
-      const id = k ? to.id : '';
-      if (prev >= 0 && current?.name === 'growth') history.replaceState(history.state, '', `${location.pathname}${location.search}${id ? `#${id}` : ''}`);
-      return true;
-    };
-    const step = (d) => performance.now() >= lockUntil && go(at + d);
-    // 휠: 몸짓 하나 = 한 화면. 넘긴 뒤에는 휠이 잠깐(180ms) 멎을 때까지 — 관성으로 두 장 넘어가지 않게
-    let acc = 0;
-    let lastWheel = 0;
-    let hold = false;
-    const onWheel = (e) => {
-      if (e.ctrlKey) return; // 확대
-      e.preventDefault();
-      const now = performance.now();
-      const gap = now - lastWheel;
-      lastWheel = now;
-      if (hold) {
-        if (gap < 180 && now < lockUntil + 900) return;
-        hold = false;
-        acc = 0;
-      }
-      if (gap > 300) acc = 0;
-      acc += e.deltaMode === 1 ? e.deltaY * 30 : e.deltaY;
-      if (Math.abs(acc) < 40) return;
-      const d = Math.sign(acc);
-      acc = 0;
-      if (step(d)) hold = true;
-    };
-    let ty = null;
-    let tx = 0;
-    const onTouchStart = (e) => {
-      ty = e.touches[0].clientY;
-      tx = e.touches[0].clientX;
-    };
-    const onTouchMove = (e) => {
-      if (ty != null) e.preventDefault(); // 페이지가 끌려 오지 않게
-    };
-    const onTouchEnd = (e) => {
-      if (ty == null) return;
-      const t = e.changedTouches[0];
-      const dy = ty - t.clientY;
-      const dx = tx - t.clientX;
-      ty = null;
-      if (Math.abs(dy) > 50 && Math.abs(dy) > Math.abs(dx)) step(Math.sign(dy));
-    };
-    const onKey = (e) => {
-      if (e.target.closest('input, textarea, select')) return;
-      const k = e.key;
-      if (['ArrowDown', 'PageDown', 'ArrowRight'].includes(k) || (k === ' ' && !e.shiftKey)) step(1);
-      else if (['ArrowUp', 'PageUp', 'ArrowLeft'].includes(k) || (k === ' ' && e.shiftKey)) step(-1);
-      else if (k === 'Home') go(0);
-      else if (k === 'End') go(slides.length - 1);
-      else return;
-      e.preventDefault();
-    };
-    page.addEventListener('wheel', onWheel, { passive: false });
-    page.addEventListener('touchstart', onTouchStart, { passive: true });
-    page.addEventListener('touchmove', onTouchMove, { passive: false });
-    page.addEventListener('touchend', onTouchEnd);
-    page.addEventListener('keydown', onKey);
-    dots.forEach((d, k) => d.addEventListener('click', () => go(k)));
-    hint?.addEventListener('click', () => step(1));
-    go(0, { instant: true });
-    return {
-      go,
-      indexOf: (sl) => slides.indexOf(sl),
-      get at() {
-        return at;
-      },
-      destroy() {
-        page.removeEventListener('wheel', onWheel);
-        page.removeEventListener('touchstart', onTouchStart);
-        page.removeEventListener('touchmove', onTouchMove);
-        page.removeEventListener('touchend', onTouchEnd);
-        page.removeEventListener('keydown', onKey);
-      },
-    };
-  }
+
 
   function bind(route) {
     // 이미지 로드 페이드
@@ -1361,8 +1130,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       );
       if (!reducedMotion)
         gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .ab-who > *, .ab-act > *, .ab-nums > div'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.035, ease: 'expo.out', delay: 0.2, clearProps: 'opacity,visibility,transform' });
-    } else if (route.name === 'growth') {
-      deck = bindDeck(page.querySelector('[data-deck]'));
     } else if (route.name === 'skills') {
       bindSkills();
       if (!reducedMotion)
@@ -1413,7 +1180,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     current = route.name === 'film' ? null : route;
     toTop.classList.remove('is-on');
     if (route.name === 'film') {
-      // 필름의 한 장면으로 가는 주소(/about · /history)는 필름 주소(/#prologue)로 바꿔 둔다
+      // 필름의 한 장면으로 가는 주소(/about · /growth · /history)는 필름 주소(/#prologue · /#growth)로 바꿔 둔다
       if (route.scene) history.replaceState(history.state, '', `/${location.search}#${route.scene}`);
       if (!prev) return onClose?.(route);
       const back = () => {

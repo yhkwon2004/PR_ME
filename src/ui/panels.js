@@ -95,7 +95,7 @@ function render(scene, i) {
       </div>
     </div>`;
   }
-  // 한 장면 안의 여러 화면(소개 · 이력) — 스크롤 없이 한 화면씩
+  // 한 장면 안의 여러 화면(소개 · 성장 · 이력) — 스크롤 없이 한 화면씩
   if (L === 'beats') return renderBeats(scene, i);
   // 보도: 대학 · 기관 공식 기사를 오려 낸 지면처럼 한 장씩 — 누르면 기사 원문(새 창)
   if (L === 'reel' && scene.press) {
@@ -222,7 +222,7 @@ function render(scene, i) {
         </dl>
         <div class="endcard-actions" data-r>
           <a class="btn-works" href="/resume" data-link>이력서 · PDF <span aria-hidden="true">↗</span></a>
-          <a class="btn-works" href="/growth" data-link>성장 과정 · 가치관 <span aria-hidden="true">↗</span></a>
+          <a class="btn-works" href="/growth" data-link>성장 과정 · 연도별 이력 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/works" data-link>모든 프로젝트 보기 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/awards" data-link>수상 기록 · 상장 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/skills" data-link>보유 스킬 <span aria-hidden="true">↗</span></a>

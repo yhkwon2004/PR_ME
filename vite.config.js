@@ -67,7 +67,7 @@ function pageMeta() {
         {
           path: '/about',
           title: `프로필 — ${NAME}`,
-          desc: `Physical AI Developer — AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자. 프로젝트 ${projects.length} · 수상 ${awards.length} · 보도 ${press.length} — 소개 · 학력 · 핵심 역량 · 가치관 · 성장 과정을 영화처럼 한 화면씩.`,
+          desc: `Physical AI Developer — AI·소프트웨어·하드웨어를 연결해 현장 문제를 푸는 개발자. 프로젝트 ${projects.length} · 수상 ${awards.length} · 보도 ${press.length} — 소개 · 학력 · 기술 스택을 이력서처럼, 영화처럼 한 화면씩.`,
           image: og('about'),
           type: 'profile',
         },
@@ -79,8 +79,8 @@ function pageMeta() {
         },
         {
           path: '/growth',
-          title: `성장 과정 · 가치관 — ${NAME}`,
-          desc: '1학년 전공 탐색(2023) → 2학년 도전(2024) → 3학년 인턴십 · Physical AI 집중(2025 — 2026). 학년마다 한 일과 배운 것, 그리고 일하는 방식 세 가지.',
+          title: `성장 과정 · 연도별 이력 — ${NAME}`,
+          desc: '1학년 전공 탐색(2023) → 2학년 도전(2024) → 3학년 인턴십 · Physical AI 집중(2025 — 2026). 일하는 방식 세 가지, 학년마다 한 일과 배운 것, 해마다의 이력을 한 화면씩.',
           image: og('growth'),
         },
         {

@@ -54,8 +54,8 @@ export const scenes = [
     ko: '소개',
     code: 'PROLOGUE',
     label: 'Prologue',
-    // 다섯 화면(소개 → 학력 · 기록 → 핵심 역량 → 가치관 → 성장 과정) — 스크롤 없이 한 화면씩(src/ui/beats.js).
-    // 가치관 · 학년별 성장은 data/growth.js(자세한 내용은 /growth) — 성장 과정 다음은 연도별 이력
+    // 이력서처럼 세 화면(소개 → 학력 · 기록 → 기술 스택) — 스크롤 없이 한 화면씩(src/ui/beats.js).
+    // 다음 장면이 성장 · 이력(가치관 · 학년별 성장 · 연도별 이력)
     layout: 'beats',
     beats: 'profile',
     hold: 11,
@@ -90,17 +90,17 @@ export const scenes = [
     ],
   },
   {
-    // 연도별 이력(src/data/history.js) — 3D는 드론이 웨이포인트를 따라 나는 하늘 세트
-    id: 'history',
-    ko: '이력',
-    code: 'HISTORY',
-    label: 'History',
-    // 연도마다 한 화면 — 항목 · 기록 한 줄 · 이어진 프로젝트 사진 · 상장 · 기사가 그 화면에 바로(src/ui/beats.js)
+    // 성장 · 이력(/growth) — 학년 길 → 가치관 → 학년마다 [이야기 → 그 학년의 연도별 이력](src/data/growth.js · history.js).
+    // 3D는 드론이 웨이포인트를 따라 나는 하늘 세트(읽는 동안 흐리게) — 끝나면 초점이 돌아오며 프로젝트 장면으로
+    id: 'growth',
+    ko: '성장 · 이력',
+    code: 'GROWTH',
+    label: 'Growth',
     layout: 'beats',
-    beats: 'history',
+    beats: 'growth',
     hold: 14,
     beatHold: 8,
-    kicker: 'HISTORY — 연도별 이력',
+    kicker: 'GROWTH — 성장 과정 · 연도별 이력',
   },
   {
     id: 'ground',

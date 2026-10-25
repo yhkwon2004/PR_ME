@@ -8,7 +8,6 @@ import './styles/premium.css';
 import './styles/skills.css';
 import './styles/about.css';
 import './styles/beats.css';
-import './styles/growth.css';
 import './styles/guide.css';
 import './styles/perf.css';
 import './styles/clarity.css';
@@ -250,7 +249,7 @@ const site = createSite({
     video?.pause();
     if (!started) $('boot').hidden = true;
   },
-  // route.scene: 프로필(/about) · 이력(/history)처럼 필름의 한 장면으로 가는 주소
+  // route.scene: 프로필(/about) · 성장 · 이력(/growth · /history)처럼 필름의 한 장면으로 가는 주소
   onClose: (route) => {
     pageCovered = false;
     if (route?.scene && started) goScene(route.scene, route.beat);
@@ -290,8 +289,13 @@ function onTransition(i, prev, duration) {
     if (location.hash !== want) history.replaceState(history.state, '', `/${location.search}${want}`);
   }
   if (prev >= 0) audio.whoosh(Math.max(1.2, duration));
-  // 글을 읽는 장면(소개 · 이력)은 읽기 모드 — 3D를 흐리고 밝게 띄워 글이 앞에 선다(크레인 이동과 함께 천천히)
+  // 글을 읽는 장면(소개 · 성장 · 이력)은 읽기 모드 — 3D를 흐리고 밝게 띄워 글이 앞에 선다(크레인 이동과 함께 천천히)
   if (stage) gsap.to(stage.film.uniforms.uRead, { value: scenes[i]?.layout === 'beats' ? 1 : 0, duration: Math.max(0.6, duration * 0.8), ease: 'power2.inOut', overwrite: true });
+}
+
+// 주소의 장면(#robotics 등) — 예전 이력 장면 주소(#history)는 지금의 성장 · 이력 장면으로
+function sceneOfHash(h) {
+  return scenes.findIndex((s) => `#${s.id}` === (h === '#history' ? '#growth' : h));
 }
 
 function goTo(i, opts) {
@@ -417,7 +421,7 @@ $('stage').addEventListener('click', (e) => {
 // 주소의 장면을 손으로 바꾸면(#robotics 등) 그 장면으로
 addEventListener('hashchange', () => {
   if (!started || site.open) return;
-  const i = scenes.findIndex((s) => `#${s.id}` === location.hash);
+  const i = sceneOfHash(location.hash);
   if (i >= 0 && i !== director.index) goTo(i);
 });
 
@@ -660,8 +664,8 @@ function start(withSound) {
     }, 5000);
   }
   // 주소에 장면이 있으면(#robotics 등) 그 장면으로, 없으면 처음부터 — 지난번 멈춘 곳이 있으면 이어 보기를 권한다
-  const deep = scenes.findIndex((s) => `#${s.id}` === location.hash);
-  // /history#y2025로 들어왔다면 그 해의 화면부터
+  const deep = sceneOfHash(location.hash);
+  // /growth#gr-challenge · /history#y2025로 들어왔다면 그 화면부터
   if (deep > 0 && site.initial?.beat != null && !pendingNav) pendingNav = { beat: site.initial.beat };
   director.go(deep > 0 ? deep : 0);
   if (deep <= 0) setTimeout(() => !site.open && guide.offerResume(), reduced ? 600 : 3200);
@@ -925,6 +929,8 @@ if (stage && new URLSearchParams(location.search).has('capture')) {
     // 걷히는 움직임을 멈추고 sec초 지점을 보여 준다
     leaveAt: (sec) => leaveTl?.pause().seek(sec),
     freeze: () => (frozen = true),
+    // 모든 움직임을 k배로 느리게(전환 중간 모습 확인용)
+    slow: (k = 0.1) => gsap.globalTimeline.timeScale(k),
     go: (i) => director.go(i, { instant: true }),
     advance(sec, step = 1 / 30) {
       for (let k = 0; k < sec / step; k++) {

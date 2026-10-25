@@ -11,7 +11,7 @@ const SHOTS = {
   prologue: { pos: add(SETS.hangar, 5.5, 3.4, 7.4), target: add(SETS.hangar, 0, 2.2, 0), fov: 36, shift: [0, 0] },
   aerial: { pos: add(SETS.aerial, 11.15, 8.57, 16.22), target: add(SETS.aerial, 0, 3.4, 0), fov: 42, shift: [0, 0.1] },
   // 연도별 이력: 드론이 웨이포인트를 따라 나는 하늘 세트를 조금 높이서 — 연도 줄이 화면 가운데를 가로지른다
-  history: { pos: add(SETS.aerial, 12.4, 11.2, 18.6), target: add(SETS.aerial, 0, 3.0, 0), fov: 44, shift: [0, 0.04] },
+  growth: { pos: add(SETS.aerial, 12.4, 11.2, 18.6), target: add(SETS.aerial, 0, 3.0, 0), fov: 44, shift: [0, 0.04] },
   ground: { pos: add(SETS.ground, 15.35, 9.0, 18.35), target: add(SETS.ground, -2.2, 1.2, -2.2), fov: 44, shift: [0, 0.2] },
   // 로보틱스: 덱 양옆의 두 무리(휴머노이드 + 4족 · 매니퓰레이터 작업 셀)를 조금 낮고 가깝게
   robotics: { pos: add(SETS.robotics, 0.2, 5.6, 12.0), target: add(SETS.robotics, 0.3, 0.9, -0.9), fov: 40, shift: [0, 0.12] },
@@ -250,7 +250,7 @@ export class Director {
         drone.hold(this.holdHome, 0.5);
         break;
       case 'aerial':
-      case 'history':
+      case 'growth':
         drone.fly(this.a.aerial.curve, 0.032, 0.0);
         break;
       case 'ground':
