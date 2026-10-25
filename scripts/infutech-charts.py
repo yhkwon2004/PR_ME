@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
-"""INFU RETRO 피치덱 그래프를 Python으로 계산하고 Plotly(plotly.py)로 그립니다.
+"""INFU RETRO 피치덱 그래프를 Python(NumPy)으로 계산하고 Matplotlib으로 그려 고정된 SVG로 내보냅니다.
 
-그림 파일이 아니라 차트 정의(데이터 · 축 · 범례)를 charts/charts.js로 내보내고, 덱이 Plotly.js로 그 자리에서
-그립니다. 그래서 확대해도 선명하고, 마우스를 올리면 그 시점의 값이 보입니다.
+글자까지 모두 윤곽선(path)으로 저장하므로 서체 · 브라우저 · 화면 크기가 달라도 똑같이 보이고, 확대해도 선명합니다.
 
-  pip install numpy plotly
-  python3 scripts/infutech-charts.py
+  pip install numpy matplotlib
+  python3 scripts/infutech-charts.py          # 서체: node_modules의 Pretendard, 없으면 PRETENDARD_DIR
 
-  gyro      8장 · 학습 장비의 자이로 신호와 무게 편차, 자이로로 보정한 뒤의 잔차
-  filter    7장 · 흔들림 구간 원신호와 칼만필터 출력 (썸네일)
+  charts/gyro.svg     부록 · 핵심 알고리즘 — 학습 장비의 자이로 신호와 무게 편차, 자이로로 보정한 뒤의 잔차
+  charts/filter.svg   7장 · 흔들림 구간 원신호와 칼만필터 출력 (썸네일)
 
 모든 신호는 모의 데이터입니다. 실측 로그(CSV)가 있으면 simulate() 대신 그 값을 넣으면 같은 차트가 나옵니다.
 """
-import json, math, os
+import glob, math, os
 import numpy as np
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from matplotlib import font_manager
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DECK = os.path.join(ROOT, 'public', 'infutech') if os.path.isdir(os.path.join(ROOT, 'public', 'infutech')) else ROOT
-OUT = os.path.join(DECK, 'charts', 'charts.js')
+OUT = os.path.join(DECK, 'charts')
 
-FONT = '"Pretendard Pitch", Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif'
 INK, INK2, MUTE, HONEY, ALERT, SAGE, RAW = '#2A1F18', '#5B4B3F', '#8C7C6F', '#AD6229', '#D04E2D', '#4C8744', '#A39282'
 GRID, LINE = '#EFE7DC', '#CDBFAF'
 
@@ -86,12 +86,29 @@ def simulate(kind, seed):
     return np.array(raw), np.array(kw), exp, np.array(score)
 
 
-def r2(a, d=2):
-    return [round(float(v), d) for v in a]
+def use_font():
+    dirs = [os.environ.get('PRETENDARD_DIR', ''), os.path.join(ROOT, 'node_modules', 'pretendard', 'dist', 'public', 'static')]
+    files = [f for d in dirs if d for f in glob.glob(os.path.join(d, 'Pretendard-*.otf'))]
+    if not files:
+        raise SystemExit('Pretendard OTF가 없습니다 — npm ci 하거나 PRETENDARD_DIR=<Pretendard-*.otf 폴더>')
+    for f in files:
+        font_manager.fontManager.addfont(f)
+    plt.rcParams.update({
+        'font.family': 'Pretendard', 'font.size': 9, 'axes.unicode_minus': False,
+        'svg.fonttype': 'path', 'svg.hashsalt': 'infu-retro',  # 글자는 윤곽선으로, 결과는 매번 같게
+        'axes.edgecolor': LINE, 'axes.linewidth': .8, 'axes.labelcolor': INK2,
+        'xtick.color': LINE, 'ytick.color': LINE, 'xtick.labelcolor': MUTE, 'ytick.labelcolor': MUTE,
+        'xtick.major.size': 3, 'ytick.major.size': 3,
+    })
 
 
-AX = dict(showgrid=True, gridcolor=GRID, showline=True, linecolor=LINE, zeroline=False, ticks='outside',
-          tickcolor=LINE, ticklen=4, fixedrange=True, tickfont=dict(color=MUTE))
+def save(fig, name):
+    path = os.path.join(OUT, name)
+    fig.savefig(path, format='svg', transparent=True, metadata={'Date': None, 'Creator': None})
+    plt.close(fig)
+    print(path, os.path.getsize(path) // 1024, 'KB')
+
+
 def chart_gyro():
     # training rig, 12 s at 20 Hz: two pushes on the pole; the load cell's deviation follows the gyro rate
     rng = np.random.default_rng(7)
@@ -107,49 +124,44 @@ def chart_gyro():
     res = dev - X @ coef
     r = float(np.corrcoef(np.roll(gyro, lag)[4:], dev[4:])[0, 1])
     rms0, rms1 = float(np.sqrt(np.mean(dev[4:] ** 2))), float(np.sqrt(np.mean(res[4:] ** 2)))
-    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=.07)
-    rows = [(gyro, SAGE, '자이로 (°/s)', '자이로'), (dev, HONEY, '무게 편차 (g)', '무게 편차'), (res, INK, '보정 후 (g)', '보정 후')]
-    for i, (y, col, lab, short) in enumerate(rows, start=1):
-        fig.add_trace(go.Scatter(x=r2(t), y=r2(y), mode='lines', line=dict(color=col, width=1.6), showlegend=False,
-                                 hovertemplate=f'%{{x:.2f}} s · %{{y:.1f}}<extra>{short}</extra>'), i, 1)
-        fig.update_yaxes(title_text=lab, title_font=dict(size=11, color=INK2), row=i, col=1)
     lim = float(max(abs(dev).max(), abs(res).max()) * 1.15)
-    fig.update_xaxes(**AX, range=[0, 12], dtick=2)
-    fig.update_xaxes(title_text='시간 (s) · 20 Hz 샘플링', title_font=dict(size=11, color=INK2), row=3)
-    fig.update_yaxes(**AX)
-    fig.update_yaxes(range=[-lim, lim], row=2); fig.update_yaxes(range=[-lim, lim], row=3)
-    ann = [dict(x=.01, y=1, xref='x2 domain', yref='y2 domain', text=f'<b>r = {r:.2f}</b> (자이로와 상관)', showarrow=False,
-                xanchor='left', yanchor='top', font=dict(color=HONEY)),
-           dict(x=.01, y=1, xref='x3 domain', yref='y3 domain', text=f'<b>RMS {rms0:.1f} g → {rms1:.1f} g</b>', showarrow=False,
-                xanchor='left', yanchor='top', font=dict(color=INK))]
-    fig.update_layout(annotations=ann, font=dict(family=FONT, size=11, color=INK), paper_bgcolor='white', plot_bgcolor='white',
-                      margin=dict(l=70, r=8, t=6, b=40), hovermode='closest', dragmode=False,
-                      hoverlabel=dict(bgcolor='white', bordercolor=LINE, font=dict(family=FONT, color=INK)))
+    fig, axs = plt.subplots(3, 1, sharex=True, figsize=(7.2, 4.4), gridspec_kw=dict(hspace=.62))
+    rows = [(gyro, SAGE, '자이로 각속도 (°/s)', '흔들림 두 번', MUTE),
+            (dev, HONEY, '같은 시각 무게 편차 (g)', f'r = {r:.2f} · 자이로와 상관', HONEY),
+            (res, INK, '자이로로 보정한 뒤 (g)', f'편차 RMS {rms0:.1f} g → {rms1:.1f} g', INK)]
+    for ax, (y, col, left, right, rc) in zip(axs, rows):
+        ax.plot(t, y, color=col, lw=1.3, solid_joinstyle='round')
+        ax.set_title(left, loc='left', fontsize=9.5, fontweight='semibold', color=INK2, pad=5)
+        ax.set_title(right, loc='right', fontsize=9.5, fontweight='bold', color=rc, pad=5)
+        ax.grid(axis='y', color=GRID, lw=.8)
+        ax.set_axisbelow(True)
+        for side in ('top', 'right'):
+            ax.spines[side].set_visible(False)
+        ax.tick_params(labelsize=8)
+    axs[0].set_ylim(-46, 46); axs[0].set_yticks([-40, 0, 40])
+    for ax in axs[1:]:
+        ax.set_ylim(-lim, lim); ax.set_yticks([-5, 0, 5])
+    axs[2].set_xlim(0, 12); axs[2].set_xticks(range(0, 13, 2))
+    axs[2].set_xlabel('시간 (s) · 20 Hz 샘플링', fontsize=8.5, color=INK2, labelpad=4)
+    fig.subplots_adjust(left=.075, right=.985, top=.93, bottom=.11)
     return fig, (r, rms0, rms1)
 
 
 def chart_filter():
     raw, kw, *_ = simulate('shake', 23)
     t = np.arange(660, 1380)
-    fig = go.Figure([go.Scatter(x=r2(t[::6]), y=r2(raw[t][::6], 1), mode='markers', marker=dict(size=2.4, color=RAW, opacity=.75)),
-                     go.Scatter(x=r2(t[::3]), y=r2(kw[t][::3], 1), mode='lines', line=dict(color=HONEY, width=1.8))])
-    fig.update_xaxes(visible=False, fixedrange=True); fig.update_yaxes(visible=False, fixedrange=True)
-    fig.update_layout(showlegend=False, margin=dict(l=3, r=3, t=3, b=3), paper_bgcolor='white', plot_bgcolor='white', hovermode=False)
+    fig = plt.figure(figsize=(2.8, 2.1))
+    ax = fig.add_axes([.02, .04, .96, .92])
+    ax.scatter(t[::6], raw[t][::6], s=2.2, color=RAW, alpha=.8, linewidths=0)
+    ax.plot(t[::3], kw[t][::3], color=HONEY, lw=2)
+    ax.set_xlim(t[0], t[-1]); ax.axis('off')
     return fig
 
 
-def spec(fig, base, static=False):
-    j = json.loads(fig.to_json())
-    j['layout'].pop('template', None)
-    return {'base': base, 'static': static, 'data': j['data'], 'layout': j['layout']}
-
-
 if __name__ == '__main__':
+    use_font()
+    os.makedirs(OUT, exist_ok=True)
     gyro, (r, a, b) = chart_gyro()
-    charts = {'gyro': spec(gyro, 560), 'filter': spec(chart_filter(), 112, True)}
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, 'w', encoding='utf-8') as f:
-        f.write('/* generated by scripts/infutech-charts.py (plotly.py) — do not edit by hand */\n')
-        f.write('window.INFU_CHARTS = ' + json.dumps(charts, ensure_ascii=False, separators=(',', ':')) + ';\n')
-    print(OUT, os.path.getsize(OUT) // 1024, 'KB')
+    save(gyro, 'gyro.svg')
+    save(chart_filter(), 'filter.svg')
     print(f'  자이로-편차 r={r:.2f}, RMS {a:.2f} → {b:.2f} g')

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""INFU RETRO 피치덱(public/infutech/index.html · charts/charts.js)에 쓰인 글자만 담은 Pretendard 서브셋 생성.
+"""INFU RETRO 피치덱(public/infutech/index.html)에 쓰인 글자만 담은 Pretendard 서브셋 생성.
+
+그래프(charts/*.svg)는 글자를 윤곽선으로 담고 있어 이 서체가 필요 없습니다.
 
 덱 문구를 고친 뒤 새 글자가 생기면 다시 실행합니다(없는 글자는 시스템 서체로 보입니다).
 
@@ -15,9 +17,6 @@ src = os.path.join(ROOT, 'node_modules', 'pretendard', 'dist', 'public', 'variab
 out = os.path.join(ROOT, 'public', 'infutech', 'fonts', 'pretendard-pitch.woff2')
 
 text = open(html, encoding='utf-8').read()
-charts = os.path.join(ROOT, 'public', 'infutech', 'charts', 'charts.js')
-if os.path.exists(charts):
-    text += open(charts, encoding='utf-8').read()
 chars = set(text) | set(string.printable) | set('·—–…“”‘’「」→←↔↓↑×−±①②③※%')
 chars = {c for c in chars if c.isprintable() and not c.isspace()} | {' ', ' '}
 

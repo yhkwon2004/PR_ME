@@ -342,11 +342,11 @@ small { font-size: .8em; }
 .lim .x span { font-size: .9em; color: var(--mute); }
 .lim .why { display: flex; align-items: flex-start; gap: .45em; padding-top: .75em; border-top: 1px dashed var(--line); font-size: .92em; line-height: 1.45; color: var(--cream-2); }
 .lim .why .ico { width: 1.05em; height: 1.05em; margin-top: .2em; color: var(--alert); stroke-width: 2.4; }
-/* a picture per card: photos for the people, drawings for the equipment */
+/* a real photo per card; the labelled smart-pole figure is shown whole on white */
 .lv-ph { position: relative; flex: 1; min-height: 10em; margin: 0; border-radius: .7em; overflow: hidden; background: var(--panel-2); }
-.lv-ph > img, .lv-ph > .ill { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.lv-ph > .ill { padding: .4em; }
-.ill text { font-family: var(--font); font-size: 11px; font-weight: 700; fill: #5B4B3F; }
+.lv-ph > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.lv-ph.fit { background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
+.lv-ph.fit > img { object-fit: contain; padding: .35em 0; }
 .ov { position: absolute; left: .6em; right: .6em; bottom: .6em; padding: .55em .75em; border-radius: .55em; background: rgba(255, 255, 255, .93); box-shadow: 0 .4em 1.2em rgba(42, 31, 24, .2); }
 .ov-dark { background: rgba(18, 13, 10, .74); box-shadow: none; }
 .ov-tag { left: auto; top: .6em; bottom: auto; font-size: .86em; font-weight: 700; color: var(--cream-2); }
@@ -427,11 +427,9 @@ small { font-size: .8em; }
 .sx-pair li { display: inline-flex; align-items: center; gap: .4em; padding: .35em .8em; border-radius: 99em; background: rgba(173, 98, 41, .1); color: var(--honey); font-size: .86em; font-weight: 750; }
 .sx-pair li .ico { width: 1.3em; height: 1.3em; }
 .sx-pair .plus { color: var(--mute); font-weight: 700; }
-.sx-fig { margin: 0; padding: .3em .4em; border-radius: .6em; background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
-.sx-fig .chart { height: 15em; }
-/* charts are plotly.py specs (charts/charts.js) drawn in place by Plotly.js */
+.sx-team { flex: 1.25; min-height: 6em; }
+.sx-team img { object-position: 50% 78%; }
 .chart { width: 100%; height: 100%; min-width: 0; }
-.chart .main-svg { font-variant-numeric: tabular-nums; }
 .sx-out { font-size: 1.02em; font-weight: 720; line-height: 1.45; }
 .sx-out em { font-weight: 800; }
 .sx-pcb { flex: 1; min-height: 0; display: grid; grid-template-rows: 1fr 1fr; gap: .5em; }
@@ -742,6 +740,9 @@ small { font-size: .8em; }
 .pstep p { margin-top: .4em; font-size: .9em; line-height: 1.5; color: var(--cream-2); }
 .light-box { background: var(--sheet); border-radius: .6em; display: grid; place-items: center; padding: .8em; }
 .light-box img { width: auto; height: auto; max-height: 100%; }
+/* fixed SVG charts (scripts/infutech-charts.py) fill their box at any size */
+.chart-box { background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
+.chart-box img { width: 100%; height: 100%; object-fit: contain; }
 .spec { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2em; padding: 1.2em 1.6em; }
 .spec div { display: flex; flex-direction: column; gap: .3em; }
 .spec span { font-size: .8em; color: var(--honey); font-weight: 650; }
@@ -1056,27 +1057,7 @@ small { font-size: .8em; }
           <p class="tag">장비 · 펌프</p>
           <h3>동물용 인퓨전펌프</h3>
           <figure class="lv-ph">
-            <svg class="ill" viewBox="0 0 300 190" preserveAspectRatio="xMidYMid meet" role="img" aria-label="링거폴대에 클램프로 고정한 인퓨전펌프 그림">
-              <rect width="300" height="190" fill="#F6EFE5"/>
-              <rect x="94" y="8" width="5" height="182" rx="2.5" fill="#BDAE9F"/>
-              <path d="M60 14H134" stroke="#BDAE9F" stroke-width="4" stroke-linecap="round"/>
-              <path d="M60 14v8" stroke="#BDAE9F" stroke-width="2"/>
-              <rect x="42" y="22" width="36" height="50" rx="8" fill="#FFFFFF" stroke="#CDBFAF" stroke-width="1.5"/>
-              <rect x="46" y="40" width="28" height="28" rx="5" fill="rgba(173,98,41,.18)"/>
-              <rect x="56" y="72" width="8" height="8" fill="#E6DBCD"/>
-              <rect x="55" y="82" width="10" height="15" rx="3" fill="#FFFFFF" stroke="#CDBFAF" stroke-width="1.2"/>
-              <path d="M60 97v12q0 12 12 12h48" fill="none" stroke="#CDBFAF" stroke-width="2"/>
-              <rect x="92" y="112" width="20" height="16" rx="3" fill="#8C7C6F"/>
-              <rect x="108" y="80" width="136" height="86" rx="12" fill="#FFFFFF" stroke="#CDBFAF" stroke-width="1.5"/>
-              <rect x="108" y="150" width="136" height="16" rx="0" fill="#EFE5D8"/>
-              <rect x="120" y="92" width="72" height="34" rx="5" fill="#2A1F18"/>
-              <text x="156" y="114" text-anchor="middle" style="fill:#F2C792;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums">120 mL/h</text>
-              <circle cx="210" cy="98" r="5" fill="#E2D6C7"/><circle cx="226" cy="98" r="5" fill="#E2D6C7"/>
-              <circle cx="210" cy="114" r="5" fill="#E2D6C7"/><circle cx="226" cy="114" r="5" fill="#E2D6C7"/>
-              <rect x="120" y="132" width="40" height="12" rx="6" fill="#4C8744"/>
-              <rect x="166" y="132" width="26" height="12" rx="6" fill="#D04E2D"/>
-              <path d="M226 166v24" stroke="#CDBFAF" stroke-width="2"/>
-            </svg>
+            <img src="media/pump-real.webp" alt="동물병원 입원장 옆에 단 동물용 인퓨전펌프 — 화면에 유속 22 mL/h" data-zoom decoding="async" style="object-position: 22% 62%">
             <p class="ov ov-tag">입원장 5대 = <b>550만 원</b></p>
           </figure>
           <p class="x"><b>110만 원</b><span>대당 판매가</span></p>
@@ -1085,33 +1066,8 @@ small { font-size: .8em; }
         <div class="card lim b">
           <p class="tag">장비 · 스마트 폴대</p>
           <h3>다중 센서 스마트 폴대</h3>
-          <figure class="lv-ph">
-            <svg class="ill" viewBox="0 0 300 190" preserveAspectRatio="xMidYMid meet" role="img" aria-label="무게 · 자이로 · 가속도 · 광학 센서와 제어부를 단 스마트 폴대 그림">
-              <rect width="300" height="190" fill="#F6EFE5"/>
-              <rect x="147" y="12" width="6" height="160" rx="3" fill="#BDAE9F"/>
-              <path d="M118 14H182" stroke="#BDAE9F" stroke-width="4" stroke-linecap="round"/>
-              <path d="M110 184l40-12 40 12" fill="none" stroke="#BDAE9F" stroke-width="4" stroke-linecap="round"/>
-              <circle cx="110" cy="185" r="3.5" fill="#8C7C6F"/><circle cx="190" cy="185" r="3.5" fill="#8C7C6F"/>
-              <rect x="122" y="16" width="14" height="8" rx="2" fill="#AD6229"/>
-              <rect x="111" y="26" width="36" height="46" rx="8" fill="#FFFFFF" stroke="#CDBFAF" stroke-width="1.5"/>
-              <rect x="115" y="42" width="28" height="27" rx="5" fill="rgba(173,98,41,.18)"/>
-              <rect x="124" y="72" width="10" height="16" rx="3" fill="#FFFFFF" stroke="#CDBFAF" stroke-width="1.2"/>
-              <rect x="120" y="76" width="4" height="9" rx="1.5" fill="#AD6229"/>
-              <path d="M129 88v86" stroke="#CDBFAF" stroke-width="2"/>
-              <rect x="143" y="98" width="14" height="14" rx="3" fill="#AD6229"/>
-              <rect x="143" y="122" width="14" height="14" rx="3" fill="#AD6229"/>
-              <rect x="138" y="148" width="24" height="16" rx="3" fill="#8C7C6F"/>
-              <g stroke="#AD6229" stroke-width="1.2" fill="none">
-                <path d="M136 20H196"/><path d="M120 80H90"/><path d="M157 105H196"/><path d="M143 129H90"/><path d="M162 156H196"/>
-              </g>
-              <g>
-                <rect x="196" y="11" width="52" height="18" rx="9" fill="#FFFFFF" stroke="#E2BF98"/><text x="222" y="24" text-anchor="middle">무게</text>
-                <rect x="38" y="71" width="52" height="18" rx="9" fill="#FFFFFF" stroke="#E2BF98"/><text x="64" y="84" text-anchor="middle">광학</text>
-                <rect x="196" y="96" width="58" height="18" rx="9" fill="#FFFFFF" stroke="#E2BF98"/><text x="225" y="109" text-anchor="middle">자이로</text>
-                <rect x="32" y="120" width="58" height="18" rx="9" fill="#FFFFFF" stroke="#E2BF98"/><text x="61" y="133" text-anchor="middle">가속도</text>
-                <rect x="196" y="147" width="74" height="18" rx="9" fill="#FFFFFF" stroke="#E2BF98"/><text x="233" y="160" text-anchor="middle">제어 · 통신</text>
-              </g>
-            </svg>
+          <figure class="lv-ph fit">
+            <img src="media/pole-multi.webp" alt="기존 다중 센서 스마트 폴대 — 초음파 센서 · 서보 모터 · 액추에이터 · 자이로 · 심박수 센서 · 스피커 · 조이스틱 · DC 모터를 단 구조" data-zoom decoding="async">
           </figure>
           <p class="x"><b>100만 원+</b><span>제작비</span></p>
           <p class="why"><svg class="ico"><use href="#i-x"/></svg>센서를 더할수록 비싸지고, 폴대째 바꿔야 함</p>
@@ -1127,7 +1083,7 @@ small { font-size: .8em; }
         </ul>
       </div>
     </div>
-    <div class="ft"><p class="src b">출처: 한국소비자원(2026.9) · 수의미래연구소 집계(농식품부 자료, 2025.6 — 전국 동물병원 5,312곳 중 1인 병원 3,815곳) · SW Medi 동물용 인퓨전펌프 판매가(2025) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 기록지 · 순회 표시와 장비 그림은 이해를 돕는 예시</p></div>
+    <div class="ft"><p class="src b">출처: 한국소비자원(2026.9) · 수의미래연구소 집계(농식품부 자료, 2025.6 — 전국 동물병원 5,312곳 중 1인 병원 3,815곳) · SW Medi 동물용 인퓨전펌프 판매가(2025) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 펌프 · 스마트 폴대는 실제 장비 사진 · 기록지 · 순회 표시는 이해를 돕는 예시</p></div>
   </div>
   <div class="note" hidden><p>지금 병원은 사람과 장비로 이 공백을 메우려 합니다. 기록은 손으로 남기다 보니 빈칸과 사후 기록이 생기고, 기록이 없으면 분쟁 해결률은 19.5%에 그칩니다. 확인은 순회로 하지만, 전국 동물병원 열 곳 중 일곱 곳은 수의사 한 명이 지켜 순회와 순회 사이를 볼 사람이 없습니다.</p><p>장비로 풀려면 대당 110만 원 펌프를 입원장마다 들여야 하고, 스마트 폴대는 흔들림을 잡으려 자이로 · 가속도 센서를 더하느라 제작비만 100만 원을 넘습니다. 그래서 필요한 건 각각에 대한 답, 자동으로 남는 기록, 24시간 감지, 부담 없는 가격, 그리고 기존 폴대 그대로 쓰는 센서 하나입니다.</p></div>
 </section>
@@ -1170,7 +1126,7 @@ small { font-size: .8em; }
         </div>
         <div class="hero b"><div class="disc"><img src="media/module.webp" alt="INFU RETRO 실물 모듈 — 로드셀과 자체 PCB가 든 하우징, 아래에 수액백 후크" data-zoom></div></div>
         <div class="callouts">
-          <div class="card co b"><figure class="th"><div class="chart" data-chart="filter" role="img" aria-label="흔들리는 원신호(점)와 칼만필터 출력(선)"></div></figure><div><p class="k">FILTER</p><b>칼만필터 흔들림 보정</b><span>움직임 · 폴대 이동 노이즈 제거</span></div></div>
+          <div class="card co b"><figure class="th chart-box"><img src="charts/filter.svg" alt="흔들리는 원신호(점)와 칼만필터 출력(선)" data-zoom></figure><div><p class="k">FILTER</p><b>칼만필터 흔들림 보정</b><span>움직임 · 폴대 이동 노이즈 제거</span></div></div>
           <div class="card co b"><figure class="th light-th"><img src="media/cnn-curve.webp" alt="CNN 학습 곡선 — 손실 감소와 검증 정확도 수렴" data-zoom></figure><div><p class="k">AI</p><b>CNN 이상 판별</b><span>신호 패턴 분류 · 정확도 97.3%</span></div></div>
         </div>
       </div>
@@ -1207,7 +1163,7 @@ small { font-size: .8em; }
           <p class="sx-k">학습 단계<small>개발 장비에서만</small></p>
           <ul class="sx-pair"><li><svg class="ico"><use href="#i-scale"/></svg>무게센서</li><li class="plus">+</li><li><svg class="ico"><use href="#i-gyro"/></svg>자이로</li></ul>
           <figure class="ph sx-ph"><img src="media/field-bag.webp" alt="실제 수액백을 건 폴대에서 흔들림 데이터를 모으는 팀원" data-zoom decoding="async"><figcaption class="cap">모의 병실 · 실제 수액으로 데이터 수집</figcaption></figure>
-          <figure class="sx-fig"><div class="chart" data-chart="gyro" role="img" aria-label="학습 장비 신호 차트 — 자이로 각속도, 같은 시각의 무게 편차(r = 0.95), 자이로로 보정한 뒤의 잔차(RMS 2.1 g → 0.5 g)"></div></figure>
+          <figure class="ph sx-team"><img src="media/team-pole.webp" alt="INFUTECH 팀이 수액백을 건 시제품 폴대와 앱 화면을 띄운 휴대폰 곁에서 엄지를 세운 모습" data-zoom decoding="async"><figcaption class="cap">팀 · 시제품과 앱 연동</figcaption></figure>
           <p class="sx-out">흔들림 ↔ 무게 편차 학습 → 편차 <em>2.1 g → 0.5 g</em></p>
         </div>
         <svg class="ico sx-arr b" aria-hidden="true"><use href="#i-arrow"/></svg>
@@ -1224,7 +1180,7 @@ small { font-size: .8em; }
         </div>
       </div>
     </div>
-    <div class="ft"><p class="src b">※ 기존 스마트 폴대 제작비는 INFUTECH 시장조사 기준 · 자이로는 개발 · 학습 장비에만 달고 제품에는 넣지 않습니다 · 차트는 Python(NumPy · plotly.py)으로 계산한 학습 장비 모의 신호(20 Hz)</p></div>
+    <div class="ft"><p class="src b">※ 기존 스마트 폴대 제작비는 INFUTECH 시장조사 기준 · 자이로는 개발 · 학습 장비에만 달고 제품에는 넣지 않습니다 · 학습 장비 신호 그래프는 부록 A2</p></div>
   </div>
   <div class="note" hidden><p>핵심 기술입니다. 기존 스마트 폴대는 흔들림을 잡으려고 자이로, 가속도 같은 센서를 여러 개 넣습니다. 그래서 제작비만 100만 원을 넘기는 구성이 대부분입니다.</p><p>저희는 반대로 갔습니다. 학습할 때만 무게센서와 자이로를 함께 달아, 폴대가 흔들릴 때 무게가 얼마나 틀어지는지를 데이터로 모았고, 그 편차를 칼만필터와 CNN이 스스로 보정하도록 학습시켰습니다.</p><p>그래서 제품에는 무게센서 하나만 들어갑니다. 대당 원가 8만 원, 판별 정확도 97.3%입니다.</p></div>
 </section>
@@ -1673,7 +1629,7 @@ small { font-size: .8em; }
         <figure class="card b" style="display: flex; flex-direction: column; gap: .8em">
           <h3>CNN 학습 곡선 <small style="color: var(--mute); font-weight: 500">손실 · 정확도 — 기존 개발 결과</small></h3>
           <div class="light-box" style="flex: 1; min-height: 0"><img src="media/cnn-curve.webp" alt="CNN 학습 곡선 — 80 epoch 동안 손실은 0 근처로 떨어지고 검증 정확도는 1.0 근처로 수렴" data-zoom></div>
-          <p class="cs">테스트 환경에서는 자이로로 흔들림 ↔ 무게 관계를 학습해 보정합니다. 실제 제품에는 무게센서 하나만 들어갑니다.</p>
+          <p class="cs">테스트 환경에서는 자이로로 흔들림 ↔ 무게 관계를 학습해 보정합니다(부록 A2). 실제 제품에는 무게센서 하나만 들어갑니다.</p>
         </figure>
         <div class="card hi acc-card b">
           <p class="cs">검증 정확도 (val_acc) · 최근 6 epoch</p>
@@ -1694,6 +1650,33 @@ small { font-size: .8em; }
     </div>
   </div>
   <div class="note" hidden><p>질의응답용: 네 단계 파이프라인과 CNN 학습 로그입니다. 97.3%는 마지막 6 epoch 검증 정확도의 평균이고, 범위는 95.2~99.0%입니다.</p></div>
+</section>
+
+<section class="slide appx" id="a-gyro" data-sec="13" data-title="부록 · 센서 절감 학습">
+  <div class="frame">
+    <p class="lab b">Appendix <span>센서 절감 학습</span></p>
+    <h2 class="h b">자이로는 <mark>학습할 때만</mark> 씁니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: 1.75fr 1fr">
+        <figure class="card b" style="display: flex; flex-direction: column; gap: .8em">
+          <h3>학습 장비 신호 <small style="color: var(--mute); font-weight: 500">모의 신호 · 20 Hz · 12초</small></h3>
+          <div class="light-box chart-box" style="flex: 1; min-height: 0"><img src="charts/gyro.svg" alt="학습 장비 신호 — 위: 자이로 각속도, 가운데: 같은 시각의 무게 편차(자이로와 상관 r = 0.95), 아래: 학습한 보정을 적용한 뒤의 편차(RMS 2.1 g → 0.5 g)" data-zoom></div>
+        </figure>
+        <div class="card hi docinfo b">
+          <p class="k">읽는 법</p>
+          <ul class="facts">
+            <li><span>위</span><b>폴대를 두 번 흔들 때의 자이로 각속도</b></li>
+            <li><span>가운데</span><b>같은 시각의 무게 편차 — 자이로와 상관 r = 0.95</b></li>
+            <li><span>아래</span><b>학습한 보정을 적용한 뒤 — 편차 RMS 2.1 g → 0.5 g</b></li>
+          </ul>
+          <p class="cs">흔들림이 무게에 남기는 편차를 학습해 두면, 제품에는 자이로 없이 무게센서 하나만 넣어도 됩니다.</p>
+          <figure class="ph" style="flex: 1; min-height: 6em"><img src="media/field-bag.webp" alt="실제 수액백을 건 폴대에서 흔들림 데이터를 모으는 팀원" data-zoom decoding="async" style="object-position: 45% 50%"><figcaption class="cap">학습 장비 · 실제 수액으로 데이터 수집</figcaption></figure>
+        </div>
+      </div>
+    </div>
+    <div class="ft"><p class="src b">※ Python(NumPy)으로 계산하고 Matplotlib으로 그린 학습 장비 모의 신호 · 실측 로그를 넣으면 같은 그래프로 그려집니다(scripts/infutech-charts.py)</p></div>
+  </div>
+  <div class="note" hidden><p>질의응답용: 학습 장비에서 자이로와 무게 편차의 관계를 보여 주는 모의 신호입니다. 폴대가 흔들리면 무게도 같이 출렁이는데, 그 편차가 자이로 값과 0.95로 거의 같이 움직입니다.</p><p>이 관계를 학습한 보정을 적용하면 편차가 2.1 g에서 0.5 g으로 줄어듭니다. 그래서 제품에서는 자이로를 빼고 무게센서 하나만 씁니다.</p></div>
 </section>
 
 <section class="slide appx" id="a-hw" data-sec="13" data-title="부록 · 하드웨어 · PCB">
@@ -1906,8 +1889,6 @@ small { font-size: .8em; }
 <p class="toast" id="toast" role="status"></p>
 <p class="sr" id="live" aria-live="polite"></p>
 
-<script src="vendor/plotly-basic.min.js"></script>
-<script src="charts/charts.js"></script>
 <script>
 (() => {
   const SECTIONS = ['표지', '문제 배경', '기존 시스템의 한계', '아이디어 소개', '시연', '시장분석', '차별점', '제품 원가', 'MOU 체결 현황', '시장 진입 전략', '기대효과', '팀 소개', '마무리', '부록'];
@@ -1920,38 +1901,10 @@ small { font-size: .8em; }
   // screen point -> point on the (possibly turned) viewer, and the viewer's width
   const local = (x, y) => isRot() ? { x: y, y: innerWidth - x } : { x, y };
   const viewW = () => isRot() ? innerHeight : innerWidth;
-  turned.addEventListener?.('change', () => { document.documentElement.classList.toggle('rot', turned.matches); setTimeout(drawCharts, 60); });
+  turned.addEventListener?.('change', () => document.documentElement.classList.toggle('rot', turned.matches));
   const pad = n => String(n).padStart(2, '0');
   const mmss = sec => `${Math.floor(sec / 60)}:${pad(Math.floor(sec % 60))}`;
 
-
-  // ---- charts: plotly.py specs drawn by Plotly.js; text and margins follow the stage size ----
-  const scaleFonts = (o, k) => {
-    if (Array.isArray(o)) return o.forEach(v => scaleFonts(v, k));
-    if (!o || typeof o !== 'object') return;
-    for (const [key, v] of Object.entries(o)) {
-      if (key === 'font' && v && typeof v.size === 'number') v.size *= k;
-      scaleFonts(v, k);
-    }
-  };
-  function drawCharts() {
-    if (!window.Plotly || !window.INFU_CHARTS) return;
-    document.querySelectorAll('[data-chart]').forEach(el => {
-      const c = INFU_CHARTS[el.dataset.chart];
-      if (!c || !el.clientWidth) return;
-      const k = Math.min(1.6, Math.max(.7, el.clientWidth / c.base));
-      const layout = JSON.parse(JSON.stringify(c.layout));
-      scaleFonts(layout, k);
-      if (layout.margin) for (const m of ['l', 'r', 't', 'b']) if (m in layout.margin) layout.margin[m] *= k;
-      (layout.annotations || []).forEach(a => { if (a.xshift) a.xshift *= k; if (a.yshift) a.yshift *= k; });
-      layout.autosize = true;
-      Plotly.react(el, c.data, layout, { displayModeBar: false, staticPlot: c.static, scrollZoom: false, doubleClick: false, showTips: false });
-    });
-  }
-  drawCharts();
-  document.fonts?.ready.then(drawCharts);
-  let chartTimer;
-  addEventListener('resize', () => { clearTimeout(chartTimer); chartTimer = setTimeout(drawCharts, 160); });
 
   // ---- slides, steps, sections ----
   const slides = [...deck.querySelectorAll('.slide')];
