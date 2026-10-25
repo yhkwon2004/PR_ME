@@ -84,6 +84,12 @@ function pageMeta() {
           image: og('growth'),
         },
         {
+          path: '/growth/detail',
+          title: `성장 · 이력 상세 — SWOT · 미래 계획 — ${NAME}`,
+          desc: '대학 시절 2023 — 2026을 네 쪽으로: 학년별 성장 과정과 해마다의 수, 연도별 이력 전체(프로젝트 · 상장 · 기사), 기록으로 본 SWOT 분석, 진행 중인 일과 진로 목표.',
+          image: og('growth'),
+        },
+        {
           path: '/history',
           title: `연도별 이력 — ${NAME}`,
           desc: '2023 — 2026, 해마다 한 일 — 연구실 · 동아리 · 전공 · 창업 · 수상. 연도마다 한 화면에 이어진 프로젝트 · 상장 · 기사까지.',

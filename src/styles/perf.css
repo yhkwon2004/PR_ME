@@ -31,7 +31,8 @@ html.q-lite .deck-btn {
 html.q-lite .boot-kicker,
 html.q-lite .boot-name,
 html.q-lite .bn-en,
-html.q-lite .boot-title {
+html.q-lite .boot-role,
+html.q-lite .boot-stats {
   animation-name: boot-rise-lite;
 }
 @keyframes boot-rise-lite {

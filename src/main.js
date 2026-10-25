@@ -7,6 +7,7 @@ import './styles/pages.css';
 import './styles/premium.css';
 import './styles/skills.css';
 import './styles/about.css';
+import './styles/journey.css';
 import './styles/beats.css';
 import './styles/guide.css';
 import './styles/perf.css';
@@ -15,6 +16,9 @@ import './styles/clarity.css';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { scenes, profile } from './content.js';
+import { projects, CATEGORIES } from './data/projects.js';
+import { AWARDS } from './data/awards.js';
+import { PRESS } from './data/press.js';
 import { createStage } from './core/stage.js';
 import { createPerf } from './core/perf.js';
 import { SETS } from './core/layout.js';
@@ -496,15 +500,32 @@ function pick() {
 }
 
 // ── 부팅 시퀀스 ────────────────────────────────────────────
+// 부팅 로그: 기체 점검 흉내 대신 이 포트폴리오가 담은 것을 차례로 불러온다(숫자는 데이터에서)
+const GRAND = AWARDS.filter((a) => a.tier === 1).length;
+const FIELDS = new Set(projects.map((p) => p.category)).size;
 const bootLines = [
-  ['BOOT', 'physical-ai.film — reel 2026', ''],
-  ['INIT', 'IMU · GPS · BAROMETER', 'OK'],
-  ['SPIN', 'LIDAR 360° / 8 CH', 'OK'],
-  ['LINK', 'PIXHAWK FLIGHT CONTROLLER', 'OK'],
-  ['LOAD', 'NEURAL WEIGHTS · PERCEPTION', 'OK'],
-  ['CALI', 'QUADRUPED GAIT · 2-LINK IK', 'OK'],
-  ['ARM', 'ACTUATORS', 'READY'],
+  ['BOOT', `kwon.portfolio — ${profile.span || '2023 – 2026'}`, ''],
+  ['PROF', `${profile.name} · ${profile.role}`, 'OK'],
+  ['EDU', `${(profile.education || []).map((e) => e.major).slice(-2).join(' · ')}`, 'OK'],
+  ['PROJ', `${projects.length} PROJECTS · ${Math.min(FIELDS, CATEGORIES.length)} FIELDS`, 'OK'],
+  ['AWRD', `${AWARDS.length} AWARDS · ${GRAND} GRAND PRIZE`, 'OK'],
+  ['PRESS', `${PRESS.length} ARTICLES · INTERVIEW`, 'OK'],
+  ['SETS', 'HANGAR · SKY · GROUND · ROBOTICS', 'READY'],
 ];
+// 부팅 화면의 기록 네 개 — 로딩 진행만큼 0에서 올라간다
+const BOOT_STATS = [
+  [projects.length, '프로젝트'],
+  [AWARDS.length, '수상'],
+  [GRAND, '대상'],
+  [PRESS.length, '공식 보도'],
+];
+function fillBootStats() {
+  const dl = $('boot-stats');
+  if (!dl) return [];
+  dl.innerHTML = BOOT_STATS.map(([, l]) => `<div><dt>${l}</dt><dd>0</dd></div>`).join('');
+  if (profile.roleKo && $('boot-role')) $('boot-role').textContent = profile.roleKo;
+  return [...dl.querySelectorAll('dd')];
+}
 
 // 카운트다운 한 프레임: 표찰의 숫자, 초마다 다시 차는 고리, 재생 아이콘 둘레의 자동 시작 고리
 function countdown(left, total) {
@@ -561,6 +582,7 @@ async function boot() {
     clock.textContent = `00:00:${String(Math.floor(s)).padStart(2, '0')}:${String(Math.floor((s % 1) * 24)).padStart(2, '0')}`;
   }, 42);
 
+  const statEls = fillBootStats();
   const addLine = (i) => {
     const [a, b, c] = bootLines[i];
     const li = document.createElement('li');
@@ -605,6 +627,7 @@ async function boot() {
       pct.textContent = String(Math.round(progress * 100)).padStart(2, '0');
       ring.style.strokeDashoffset = String(100 - progress * 100);
       bootProgress = progress;
+      statEls.forEach((el, k) => (el.textContent = String(Math.round(BOOT_STATS[k][0] * Math.min(1, progress * 1.08)))));
       const want = Math.min(bootLines.length, Math.floor(progress * bootLines.length + 0.6));
       while (shown < want) addLine(shown++);
       if (progress >= 1 || started) resolve();

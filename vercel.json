@@ -43,6 +43,10 @@
       "destination": "/"
     },
     {
+      "source": "/growth/:path*",
+      "destination": "/"
+    },
+    {
       "source": "/history",
       "destination": "/"
     },

@@ -201,8 +201,8 @@ function yearBeat(y, i) {
           </div>
           ${
             y.awards.length
-              ? `<p class="bt-more">${tiers.map(([t, n]) => `${TIER_LABEL[t]} ${n}`).join(' · ')}<a href="/awards#y${y.year}" data-link>${y.year}년 상장 ${y.awards.length}건 모두 보기 →</a></p>`
-              : ''
+              ? `<p class="bt-more">${tiers.map(([t, n]) => `${TIER_LABEL[t]} ${n}`).join(' · ')}<a href="/awards#y${y.year}" data-link>${y.year}년 상장 ${y.awards.length}건 모두 보기 →</a><a href="/growth/detail#y${y.year}" data-link>${y.year}년 이력 자세히 →</a></p>`
+              : `<p class="bt-more"><a href="/growth/detail#y${y.year}" data-link>${y.year}년 이력 자세히 →</a></p>`
           }
         </header>
         <div class="pano" style="--n: ${y.items.length}"${g ? ` data-stage="${esc(g.id)}"` : ''}>
@@ -240,7 +240,7 @@ function storyBeat(s, k, i) {
             .map((p) => `<a class="gw-m" href="${p.path}" data-link data-cat="${esc(p.category)}">${photoOf(p)}<span>${esc(p.title)}</span></a>`)
             .join('')}</div>
           <div class="gw-copy">
-            <p class="gw-k b-a"><span class="gw-badge">${esc(s.code)}</span>${esc(s.grade)} · ${esc(s.span)}</p>
+            <p class="gw-k b-a"><span class="gw-badge">${esc(s.code)}</span>${esc(s.grade)} · ${esc(s.span)}<a class="gw-more" href="/growth/detail#s-${esc(s.id)}" data-link>이 시기 자세히 →</a></p>
             <h2 class="gw-h b-a">${esc(s.title)}</h2>
             <p class="gw-hl b-a">${esc(s.headline)}</p>
             <dl class="gw-nums b-a">
@@ -281,6 +281,7 @@ function growthBeats(scene, i) {
           </li>`;
         }).join('')}</ol>
         <p class="bt-more b-a"><b>${esc(PRELUDE.year)}</b>${esc(PRELUDE.text)} · 3년 동안 프로젝트 ${projects.length} · 수상 ${AWARDS.length}</p>
+        <nav class="gw-links b-a" aria-label="성장 · 이력 자세히"><a href="/growth/detail" data-link>성장 과정 자세히</a><a href="/growth/detail#years" data-link>연도별 이력 전체</a><a href="/growth/detail#swot" data-link>SWOT 분석</a><a href="/growth/detail#plan" data-link>미래 계획</a></nav>
       </div>`,
   };
   const values = {

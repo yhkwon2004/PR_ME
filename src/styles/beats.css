@@ -715,6 +715,40 @@
 .bt-gcover .bt-more {
   margin-top: calc(22 * var(--u));
 }
+/* 성장 · 이력 상세(/growth/detail)로 가는 네 갈래 */
+.gw-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(8 * var(--u));
+  margin-top: calc(14 * var(--u));
+}
+.gw-links a {
+  padding: calc(8 * var(--u)) calc(16 * var(--u));
+  border: 1px solid var(--panel-line);
+  border-radius: 999px;
+  background: rgba(20, 30, 46, 0.86);
+  font-size: calc(14.5 * var(--u));
+  font-weight: 700;
+  color: var(--ink);
+  transition: border-color 0.3s;
+}
+.gw-links a:hover,
+.gw-links a:focus-visible {
+  border-color: var(--cyan);
+  outline: none;
+}
+.gw-links a:nth-child(n + 3) {
+  border-color: rgba(255, 207, 90, 0.5);
+}
+/* 학년 이야기: 머리 줄 오른쪽 끝 — 높이를 더하지 않는다 */
+.gw-more {
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: calc(14 * var(--u));
+  font-weight: 700;
+  color: var(--gc, var(--cyan));
+}
 
 /* 가치관: 세 카드 — 위는 근거 프로젝트 사진(이름), 아래는 번호 · 제목 · 한 문단 · 나머지 근거 */
 .gw-values {
@@ -1613,6 +1647,17 @@ a.pn-col:focus-visible {
   }
   .bt-gcover .bt-more {
     margin-top: 10px;
+  }
+  .gw-links {
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .gw-links a {
+    padding: 6px 11px;
+    font-size: 12.5px;
+  }
+  .gw-more {
+    font-size: 13px;
   }
   .gw-values > li {
     display: grid;
