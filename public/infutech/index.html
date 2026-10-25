@@ -669,6 +669,8 @@ small { font-size: .8em; }
 .tier span { font-size: .86em; font-weight: 650; color: var(--cream-2); }
 .tier b { font-size: 2.5em; font-weight: 800; letter-spacing: -.035em; line-height: 1.15; }
 .tier small { font-size: .78em; color: var(--mute); }
+.tier em { margin-top: .3em; padding: .22em .75em; border-radius: 99em; background: rgba(173, 98, 41, .12); color: var(--honey); font-style: normal; font-size: 1.02em; font-weight: 780; font-variant-numeric: tabular-nums; }
+.t3 em { background: rgba(255, 255, 255, .2); color: #FFFFFF; }
 .t1 { background: #F2EADF; border: 1px solid var(--line); flex: 1.25; z-index: 1; }
 .t2 { background: #EAD9C3; margin-left: 2.4em; flex: 1; z-index: 2; box-shadow: 0 -.6em 1.6em rgba(92, 62, 36, .08); }
 .t3 { background: linear-gradient(150deg, #C97F40, #A35A22); margin-left: 4.8em; flex: 1; z-index: 3; box-shadow: 0 -.6em 1.8em rgba(92, 62, 36, .18); }
@@ -740,6 +742,19 @@ small { font-size: .8em; }
 .pstep p { margin-top: .4em; font-size: .9em; line-height: 1.5; color: var(--cream-2); }
 .light-box { background: var(--sheet); border-radius: .6em; display: grid; place-items: center; padding: .8em; }
 .light-box img { width: auto; height: auto; max-height: 100%; }
+/* appendix: pole-top hanger — photo, render video, drawing */
+.hg { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 1em; }
+.hg-c { display: flex; flex-direction: column; gap: .8em; margin: 0; padding: 1.1em; min-height: 0; }
+.hg-ph { flex: 1; min-height: 0; background: #ECE9E4; }
+.hg-ph img, .hg-ph video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hg-vid { background: #8C8C8C; }
+.hg-dw .hg-ph { background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
+.hg-dw .hg-ph img { object-fit: contain; padding: .3em; }
+.hg-c figcaption { display: flex; flex-direction: column; gap: .2em; }
+.hg-c figcaption b { font-size: 1.12em; font-weight: 780; }
+.hg-c figcaption span { font-size: .86em; color: var(--mute); }
+.hg-parts { display: grid; grid-template-columns: 1fr 1fr; gap: .4em 1em; padding-top: .7em; border-top: 1px dashed var(--line); font-size: .88em; color: var(--cream-2); }
+.hg-parts b { display: inline-block; min-width: 1.5em; color: var(--honey); font-weight: 800; }
 /* fixed SVG charts (scripts/infutech-charts.py) fill their box at any size */
 .chart-box { background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
 .chart-box img { width: 100%; height: 100%; object-fit: contain; }
@@ -798,11 +813,6 @@ small { font-size: .8em; }
 .chaps button:hover::before { background: var(--track-hi); }
 .tip { position: absolute; bottom: 100%; left: 50%; transform: translate(-50%, -4px); padding: 6px 9px; border-radius: 6px; background: var(--panel-2); color: var(--cream); font-size: 12px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .2s; }
 .chaps button:hover .tip, .chaps button:focus-visible .tip { opacity: 1; }
-.timer { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; font-variant-numeric: tabular-nums; padding: 6px 10px; border-radius: 8px; background: var(--tint); cursor: pointer; border: 0; color: var(--cream-2); }
-.timer b { color: var(--cream); font-size: 14px; }
-.timer .pace { font-size: 12px; color: var(--sage); }
-.timer .pace.late { color: var(--honey); }
-.timer .pace.over { color: var(--alert); }
 .ctl { display: flex; align-items: center; gap: 4px; }
 .count { font-variant-numeric: tabular-nums; margin-right: 8px; white-space: nowrap; color: var(--cream-2); }
 .count b { color: var(--cream); }
@@ -917,7 +927,7 @@ small { font-size: .8em; }
 <main class="deck" id="deck">
 
 <!-- ================= 표지 ================= -->
-<section class="slide light s-cover" id="cover" data-sec="0" data-time="6" data-title="반려동물 주사약물 투약 관리 AIoT 솔루션">
+<section class="slide light s-cover" id="cover" data-sec="0" data-time="8" data-title="반려동물 주사약물 투약 관리 AIoT 솔루션">
   <div class="frame">
     <div class="cover-photo"><img src="media/cover-night.webp" alt="불 꺼진 입원실, 링거폴대 옆 케이지에서 잠든 강아지" decoding="async"></div>
     <p class="topline b"><span>2026 NEXT WAVE-UP 아이디어 리그 · 일반·기술 트랙</span></p>
@@ -936,11 +946,11 @@ small { font-size: .8em; }
       <figcaption>INFU RETRO · 무게센서 모듈</figcaption>
     </figure>
   </div>
-  <div class="note" hidden><p>안녕하십니까, INFUTECH입니다. 말하지 못하는 입원 동물의 수액을, 지금 쓰는 링거폴대 그대로 지켜보는 AIoT 솔루션을 소개하겠습니다.</p></div>
+  <div class="note" hidden><p>안녕하십니까, INFUTECH입니다. 입원 동물의 수액을, 링거폴대 그대로 지키는 솔루션을 소개합니다.</p></div>
 </section>
 
 <!-- ================= 01 문제 배경 ================= -->
-<section class="slide photo s-night" id="night" data-sec="1" data-time="14" data-title="새벽 3시, 동물병원 입원실">
+<section class="slide photo s-night" id="night" data-sec="1" data-time="15" data-title="새벽 3시, 동물병원 입원실">
   <img class="bleed" src="media/scene-night.webp" alt="" decoding="async">
   <div class="shade"></div>
   <div class="frame">
@@ -952,10 +962,10 @@ small { font-size: .8em; }
     </div>
     <p class="scene-src">전남대학교 · 전북권 동물병원 설문조사 결과를 바탕으로 한 장면</p>
   </div>
-  <div class="note" hidden><p>새벽 3시 동물병원 입원실입니다. 보호자는 집에 있고, 당직 수의사는 다른 환자를 봅니다.</p><p>다음 순회 전까지 수액에 무슨 일이 생겨도, 기록되지도 확인되지도 않습니다. 저희가 푸는 문제는 이 두 가지, 확인 공백과 기록 공백입니다.</p></div>
+  <div class="note" hidden><p>새벽 3시, 동물병원 입원실입니다. 보호자는 집에 있고, 당직 수의사는 다른 환자를 봅니다.</p><p>이 시간 수액에 생긴 일은 확인되지도, 기록되지도 않습니다. 저희가 푸는 문제는 이 두 공백입니다.</p></div>
 </section>
 
-<section class="slide" id="watch" data-sec="1" data-time="16" data-title="① 확인 공백 — 26.7%">
+<section class="slide" id="watch" data-sec="1" data-time="15" data-title="① 확인 공백 — 26.7%">
   <div class="frame">
     <p class="lab b">Problem <span>① 확인 공백</span></p>
     <div class="hook2">
@@ -975,10 +985,10 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: RVC·BSAVA 연구(2024, 19개 기관 382마리) · Simpson et al., J Small Anim Pract(2023) · 데일리벳 수도권 동물병원 운영시간 조사(2025) · 데일리벳 2018.07.27</p></div>
   </div>
-  <div class="note" hidden><p>숫자 하나로 시작하겠습니다. 26.7%. 입원한 개와 고양이의 정맥 카테터는 네 마리 중 한 마리꼴로 빠지거나 막히는 합병증이 생깁니다.</p><p>그런데 24시간 지켜보는 병원은 서울 100곳 중 8곳뿐입니다. 사람의 눈만으로는 밤을 지킬 수 없습니다.</p></div>
+  <div class="note" hidden><p>첫째, 확인 공백입니다. 입원한 개와 고양이의 26.7%에서 카테터가 빠지거나 막히는 합병증이 생깁니다.</p><p>그런데 24시간 지켜보는 병원은 서울 100곳 중 8곳뿐입니다.</p></div>
 </section>
 
-<section class="slide" id="record" data-sec="1" data-time="15" data-title="② 기록 공백 — 해결률 19.5%">
+<section class="slide" id="record" data-sec="1" data-time="16" data-title="② 기록 공백 — 해결률 19.5%">
   <div class="frame">
     <p class="lab b">Problem <span>② 기록 공백</span></p>
     <h2 class="h b">기록이 없으면, <mark>아무도</mark> 지킬 수 없습니다</h2>
@@ -1016,11 +1026,11 @@ small { font-size: .8em; }
       <p class="src b">출처: 한국소비자원 동물병원 피해구제 분석(2026.9, 2021~2026.6 접수 128건) · 데일리벳 2026.09.09</p>
     </div>
   </div>
-  <div class="note" hidden><p>두 번째는 기록 공백입니다. 동물병원 피해구제 신청은 4년 만에 세 배가 됐고, 올해는 6월까지만 45건입니다.</p><p>진료기록이 있으면 30%가 해결되지만, 없으면 19.5%로 떨어집니다. 다섯 건 중 네 건은 해결되지 못합니다. 그래서 자동으로 남는 기록이 필요합니다.</p></div>
+  <div class="note" hidden><p>둘째, 기록 공백입니다. 피해구제 신청은 4년 만에 세 배로 늘었습니다.</p><p>진료기록이 있으면 30%가 해결되지만, 없으면 19.5%에 그칩니다. 기록이 자동으로 남아야 하는 이유입니다.</p></div>
 </section>
 
 <!-- ================= 02 기존 시스템의 한계 ================= -->
-<section class="slide" id="limits" data-sec="2" data-time="17" data-title="지금 방식으로는 두 공백을 메울 수 없습니다">
+<section class="slide" id="limits" data-sec="2" data-time="20" data-title="지금 방식으로는 두 공백을 메울 수 없습니다">
   <div class="frame">
     <p class="lab b">Pain Point <span>기존 시스템의 한계</span></p>
     <h2 class="h b">지금 방식으로는 두 공백을 <mark>메울 수 없습니다</mark></h2>
@@ -1085,7 +1095,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 한국소비자원(2026.9) · 수의미래연구소 집계(농식품부 자료, 2025.6 — 전국 동물병원 5,312곳 중 1인 병원 3,815곳) · SW Medi 동물용 인퓨전펌프 판매가(2025) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 펌프 · 스마트 폴대는 실제 장비 사진 · 기록지 · 순회 표시는 이해를 돕는 예시</p></div>
   </div>
-  <div class="note" hidden><p>지금 병원은 사람과 장비로 이 공백을 메우려 합니다. 기록은 손으로 남기다 보니 빈칸과 사후 기록이 생기고, 기록이 없으면 분쟁 해결률은 19.5%에 그칩니다. 확인은 순회로 하지만, 전국 동물병원 열 곳 중 일곱 곳은 수의사 한 명이 지켜 순회와 순회 사이를 볼 사람이 없습니다.</p><p>장비로 풀려면 대당 110만 원 펌프를 입원장마다 들여야 하고, 스마트 폴대는 흔들림을 잡으려 자이로 · 가속도 센서를 더하느라 제작비만 100만 원을 넘습니다. 그래서 필요한 건 각각에 대한 답, 자동으로 남는 기록, 24시간 감지, 부담 없는 가격, 그리고 기존 폴대 그대로 쓰는 센서 하나입니다.</p></div>
+  <div class="note" hidden><p>손 기록엔 빈칸이 생기고, 병원 열 곳 중 일곱 곳은 수의사 한 명이라 순회 사이를 못 봅니다.</p><p>장비는 110만 원 펌프, 100만 원이 넘는 다중 센서 폴대라 너무 비쌉니다. 그래서 필요한 건, 자동으로 남고 24시간 지키는, 기존 폴대에 붙는 센서 하나입니다.</p></div>
 </section>
 
 <!-- ================= 03 아이디어 소개 ================= -->
@@ -1110,10 +1120,10 @@ small { font-size: .8em; }
       </div>
     </div>
   </div>
-  <div class="note" hidden><p>저희는 책상이 아니라 현장에서 시작했습니다. 전북 지역 병원을 직접 찾아가 모듈을 보여 주며 인터뷰하고 레퍼런스 데이터를 모았고, 동물병원 설문에서 야간 공백과 수기 기록 문제를 확인했습니다. 이어서 원광대 간호학과와 모의 병실을 꾸려 흔들림 오측정을 자이로 데이터로 학습해 잡았습니다.</p><p>의료실증팀이 수액 10종으로 알고리즘을 보정해 테스트에 성공했고, 수의과대학과 유통사를 만나 실제 구매 의사까지 확인했습니다.</p></div>
+  <div class="note" hidden><p>저희는 현장에서 시작했습니다. 전북 지역 병원을 찾아가 인터뷰하며 데이터를 모았고, 원광대 간호학과와 모의 병실을 꾸려 실험했습니다.</p><p>수의과대학과 유통사에서는 구매 의사까지 확인했습니다.</p></div>
 </section>
 
-<section class="slide" id="solution" data-sec="3" data-time="21" data-title="INFU RETRO — 링거폴대에 모듈 하나">
+<section class="slide" id="solution" data-sec="3" data-time="17" data-title="INFU RETRO — 링거폴대에 모듈 하나">
   <div class="frame">
     <p class="lab b">Solution <span>아이디어 소개</span></p>
     <h2 class="h b">링거폴대에 <mark>모듈 하나</mark>, INFU RETRO</h2>
@@ -1139,10 +1149,10 @@ small { font-size: .8em; }
       </ol>
     </div>
   </div>
-  <div class="note" hidden><p>저희 해법은 INFU RETRO, 무게센서 모듈 하나입니다. 로드셀이 1초마다 수액 무게를 재고, 칼만필터가 흔들림을 걸러내고, CNN이 정상과 이상을 판별합니다. 검증 정확도는 평균 97.3%입니다.</p><p>쓰는 법은 세 단계입니다. 기존 걸이에 걸고, 무게를 재고, 대시보드와 휴대폰으로 알립니다. 폴대 교체도, 공구도 필요 없습니다.</p></div>
+  <div class="note" hidden><p>해법은 INFU RETRO, 링거폴대에 거는 무게센서 모듈 하나입니다. 1초마다 수액 무게를 재고, 칼만필터로 흔들림을 거르고, CNN이 이상을 판별합니다.</p><p>걸고, 재고, 알립니다. 폴대 교체도, 공구도 필요 없습니다.</p></div>
 </section>
 
-<section class="slide" id="sensor" data-sec="3" data-time="22" data-title="센서는 줄이고, 학습으로 채웠습니다">
+<section class="slide" id="sensor" data-sec="3" data-time="21" data-title="센서는 줄이고, 학습으로 채웠습니다">
   <div class="frame">
     <p class="lab b">Core Tech <span>센서 절감 설계</span></p>
     <h2 class="h b">센서는 줄이고, <mark>학습</mark>으로 채웠습니다</h2>
@@ -1182,7 +1192,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">※ 기존 스마트 폴대 제작비는 INFUTECH 시장조사 기준 · 자이로는 개발 · 학습 장비에만 달고 제품에는 넣지 않습니다 · 학습 장비 신호 그래프는 부록 A2</p></div>
   </div>
-  <div class="note" hidden><p>핵심 기술입니다. 기존 스마트 폴대는 흔들림을 잡으려고 자이로, 가속도 같은 센서를 여러 개 넣습니다. 그래서 제작비만 100만 원을 넘기는 구성이 대부분입니다.</p><p>저희는 반대로 갔습니다. 학습할 때만 무게센서와 자이로를 함께 달아, 폴대가 흔들릴 때 무게가 얼마나 틀어지는지를 데이터로 모았고, 그 편차를 칼만필터와 CNN이 스스로 보정하도록 학습시켰습니다.</p><p>그래서 제품에는 무게센서 하나만 들어갑니다. 대당 원가 8만 원, 판별 정확도 97.3%입니다.</p></div>
+  <div class="note" hidden><p>기존 스마트 폴대는 자이로, 가속도 센서를 더해 제작비가 100만 원을 넘습니다.</p><p>저희는 학습할 때만 자이로를 달아, 흔들릴 때 무게가 얼마나 틀어지는지 배우게 했습니다. 편차는 2.1그램에서 0.5그램으로 줄었고, 제품에는 무게센서 하나만 남았습니다.</p></div>
 </section>
 
 <!-- ================= 04 시연 ================= -->
@@ -1210,10 +1220,10 @@ small { font-size: .8em; }
       </div>
     </div>
   </div>
-  <div class="note" hidden><p>실제 시연입니다. 폴대 상단에 모듈을 끼우고 수액백을 겁니다. 유속을 빠르게 하면 대시보드와 휴대폰에 유속 과다 알림이, 느리게 하거나 멈추면 각각 알림이 뜹니다. 영상 속 하우징은 구형 시제품입니다.</p></div>
+  <div class="note" hidden><p>실제 시연입니다. 수액백을 걸고 유속을 바꾸면, 빠를 때도 느릴 때도 대시보드와 휴대폰에 바로 알림이 뜹니다.</p></div>
 </section>
 
-<section class="slide" id="paper" data-sec="4" data-time="18" data-title="논문 — 상태 패턴 분석 기반 수액 이상 감지">
+<section class="slide" id="paper" data-sec="4" data-time="17" data-title="논문 — 상태 패턴 분석 기반 수액 이상 감지">
   <div class="frame">
     <p class="lab b">Research <span>학술 검증</span></p>
     <h2 class="h b">판별 알고리즘은 <mark>논문</mark>으로 먼저 검증했습니다</h2>
@@ -1245,10 +1255,10 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 한우진 외, 「상태 패턴 분석 기반 수액 이상 감지 알고리즘」, 한국혁신산업학회 · 한국디지털정책학회 공동학술대회(2026.07), 원광대학교 지원 · AIT 2026(2026.01) · 쪽을 누르면 전문을 크게 볼 수 있습니다</p></div>
   </div>
-  <div class="note" hidden><p>판별 알고리즘은 논문으로 먼저 검증했습니다. 유속이 기준보다 느린지, 정상인지, 빠른지를 세 상태로 바꾸고, 연속 16개 상태를 4×4 패턴 이미지로 만들어 CNN이 봅니다. 그래서 순간적인 흔들림과 계속되는 이상을 구분합니다.</p><p>선행 방식과 달리 사용자가 점적 계수를 넣을 필요가 없고, 파라미터 660개짜리 경량 모델이라 기기 안의 ESP32에서 바로 판정합니다. 같은 알고리즘의 듀얼 트랙 설계는 국제 학술대회 AIT 2026에서도 발표했습니다.</p></div>
+  <div class="note" hidden><p>알고리즘은 논문으로 검증했습니다. 유속을 느림, 정상, 빠름 세 상태로 바꾸고, 16개를 4×4 패턴으로 만들어 CNN이 봅니다. 순간 흔들림과 진짜 이상을 구분합니다.</p><p>경량 모델이라 기기 안에서 바로 판정합니다.</p></div>
 </section>
 
-<section class="slide" id="results" data-sec="4" data-time="16" data-title="검증 성과 — 숫자로 증명">
+<section class="slide" id="results" data-sec="4" data-time="14" data-title="검증 성과 — 숫자로 증명">
   <div class="frame">
     <p class="lab b">Validation <span>검증 성과</span></p>
     <h2 class="h b">흔들리는 모의 병실에서, <mark>숫자로</mark> 증명했습니다</h2>
@@ -1269,7 +1279,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">※ 모의 병실 반복시험(폴대 이동 · 흔들림 · 기울어짐 · 당겨짐, 500 mL) · ±5분 · 5초는 보정을 포함한 최대 검측 시간 기준</p></div>
   </div>
-  <div class="note" hidden><p>흔들리고 기울어지는 모의 병실에서 반복 시험했습니다. 잔량 오차 ±3%, 종료시점 예측 오차 ±5분, 이상 감지 5초 이내, 패턴 검증 정확도는 최근 여섯 번 학습 평균 97.3%입니다.</p><p>점도가 다른 수액 10종으로 알고리즘을 보정해 테스트에 성공했고, 학습 곡선도 안정적으로 수렴했습니다. 특허 3건이 심사 중입니다.</p></div>
+  <div class="note" hidden><p>모의 병실에서 반복 시험한 결과, 잔량 오차 3% 이내, 이상 감지 5초 이내, 판별 정확도 97.3%입니다.</p><p>수액 10종으로 보정을 마쳤고, 특허 3건이 심사 중입니다.</p></div>
 </section>
 
 <!-- ================= 05 시장분석 ================= -->
@@ -1316,11 +1326,11 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 농림축산식품부 2025 반려동물 양육현황 조사(2026.2) · 수의미래연구소 집계(농식품부 자료, 2025.6) · 농식품부 연관산업 육성 대책 · Data Bridge / Grand View / GM Insights / MRF · 농식품부 진료항목 표준화(2025.4) · 연합뉴스 2026.05.31 · 중앙일보 2026.09.02</p></div>
   </div>
-  <div class="note" hidden><p>반려동물을 키우는 가구는 29.2%로 역대 최대이고, 그중 95%가 1년 안에 동물병원을 찾습니다. 동물병원은 2년 새 300곳 넘게 늘어 5,312곳이 됐고, 동물용 인퓨전펌프 시장도 연 7~12%씩 큽니다.</p><p>그리고 지금, 진료항목 표준화와 마약류 투약 기록, 진료기록 발급 의무화가 잇따라 추진되고, 마약류 처방량은 3년 새 37% 늘었습니다. 기록을 요구하는 압력이 커지는 지금이 시장이 열리는 시점입니다.</p></div>
+  <div class="note" hidden><p>반려가구는 29.2%로 역대 최대, 동물병원은 5,312곳입니다.</p><p>진료기록 발급 의무화가 추진되고, 마약류 처방은 3년 새 37% 늘었습니다. 기록을 요구하는 지금이 진입 시점입니다.</p></div>
 </section>
 
 <!-- ================= 06 차별점 ================= -->
-<section class="slide" id="compare" data-sec="6" data-time="15" data-title="차별점 — 대안 비교와 IP">
+<section class="slide" id="compare" data-sec="6" data-time="13" data-title="차별점 — 대안 비교와 IP">
   <div class="frame">
     <p class="lab b">Competitor <span>차별점</span></p>
     <h2 class="h b">동물병원 폴대에 바로 끼우는 무게센서는 <mark>아직 없습니다</mark></h2>
@@ -1350,10 +1360,10 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: SW Medi 동물용 인퓨전펌프 판매가(2025) · Shift Labs 제품 자료 · 삼성전자 뉴스룸(2017) · KOITA 기술사업화 DB(아이링거) · 아이디어 제안서</p></div>
   </div>
-  <div class="note" hidden><p>대안을 비교하면, 펌프는 비싼 별도 장비이고 나머지는 사람 병원용 광학 방식이거나 폴대를 바꿔야 합니다. INFU RETRO는 25만 원에 기존 폴대에 바로 끼우는 동물병원 전용 무게센서입니다.</p><p>가장 싸고, 폴대를 바꾸지 않고, 센서 하나로 흔들림까지 잡습니다.</p></div>
+  <div class="note" hidden><p>대안과 비교하면, 펌프는 비싸고, 다른 제품은 사람 병원용이거나 폴대를 바꿔야 합니다.</p><p>INFU RETRO는 25만 원에, 기존 폴대에 끼우는 동물병원 전용 제품입니다.</p></div>
 </section>
 
-<section class="slide" id="reg" data-sec="6" data-time="15" data-title="인허가 — 사람용 의료기기 허가 없이 공급">
+<section class="slide" id="reg" data-sec="6" data-time="14" data-title="인허가 — 사람용 의료기기 허가 없이 공급">
   <div class="frame">
     <p class="lab b">Regulation <span>차별점 · 인허가</span></p>
     <h2 class="h b">사람용 의료기기 <mark>허가 없이</mark>, 동물병원에 바로 공급합니다</h2>
@@ -1406,7 +1416,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">근거: 「의료기기법」 제46조(동물용 의료기기 특례) · 농림축산검역본부 「동물용의료기기의 범위 및 분류 등에 관한 규정」(고시 제2021-36호) · 데일리벳 2013.08(동물용 의료기기 등급별 신고 · 허가제, 2014.1 시행) · 최종 품목 등급은 검역본부 분류표로 확인</p></div>
   </div>
-  <div class="note" hidden><p>인허가는 세 가지만 보면 됩니다. 첫째, 관할입니다. 동물 전용 기기는 식약처가 아니라 의료기기법 특례에 따라 농림축산검역본부 소관입니다.</p><p>둘째, 등급입니다. 동물용은 1등급부터 4등급까지 있고, 가장 낮은 1등급은 허가가 아니라 신고입니다. 셋째, INFU RETRO는 동물 몸에 닿지 않고 주입도 제어하지 않는, 폴대와 수액백 사이에서 무게만 재는 장치라 1등급 기준에 맞는 구조입니다. 그래서 사람용처럼 긴 허가 심사 없이 공급할 수 있고, KC 인증과 특허도 함께 진행하고 있습니다.</p></div>
+  <div class="note" hidden><p>인허가도 가볍습니다. 동물 전용 기기는 식약처가 아니라 농림축산검역본부 소관입니다.</p><p>몸에 닿지 않고 주입도 제어하지 않아, 신고만 하면 되는 가장 낮은 1등급 기준에 맞습니다.</p></div>
 </section>
 
 <!-- ================= 07 제품 원가 ================= -->
@@ -1468,13 +1478,13 @@ small { font-size: .8em; }
         </div>
       </div>
     </div>
-    <div class="ft"><p class="src b">출처: 아이디어 제안서(원가 · 판매가) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 동물용 인퓨전펌프 판매가(2025) · 구독료 · 3년 목표는 내부 기준 · 유통사 공급가 17만 원/대(MOQ 300개, ㈜씨엔 약정)</p></div>
+    <div class="ft"><p class="src b">출처: 아이디어 제안서(원가 · 판매가) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 동물용 인퓨전펌프 판매가(2025) · 구독료 · 3년 목표는 사업계획 기준 · 유통사 공급가 17만 원/대(MOQ 300개, ㈜씨엔 약정)</p></div>
   </div>
-  <div class="note" hidden><p>다중 센서 스마트 폴대는 제작비만 100만 원을 넘지만, 센서를 하나로 줄인 INFU RETRO는 유통까지 포함한 실질 원가가 8만 원입니다. 그중 하드웨어 부품은 1만 5천 원뿐입니다.</p><p>25만 원에 팔면 대당 17만 원이 남고, 여기에 기기당 월 12만 원 관제 구독이 붙습니다. 입원장 5대 병원이라면 펌프 550만 원 대신 125만 원으로 시작하고, 3년 목표 250대면 구독 매출만 연 3억 6천만 원입니다.</p></div>
+  <div class="note" hidden><p>센서를 하나로 줄여 원가는 8만 원입니다. 25만 원에 팔면 대당 17만 원이 남고, 월 12만 원 관제 구독이 더해집니다.</p><p>입원장 5대 병원이라면 펌프 550만 원 대신 125만 원으로 시작합니다.</p></div>
 </section>
 
 <!-- ================= 08 MOU 체결 현황 ================= -->
-<section class="slide" id="mou" data-sec="8" data-time="15" data-title="구매의향 · 공급 약정 · MOU">
+<section class="slide" id="mou" data-sec="8" data-time="12" data-title="구매의향 · 공급 약정 · MOU">
   <div class="frame">
     <p class="lab b">Traction <span>MOU 체결 현황</span></p>
     <h2 class="h b">구매의향과 공급 약정, <mark>문서로</mark> 확인했습니다</h2>
@@ -1508,11 +1518,11 @@ small { font-size: .8em; }
       <p class="next b"><b>다음 단계</b>제품 생산 · 인증을 마치면 수량 · 단가 · 납기를 정해 본계약으로 전환합니다<button type="button" class="more" data-goid="a-cn">문서 전문 보기</button></p>
     </div>
   </div>
-  <div class="note" hidden><p>판로는 문서로 확인했습니다. 전남대학교 수의과대학과 구매의향서를, 8월에는 ㈜씨엔과 최소 300개 공급 약정을, 10월에는 의료기기 유통사 SKM&amp;M과 5,000만 원 규모 구매의향 MOU를 맺었습니다.</p></div>
+  <div class="note" hidden><p>판로는 문서로 확인했습니다. 전남대 수의과대학 구매의향서, ㈜씨엔 최소 300개 공급 약정, 그리고 유통사 SKM&amp;M과 5,000만 원 규모 MOU입니다.</p></div>
 </section>
 
 <!-- ================= 09 시장 진입 전략 ================= -->
-<section class="slide" id="gtm" data-sec="9" data-time="10" data-title="전북에서 증명하고, 전국 5,312곳으로">
+<section class="slide" id="gtm" data-sec="9" data-time="16" data-title="전북에서 증명하고, 전국 5,312곳으로">
   <div class="frame">
     <p class="lab b">Go-to-Market <span>시장 진입 전략</span></p>
     <h2 class="h b">전북에서 증명하고, <mark>전국 5,312곳</mark>으로</h2>
@@ -1520,9 +1530,9 @@ small { font-size: .8em; }
       <div class="g" style="--c: .8fr 1.6fr">
         <div class="tiers b">
           <svg class="arrow" viewBox="0 0 30 300" preserveAspectRatio="none" aria-hidden="true"><path d="M15 0 L30 34 L20 34 L20 300 L10 300 L10 34 L0 34 Z"/></svg>
-          <div class="tier t1"><span>TAM · 전국 동물병원</span><b><span data-count="5312">5,312</span>곳</b></div>
-          <div class="tier t2"><span>SAM · 호남권</span><b>약 300곳</b></div>
-          <div class="tier t3"><span>SOM · 3년</span><b>50곳 · 250대</b></div>
+          <div class="tier t1"><span>TAM · 전국 동물병원</span><b><span data-count="5312">5,312</span>곳</b><em>약 449억 원</em></div>
+          <div class="tier t2"><span>SAM · 호남권</span><b>약 300곳</b><em>약 25억 원</em></div>
+          <div class="tier t3"><span>SOM · 3년</span><b>50곳 · 250대</b><em>약 4.2억 원</em></div>
         </div>
         <ol class="road b">
           <li class="card hi rstep"><p class="k">STEP 1</p><h3>전북 실증</h3><figure class="ph rs-ph"><img src="media/field-interview.webp" alt="전북 지역 병원에서 모듈을 보여 주며 의료진을 인터뷰하는 팀원들" data-zoom style="object-position: 8% 50%"><figcaption class="cap">전북지역 병원 인터뷰</figcaption></figure><p>대학 인접 일반 · 24시 동물병원에서 레퍼런스 확보</p><p class="partner">원광대 간호학과 실험 협력</p></li>
@@ -1531,13 +1541,13 @@ small { font-size: .8em; }
         </ol>
       </div>
     </div>
-    <div class="ft"><p class="src b">출처: 수의미래연구소 집계(농식품부 자료, 2025.6 전국 동물병원 5,312곳) · SAM · SOM은 아이디어 제안서 자체 추정</p></div>
+    <div class="ft"><p class="src b">출처: 수의미래연구소 집계(농식품부 자료, 2025.6 전국 동물병원 5,312곳) · SAM · SOM은 아이디어 제안서 기준 · 금액은 병원당 5대 × 대당(장비 25만 원 + 연 구독 144만 원)</p></div>
   </div>
-  <div class="note" hidden><p>전국 동물병원 5,312곳 중 호남권 300곳을 먼저 공략해, 3년 안에 50곳 250대가 목표입니다.</p><p>이미 병원 인터뷰로 레퍼런스 데이터를 모으고 있는 전북에서 실증하고, 전남대 수의과대학을 거점으로 광주 · 전남으로, 유통사 MOU로 전국에 공급합니다.</p></div>
+  <div class="note" hidden><p>전국 5,312곳, 약 449억 원 시장 가운데 호남권 300곳을 먼저 공략해, 3년 안에 50곳 250대, 연 4억 원 규모를 만듭니다.</p><p>전북에서 증명하고, 유통망을 따라 전국으로 넓힙니다.</p></div>
 </section>
 
 <!-- ================= 10 기대효과 ================= -->
-<section class="slide s-impact" id="impact" data-sec="10" data-time="12" data-title="순회는 줄이고, 먼저 알아챕니다">
+<section class="slide s-impact" id="impact" data-sec="10" data-time="17" data-title="순회는 줄이고, 먼저 알아챕니다">
   <div class="frame">
     <p class="lab b">Impact <span>기대효과</span></p>
     <h2 class="h b">순회는 줄이고, <mark>먼저</mark> 알아챕니다</h2>
@@ -1556,11 +1566,11 @@ small { font-size: .8em; }
     <div class="ft"><p class="src b">출처: Puolitaival et al., Advances in Therapy(2022) — 근무조당 5.05분 확보 · 간호사 56.3% 시간 절약 응답(자기보고 설문) · Tong et al., Frontiers in Medicine(2025) — 수액 합병증 감소 · 정시 완료율 향상</p></div>
     <div class="impact-photo"><img src="media/vet-cat.webp" alt="창가 입원장에서 링거를 맞는 고양이 곁에서 태블릿을 확인하는 수의사" decoding="async"></div>
   </div>
-  <div class="note" hidden><p>사람 병원에서는 효과가 먼저 확인됐습니다. 핀란드 6개 병원에서 원격 수액 모니터링을 쓴 간호사들은 근무조당 병실 확인 방문이 2회 줄었다고 답했고, 중국 대학병원에서는 이상 알림 뒤 평균 2분 만에 대응했습니다.</p><p>동물병원은 순회와 기록 부담을 덜고, 보호자는 남는 기록으로 신뢰를 얻고, 반려동물은 이상을 먼저 발견합니다.</p></div>
+  <div class="note" hidden><p>사람 병원에선 효과가 확인됐습니다. 근무조당 병실 방문이 두 번 줄었다는 응답이 나왔고, 이상 알림 뒤 평균 2분 만에 대응했습니다.</p><p>동물병원은 순회와 기록 부담을 덜고, 반려동물은 이상을 먼저 발견합니다.</p></div>
 </section>
 
 <!-- ================= 11 팀 소개 ================= -->
-<section class="slide" id="team" data-sec="11" data-time="10" data-title="팀 INFUTECH">
+<section class="slide" id="team" data-sec="11" data-time="8" data-title="팀 INFUTECH">
   <div class="frame">
     <p class="lab b">Team <span>팀 소개</span></p>
     <h2 class="h b">개발과 <mark>의료 실증</mark>, 두 축으로 움직입니다</h2>
@@ -1592,11 +1602,11 @@ small { font-size: .8em; }
       </ul>
     </div>
   </div>
-  <div class="note" hidden><p>개발팀 네 명이 하드웨어와 AI, 서버를 맡고, 의료실증팀 세 명이 모의 병실과 현장 시험을 맡습니다. 현장 실험과 보정 테스트를 직접 해 온 팀입니다.</p></div>
+  <div class="note" hidden><p>개발팀 네 명이 하드웨어와 AI, 서버를, 의료실증팀 세 명이 현장 시험을 맡은 팀, INFUTECH입니다.</p></div>
 </section>
 
 <!-- ================= 마무리 ================= -->
-<section class="slide light s-end" id="end" data-sec="12" data-time="5" data-title="감사합니다">
+<section class="slide light s-end" id="end" data-sec="12" data-time="4" data-title="감사합니다">
   <div class="frame">
     <p class="topline b" style="width: 100%"><span>INFUTECH</span><span>WON SHOT</span></p>
     <div class="end-mid">
@@ -1607,7 +1617,7 @@ small { font-size: .8em; }
       <div class="end-act b"><button type="button" data-go="0">처음으로</button><button type="button" data-open="toc">목차 보기</button></div>
     </div>
   </div>
-  <div class="note" hidden><p>말하지 못해도, 먼저 알아채겠습니다. 입원 동물의 수액, INFUTECH가 지켜보겠습니다. 감사합니다.</p></div>
+  <div class="note" hidden><p>말하지 못해도, 먼저 알아채겠습니다. 감사합니다.</p></div>
 </section>
 
 <!-- ================= 부록 (Q&A) ================= -->
@@ -1697,6 +1707,37 @@ small { font-size: .8em; }
     </div>
   </div>
   <div class="note" hidden><p>질의응답용: 60×35mm 자체 PCB에 무게센서 하나만 올렸고, 이벤트 전송으로 트래픽을 80% 이상 줄였습니다.</p></div>
+</section>
+
+<section class="slide appx" id="a-hanger" data-sec="13" data-title="부록 · INFU 폴대 걸이형">
+  <div class="frame">
+    <p class="lab b">Appendix <span>제품 · 폴대 걸이형</span></p>
+    <h2 class="h b">폴대 꼭대기에 끼우는 <mark>4구 걸이형</mark> INFU</h2>
+    <div class="bd">
+      <div class="hg">
+        <figure class="card hg-c b">
+          <div class="ph hg-ph"><img src="media/hanger-real.webp" alt="링거폴대 꼭대기에 끼운 흰색 십자형 INFU 걸이 — 한쪽 갈고리에 0.9% 생리식염수 500 mL 수액백을 건 실물" data-zoom decoding="async" style="object-position: 50% 30%"></div>
+          <figcaption><b>실물 시제품</b><span>폴대 꼭대기에 끼우고, 갈고리에 수액백을 겁니다</span></figcaption>
+        </figure>
+        <figure class="card hg-c b">
+          <div class="ph hg-ph hg-vid"><video src="media/hanger.mp4" poster="media/hanger-poster.webp" muted loop playsinline preload="metadata" aria-label="걸이형 INFU 구조 렌더 영상 — 로드셀 갈고리 네 개가 든 뼈대 위로 곡면 커버가 덮입니다"></video></div>
+          <figcaption><b>구조 렌더 영상</b><span>로드셀 갈고리 4개 위로 곡면 커버가 덮입니다</span></figcaption>
+        </figure>
+        <figure class="card hg-c hg-dw b">
+          <div class="ph hg-ph"><img src="media/hanger-drawing.webp" alt="2차 구상도(2025.08.19) — 십자형 걸이 3D 모델, 갈고리부 확대도, 부품 리스트" data-zoom decoding="async"></div>
+          <figcaption><b>2차 구상도</b><span>2025.08 · 부품 리스트</span></figcaption>
+          <ul class="hg-parts">
+            <li><b>4</b>로드셀 (갈고리)</li>
+            <li><b>1</b>로드셀 (고정형)</li>
+            <li><b>1</b>커버 결합부</li>
+            <li><b>1</b>곡면 커버</li>
+          </ul>
+        </figure>
+      </div>
+    </div>
+    <div class="ft"><p class="src b">※ INFUTECH 2차 구상도(2025.08.19) 부품 리스트 기준 · 영상은 구조 렌더링</p></div>
+  </div>
+  <div class="note" hidden><p>질의응답용: 폴대 걸이형 INFU입니다. 폴대 꼭대기에 십자형 걸이를 끼우는 형태로, 갈고리 네 곳마다 로드셀이 들어갑니다.</p><p>왼쪽이 실물 시제품, 가운데가 구조 렌더 영상, 오른쪽이 2차 구상도와 부품 리스트입니다.</p></div>
 </section>
 
 <section class="slide appx" id="a-paper" data-sec="13" data-title="부록 · 논문 전문">
@@ -1855,7 +1896,6 @@ small { font-size: .8em; }
 <nav class="chrome" id="chrome" aria-label="슬라이드 조작">
   <p class="where" aria-hidden="true"><b id="where-n">·</b><span id="where-t">표지</span></p>
   <div class="chaps" id="chaps"></div>
-  <button type="button" class="timer" id="timer" title="발표 타이머 · T 시작/멈춤 · Shift+T 초기화"><b id="t-el">0:00</b><span>/ 5:00</span><span class="pace" id="t-pace"></span></button>
   <div class="ctl">
     <p class="count" aria-hidden="true"><b id="count-n">1</b> / <span id="count-t">20</span></p>
     <button type="button" id="btn-prev" aria-label="이전"><svg class="ico"><use href="#i-prev"/></svg></button>
@@ -1869,7 +1909,7 @@ small { font-size: .8em; }
 
 <div class="panel" id="toc" hidden role="dialog" aria-modal="true" aria-labelledby="toc-h">
   <div class="panel-in">
-    <div class="panel-hd"><div><h2 id="toc-h">목차</h2><p>본 발표 20장 · 5분 · 부록은 본 발표 자료의 원문 · 상세</p></div><button type="button" class="panel-x" data-close aria-label="목차 닫기"><svg class="ico" style="width:18px;height:18px"><use href="#i-x"/></svg></button></div>
+    <div class="panel-hd"><div><h2 id="toc-h">목차</h2><p>본 발표 20장 · 대본 5분 · 부록은 원문 · 상세 자료</p></div><button type="button" class="panel-x" data-close aria-label="목차 닫기"><svg class="ico" style="width:18px;height:18px"><use href="#i-x"/></svg></button></div>
     <div class="toc-grid" id="toc-grid"></div>
     <p class="keys">
       <span><kbd>→</kbd><kbd>Space</kbd>다음</span>
@@ -1877,7 +1917,6 @@ small { font-size: .8em; }
       <span><kbd>12</kbd><kbd>Enter</kbd>12번 장으로</span>
       <span><kbd>O</kbd>목차</span>
       <span><kbd>N</kbd>발표 노트</span>
-      <span><kbd>T</kbd>타이머 시작/멈춤</span>
       <span><kbd>F</kbd>전체 화면</span>
       <span><kbd>B</kbd>화면 가리기</span>
     </p>
@@ -1903,7 +1942,6 @@ small { font-size: .8em; }
   const viewW = () => isRot() ? innerHeight : innerWidth;
   turned.addEventListener?.('change', () => document.documentElement.classList.toggle('rot', turned.matches));
   const pad = n => String(n).padStart(2, '0');
-  const mmss = sec => `${Math.floor(sec / 60)}:${pad(Math.floor(sec % 60))}`;
 
 
   // ---- slides, steps, sections ----
@@ -1925,10 +1963,6 @@ small { font-size: .8em; }
     const n = +el.dataset.dots, on = +el.dataset.on;
     el.innerHTML = Array.from({ length: n }, (_, k) => k < on ? '<i class="on"></i>' : '<i></i>').join('');
   });
-  // planned seconds before each main slide
-  let acc = 0;
-  slides.forEach(s => { s._planStart = acc; acc += +(s.dataset.time || 0); s._planEnd = acc; });
-  const PLAN = acc;
 
   const bySec = SECTIONS.map((_, si) => slides.map((s, k) => +s.dataset.sec === si ? k : -1).filter(k => k >= 0));
   const chaps = $('#chaps');
@@ -1936,8 +1970,7 @@ small { font-size: .8em; }
     `<button type="button" class="${si === APPX ? 'ax' : ''}" style="--n:${bySec[si].length}" data-sec="${si}" aria-label="${name} (${bySec[si].length}장)"><i></i><span class="tip">${si && si < 12 ? pad(si) + ' ' : ''}${name}</span></button>`).join('');
   chaps.addEventListener('click', e => { const b = e.target.closest('button[data-sec]'); if (b) go(bySec[+b.dataset.sec][0]); });
   $('#toc-grid').innerHTML = SECTIONS.map((name, si) => {
-    const secs = bySec[si].reduce((m, k) => m + +(slides[k].dataset.time || 0), 0);
-    return `<div class="toc-sec"><h3>${si && si < 12 ? `<b>${pad(si)}</b>` : ''}${name}${secs ? `<span>${secs}초</span>` : ''}</h3>
+    return `<div class="toc-sec"><h3>${si && si < 12 ? `<b>${pad(si)}</b>` : ''}${name}</h3>
       ${bySec[si].map(k => `<button type="button" data-go="${k}"><span>${si === APPX ? 'A' + (k - mainCount + 1) : k + 1}</span>${slides[k].dataset.title}</button>`).join('')}</div>`;
   }).join('');
   $('#count-t').textContent = mainCount;
@@ -1965,7 +1998,6 @@ small { font-size: .8em; }
     sync();
     try { history.replaceState(null, '', '#' + s.id); } catch (_) {}
     if (!opts.quiet) $('#live').textContent = `${s.dataset.title}`;
-    if (n > 0 && !timer.started) startTimer();
   }
   function next() {
     const s = slides[cur];
@@ -1991,10 +2023,9 @@ small { font-size: .8em; }
     });
     document.querySelectorAll('#toc-grid [data-go]').forEach(b => b.setAttribute('aria-current', +b.dataset.go === cur ? 'true' : 'false'));
     $('#notes-body').innerHTML = s.querySelector('.note')?.innerHTML || '<p>이 슬라이드에는 노트가 없습니다.</p>';
-    $('#notes-time').textContent = s.dataset.time ? `권장 ${s.dataset.time}초 · ${mmss(s._planStart)}~${mmss(s._planEnd)}` : '질의응답용';
+    $('#notes-time').textContent = s.dataset.time ? `대본 약 ${s.dataset.time}초` : '질의응답용';
     $('#btn-prev').disabled = cur === 0 && step === 0;
     $('#btn-next').disabled = cur === total - 1 && step === s._max;
-    tick();
   }
 
   function enter(s) {
@@ -2019,29 +2050,6 @@ small { font-size: .8em; }
     el.textContent = fmt(0);
     el._raf = requestAnimationFrame(tickN);
   }
-
-  // ---- talk timer (5:00 plan) ----
-  const timer = { started: false, running: false, base: 0, t0: 0 };
-  const elapsed = () => timer.base + (timer.running ? (performance.now() - timer.t0) / 1000 : 0);
-  function startTimer() { timer.started = true; timer.running = true; timer.t0 = performance.now(); }
-  function toggleTimer() {
-    if (!timer.started) { startTimer(); say('타이머를 시작했습니다'); return; }
-    if (timer.running) { timer.base = elapsed(); timer.running = false; say('타이머를 멈췄습니다'); }
-    else { timer.running = true; timer.t0 = performance.now(); say('타이머를 다시 시작했습니다'); }
-    tick();
-  }
-  function resetTimer() { Object.assign(timer, { started: false, running: false, base: 0, t0: 0 }); tick(); say('타이머를 0:00으로 되돌렸습니다'); }
-  function tick() {
-    const el = elapsed(), s = slides[cur];
-    $('#t-el').textContent = mmss(el);
-    const pace = $('#t-pace');
-    if (!timer.started || !s || !s.dataset.time) { pace.textContent = timer.started && !timer.running ? '멈춤' : ''; pace.className = 'pace'; return; }
-    const late = el - s._planEnd, over = el > PLAN;
-    pace.className = 'pace' + (over ? ' over' : late > 8 ? ' late' : '');
-    pace.textContent = !timer.running ? '멈춤' : over ? `+${mmss(el - PLAN)} 초과` : late > 8 ? `${Math.round(late)}초 늦음` : '계획대로';
-  }
-  setInterval(() => { if (timer.running) tick(); }, 500);
-  $('#timer').addEventListener('click', toggleTimer);
 
   // ---- demo video chapters ----
   const video = $('#demo-video');
@@ -2117,8 +2125,6 @@ small { font-size: .8em; }
       case 'End': go(mainCount - 1); e.preventDefault(); break;
       case 'o': case 'O': case 'g': case 'G': toggleToc(true); e.preventDefault(); break;
       case 'n': case 'N': toggleNotes(); break;
-      case 't': toggleTimer(); break;
-      case 'T': resetTimer(); break;
       case 'f': case 'F': toggleFs(); break;
       case 'b': case 'B': case '.': black.hidden = false; break;
       case 'Escape': if (!notes.hidden) toggleNotes(false); break;
@@ -2189,11 +2195,10 @@ small { font-size: .8em; }
   }
   addEventListener('hashchange', () => go(fromHash()));
   go(fromHash(), { quiet: true });
-  timer.started = false; timer.running = false; tick();
   wake();
   setTimeout(() => say(matchMedia('(pointer: coarse)').matches
     ? (isRot() ? '휴대폰을 가로로 돌려 보세요 · 탭하거나 밀어서 넘깁니다' : '탭하거나 밀어서 넘깁니다 · 왼쪽을 탭하면 이전 장')
-    : '<kbd>→</kbd> · <kbd>Space</kbd> · 클릭으로 넘기기 · <kbd>N</kbd> 발표 노트 · <kbd>T</kbd> 타이머 · <kbd>O</kbd> 목차', 4200), 900);
+    : '<kbd>→</kbd> · <kbd>Space</kbd> · 클릭으로 넘기기 · <kbd>N</kbd> 발표 노트 · <kbd>O</kbd> 목차', 4200), 900);
 })();
 </script>
 </body>
