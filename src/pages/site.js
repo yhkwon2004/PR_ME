@@ -290,7 +290,10 @@ export function pressCard(a, k) {
     ? `<span class="pc-iv"><i class="pc-quote" aria-hidden="true">“</i>${
         qa ? `<span class="pc-iv-q">Q. ${esc(qa.q)}</span>` : `<small>INTERVIEW</small><b>${esc(profile.name)}</b><span>${esc(profile.en)}</span>`
       }</span>`
-    : `<span class="pc-photo"><img src="${esc(a.image.thumb)}" srcset="${esc(a.image.thumb)} 720w, ${esc(a.image.src)} ${a.image.w}w" sizes="${REEL_SIZES}" alt="${esc(a.image.alt)}" loading="lazy" decoding="async" /></span>`;
+    : a.image
+      ? `<span class="pc-photo"><img src="${esc(a.image.thumb)}" srcset="${esc(a.image.thumb)} 720w, ${esc(a.image.src)} ${a.image.w}w" sizes="${REEL_SIZES}" alt="${esc(a.image.alt)}" loading="lazy" decoding="async" /></span>`
+      : // 기사 사진을 받아 두지 못한 보도: 사진 칸에 기사 제목을 활자로
+        `<span class="pc-iv is-text"><small>NEWS${a.date ? ` · ${esc(a.date.replace(/-/g, '.'))}` : ''}</small><b>${esc(a.title)}</b></span>`;
   const label = a.interview ? `${a.publisher} 인터뷰 — ${a.title} (새 창)` : `${a.publisher} 보도 — ${a.title} (새 창)`;
   return `<a class="r-card p-card${a.interview ? ' is-interview' : ''}" href="${esc(a.url)}" target="_blank" rel="noopener" data-cat="${esc(cat)}" data-rel="${relKey(a)}" aria-label="${esc(label)}">
     <figure class="card-media">
@@ -914,7 +917,7 @@ function detailPage(p) {
       return list.length
         ? `<section class="d-press reveal"><h2 class="d-h">IN THE PRESS<sup>${pad(list.length)}</sup></h2><ul>${list
             .map(
-              (a) => `<li><a href="${esc(a.url)}" target="_blank" rel="noopener"><span class="dp-img"><img src="${esc(a.image.thumb)}" alt="" loading="lazy" decoding="async" /></span><span class="dp-t"><small>${esc(a.publisher)} · ${esc(a.date.replace(/-/g, '.'))} · ${esc(a.relation)}</small><b>${esc(a.title)}</b></span><i aria-hidden="true">↗</i></a></li>`
+              (a) => `<li><a href="${esc(a.url)}" target="_blank" rel="noopener"><span class="dp-img${a.image ? '' : ' is-text'}">${a.image ? `<img src="${esc(a.image.thumb)}" alt="" loading="lazy" decoding="async" />` : `<b>${esc(a.publisher)}</b>`}</span><span class="dp-t"><small>${esc(a.publisher)} · ${esc(a.date.replace(/-/g, '.'))} · ${esc(a.relation)}</small><b>${esc(a.title)}</b></span><i aria-hidden="true">↗</i></a></li>`
             )
             .join('')}</ul></section>`
         : '';

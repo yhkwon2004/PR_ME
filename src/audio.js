@@ -1,41 +1,17 @@
-// Web Audio로 합성한 배경 음악 — 밝고 경쾌하게: 108BPM 장조 네 마디(C → G → F → G)를 높은 음역에서.
-// 맑은 플럭이 8분음표로 화음을 오르내리고, 글로켄슈필 멜로디가 노래하며, 하이햇 · 셰이커 · 핑거스냅이 가볍게 박을 짚는다.
-// 베이스 · 킥 · 낮게 깔리는 드론은 쓰지 않는다 — 가장 낮은 음도 B4(약 494Hz)이고, 마스터 앞에서 220Hz 아래를 깎아(24dB/옥타브)
-// 잔향에서 생길 수 있는 웅웅거림까지 막는다(휴대폰 스피커 · 이어폰 모두 가볍게 들리게).
-// 음은 미리보기 스케줄러(25ms마다 0.15초 앞을 예약)로 박자에 정확히 맞춘다.
+// Web Audio로 합성한 효과음만 — 배경 음악은 없다. 장면이 바뀔 때 높은 대역을 스치는 바람 소리와 위로 반짝이는 종소리,
+// 카드를 넘길 때 맑은 한 음, 누를 때 작은 종소리. 모두 밝은 음역(가장 낮은 음도 C5 근처)이고,
+// 마스터 앞에서 220Hz 아래를 깎아(24dB/옥타브) 낮게 웅웅거리는 소리가 나지 않는다.
 // 사용자가 시작 버튼을 누르기 전에는 아무 소리도 내지 않는다.
 
 const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
-const LEVEL = 1.4; // 전체 음량(예전 앰비언트와 비슷하게 들리도록)
-const BPM = 108;
-const EIGHTH = 60 / BPM / 2; // 8분음표(약 0.28초)
-const BAR = EIGHTH * 8;
-// 네 마디 화음(한 마디에 하나) — 장조만, B4~D6 사이에 펼친 밝은 자리바꿈
+const LEVEL = 1.2; // 전체 음량
+// 장면이 바뀔 때마다 돌아가며 쓰는 밝은 장조 화음(종소리로 아래에서 위로 훑는다)
 const CHORDS = [
   [72, 76, 79, 86], // C5 E5 G5 D6 — Cadd9
   [71, 74, 79, 83], // B4 D5 G5 B5 — G
   [72, 77, 81, 84], // C5 F5 A5 C6 — F
   [74, 79, 83, 86], // D5 G5 B5 D6 — G
-];
-// 플럭(8분음표): 화음 음 번호를 한 옥타브 위에서 — 마디마다 모양을 조금씩 바꿔 오르내린다
-const ARPS = [
-  [0, 1, 2, 3, 2, 1, 2, 3],
-  [0, 2, 1, 3, 2, 3, 1, 2],
-  [0, 1, 2, 3, 3, 2, 1, 2],
-  [3, 2, 1, 2, 0, 1, 2, 3],
-];
-// 글로켄슈필 멜로디(여덟 마디, 마디마다 8칸 · null은 쉼) — C장조 펜타토닉을 높은 음역에서
-const _ = null;
-const MELODY = [
-  [88, _, 91, _, 93, _, 91, _], // E6 G6 A6 G6
-  [86, _, _, _, 91, _, _, _], // D6 G6
-  [84, _, 86, _, 88, _, 89, 88], // C6 D6 E6 F6 E6
-  [86, _, _, _, _, _, 83, 86], // D6 … B5 D6
-  [88, _, 91, _, 96, _, 93, _], // E6 G6 C7 A6
-  [91, _, _, _, 88, _, 86, _], // G6 E6 D6
-  [89, _, 88, _, 86, _, 84, _], // F6 E6 D6 C6
-  [86, _, 88, _, 91, _, _, _], // D6 E6 G6
 ];
 // 카드 넘김 · 버튼: C장조 펜타토닉(C D E G A)
 const PENTA = [0, 2, 4, 7, 9];
@@ -69,25 +45,9 @@ export function createAudio({ makeContext } = {}) {
   let bus = null; // 건조한 소리
   let verbSend = null;
   let delaySend = null;
-  let padBus = null;
-  let pad = [];
-  let noise = null; // 하이햇 · 셰이커 · 스냅 · 장면 전환 바람 소리용 잡음
-  let chord = 0;
+  let noise = null; // 장면 전환 바람 소리용 잡음
+  let chord = 0; // 장면 전환 종소리가 쓰는 화음 번호
   const stateListeners = new Set();
-
-  // 패드: 화음이 바뀌면 음이 미끄러지듯 옮겨 가고, 마디 머리에서 살짝 부풀었다 가라앉는다
-  function setChord(i, when, glide = 0.25) {
-    chord = ((i % CHORDS.length) + CHORDS.length) % CHORDS.length;
-    const t = when ?? ctx.currentTime;
-    pad.forEach((v, k) => {
-      const f = hz(CHORDS[chord][k] + 12);
-      v.oscs.forEach((o) => o.frequency.setTargetAtTime(f, t, glide));
-    });
-    const g = padBus.gain;
-    g.cancelScheduledValues(t);
-    g.setTargetAtTime(0.026, t, 0.04);
-    g.setTargetAtTime(0.014, t + 0.3, 0.8);
-  }
 
   function init() {
     if (ctx) return;
@@ -139,12 +99,12 @@ export function createAudio({ makeContext } = {}) {
     verbSend = ctx.createGain();
     verbSend.connect(verbHp);
 
-    // 메아리(점 8분음표): 좌우로 오가며 사라진다 — 되먹임 고리에서 저음 · 고음을 덜어 맑게
+    // 메아리: 좌우로 오가며 사라진다 — 되먹임 고리에서 저음 · 고음을 덜어 맑게
     delaySend = ctx.createGain();
     const dl = ctx.createDelay(1);
     const dr = ctx.createDelay(1);
-    dl.delayTime.value = EIGHTH * 1.5;
-    dr.delayTime.value = EIGHTH * 1.5;
+    dl.delayTime.value = 0.42;
+    dr.delayTime.value = 0.42;
     const fb = ctx.createGain();
     fb.gain.value = 0.22;
     const damp = ctx.createBiquadFilter();
@@ -163,38 +123,6 @@ export function createAudio({ makeContext } = {}) {
     delayOut.gain.value = 0.18;
     merger.connect(delayOut);
     delayOut.connect(out);
-
-    // 패드: 화음을 한 옥타브 위(C6 ~ D7)에서 삼각파 둘로 좌우 살짝 어긋나게 — 깔리는 소리가 아니라 박자 뒤의 아주 작은 빛
-    const padTone = ctx.createBiquadFilter();
-    padTone.type = 'lowpass';
-    padTone.frequency.value = 6500;
-    const padHp = ctx.createBiquadFilter();
-    padHp.type = 'highpass';
-    padHp.frequency.value = 450;
-    padBus = ctx.createGain();
-    padBus.gain.value = 0.014;
-    padTone.connect(padHp).connect(padBus);
-    padBus.connect(bus);
-    padBus.connect(verbSend);
-    pad = CHORDS[0].map((m, k) => {
-      const g = ctx.createGain();
-      g.gain.value = 0.22 - k * 0.025;
-      const oscs = [-1, 1].map((side) => {
-        const o = ctx.createOscillator();
-        o.type = 'triangle';
-        o.frequency.value = hz(m + 12);
-        o.detune.value = side * 7;
-        if (ctx.createStereoPanner) {
-          const p = ctx.createStereoPanner();
-          p.pan.value = side * 0.5;
-          o.connect(p).connect(g);
-        } else o.connect(g);
-        o.start();
-        return o;
-      });
-      g.connect(padTone);
-      return { oscs, g };
-    });
 
     noise = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 1.5), ctx.sampleRate);
     const nd = noise.getChannelData(0);
@@ -282,80 +210,6 @@ export function createAudio({ makeContext } = {}) {
     return oscs;
   }
 
-  // 잡음 타악기: 하이햇(8kHz 위, 아주 짧게) · 셰이커(6kHz 대역) · 핑거스냅(2.4kHz 대역, 두 번 겹쳐)
-  function hit(kind, when, level) {
-    const t = when;
-    const src = ctx.createBufferSource();
-    src.buffer = noise;
-    const f = ctx.createBiquadFilter();
-    const g = ctx.createGain();
-    let dur = 0.05;
-    if (kind === 'hat') {
-      f.type = 'highpass';
-      f.frequency.value = 8000;
-      dur = 0.045;
-    } else if (kind === 'shaker') {
-      f.type = 'bandpass';
-      f.frequency.value = 6500;
-      f.Q.value = 0.8;
-      dur = 0.07;
-    } else {
-      f.type = 'bandpass';
-      f.frequency.value = 2400;
-      f.Q.value = 1.4;
-      dur = 0.12;
-    }
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(level, t + (kind === 'shaker' ? 0.02 : 0.002));
-    if (kind === 'snap') {
-      // 손가락 두 번이 겹친 듯 — 아주 짧은 간격의 두 번째 머리
-      g.gain.exponentialRampToValueAtTime(level * 0.3, t + 0.012);
-      g.gain.exponentialRampToValueAtTime(level * 0.8, t + 0.018);
-    }
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    src.connect(f).connect(g);
-    route(g, { pan: kind === 'hat' ? 0.25 : kind === 'shaker' ? -0.3 : 0.05, wet: kind === 'snap' ? 0.35 : 0.08 });
-    src.start(t, Math.random() * 1.2, dur + 0.02);
-  }
-
-  // ── 박자 스케줄러: 25ms마다 앞으로 0.15초 안에 올 8분음표를 예약한다 ──
-  let seqTimer = 0;
-  let step = 0; // 8분음표 번호(마디 = 8)
-  let nextTime = 0;
-  function schedule() {
-    if (!awake()) return;
-    const now = ctx.currentTime;
-    // 브라우저가 재웠다 깨우면(탭 전환 등) 밀린 음을 몰아 치지 않고 지금부터 다시
-    if (nextTime < now - 0.1) nextTime = now + 0.05;
-    while (nextTime < now + 0.15) {
-      playStep(step, nextTime);
-      step++;
-      nextTime += EIGHTH;
-    }
-  }
-  function playStep(n, t) {
-    const s = n % 8; // 마디 안 위치
-    const bar = Math.floor(n / 8);
-    const c = bar % CHORDS.length;
-    if (s === 0) setChord(c, t);
-    const tones = CHORDS[c];
-    // 플럭 8분음표(한 옥타브 위) — 박 머리는 조금 세게
-    const arp = ARPS[bar % ARPS.length];
-    pluckTone(tones[arp[s]] + 12, { when: t, level: s % 2 ? 0.02 : 0.028, pan: (arp[s] - 1.5) * 0.25 });
-    // 멜로디는 네 마디를 쉬었다가(플럭만) 여덟 마디 노래 — 열두 마디마다 한 바퀴
-    const phrase = bar % 12;
-    if (phrase >= 4) {
-      const m = MELODY[phrase - 4][s];
-      if (m) glock(m, { when: t, level: 0.045, pan: 0.15, decay: 1.4 });
-    }
-    // 타악기: 엇박 하이햇 · 16분 셰이커 · 2 · 4박 스냅(마디 첫 줄은 비워 숨 돌리기)
-    if (s % 2 === 1) hit('hat', t, 0.05);
-    hit('shaker', t + EIGHTH / 2, 0.016);
-    if (bar % 4 !== 0 && (s === 2 || s === 6)) hit('snap', t, 0.05);
-    // 네 마디마다 마지막 박에 위로 쓸어 올리는 반짝임
-    if (bar % 4 === 3 && s === 7) [96, 100, 103, 108].forEach((m, k) => glock(m, { when: t + k * 0.045, level: 0.012, pan: -0.3 + k * 0.2, decay: 0.9, wet: 0.5 }));
-  }
-
   // 바람 소리: 높은 대역을 지나가는 잡음 — 대역이 위로 쓸려 올라가며 커졌다 사라진다
   function swish(duration = 1.2, level = 0.02) {
     if (!ctx || !noise) return;
@@ -402,15 +256,7 @@ export function createAudio({ makeContext } = {}) {
       ['pointerdown', 'keydown', 'touchend'].forEach((t) => addEventListener(t, wake, true));
     }
     master.gain.cancelScheduledValues(ctx.currentTime);
-    master.gain.setTargetAtTime(on ? LEVEL : 0, ctx.currentTime, on ? 0.8 : 0.4);
-    clearInterval(seqTimer);
-    if (on) {
-      // 다시 켤 때는 첫 마디부터
-      step = 0;
-      nextTime = ctx.currentTime + 0.1;
-      schedule();
-      seqTimer = setInterval(schedule, 25);
-    }
+    master.gain.setTargetAtTime(on ? LEVEL : 0, ctx.currentTime, on ? 0.2 : 0.3);
   }
 
   // 로딩 중 사용자가 화면을 누르면 그 순간에 오디오를 깨워 둔다(자동 진입 때 바로 소리가 나도록)
@@ -436,6 +282,7 @@ export function createAudio({ makeContext } = {}) {
     if (!awake()) return;
     const t = ctx.currentTime;
     swish(Math.min(1.4, duration * 0.6));
+    chord = (chord + 1) % CHORDS.length; // 장면마다 다음 화음으로
     const c = CHORDS[chord];
     [c[0], c[1], c[2], c[3], c[3] + 5].forEach((m, k) =>
       glock(m + 12, { when: t + duration * 0.35 + k * 0.07, level: 0.05 - k * 0.006, pan: (k - 2) * 0.22, decay: 1.4, wet: 0.45, echo: 0.2 })

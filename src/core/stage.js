@@ -7,7 +7,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { COLORS } from './materials.js';
 
-// 필름 패스: 색수차 · 전환 줌블러 · 비네팅 · 그레인 · 노출(페이드) · 밝힘(글을 읽는 장면에서 화면을 밝게 띄운다)
+// 필름 패스: 색수차 · 전환 줌블러 · 비네팅 · 그레인 · 노출(페이드) · 읽기 모드(글을 읽는 장면에서 3D를 흐리게 · 밝게 — 글이 앞에 선다)
 const FilmShader = {
   uniforms: {
     tDiffuse: { value: null },
@@ -20,7 +20,7 @@ const FilmShader = {
     uTint: { value: new THREE.Color(0x5ef2ff) },
     uTintAmt: { value: 0 },
     uPulse: { value: 0 },
-    uLift: { value: 0 },
+    uRead: { value: 0 },
   },
   vertexShader: /* glsl */ `
     varying vec2 vUv;
@@ -28,7 +28,7 @@ const FilmShader = {
   `,
   fragmentShader: /* glsl */ `
     uniform sampler2D tDiffuse;
-    uniform float uTime, uTransition, uGrain, uAberration, uExposure, uTintAmt, uPulse, uLift;
+    uniform float uTime, uTransition, uGrain, uAberration, uExposure, uTintAmt, uPulse, uRead;
     uniform vec2 uRes;
     uniform vec3 uTint;
     varying vec2 vUv;
@@ -50,15 +50,27 @@ const FilmShader = {
         }
         col = mix(col, acc / 6.0, clamp(uTransition * 0.85, 0.0, 1.0));
       }
+      // 읽기 모드: 렌즈 초점을 빼듯 3D를 흐린다 — 해바라기 나선으로 16점을 모으고, 점마다 각도를 흔들어 고리 무늬 대신 고운 결로
+      if (uRead > 0.01) {
+        float r = uRead * 0.016 * uRes.y;
+        float rot = rand(uv * uRes) * 6.2831;
+        vec3 acc = col;
+        for (int i = 0; i < 16; i++) {
+          float fi = float(i) + 0.5;
+          float a = fi * 2.39996 + rot;
+          acc += texture2D(tDiffuse, uv + vec2(cos(a), sin(a)) * sqrt(fi / 16.0) * r / uRes).rgb;
+        }
+        col = mix(col, acc / 17.0, smoothstep(0.0, 1.0, uRead));
+      }
       // 카드 색 그레이드: 화면 전체를 그 색으로 살짝 물들이고, 카드가 바뀔 때 가장자리에 빛이 번진다
       float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
       col = mix(col, col * (0.72 + 0.56 * uTint), uTintAmt * 0.2);
       col += uTint * uTintAmt * 0.012 * (1.0 - lum);
       col += uTint * uPulse * 0.12 * smoothstep(0.22, 0.85, d);
       float vig = smoothstep(0.92, 0.28, d);
-      col *= mix(0.55 + 0.3 * uLift, 1.0, vig);
-      // 밝힘: 전체를 올리고 가장 어두운 곳은 검정 대신 남색으로 띄운다(밝은 곳은 덜 올려 하얗게 날리지 않게)
-      col = col * (1.0 + 0.5 * uLift * (1.0 - 0.5 * lum)) + vec3(0.03, 0.045, 0.07) * uLift;
+      col *= mix(0.55 + 0.3 * uRead, 1.0, vig);
+      // 읽기 모드 밝힘: 전체를 올리고 가장 어두운 곳은 검정 대신 남색으로 띄운다(밝은 곳은 덜 올려 하얗게 날리지 않게)
+      col = col * (1.0 + 0.5 * uRead * (1.0 - 0.5 * lum)) + vec3(0.03, 0.045, 0.07) * uRead;
       float g = rand(uv * uRes * 0.5 + fract(uTime * 13.7)) - 0.5;
       col += g * uGrain;
       col *= uExposure;

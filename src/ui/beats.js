@@ -172,11 +172,14 @@ function profileBeats(scene, i) {
 // { html, project, certs } — 큰 그림에 쓴 프로젝트 · 상장은 아래 근거 줄에서 뺀다
 function heroOf(it) {
   const p = it.projects.find((x) => x.cover);
-  if (p)
+  if (p) {
+    // 같은 해에 같은 프로젝트가 두 번 나오면 항목이 고른 다른 사진(photo)으로
+    const im = (it.photo && p.images.find((x) => x.file === it.photo)) || p.cover;
     return {
       project: p,
-      html: `<a class="bt-ph" href="${p.path}" data-link data-cat="${esc(p.category)}"><img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async" /><span class="bt-cap">${esc(p.title)}</span></a>`,
+      html: `<a class="bt-ph" href="${p.path}" data-link data-cat="${esc(p.category)}"><img src="${esc(im.thumb)}" alt="" loading="lazy" decoding="async" /><span class="bt-cap">${esc(p.title)}</span></a>`,
     };
+  }
   const certs = it.awards.filter((a) => a.certs.length || a.photo).slice(0, 3);
   if (certs.length)
     return {

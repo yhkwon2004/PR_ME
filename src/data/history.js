@@ -1,5 +1,6 @@
 // 연도별 이력 — 연도와 항목은 본인이 정리한 이력을 그대로 쓴다.
-// 항목마다 이어진 프로젝트 · 수상(상장) · 보도를 붙이고, note에는 2026 Notion 포트폴리오에 본인이 적은 기록만 옮긴다.
+// 항목마다 이어진 프로젝트 · 수상(상장) · 보도를 붙이고, note에는 2026 Notion 포트폴리오에 본인이 적은 기록이나 대학 공식 기사에 나온 사실만 옮긴다.
+// photo: 카드의 큰 그림으로 쓸 프로젝트 사진(없으면 그 프로젝트의 대표 사진)
 // 근거 기록이 없는 항목은 이름만 둔다(지어내지 않는다). 그 해의 나머지 프로젝트 · 수상은 연도 아래에 자동으로 모인다.
 import { projects, byId } from './projects.js';
 import { AWARDS } from './awards.js';
@@ -86,7 +87,15 @@ const RAW = [
         projects: ['recap-jbmotors'],
         press: ['recap-store-2026', 'recap-soldout-2026'],
       },
-      { id: 'expo', kind: '전시 · 수상', title: 'EXPO 우수사례 전시 및 우수 성과상 수여' },
+      {
+        id: 'expo',
+        kind: '전시 · 수상',
+        title: 'EXPO 우수사례 전시 및 우수 성과상 수여',
+        note: '2026 산학연협력 EXPO(9.30 ~ 10.2, KINTEX) — 앵커사업단 전시관에 폐키보드 업사이클링 키캡 등 6개 성과물 전시, 오프라인 우수성과 전시관 부문 우수성과상',
+        projects: ['recap-jbmotors'],
+        press: ['expo-2026'],
+        photo: 'media/projects/recap-jbmotors/08.webp',
+      },
       { id: 'modoo', kind: '창업', title: '모두의창업 1기 2R진출' },
     ],
   },

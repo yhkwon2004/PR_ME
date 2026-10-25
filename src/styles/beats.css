@@ -954,7 +954,8 @@ a.bt-ph:focus-visible {
   .bt-media {
     gap: 5px;
   }
-  .bt-media > :nth-child(n + 4) {
+  .bt-media > :nth-child(n + 4),
+  .bt-item .bt-media > :nth-child(n + 2) {
     display: none;
   }
   .bt-pi,
