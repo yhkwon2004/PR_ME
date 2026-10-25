@@ -1010,10 +1010,13 @@
   display: grid;
 }
 .pn-win {
+  --o: 1;
   display: grid;
   grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
   gap: 3px;
   overflow: hidden;
+  /* 열림 정도(--o, beats.js가 움직인다): 0이면 가운데 가는 틈, 1이면 다 열린 창 — 위아래가 늘 똑같이 */
+  clip-path: inset(calc((1 - var(--o)) * 46%) 0 calc((1 - var(--o)) * 46%) 0);
   height: calc(230 * var(--u));
   border-radius: 18px 18px 0 0;
   background: linear-gradient(90deg, #cfe9ff, #f5fbff 50%, #cfe9ff);

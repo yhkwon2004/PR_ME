@@ -345,21 +345,26 @@ export function bindBeats(el, reducedMotion, onBeat) {
   const nav = [...el.querySelectorAll('.beat-nav button')];
   let index = 0;
   const parts = (b) => b.querySelectorAll('.b-a');
-  // 파노라마 창(이력): 가는 틈에서 위아래로 열리고, 안의 사진이 조금 크게 시작해 제자리로 — 나갈 때는 다시 틈으로 닫힌다
-  const SLIT = 'inset(47% 0% 47% 0% round 18px)';
-  const OPEN = 'inset(0% 0% 0% 0% round 18px)';
+  // 파노라마 창(연도 화면): 가는 틈에서 위아래로 똑같이 열리고, 안의 사진이 조금 크게 시작해 제자리로 — 나갈 때는 다시 틈으로 닫힌다.
+  // 열림 정도는 CSS 변수 --o(0 틈 · 1 다 열림) 하나로 움직인다(beats.css의 clip-path) — clip-path 글자를 직접 움직이면
+  // 브라우저가 inset(47% 0% 47% 0%)을 inset(47% 0%)로 줄여 읽어 숫자 짝이 어긋나, 위는 덜 열리고 아래만 열린 채로 보였다
   const pano = (b) => b.querySelector('[data-pano]');
+  const clearPano = (w) => {
+    if (!w) return;
+    w.style.removeProperty('--o');
+    gsap.set(w.querySelectorAll('img'), { clearProps: 'transform' });
+  };
   const openPano = (b, delay = 0, tl = null) => {
     const w = pano(b);
     if (!w || reducedMotion) return;
     const imgs = w.querySelectorAll('img');
-    gsap.set(w, { clipPath: SLIT });
-    gsap.set(imgs, { scale: 1.16 });
+    gsap.set(w, { '--o': 0 });
+    gsap.set(imgs, { scale: 1.12 });
     const t = tl || gsap;
     const at = tl ? delay : undefined;
     const d = tl ? {} : { delay };
-    t.to(w, { clipPath: OPEN, duration: 1.15, ease: 'expo.inOut', ...d }, at);
-    t.to(imgs, { scale: 1, duration: 1.8, ease: 'power3.out', ...d }, at);
+    t.to(w, { '--o': 1, duration: 0.9, ease: 'power3.inOut', ...d }, at);
+    t.to(imgs, { scale: 1, duration: 1.5, ease: 'power3.out', ...d }, at);
   };
   // 다음 · 이전 화면의 사진은 미리 받아 둔다(숨은 화면의 lazy 사진은 보일 때에야 받기 시작해 빈 칸이 보였다)
   const warm = (k) =>
@@ -369,8 +374,7 @@ export function bindBeats(el, reducedMotion, onBeat) {
     if (b === list[index]) return;
     b.hidden = true;
     gsap.set([b, ...parts(b)], { clearProps: 'opacity,visibility,transform' });
-    const w = pano(b);
-    if (w) gsap.set([w, ...w.querySelectorAll('img')], { clearProps: 'clipPath,transform' });
+    clearPano(pano(b));
   };
   const mark = () =>
     nav.forEach((n, k) => {
@@ -400,7 +404,8 @@ export function bindBeats(el, reducedMotion, onBeat) {
       list.forEach((b) => {
         gsap.set([b, ...parts(b)], { clearProps: 'opacity,visibility,transform' });
         const w = pano(b);
-        if (w) gsap.set([w, ...w.querySelectorAll('img')], { clearProps: 'clipPath,transform' });
+        if (w) gsap.killTweensOf([w, ...w.querySelectorAll('img')]);
+        clearPano(w);
       });
       mark();
       warm(index);
@@ -431,7 +436,7 @@ export function bindBeats(el, reducedMotion, onBeat) {
         from.inert = true;
         gsap.to(from, { autoAlpha: 0, y: -24 * dir, duration: 0.3, ease: 'power2.in', onComplete: () => settle(from) });
         const fw = pano(from);
-        if (fw) gsap.to(fw, { clipPath: SLIT, duration: 0.3, ease: 'power2.in' });
+        if (fw) gsap.to(fw, { '--o': 0, duration: 0.3, ease: 'power2.in' });
         // 들어오는 화면: 나가는 화면이 거의 사라진 뒤 판이 나타나고, 줄들이 차례로 들어선다
         to.hidden = false;
         to.inert = false;

@@ -966,9 +966,9 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     if (has(reveal)) tl.to(reveal, { autoAlpha: 1, y: 0, duration: 0.8 * D, ease: 'power3.out', stagger: 0.055 * D }, heroChars.length ? 0.6 : 0.25);
     tl.add(() => countUp(el), 0.4);
     if (el.beats) {
-      // 뒤로 돌아왔다면 마지막 화면부터 — 위로 스크롤하면 화면을 거꾸로 넘긴다.
-      // 화면은 휴대폰에서도 위아래로 넘기므로(덱과 달리) 밀어서 돌아와도 마지막 화면부터
-      el.beats.reset(beat != null ? el.beats.indexOf(beat) : back ? el.beats.count - 1 : 0);
+      // 장면에 들어서면 늘 첫 화면부터 — 뒤로 돌아와도(다음 장면에서 위로 넘겨도) 지난번에 보던 화면이 아니라 처음부터.
+      // 주소 · 목차로 특정 화면(연도 등)을 골랐을 때만 그 화면부터
+      el.beats.reset(beat != null ? el.beats.indexOf(beat) : 0);
       el.beats.intro(tl, 0.25);
     }
     if (el.reel) {
