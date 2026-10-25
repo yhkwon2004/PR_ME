@@ -637,11 +637,17 @@ small { font-size: .8em; }
 .mini2 { display: flex; flex-direction: column; justify-content: space-between; gap: .6em; }
 .mini2 .big3 { display: flex; align-items: baseline; gap: .4em; font-size: .9em; font-weight: 650; color: var(--mute); }
 .mini2 .big3 b { font-size: 2.4em; font-weight: 800; letter-spacing: -.03em; color: var(--honey); }
-.rev { display: grid; gap: .8em; margin-top: .4em; }
-.rev div { display: grid; gap: .1em; padding-bottom: .7em; border-bottom: 1px dashed var(--line); }
+.subs-why { grid-column: 1 / -1; display: flex; align-items: center; gap: 1.4em; padding: 1em 1.4em; }
+.subs-why .k { flex: none; width: 4.6em; line-height: 1.35; font-size: .9em; font-weight: 760; color: var(--honey); }
+.subs-why ul { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1em; }
+.subs-why li { display: grid; gap: .15em; padding-left: 1em; border-left: 2px solid #E2BF98; }
+.subs-why li b { font-size: .98em; font-weight: 760; color: var(--cream); }
+.subs-why li span { font-size: .8em; color: var(--cream-2); line-height: 1.4; }
+.rev { display: grid; gap: .55em; margin-top: .3em; }
+.rev div { display: grid; gap: .1em; padding-bottom: .55em; border-bottom: 1px dashed var(--line); }
 .rev dt { font-size: .9em; font-weight: 700; color: var(--cream-2); }
 .rev dt small { display: block; font-size: .85em; font-weight: 500; color: var(--mute); }
-.rev dd { margin: 0; font-size: 1.7em; font-weight: 800; letter-spacing: -.02em; color: var(--cream); font-variant-numeric: tabular-nums; }
+.rev dd { margin: 0; font-size: 1.5em; font-weight: 800; letter-spacing: -.02em; color: var(--cream); font-variant-numeric: tabular-nums; }
 .rev div:first-child dd { color: var(--honey); }
 .cmpbar { display: grid; grid-template-columns: 6.8em 1fr; gap: .7em .8em; align-items: center; margin-top: .9em; font-size: .9em; }
 .cmpbar .lab2 { font-weight: 650; color: var(--cream-2); }
@@ -1295,15 +1301,15 @@ small { font-size: .8em; }
   <div class="note" hidden><p>알고리즘은 논문으로 검증했습니다. 유속을 느림, 정상, 빠름 세 상태로 바꾸고, 16개를 4×4 패턴으로 만들어 CNN이 봅니다. 순간 흔들림과 진짜 이상을 구분합니다.</p><p>경량 모델이라 기기 안에서 바로 판정합니다.</p></div>
 </section>
 
-<section class="slide" id="results" data-sec="4" data-time="17" data-title="검증 성과 — 숫자로 증명">
+<section class="slide" id="results" data-sec="4" data-time="18" data-title="검증 성과 — 숫자로 증명">
   <div class="frame">
     <p class="lab b">Validation <span>검증 성과</span></p>
-    <h2 class="h b">흔들리는 모의 병실에서, <mark>숫자로</mark> 증명했습니다</h2>
+    <h2 class="h b">흔들고 당긴 <mark>1,000회</mark>, 숫자로 증명했습니다</h2>
     <div class="bd">
       <div class="stats">
-        <div class="card stat b"><div><p class="num">±<span data-count="3">3</span><small>%</small></p><p>잔량 측정 오차</p></div><p class="cond"><span><b>조건</b>500 mL · 이동 · 흔들림 · 기울어짐 · 당겨짐</span><span><b>환산</b>500 mL 중 ±15 mL</span></p></div>
-        <div class="card stat b"><div><p class="num">±<span data-count="5">5</span><small>분</small></p><p>종료시점 예측 오차</p></div><p class="cond"><span><b>방법</b>초기 감소량 + 방울 수(GTT)로 유속 추정</span><span><b>기준</b>보정 포함 최대 오차</span></p></div>
-        <div class="card stat b"><div><p class="num"><span data-count="5">5</span><small>초</small></p><p>이내 이상 감지</p></div><p class="cond"><span><b>조건</b>흔들림 · 당겨짐 보정 포함</span><span><b>기준</b>최대 검측 시간</span></p></div>
+        <div class="card stat b"><div><p class="num">±<span data-count="3">3</span><small>%</small></p><p>잔량 측정 오차</p></div><p class="cond"><span><b>시험</b>1,000회 · 당겨짐 · 흔들림 연출</span><span><b>환산</b>500 mL 중 ±15 mL</span></p></div>
+        <div class="card stat b"><div><p class="num">±<span data-count="5">5</span><small>분</small></p><p>종료시점 예측 오차</p></div><p class="cond"><span><b>방법</b>초기 감소량 + 방울 수(GTT)로 유속 추정</span><span><b>기준</b>1,000회 중 보정 포함 최대 오차</span></p></div>
+        <div class="card stat b"><div><p class="num"><span data-count="5">5</span><small>초</small></p><p>이내 이상 감지</p></div><p class="cond"><span><b>시험</b>1,000회 · 흔들림 · 당겨짐 보정 포함</span><span><b>기준</b>1,000회 중 최대 검측 시간</span></p></div>
         <div class="card hi stat b"><div><p class="num ac"><span data-count="97.3">97.3</span><small>%</small></p><p>CNN 검증 정확도</p></div>
           <div class="ep" role="img" aria-label="최근 6 epoch 검증 정확도 95.7, 99.0, 95.2, 97.3, 97.4, 99.0%"><i style="--v: 95.66"></i><i style="--v: 99"></i><i style="--v: 95.24"></i><i style="--v: 97.29"></i><i style="--v: 97.41"></i><i style="--v: 99"></i></div>
           <p class="cond"><span><b>기준</b>검증셋(val_acc) 최근 6 epoch 평균</span><span><b>범위</b>95.2 ~ 99.0% · 학습 로그 부록 A1</span></p></div>
@@ -1314,9 +1320,9 @@ small { font-size: .8em; }
         <div class="card hi pf pf-next"><p class="pf-k">다음 검증</p><p><b>동물병원 입원실 실증</b>모의 병실 결과를 실제 입원 환경에서 다시 확인 — 전북 병원 (진입 전략 STEP 1)</p></div>
       </div>
     </div>
-    <div class="ft"><p class="src b">※ 모의 병실 반복시험(폴대 이동 · 흔들림 · 기울어짐 · 당겨짐, 500 mL) · ±5분 · 5초는 보정을 포함한 최대 검측 시간 기준</p></div>
+    <div class="ft"><p class="src b">※ 모의 병실(폴대 이동 · 흔들림 · 기울어짐 · 당겨짐, 500 mL) · 시험 1,000회(당겨짐 · 흔들림 연출 상황) · ±5분 · 5초는 보정을 포함한 최대 검측 시간 기준</p></div>
   </div>
-  <div class="note" hidden><p>흔들리는 모의 병실 시험에서, 잔량 오차 3% 이내, 이상 감지 5초 이내, 판별 정확도 97.3%를 확인했습니다.</p><p>특허 3건이 심사 중이고, 다음은 전북 동물병원 입원실에서 실제 환경으로 다시 검증합니다.</p></div>
+  <div class="note" hidden><p>당겨짐과 흔들림을 1,000회 반복한 시험에서, 잔량 오차 3% 이내, 이상 감지 5초 이내, 판별 정확도 97.3%를 확인했습니다.</p><p>특허 3건이 심사 중이고, 다음은 전북 동물병원 입원실에서 실제 환경으로 다시 검증합니다.</p></div>
 </section>
 
 <!-- ================= 05 시장분석 ================= -->
@@ -1381,7 +1387,7 @@ small { font-size: .8em; }
             <th scope="col"><b>아이링거</b><small>신성티케이</small></th>
             <th scope="col" class="us"><b>INFU RETRO</b><small>INFUTECH</small></th></tr></thead>
           <tbody>
-            <tr><th scope="row">가격</th><td>약 110만 원</td><td>약 $400</td><td>미공개</td><td>미공개</td><td class="us">25만 원<small>+ 월 12만 원 관제</small></td></tr>
+            <tr><th scope="row">가격</th><td>약 110만 원</td><td>약 $400</td><td>미공개</td><td>미공개</td><td class="us">25만 원<small>+ 월 12만 원 관제 (관리비 포함)</small></td></tr>
             <tr><th scope="row">측정 방식</th><td>펌프식 유량 제어</td><td>광학 방울 계수</td><td>무게센서</td><td>적외선 · 광학</td><td class="us">무게센서 + CNN</td></tr>
             <tr><th scope="row">설치 방식</th><td>별도 장비 도입</td><td>드립 챔버 클립</td><td>폴대 일체형 (교체)</td><td>수액 세트 클립</td><td class="us">기존 폴대 상단 장착</td></tr>
             <tr><th scope="row">주 사용처</th><td>동물병원</td><td>사람 · 수의</td><td>사람 병원</td><td>사람 병원</td><td class="us">동물병원 전용</td></tr>
@@ -1457,7 +1463,7 @@ small { font-size: .8em; }
 </section>
 
 <!-- ================= 07 제품 원가 ================= -->
-<section class="slide" id="cost" data-sec="7" data-time="16" data-title="제품 원가와 수익 구조">
+<section class="slide" id="cost" data-sec="7" data-time="15" data-title="제품 원가와 수익 구조">
   <div class="frame">
     <p class="lab b">Unit Economics <span>제품 원가</span></p>
     <h2 class="h b">센서를 줄인 설계, 대당 원가 <mark>8만 원</mark></h2>
@@ -1485,7 +1491,7 @@ small { font-size: .8em; }
             <tfoot><tr><th scope="row" colspan="2">실질 판매원가</th><td>80,000원</td></tr></tfoot>
           </table>
         </div>
-        <div class="g b" style="--c: 1fr 1fr; grid-template-rows: auto 1fr">
+        <div class="g b" style="--c: 1fr 1fr; grid-template-rows: auto 1fr auto">
           <div class="card hi">
             <h3>1대 기준 수익</h3>
             <div class="pl">
@@ -1495,9 +1501,9 @@ small { font-size: .8em; }
             </div>
           </div>
           <div class="card mini">
-            <p class="k">관제 SaaS 구독</p>
+            <p class="k">관제 SaaS 구독 · 관리비 포함</p>
             <p class="num">12<small>만 원 / 대 · 월</small></p>
-            <p>대당 연 144만 원 · 대시보드 · 투약 기록 · 유지관리</p>
+            <p>대당 연 144만 원 · 대시보드 · 투약 기록 자동 저장 · 이상 알림 · 유지관리</p>
           </div>
           <div class="card mini mini2">
             <p class="k">병원 1곳 · 입원장 5대 도입비</p>
@@ -1506,7 +1512,7 @@ small { font-size: .8em; }
               <span class="lab2" style="color: var(--honey)">INFU RETRO 5대</span><span class="row"><i class="ac" style="--v: 22.7; --j: 1"></i><b>125만</b></span>
             </div>
             <p class="big3"><b>−77%</b>도입비</p>
-            <p>+ 관제 구독 월 60만 원 (대시보드 · 투약 기록 · 유지관리)</p>
+            <p>+ 관제 구독 월 60만 원 (관리비 포함)</p>
           </div>
           <div class="card mini mini2">
             <p class="k">3년 목표 · 50곳 250대</p>
@@ -1514,14 +1520,22 @@ small { font-size: .8em; }
               <div><dt>구독 <small>250대 × 12만 원 × 12개월</small></dt><dd>3.6억 원 / 년</dd></div>
               <div><dt>하드웨어 <small>250대 × 25만 원 · 1회</small></dt><dd>6,250만 원</dd></div>
             </dl>
-            <p>설치가 늘수록 구독 매출이 쌓이는 구조 · 병원당 5대는 SOM 평균 가정</p>
+            <p>병원당 5대 = SOM 평균 가정</p>
+          </div>
+          <div class="card hi subs-why">
+            <p class="k">구독이 대신하는 것</p>
+            <ul>
+              <li><b>펌프 운용 · 소모 비용</b><span>입원장마다 펌프를 쓰고 관리하는 비용</span></li>
+              <li><b>수기 투약 기록</b><span>시간별 기록이 자동으로 남음</span></li>
+              <li><b>관리 · 유지보수</b><span>관리비 포함 · 추가 비용 없음</span></li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
-    <div class="ft"><p class="src b">출처: 아이디어 제안서(원가 · 판매가) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 동물용 인퓨전펌프 판매가(2025) · 구독료 · 3년 목표는 사업계획 기준 · 유통사 공급가 17만 원/대(MOQ 300개, ㈜씨엔 약정)</p></div>
+    <div class="ft"><p class="src b">출처: 아이디어 제안서(원가 · 판매가) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 동물용 인퓨전펌프 판매가(2025) · 구독료(관리비 포함) · 3년 목표는 사업계획 기준 · 유통사 공급가 17만 원/대(MOQ 300개, ㈜씨엔 약정)</p></div>
   </div>
-  <div class="note" hidden><p>센서를 하나로 줄여 원가는 8만 원입니다. 25만 원에 팔면 대당 17만 원이 남고, 월 12만 원 관제 구독이 더해집니다.</p><p>입원장 5대 병원이라면 펌프 550만 원 대신 125만 원으로 시작합니다.</p></div>
+  <div class="note" hidden><p>센서를 하나로 줄여 원가는 8만 원, 25만 원에 팔면 대당 17만 원이 남습니다.</p><p>월 12만 원 구독은 관리비를 포함한 금액으로, 펌프 운용 비용과 손으로 기록하는 수고를 대신합니다.</p></div>
 </section>
 
 <!-- ================= 08 MOU 체결 현황 ================= -->
