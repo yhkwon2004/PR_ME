@@ -6,8 +6,21 @@
   pip install numpy matplotlib
   python3 scripts/infutech-charts.py          # 서체: node_modules의 Pretendard, 없으면 PRETENDARD_DIR
 
-  charts/gyro.svg     부록 · 핵심 알고리즘 — 학습 장비의 자이로 신호와 무게 편차, 자이로로 보정한 뒤의 잔차
+  charts/gyro.svg       부록 A2 — 학습 장비의 자이로 신호와 무게 편차, 자이로로 보정한 뒤의 잔차
+  charts/gyro-mini.svg  8장 — 같은 신호를 한 칸에: 보정 전 편차와 보정 뒤 편차 (본 발표용으로 글자를 크게)
   charts/filter.svg   7장 · 흔들림 구간 원신호와 칼만필터 출력 (썸네일)
+
+자료 그래프(덱의 막대 · 점 그래프는 모두 여기서 그린다 — HTML로 그리지 않는다)
+  charts/clinic-24h.svg      3장 · 서울 동물병원 100곳 중 24시간 운영 약 8곳
+  charts/dispute.svg         4장 · 동물병원 피해구제 접수 건수 2021 ~ 2026.6
+  charts/resolve-30.svg · resolve-19.svg   4장 · 진료기록 유무별 분쟁 해결률
+  charts/visit.svg           12장 · 양육가구 최근 1년 동물병원 이용률 2021 → 2025 (출처의 두 해만)
+  charts/cagr.svg            12장 · 동물용 인퓨전펌프 시장 CAGR 조사기관별 전망
+  charts/rx.svg · rx-large.svg   12장 · 부록 A8 · 동물병원 의료용 마약류 처방량 2022 ~ 2025
+  charts/epoch.svg           11장 · CNN 검증 정확도 최근 6 epoch
+  charts/cost-vs.svg · cost-stack.svg · entry.svg   15장 · 제작비 비교 · 원가 구조 · 입원장 5대 도입비
+
+그림 크기(인치)는 덱에서 차지하는 자리(1080p 기준 px ÷ 96)에 맞춰, 글자가 덱 본문과 같은 크기로 보이게 한다.
 
 모든 신호는 모의 데이터입니다. 실측 로그(CSV)가 있으면 simulate() 대신 그 값을 넣으면 같은 차트가 나옵니다.
 """
@@ -17,6 +30,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
+from matplotlib.transforms import blended_transform_factory
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DECK = os.path.join(ROOT, 'public', 'infutech') if os.path.isdir(os.path.join(ROOT, 'public', 'infutech')) else ROOT
@@ -109,7 +123,7 @@ def save(fig, name):
     print(path, os.path.getsize(path) // 1024, 'KB')
 
 
-def chart_gyro():
+def gyro_signals():
     # training rig, 12 s at 20 Hz: two pushes on the pole; the load cell's deviation follows the gyro rate
     rng = np.random.default_rng(7)
     t = np.arange(0, 12, 1 / 20)
@@ -124,6 +138,11 @@ def chart_gyro():
     res = dev - X @ coef
     r = float(np.corrcoef(np.roll(gyro, lag)[4:], dev[4:])[0, 1])
     rms0, rms1 = float(np.sqrt(np.mean(dev[4:] ** 2))), float(np.sqrt(np.mean(res[4:] ** 2)))
+    return t, gyro, dev, res, r, rms0, rms1
+
+
+def chart_gyro():
+    t, gyro, dev, res, r, rms0, rms1 = gyro_signals()
     lim = float(max(abs(dev).max(), abs(res).max()) * 1.15)
     fig, axs = plt.subplots(3, 1, sharex=True, figsize=(7.2, 4.4), gridspec_kw=dict(hspace=.62))
     rows = [(gyro, SAGE, '자이로 각속도 (°/s)', '흔들림 두 번', MUTE),
@@ -147,6 +166,175 @@ def chart_gyro():
     return fig, (r, rms0, rms1)
 
 
+def chart_gyro_mini():
+    # one panel for the main talk: the deviation the shaking leaves, before and after the learned correction
+    t, gyro, dev, res, r, rms0, rms1 = gyro_signals()
+    fig, ax = plt.subplots(figsize=(5.6, 2.5))
+    ax.plot(t, dev, color=HONEY, lw=1.6, label=f'보정 전 · RMS {rms0:.1f} g')
+    ax.plot(t, res, color=INK, lw=1.6, label=f'보정 후 · RMS {rms1:.1f} g')
+    ax.set_title('흔들림이 만든 무게 편차 (g)', loc='left', fontsize=11, fontweight='semibold', color=INK2, pad=6)
+    ax.set_title(f'자이로와 상관 r = {r:.2f}', loc='right', fontsize=11, fontweight='bold', color=HONEY, pad=6)
+    lim = float(max(abs(dev).max(), abs(res).max()) * 1.15)
+    ax.set_ylim(-lim, lim * 1.6); ax.set_yticks([-5, 0, 5]);  # headroom above the traces for the legend ax.set_xlim(0, 12); ax.set_xticks(range(0, 13, 2))
+    ax.set_xlabel('시간 (s) · 학습 장비 20 Hz', fontsize=10, color=INK2, labelpad=3)
+    ax.grid(axis='y', color=GRID, lw=.8); ax.set_axisbelow(True)
+    for side in ('top', 'right'):
+        ax.spines[side].set_visible(False)
+    ax.tick_params(labelsize=9.5)
+    leg = ax.legend(loc='upper right', ncol=2, fontsize=10, frameon=False, handlelength=1.4, columnspacing=1.2, borderaxespad=.1)
+    for txt, col in zip(leg.get_texts(), (HONEY, INK)):
+        txt.set_color(col)
+    fig.subplots_adjust(left=.075, right=.985, top=.86, bottom=.22)
+    return fig
+
+
+BAR_OFF, BAR_DIM = '#E3D8CB', '#D9CBBA'
+
+
+def px(w, h):
+    """figure size for a box of w × h px on the 1080p stage (SVG renders 1 in = 96 px)"""
+    return (w / 96, h / 96)
+
+
+def bare(ax):
+    for side in ('top', 'right', 'left'):
+        ax.spines[side].set_visible(False)
+    ax.spines['bottom'].set_color(LINE)
+    ax.set_yticks([])
+    ax.tick_params(axis='x', length=0, labelsize=12, labelcolor=MUTE, pad=7)
+
+
+def columns(values, labels, size, hl, fmt, value_pt=14, label_pt=12, width=.74, top=1.16):
+    """vertical bars from zero with the value on each bar; the highlighted bar(s) in honey"""
+    fig, ax = plt.subplots(figsize=px(*size))
+    x = np.arange(len(values))
+    cols = [HONEY if k in hl else BAR_OFF for k in range(len(values))]
+    ax.bar(x, values, width=width, color=cols, zorder=2)
+    for k, v in enumerate(values):
+        ax.text(k, v + max(values) * .025, fmt(v), ha='center', va='bottom', fontsize=value_pt, fontweight='bold',
+                color=HONEY if k in hl else INK2)
+    ax.set_xticks(x, labels)
+    ax.tick_params(axis='x', labelsize=label_pt)
+    bare(ax)
+    ax.set_ylim(0, max(values) * top)
+    ax.set_xlim(-.6, len(values) - .4)
+    fig.subplots_adjust(left=.01, right=.99, top=.99, bottom=.13 if any('\n' in l for l in labels) else .08)
+    return fig
+
+
+def chart_clinic24h():
+    # 100 dots, 8 lit: 24-hour clinics in Seoul (7.95%)
+    fig = plt.figure(figsize=px(300, 71))
+    ax = fig.add_axes([0, 0, 1, 1])
+    k = np.arange(100)
+    ax.scatter(k % 20, -(k // 20), s=58, c=[HONEY if i < 8 else '#E6DCCF' for i in k], linewidths=0)
+    ax.set_xlim(-.6, 19.6); ax.set_ylim(-4.6, .6); ax.axis('off')
+    return fig
+
+
+def chart_dispute():
+    vals = [9, 20, 11, 16, 27, 45]
+    labs = ['2021', '2022', '2023', '2024', '2025', '2026\n1~6월']
+    return columns(vals, labs, (606, 559), {5}, lambda v: f'{v}', value_pt=15, label_pt=12.5)
+
+
+def chart_resolve(rate, color):
+    fig = plt.figure(figsize=px(271, 14))
+    ax = fig.add_axes([0, 0, 1, 1])
+    from matplotlib.patches import FancyBboxPatch
+    ax.add_patch(FancyBboxPatch((0, .1), 100, .8, boxstyle='round,pad=0,rounding_size=.4', mutation_aspect=.04, color='#EFE7DC', lw=0))
+    ax.add_patch(FancyBboxPatch((0, .1), rate, .8, boxstyle='round,pad=0,rounding_size=.4', mutation_aspect=.04, color=color, lw=0))
+    ax.set_xlim(0, 100); ax.set_ylim(0, 1); ax.axis('off')
+    return fig
+
+
+def chart_visit():
+    # only the two years the source gives: 2021 73.0% and 2025 95.1%
+    fig = plt.figure(figsize=px(331, 64))
+    ax = fig.add_axes([.02, .02, .96, .96])
+    ax.plot([0, 1], [73.0, 95.1], color=HONEY, lw=2.4, solid_capstyle='round', zorder=2)
+    ax.scatter([0, 1], [73.0, 95.1], s=[36, 64], color=[BAR_DIM, HONEY], zorder=3, linewidths=0)
+    ax.text(.04, 73.0 - 1.5, '2021  73.0%', ha='left', va='top', fontsize=10.5, color=MUTE)
+    ax.text(.96, 95.1 + 1.5, '2025  95.1%', ha='right', va='bottom', fontsize=10.5, fontweight='bold', color=HONEY)
+    ax.set_xlim(-.03, 1.03); ax.set_ylim(58, 112); ax.axis('off')
+    return fig
+
+
+def chart_cagr():
+    vals = [12.3, 7.4, 7.2, 6.55]
+    labs = ['Data\nBridge', 'Grand\nView', 'GM\nInsights', 'MRF']
+    return columns(vals, labs, (402, 603), {0}, lambda v: f'{v:g}%', value_pt=14, label_pt=12, width=.78)
+
+
+RX = [257.6, 299.2, 323.6, 353.0]
+def chart_rx(size, large=False):
+    labs = ['2022', '2023', '2024', '2025']
+    fmt = (lambda v: f'{v:g}') if large else (lambda v: f'{v:g}만')
+    return columns(RX, labs, size, {3}, fmt, value_pt=15 if large else 12.5, label_pt=12.5 if large else 11.5,
+                   width=.62 if large else .74, top=1.12)
+
+
+def chart_epoch():
+    # validation accuracy of the last six epochs, as dots on a 94–100% scale (not bars on a cut axis)
+    acc = [95.66, 99.0, 95.24, 97.29, 97.41, 99.0]
+    mean = sum(acc) / len(acc)
+    fig, ax = plt.subplots(figsize=px(339, 104))
+    x = np.arange(6)
+    ax.plot([-.4, 5.3], [mean, mean], color=HONEY, lw=1.1, ls=(0, (3, 2.5)), zorder=1)
+    ax.text(5.45, mean, f'평균 {mean:.1f}', ha='left', va='center', fontsize=10, fontweight='bold', color=HONEY)
+    ax.plot(x, acc, color=BAR_DIM, lw=1.4, zorder=2)
+    ax.scatter(x, acc, s=34, color=HONEY, zorder=3, linewidths=0)
+    ax.set_xticks(x, [f'E{e}' for e in range(62, 68)])
+    ax.set_yticks([95, 99]); ax.set_ylim(94, 100.2); ax.set_xlim(-.4, 6.6)
+    ax.tick_params(axis='both', labelsize=9.5, labelcolor=MUTE, length=0, pad=3)
+    for side in ('top', 'right', 'left', 'bottom'):
+        ax.spines[side].set_visible(False)
+    ax.grid(axis='y', color=GRID, lw=.8); ax.set_axisbelow(True)
+    fig.subplots_adjust(left=.07, right=.8, top=.96, bottom=.2)
+    return fig
+
+
+def hbars(rows, size, label_w, value_w, label_pt=12.5, value_pt=13, xmax=None, height=.56):
+    """horizontal bars: label | bar | value, one row per (label, value, text, colour, label colour, hatch)"""
+    fig = plt.figure(figsize=px(*size))
+    ax = fig.add_axes([label_w, .04, 1 - label_w - value_w, .92])
+    n = len(rows)
+    xmax = xmax or max(r[1] for r in rows)
+    left = blended_transform_factory(ax.transAxes, ax.transData)  # x in axes fraction, y in rows
+    for k, (lab, v, txt, col, lcol, hatch) in enumerate(rows):
+        y = n - 1 - k
+        ax.barh(y, v, height=height, color=col, hatch=hatch, edgecolor='#FFFFFF' if hatch else col, lw=0)
+        ax.text(-.03, y, lab, transform=left, ha='right', va='center', clip_on=False,
+                fontsize=label_pt, fontweight='bold' if lcol == HONEY else 'medium', color=lcol)
+        ax.text(v + xmax * .02, y, txt, ha='left', va='center', fontsize=value_pt, fontweight='bold', color=lcol if lcol == HONEY else INK)
+    ax.set_xlim(0, xmax * (1 + value_w * 3.2)); ax.set_ylim(-.6, n - .4); ax.axis('off')
+    return fig
+
+
+def chart_cost_vs():
+    plt.rcParams['hatch.color'] = '#FFFFFF'; plt.rcParams['hatch.linewidth'] = 2
+    return hbars([('다중 센서 스마트 폴대 · 제작비', 100, '100만 원+', BAR_DIM, INK2, '//'),
+                  ('INFU RETRO · 실질 판매원가', 8, '8만 원', HONEY, HONEY, None)], (787, 84), .3, .06, height=.62)
+
+
+def chart_cost_stack():
+    fig = plt.figure(figsize=px(787, 48))
+    ax = fig.add_axes([0, 0, 1, 1])
+    parts = [('제조 3.5만', 35, HONEY, '#FFFFFF'), ('운영 2만', 20, '#EDBB85', INK), ('유통 2.5만', 25, '#EFE5D8', INK2)]
+    x = 0
+    for lab, w, col, tcol in parts:
+        ax.barh(0, w, left=x, height=1, color=col, lw=0)
+        ax.text(x + w / 2, 0, lab, ha='center', va='center', fontsize=12, fontweight='bold', color=tcol)
+        x += w
+    ax.set_xlim(0, 80); ax.set_ylim(-.5, .5); ax.axis('off')
+    return fig
+
+
+def chart_entry():
+    return hbars([('펌프 5대', 550, '550만', BAR_DIM, INK2, None),
+                  ('INFU RETRO 5대', 125, '125만', HONEY, HONEY, None)], (331, 96), .4, .18, label_pt=12, value_pt=13.5, height=.6)
+
+
 def chart_filter():
     raw, kw, *_ = simulate('shake', 23)
     t = np.arange(660, 1380)
@@ -163,5 +351,18 @@ if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     gyro, (r, a, b) = chart_gyro()
     save(gyro, 'gyro.svg')
+    save(chart_gyro_mini(), 'gyro-mini.svg')
     save(chart_filter(), 'filter.svg')
+    save(chart_clinic24h(), 'clinic-24h.svg')
+    save(chart_dispute(), 'dispute.svg')
+    save(chart_resolve(30, HONEY), 'resolve-30.svg')
+    save(chart_resolve(19.5, '#B8A797'), 'resolve-19.svg')
+    save(chart_visit(), 'visit.svg')
+    save(chart_cagr(), 'cagr.svg')
+    save(chart_rx((538, 318)), 'rx.svg')
+    save(chart_rx((806, 560), large=True), 'rx-large.svg')
+    save(chart_epoch(), 'epoch.svg')
+    save(chart_cost_vs(), 'cost-vs.svg')
+    save(chart_cost_stack(), 'cost-stack.svg')
+    save(chart_entry(), 'entry.svg')
     print(f'  자이로-편차 r={r:.2f}, RMS {a:.2f} → {b:.2f} g')

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="203.25pt" height="10.5pt" viewBox="0 0 203.25 10.5" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 10.5 
+L 203.25 10.5 
+L 203.25 0 
+L 0 0 
+L 0 10.5 
+z
+" style="fill: none"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 0.813 9.45 
+L 202.437 9.45 
+Q 203.25 9.45 203.25 9.282 
+L 203.25 1.218 
+Q 203.25 1.05 202.437 1.05 
+L 0.813 1.05 
+Q 0 1.05 0 1.218 
+L 0 9.282 
+Q 0 9.45 0.813 9.45 
+z
+" clip-path="url(#pb0ad3d6ffc)" style="fill: #efe7dc"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 0.813 9.45 
+L 38.82075 9.45 
+Q 39.63375 9.45 39.63375 9.282 
+L 39.63375 1.218 
+Q 39.63375 1.05 38.82075 1.05 
+L 0.813 1.05 
+Q 0 1.05 0 1.218 
+L 0 9.282 
+Q 0 9.45 0.813 9.45 
+z
+" clip-path="url(#pb0ad3d6ffc)" style="fill: #b8a797"/>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pb0ad3d6ffc">
+   <rect x="0" y="0" width="203.25" height="10.5"/>
+  </clipPath>
+ </defs>
+</svg>

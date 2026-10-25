@@ -169,10 +169,6 @@ small { font-size: .8em; }
 [data-step] { transition: opacity .55s ease, transform .7s var(--ease), filter .55s ease; }
 [data-step]:not(.in) { opacity: 0; transform: translateY(.9em); }
 [data-step][data-dim]:not(.in) { opacity: .16; transform: none; filter: saturate(0); }
-.slide.on .plot i { animation: grow 1s var(--ease) both; animation-delay: calc(380ms + var(--j, 0) * 70ms); }
-@keyframes grow { from { transform: scaleY(0); } }
-.slide.on .hbar i, .slide.on .stackbar i, .slide.on .cmpbar i, .slide.on .vs2 i { animation: growx 1.1s var(--ease) both; animation-delay: calc(420ms + var(--j, 0) * 90ms); }
-@keyframes growx { from { transform: scaleX(0); } }
 
 /* ================= type ================= */
 .lab { text-align: center; font-size: 1em; font-weight: 650; letter-spacing: .02em; color: var(--honey); }
@@ -218,24 +214,16 @@ small { font-size: .8em; }
 .chip.lt { background: rgba(173, 98, 41, .1); color: var(--honey); }
 [data-zoom] { cursor: zoom-in; }
 
-/* charts */
+/* charts: every data graph is a fixed SVG drawn by scripts/infutech-charts.py (Python), never drawn in HTML */
+.pyc { display: block; flex: 1; min-height: 0; width: 100%; margin-top: .8em; object-fit: contain; }
+.pyc-w { display: block; width: 100%; height: auto; }
+.pyc-vs { margin-bottom: 1.1em; padding-bottom: 1.1em; border-bottom: 1px dashed var(--line); }
+.pyc-stack { margin-top: .7em; }
+.pyc-rate { display: block; width: 100%; height: auto; margin: .5em 0 .2em; }
+.pyc-ep { display: block; width: 100%; height: auto; margin-top: auto; }
+.pyc-spark { display: block; width: 100%; height: auto; margin-top: .3em; }
+.pyc-dots { display: block; width: 15em; height: auto; flex: none; }
 .chart { display: flex; flex-direction: column; }
-.bars { flex: 1; min-height: 0; display: flex; flex-direction: column; margin-top: 1.1em; }
-.plot { flex: 1; min-height: 6em; display: flex; align-items: flex-end; gap: .8em; border-bottom: 1px solid var(--line); }
-.plot > div { flex: 1; height: 100%; display: flex; align-items: flex-end; }
-.plot i {
-  position: relative; display: block; width: 100%; font-style: normal;
-  height: calc(var(--v) / var(--max) * 84%);
-  background: #E2D6C7; border-radius: .3em .3em 0 0; transform-origin: 50% 100%;
-}
-.plot i.hl { background: linear-gradient(180deg, #D98F4F, var(--honey)); }
-.plot i b { position: absolute; left: -.6em; right: -.6em; bottom: 100%; padding-bottom: .3em; text-align: center; font-size: .95em; font-weight: 750; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--cream-2); }
-.plot i.hl b { color: var(--honey); }
-.xl { display: flex; gap: .8em; padding-top: .45em; }
-.xl span { flex: 1; text-align: center; font-size: .76em; color: var(--mute); line-height: 1.3; }
-.hbar { display: block; height: .55em; border-radius: 99em; background: #ECE2D5; overflow: hidden; }
-.hbar i { display: block; height: 100%; width: calc(var(--v) * 1%); background: var(--honey); border-radius: inherit; transform-origin: 0 50%; }
-.hbar.dim i { background: #B8A898; }
 
 /* ================= 1 cover · 17 close (cream) ================= */
 .topline { display: flex; justify-content: space-between; gap: 2em; font-size: .78em; font-weight: 650; letter-spacing: .06em; color: var(--ink-mute); }
@@ -278,9 +266,6 @@ small { font-size: .8em; }
 .end-ttl { font-size: 6.4em; font-weight: 800; letter-spacing: -.05em; line-height: 1; color: var(--ink); }
 .end-sub { font-size: 1.7em; font-weight: 620; color: var(--cocoa); letter-spacing: -.02em; }
 .end-line { font-size: 1.05em; color: var(--ink-mute); }
-.end-act { display: flex; gap: .8em; margin-top: .6em; }
-.end-act button { padding: .7em 1.4em; border-radius: 99em; border: 1px solid var(--rule); background: var(--sheet); color: var(--cocoa); font-size: .92em; font-weight: 680; cursor: pointer; }
-.end-act button:hover { border-color: var(--cocoa); }
 
 /* ================= 2 night ================= */
 .photo .bleed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
@@ -308,9 +293,6 @@ small { font-size: .8em; }
 .slide.on .scribble path { stroke-dashoffset: 0; }
 .big-note { margin-top: 1.5em; font-size: 1.08em; color: var(--cream-2); }
 .watch-band { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2.2em; width: 66em; max-width: 100%; margin: 0 auto; padding: 1.4em 2em; border-radius: 1em; background: var(--panel); border: 1px solid var(--line); }
-.dots { display: grid; grid-template-columns: repeat(20, 1fr); gap: .28em; width: 15em; }
-.dots i { aspect-ratio: 1; border-radius: 50%; background: #E5DACC; }
-.dots i.on { background: var(--honey); box-shadow: 0 0 .5em rgba(173, 98, 41, .45); }
 .watch-band p { font-size: 1.35em; font-weight: 650; line-height: 1.45; letter-spacing: -.02em; }
 .watch-band p small { display: block; margin-top: .35em; font-size: .64em; font-weight: 500; color: var(--mute); letter-spacing: 0; }
 
@@ -324,7 +306,6 @@ small { font-size: .8em; }
 .rate2 .lbl { font-size: 1em; font-weight: 650; color: var(--cream-2); }
 .rate2 .num { margin: .2em 0 .35em; font-size: 4.6em; color: var(--cream-2); }
 .rate2 .num.hon { color: var(--honey); }
-.rate2 .hbar { margin-bottom: .55em; }
 .verdict { margin-top: 1.5em; font-size: 1.35em; font-weight: 700; letter-spacing: -.02em; }
 .quote { margin-top: auto; padding-top: 1.1em; border-top: 1px solid var(--line); font-size: .92em; line-height: 1.6; color: var(--cream-2); }
 .quote cite { display: block; margin-top: .3em; font-style: normal; font-size: .85em; color: var(--mute); }
@@ -400,6 +381,11 @@ small { font-size: .8em; }
 .hero::before { content: ""; position: absolute; width: 86%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(237, 189, 133, .5) 0%, rgba(237, 189, 133, 0) 68%); }
 .hero .disc { position: relative; width: 22em; max-width: 100%; aspect-ratio: 1; border-radius: 50%; background: var(--sheet); display: grid; place-items: center; box-shadow: 0 2em 4.5em rgba(92, 62, 36, .2), 0 0 0 .5em rgba(255, 255, 255, .6); }
 .hero .disc img { width: 78%; }
+.line-up { position: absolute; left: 50%; bottom: -.4em; transform: translateX(-50%); width: max-content; display: flex; gap: .6em; white-space: nowrap; }
+.line-up li { display: flex; align-items: center; gap: .55em; padding: .35em .9em .35em .35em; border-radius: 99em; background: #FFFFFF; box-shadow: 0 .4em 1.2em rgba(92, 62, 36, .14), inset 0 0 0 1px var(--line); }
+.line-up img { width: 2.6em; height: 2.6em; border-radius: 50%; object-fit: cover; background: var(--sheet); }
+.line-up span { display: grid; font-size: .78em; line-height: 1.3; color: var(--mute); }
+.line-up b { font-size: 1.15em; color: var(--cream); }
 .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: .8em; }
 .flow .arr { align-self: center; width: 1.5em; height: 1.5em; color: var(--honey); stroke-width: 2; }
 .fstep { display: grid; grid-template-columns: 2.6em 1fr; column-gap: 1em; align-items: center; padding: 1em 1.3em; }
@@ -422,6 +408,8 @@ small { font-size: .8em; }
 .sx-big b { display: block; font-size: 2.7em; font-weight: 800; letter-spacing: -.04em; line-height: 1.05; color: var(--alert); }
 .sx-big span { font-size: .86em; color: var(--mute); }
 .sx-ph { flex: 1; min-height: 6em; }
+.sx-chart { display: block; margin: 0; padding: .4em .5em; }
+.sx-chart img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .sx-ph img { object-position: 45% 50%; }
 .sx-pair { display: flex; align-items: center; gap: .5em; }
 .sx-pair li { display: inline-flex; align-items: center; gap: .4em; padding: .35em .8em; border-radius: 99em; background: rgba(173, 98, 41, .1); color: var(--honey); font-size: .86em; font-weight: 750; }
@@ -508,11 +496,6 @@ small { font-size: .8em; }
 .proof .paper { display: flex; align-items: center; gap: .9em; }
 .proof .paper img { height: 4.8em; width: auto; border-radius: .2em; box-shadow: 0 .4em 1.2em rgba(92, 62, 36, .2); background: #FFFFFF; }
 
-.stat .ep { display: flex; align-items: flex-end; gap: .3em; height: 3.4em; margin-top: auto; }
-.ep i { flex: 1; height: calc((var(--v) - 90) * 10%); border-radius: .2em .2em 0 0; background: rgba(173, 98, 41, .35); transform-origin: 50% 100%; }
-.ep i:nth-child(n+4) { background: var(--honey); }
-.slide.on .ep i { animation: grow 1s var(--ease) both; animation-delay: .5s; }
-.stat .ep + .cond { padding-top: .6em; }
 .proof2 { flex: .72; min-height: 0; display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 1em; }
 .pf { display: flex; align-items: center; gap: 1.4em; padding: 1.2em 1.5em; }
 .pf .drops { grid-template-columns: repeat(5, 1fr); gap: .5em; }
@@ -529,11 +512,8 @@ small { font-size: .8em; }
 .kpi .num small { font-size: .45em; }
 .kpi p { font-size: .98em; font-weight: 650; line-height: 1.4; }
 .kpi p:not(.num) small { display: block; margin-top: .2em; font-size: .78em; font-weight: 500; color: var(--mute); }
-.spark { width: 100%; height: 2.4em; margin-top: .5em; overflow: visible; }
-.spark polyline { fill: none; stroke: var(--honey); stroke-width: 2; vector-effect: non-scaling-stroke; }
-.spark circle { fill: var(--honey); }
-.tl { display: grid; gap: .95em; margin-top: 1.2em; }
-.tl li { display: grid; grid-template-columns: 4.6em 1fr; gap: .9em; font-size: 1.05em; line-height: 1.45; color: var(--cream-2); }
+.tl { display: grid; gap: .6em; margin-top: 1em; }
+.tl li { display: grid; grid-template-columns: 4.6em 1fr; gap: .9em; font-size: 1em; line-height: 1.45; color: var(--cream-2); }
 .tl time { font-weight: 750; color: var(--honey); font-variant-numeric: tabular-nums; }
 .tl li:last-child { color: var(--cream); font-weight: 700; }
 .rx { margin-top: auto; padding-top: 1em; border-top: 1px solid var(--line); display: flex; align-items: baseline; gap: .8em; }
@@ -542,14 +522,6 @@ small { font-size: .8em; }
 .rx2 { flex: 1; min-height: 0; display: flex; flex-direction: column; margin-top: 1.2em; padding-top: .9em; border-top: 1px solid #EED1AE; }
 .rx2 .k { font-size: .92em; font-weight: 700; color: var(--cream-2); }
 .rx2 .k b { margin-left: .3em; font-size: 1.35em; color: var(--honey); }
-.mb { flex: 1; min-height: 5em; display: flex; align-items: flex-end; gap: .7em; margin-top: .5em; }
-.mb span { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: .3em; }
-.mb i { display: block; height: calc(var(--v) / 353 * 74%); border-radius: .25em .25em 0 0; background: #E2D6C7; transform-origin: 50% 100%; }
-.mb .hl i { background: var(--honey); }
-.mb em { font-style: normal; font-size: .78em; font-weight: 650; color: var(--mute); text-align: center; }
-.mb b { font-size: .82em; font-weight: 750; text-align: center; color: var(--cream-2); font-variant-numeric: tabular-nums; }
-.mb .hl b { color: var(--honey); }
-.slide.on .mb i { animation: grow 1s var(--ease) both; }
 
 /* ================= 11 compare ================= */
 .tbl { overflow-x: auto; border-radius: .9em; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
@@ -620,11 +592,6 @@ small { font-size: .8em; }
 .cost td:last-child { text-align: right; white-space: nowrap; color: var(--cream); }
 .cost tbody th { font-weight: 750; color: var(--honey); white-space: nowrap; vertical-align: top; }
 .cost tfoot td, .cost tfoot th { border-bottom: 0; border-top: 2px solid var(--honey); font-weight: 800; font-size: 1.12em; padding-top: .55em; color: var(--cream); }
-.stackbar { display: flex; height: 2.4em; border-radius: .5em; overflow: hidden; margin-top: 1em; }
-.stackbar i { flex: var(--w) 1 0; display: grid; place-items: center; font-style: normal; font-size: .8em; font-weight: 700; transform-origin: 0 50%; }
-.stackbar i:nth-child(1) { background: var(--honey); color: #FFFFFF; }
-.stackbar i:nth-child(2) { background: var(--caramel); color: var(--cream); }
-.stackbar i:nth-child(3) { background: #EFE3D3; color: var(--cream-2); }
 .pl { display: grid; gap: .55em; margin-top: .9em; font-variant-numeric: tabular-nums; }
 .pl div { display: flex; justify-content: space-between; gap: 1em; font-size: 1.05em; color: var(--cream-2); }
 .pl div b { white-space: nowrap; color: var(--cream); }
@@ -649,21 +616,7 @@ small { font-size: .8em; }
 .rev dt small { display: block; font-size: .85em; font-weight: 500; color: var(--mute); }
 .rev dd { margin: 0; font-size: 1.5em; font-weight: 800; letter-spacing: -.02em; color: var(--cream); font-variant-numeric: tabular-nums; }
 .rev div:first-child dd { color: var(--honey); }
-.cmpbar { display: grid; grid-template-columns: 6.8em 1fr; gap: .7em .8em; align-items: center; margin-top: .9em; font-size: .9em; }
-.cmpbar .lab2 { font-weight: 650; color: var(--cream-2); }
-.cmpbar .row { display: flex; align-items: center; gap: .6em; min-width: 0; }
-/* the longest bar takes 58% of the row so its label always fits beside it */
-.cmpbar i { display: block; height: 1.4em; border-radius: .3em; width: calc(var(--v) * .58%); background: #D9CBBA; transform-origin: 0 50%; flex: none; }
-.cmpbar i.ac { background: var(--honey); }
-.cmpbar b { white-space: nowrap; font-variant-numeric: tabular-nums; }
 
-.vs2 { display: grid; gap: .55em; margin-bottom: 1.1em; padding-bottom: 1.1em; border-bottom: 1px dashed var(--line); }
-.vs2 p { display: grid; grid-template-columns: 12em 1fr 5.4em; align-items: center; gap: .8em; font-size: .92em; }
-.vs2 span { font-weight: 650; color: var(--cream-2); }
-.vs2 i { display: block; height: 1.35em; width: calc(var(--v) * 1%); border-radius: .3em; background: repeating-linear-gradient(135deg, #D9CBBA 0 .35em, #CDBDAA .35em .7em); transform-origin: 0 50%; }
-.vs2 b { text-align: right; font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.vs2 .us span, .vs2 .us b { color: var(--honey); }
-.vs2 .us i { background: var(--honey); }
 
 /* ================= 13 mou ================= */
 .deal { display: flex; flex-direction: column; gap: .85em; }
@@ -684,8 +637,7 @@ small { font-size: .8em; }
 .facts li b { font-weight: 680; color: var(--cream); }
 .next { display: flex; align-items: center; gap: 1.2em; padding: .95em 1.5em; border-radius: .9em; background: linear-gradient(90deg, #FFF3E3, #FBE8D2); border: 1px solid #EED1AE; font-weight: 650; }
 .next b { color: var(--honey); white-space: nowrap; }
-.next .more { margin-left: auto; padding: .45em 1em; border-radius: 99em; border: 1px solid #E2BF98; background: #FFFFFF; color: var(--honey); font-size: .88em; font-weight: 700; cursor: pointer; white-space: nowrap; }
-.next .more:hover { background: rgba(173, 98, 41, .08); }
+.next .more { margin-left: auto; padding: .45em 1em; border-radius: 99em; border: 1px solid #E2BF98; background: #FFFFFF; color: var(--honey); font-size: .88em; font-weight: 700; white-space: nowrap; }
 
 /* ================= 14 gtm ================= */
 .tiers { display: flex; flex-direction: column; justify-content: flex-end; gap: 0; position: relative; padding-left: 4.4em; }
@@ -915,7 +867,7 @@ small { font-size: .8em; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .slide.on .b, .slide.on .plot i, .slide.on .hbar i, .slide.on .stackbar i, .slide.on .cmpbar i, .slide.on .bleed, .slide.on .pet img, .slide.on .impact-photo img, .slide.on .cover-photo img { animation: none; }
+  .slide.on .b, .slide.on .bleed, .slide.on .pet img, .slide.on .impact-photo img, .slide.on .cover-photo img { animation: none; }
   .frame, [data-step], .scribble path { transition: none; }
   .clock .colon, .slide.on .pp-page .pin { animation: none; }
 }
@@ -926,7 +878,7 @@ small { font-size: .8em; }
   html, body { height: auto; overflow: visible; background: none; }
   .deck { position: static; overflow: visible; }
   .slide { position: relative; width: 1600px; height: 900px; opacity: 1; visibility: visible; overflow: hidden; break-after: page; --dx: 0px; }
-  .slide .b, .slide .plot i, .slide .hbar i, .slide .stackbar i, .slide .cmpbar i { animation: none !important; }
+  .slide .b { animation: none !important; }
   [data-step] { opacity: 1 !important; transform: none !important; filter: none !important; }
   .scribble path { stroke-dashoffset: 0; }
   .chrome, .bar-line, .panel, .notes, .toast, .black { display: none !important; }
@@ -1017,7 +969,7 @@ small { font-size: .8em; }
       <figure class="pet b"><img src="media/pet-cat-iv.webp" alt="입원장에서 수액 줄을 단 채 잠든 고양이" decoding="async"></figure>
     </div>
     <div class="watch-band b">
-      <div class="dots" data-dots="100" data-on="8" role="img" aria-label="100곳 중 8곳"></div>
+      <img class="pyc-dots" src="charts/clinic-24h.svg" alt="서울 동물병원 100곳 중 24시간 운영 약 8곳">
       <p>그런데 24시간 지켜보는 동물병원은 <em>서울 100곳 중 약 8곳</em>입니다
         <small>서울 7.95% · 경기 6.53% · 야간 당직 수의사를 구하지 못해 24시간 진료를 접는 병원도 늘고 있습니다</small></p>
     </div>
@@ -1036,23 +988,13 @@ small { font-size: .8em; }
         <div class="card chart b">
           <h3>동물병원 피해구제 접수 <small style="color: var(--mute)">(건)</small></h3>
           <p class="cs">4년 새 3배 · 올해는 6월까지 45건<br>128건 중 반려견 68.8% · 반려묘 28.0%</p>
-          <div class="bars" style="--max: 45">
-            <div class="plot">
-              <div><i style="--v: 9"><b>9</b></i></div>
-              <div><i style="--v: 20"><b>20</b></i></div>
-              <div><i style="--v: 11"><b>11</b></i></div>
-              <div><i style="--v: 16"><b>16</b></i></div>
-              <div><i style="--v: 27"><b>27</b></i></div>
-              <div><i class="hl" style="--v: 45"><b>45</b></i></div>
-            </div>
-            <div class="xl"><span>2021</span><span>2022</span><span>2023</span><span>2024</span><span>2025</span><span>2026<br>1~6월</span></div>
-          </div>
+          <img class="pyc" src="charts/dispute.svg" alt="동물병원 피해구제 접수 — 2021년 9건, 2022년 20건, 2023년 11건, 2024년 16건, 2025년 27건, 2026년 1~6월 45건">
         </div>
         <div class="card hi chart b" style="display: flex; flex-direction: column">
           <h3>진료기록 확보 여부별 분쟁 해결률</h3>
           <div class="rate2">
-            <div><p class="lbl">기록 있음</p><p class="num hon"><span data-count="30">30</span><small>%</small></p><span class="hbar"><i style="--v: 30"></i></span><p class="cs">80건 중 24건 해결</p></div>
-            <div><p class="lbl">기록 없음</p><p class="num"><span data-count="19.5">19.5</span><small>%</small></p><span class="hbar dim"><i style="--v: 19.5; --j: 1"></i></span><p class="cs">41건 중 8건 해결</p></div>
+            <div><p class="lbl">기록 있음</p><p class="num hon"><span data-count="30">30</span><small>%</small></p><img class="pyc-rate" src="charts/resolve-30.svg" alt=""><p class="cs">80건 중 24건 해결</p></div>
+            <div><p class="lbl">기록 없음</p><p class="num"><span data-count="19.5">19.5</span><small>%</small></p><img class="pyc-rate" src="charts/resolve-19.svg" alt=""><p class="cs">41건 중 8건 해결</p></div>
           </div>
           <p class="verdict">기록이 없으면 <em>5건 중 4건</em>은 해결되지 못합니다</p>
           <p class="quote">“의사소통이 어려운 반려동물을 대상으로… 소비자가 진료 과실을 명확히 입증하기 어렵다”<cite>한국소비자원 · 2021~2026.6 접수 128건 분석</cite></p>
@@ -1161,7 +1103,7 @@ small { font-size: .8em; }
   <div class="note" hidden><p>저희는 현장에서 시작했습니다. 전북 지역 병원을 찾아가 인터뷰하며 데이터를 모았고, 원광대 간호학과와 모의 병실을 꾸려 실험했습니다.</p><p>수의과대학과 유통사에서는 구매 의사까지 확인했습니다.</p></div>
 </section>
 
-<section class="slide" id="solution" data-sec="3" data-time="17" data-title="INFU RETRO — 링거폴대에 모듈 하나">
+<section class="slide" id="solution" data-sec="3" data-time="20" data-title="INFU RETRO — 링거폴대에 모듈 하나">
   <div class="frame">
     <p class="lab b">Solution <span>아이디어 소개</span></p>
     <h2 class="h b">링거폴대에 <mark>모듈 하나</mark>, INFU RETRO</h2>
@@ -1170,9 +1112,14 @@ small { font-size: .8em; }
       <div class="sol">
         <div class="callouts l">
           <div class="card co b"><figure class="th"><img src="media/demo-ch1.webp" alt="모듈 후크에 수액백을 거는 장면" data-zoom></figure><div><p class="k">SENSOR</p><b>로드셀 무게센서 1개</b><span>1초마다 수액 무게 측정</span></div></div>
-          <div class="card co b"><figure class="th"><img src="media/pcb-real.webp" alt="실물 제작한 PCB 앞면과 뒷면" data-zoom></figure><div><p class="k">HARDWARE</p><b>자체 설계 PCB</b><span>60×35mm · ESP 무선 · MQTT</span></div></div>
+          <div class="card co b"><figure class="th"><img src="media/pcb-real.webp" alt="실물 제작한 PCB 앞면과 뒷면" data-zoom></figure><div><p class="k">HARDWARE</p><b>자체 설계 PCB</b><span>60×35mm · ADS1232 · ESP 무선<br>MQTT 이벤트 전송 · 트래픽 −80%</span></div></div>
         </div>
-        <div class="hero b"><div class="disc"><img src="media/module.webp" alt="INFU RETRO 실물 모듈 — 로드셀과 자체 PCB가 든 하우징, 아래에 수액백 후크" data-zoom></div></div>
+        <div class="hero b"><div class="disc"><img src="media/module.webp" alt="INFU RETRO 실물 모듈 — 로드셀과 자체 PCB가 든 하우징, 아래에 수액백 후크" data-zoom></div>
+          <ul class="line-up" aria-label="제품 형태">
+            <li><img src="media/module.webp" alt=""><span><b>모듈형</b>기존 걸이에 1구</span></li>
+            <li><img src="media/hanger-real.webp" alt="폴대 걸이형 INFU 실물" data-zoom><span><b>폴대 걸이형</b>꼭대기에 4구 · 부록 A4</span></li>
+          </ul>
+        </div>
         <div class="callouts">
           <div class="card co b"><figure class="th chart-box"><img src="charts/filter.svg" alt="흔들리는 원신호(점)와 칼만필터 출력(선)" data-zoom></figure><div><p class="k">FILTER</p><b>칼만필터 흔들림 보정</b><span>움직임 · 폴대 이동 노이즈 제거</span></div></div>
           <div class="card co b"><figure class="th light-th"><img src="media/cnn-curve.webp" alt="CNN 학습 곡선 — 손실 감소와 검증 정확도 수렴" data-zoom></figure><div><p class="k">AI</p><b>CNN 이상 판별</b><span>신호 패턴 분류 · 정확도 97.3%</span></div></div>
@@ -1187,7 +1134,7 @@ small { font-size: .8em; }
       </ol>
     </div>
   </div>
-  <div class="note" hidden><p>해법은 INFU RETRO, 링거폴대에 거는 무게센서 모듈 하나입니다. 1초마다 수액 무게를 재고, 칼만필터로 흔들림을 거르고, CNN이 이상을 판별합니다.</p><p>걸고, 재고, 알립니다. 폴대 교체도, 공구도 필요 없습니다.</p></div>
+  <div class="note" hidden><p>해법은 INFU RETRO, 링거폴대에 거는 무게센서 모듈 하나입니다. 1초마다 수액 무게를 재고, 칼만필터로 흔들림을 거르고, CNN이 이상을 판별합니다.</p><p>걸고, 재고, 알립니다. 폴대 교체도 공구도 필요 없고, 네 개를 함께 재는 폴대 걸이형도 있습니다.</p></div>
 </section>
 
 <section class="slide" id="sensor" data-sec="3" data-time="18" data-title="센서는 줄이고, 학습으로 채웠습니다">
@@ -1210,9 +1157,9 @@ small { font-size: .8em; }
         <div class="card sx-train b">
           <p class="sx-k">학습 단계<small>개발 장비에서만</small></p>
           <ul class="sx-pair"><li><svg class="ico"><use href="#i-scale"/></svg>무게센서</li><li class="plus">+</li><li><svg class="ico"><use href="#i-gyro"/></svg>자이로</li></ul>
-          <figure class="ph sx-ph"><img src="media/field-bag.webp" alt="실제 수액백을 건 폴대에서 흔들림 데이터를 모으는 팀원" data-zoom decoding="async"><figcaption class="cap">모의 병실 · 실제 수액으로 데이터 수집</figcaption></figure>
+          <figure class="sx-ph sx-chart light-box chart-box"><img src="charts/gyro-mini.svg" alt="학습 장비 신호 — 흔들림이 만든 무게 편차: 보정 전 RMS 2.1 g, 학습한 보정 뒤 RMS 0.5 g, 자이로와 상관 r = 0.95" data-zoom></figure>
           <figure class="ph sx-team"><img src="media/team-pole.webp" alt="INFUTECH 팀이 수액백을 건 시제품 폴대와 앱 화면을 띄운 휴대폰 곁에서 엄지를 세운 모습" data-zoom decoding="async"><figcaption class="cap">팀 · 시제품과 앱 연동</figcaption></figure>
-          <p class="sx-out">흔들림 ↔ 무게 편차 학습 → 편차 <em>2.1 g → 0.5 g</em><small>학습 장비 모의 신호 기준 · 부록 A2</small></p>
+          <p class="sx-out">흔들림 ↔ 무게 편차 학습 → 편차 <em>2.1 g → 0.5 g</em><small>학습 장비 모의 신호 기준 · 세 신호 전체는 부록 A2</small></p>
         </div>
         <svg class="ico sx-arr b" aria-hidden="true"><use href="#i-arrow"/></svg>
         <div class="card hi sx-prod b">
@@ -1234,18 +1181,18 @@ small { font-size: .8em; }
 </section>
 
 <!-- ================= 04 시연 ================= -->
-<section class="slide" id="demo" data-sec="4" data-time="24" data-title="시연 영상">
+<section class="slide" id="demo" data-sec="4" data-time="26" data-title="시연 영상">
   <div class="frame">
     <p class="lab b">Demo <span>시연</span></p>
     <h2 class="h b">유속이 바뀌는 순간, <mark>바로</mark> 알립니다</h2>
     <div class="bd">
       <div class="g" style="--c: 1.9fr 1fr">
         <figure class="video b">
-          <video id="demo-video" src="media/demo.mp4" poster="media/demo-poster.webp" controls muted playsinline preload="metadata"></video>
+          <video id="demo-video" src="media/demo.mp4" poster="media/demo-poster.webp" muted playsinline preload="auto"></video>
           <figcaption>시제품 시연 영상 (구형 하우징) · 0:25 · 모니터 대시보드와 휴대폰 앱 동시 표시</figcaption>
         </figure>
         <div class="chap b">
-          <p class="chap-l">장면 바로가기</p>
+          <p class="chap-l">영상 흐름</p>
           <ol>
             <li><button type="button" data-t="0"><img src="media/demo-ch0.webp" alt=""><time>0:00</time>폴대 상단에 모듈 장착</button></li>
             <li><button type="button" data-t="6"><img src="media/demo-ch1.webp" alt=""><time>0:06</time>수액백 걸고 투여 시작</button></li>
@@ -1296,7 +1243,7 @@ small { font-size: .8em; }
         </div>
       </div>
     </div>
-    <div class="ft"><p class="src b">출처: 한우진 외, 「상태 패턴 분석 기반 수액 이상 감지 알고리즘」, 한국혁신산업학회 · 한국디지털정책학회 공동학술대회(2026.07), 원광대학교 지원 · AIT 2026(2026.01) · 쪽을 누르면 전문을 크게 볼 수 있습니다</p></div>
+    <div class="ft"><p class="src b">출처: 한우진 외, 「상태 패턴 분석 기반 수액 이상 감지 알고리즘」, 한국혁신산업학회 · 한국디지털정책학회 공동학술대회(2026.07), 원광대학교 지원 · AIT 2026(2026.01)</p></div>
   </div>
   <div class="note" hidden><p>알고리즘은 논문으로 검증했습니다. 유속을 느림, 정상, 빠름 세 상태로 바꾸고, 16개를 4×4 패턴으로 만들어 CNN이 봅니다. 순간 흔들림과 진짜 이상을 구분합니다.</p><p>경량 모델이라 기기 안에서 바로 판정합니다.</p></div>
 </section>
@@ -1311,7 +1258,7 @@ small { font-size: .8em; }
         <div class="card stat b"><div><p class="num">±<span data-count="5">5</span><small>분</small></p><p>종료시점 예측 오차</p></div><p class="cond"><span><b>방법</b>초기 감소량 + 방울 수(GTT)로 유속 추정</span><span><b>기준</b>1,000회 중 보정 포함 최대 오차</span></p></div>
         <div class="card stat b"><div><p class="num"><span data-count="5">5</span><small>초</small></p><p>이내 이상 감지</p></div><p class="cond"><span><b>시험</b>1,000회 · 흔들림 · 당겨짐 보정 포함</span><span><b>기준</b>1,000회 중 최대 검측 시간</span></p></div>
         <div class="card hi stat b"><div><p class="num ac"><span data-count="97.3">97.3</span><small>%</small></p><p>CNN 검증 정확도</p></div>
-          <div class="ep" role="img" aria-label="최근 6 epoch 검증 정확도 95.7, 99.0, 95.2, 97.3, 97.4, 99.0%"><i style="--v: 95.66"></i><i style="--v: 99"></i><i style="--v: 95.24"></i><i style="--v: 97.29"></i><i style="--v: 97.41"></i><i style="--v: 99"></i></div>
+          <img class="pyc-ep" src="charts/epoch.svg" alt="최근 6 epoch 검증 정확도 95.7, 99.0, 95.2, 97.3, 97.4, 99.0% — 평균 97.3%">
           <p class="cond"><span><b>기준</b>검증셋(val_acc) 최근 6 epoch 평균</span><span><b>범위</b>95.2 ~ 99.0% · 학습 로그 부록 A1</span></p></div>
       </div>
       <div class="proof2 b">
@@ -1335,39 +1282,33 @@ small { font-size: .8em; }
         <div class="kpis">
           <div class="card kpi b"><p class="num"><span data-count="29.2">29.2</span><small>%</small></p><p>반려동물 양육 가구<small>2025 · 역대 최대</small></p></div>
           <div class="card kpi b"><p class="num"><span data-count="95.1">95.1</span><small>%</small></p><div><p>최근 1년 동물병원 이용<small>양육가구 · 2021년 73.0%</small></p>
-            <svg class="spark" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><polyline points="2,21.4 26,22.6 50,14 74,1.9 98,0"/></svg></div></div>
+            <img class="pyc-spark" src="charts/visit.svg" alt="양육가구 동물병원 이용률 2021년 73.0%에서 2025년 95.1%로"></div></div>
           <div class="card kpi b"><p class="num"><span data-count="5312">5,312</span><small>곳</small></p><p>전국 동물병원<small>2025.6 · 2년 새 +327곳</small></p></div>
           <div class="card kpi b"><p class="num">15<small>조 원</small></p><p>연관산업 2027 목표<small>2022년 8조 원</small></p></div>
         </div>
         <div class="card chart b">
           <h3>동물용 인퓨전펌프 시장 성장률</h3>
           <p class="cs">글로벌 CAGR · 조사기관별 전망</p>
-          <div class="bars" style="--max: 12.3">
-            <div class="plot">
-              <div><i class="hl" style="--v: 12.3"><b>12.3%</b></i></div>
-              <div><i style="--v: 7.4"><b>7.4%</b></i></div>
-              <div><i style="--v: 7.2"><b>7.2%</b></i></div>
-              <div><i style="--v: 6.55"><b>6.55%</b></i></div>
-            </div>
-            <div class="xl"><span>Data<br>Bridge</span><span>Grand<br>View</span><span>GM<br>Insights</span><span>MRF</span></div>
-          </div>
+          <img class="pyc" src="charts/cagr.svg" alt="동물용 인퓨전펌프 글로벌 CAGR 전망 — Data Bridge 12.3%, Grand View 7.4%, GM Insights 7.2%, MRF 6.55%">
         </div>
         <div class="card hi b" style="display: flex; flex-direction: column">
           <h3>왜 지금인가 — 기록을 요구하는 흐름</h3>
           <ol class="tl">
             <li><time>2023.01</time><span>진료비 게시 의무 시행</span></li>
             <li><time>2025.04</time><span>진료항목 표준화 시행 · 진료행위 4,930종</span></li>
+            <li><time>2025.12</time><span>진료비 공개 항목 11종 → 20종 확대</span></li>
             <li><time>2026.04</time><span>마약류 투약 시 소유자 정보 기록 추진</span></li>
-            <li><time>2026.09</time><span>진료기록 발급 의무화 추진</span></li>
+            <li><time>2026.08</time><span>합동점검 46곳 중 28곳 위반 적발</span></li>
+            <li><time>2026.09</time><span>진료기록 발급 의무화 추진 · 국회 의결 단계</span></li>
           </ol>
           <div class="rx2">
             <p class="k">동물병원 의료용 마약류 처방량 (개)<b>+37%</b></p>
-            <div class="mb" role="img" aria-label="동물병원 의료용 마약류 처방량 2022년 257.6만 개, 2023년 299.2만 개, 2024년 323.6만 개, 2025년 353만 개"><span style="--v: 257.6"><b>257.6만</b><i></i><em>2022</em></span><span style="--v: 299.2"><b>299.2만</b><i></i><em>2023</em></span><span style="--v: 323.6"><b>323.6만</b><i></i><em>2024</em></span><span class="hl" style="--v: 353"><b>353만</b><i></i><em>2025</em></span></div>
+            <img class="pyc" src="charts/rx.svg" alt="동물병원 의료용 마약류 처방량 2022년 257.6만 개, 2023년 299.2만 개, 2024년 323.6만 개, 2025년 353만 개">
           </div>
         </div>
       </div>
     </div>
-    <div class="ft"><p class="src b">출처: 농림축산식품부 2025 반려동물 양육현황 조사(2026.2) · 수의미래연구소 집계(농식품부 자료, 2025.6) · 농식품부 연관산업 육성 대책 · Data Bridge / Grand View / GM Insights / MRF · 농식품부 진료항목 표준화(2025.4) · 연합뉴스 2026.05.31 · 중앙일보 2026.09.02</p></div>
+    <div class="ft"><p class="src b">출처: 농림축산식품부 2025 반려동물 양육현황 조사(2026.2) · 수의미래연구소 집계(농식품부 자료, 2025.6) · 농식품부 연관산업 육성 대책 · Data Bridge / Grand View / GM Insights / MRF · 농식품부 진료항목 표준화(2025.4) · 농식품부 · 식약처 보도자료(2025.12, 2026.4) · 데일리벳 2026.08.05 · 연합뉴스 2026.05.31 · 중앙일보 2026.09.02</p></div>
   </div>
   <div class="note" hidden><p>반려가구는 29.2%로 역대 최대, 동물병원은 5,312곳입니다.</p><p>진료기록 발급 의무화가 추진되고, 마약류 처방은 3년 새 37% 늘었습니다. 기록을 요구하는 지금이 진입 시점입니다.</p></div>
 </section>
@@ -1470,12 +1411,9 @@ small { font-size: .8em; }
     <div class="bd">
       <div class="g" style="--c: 1.05fr 1fr">
         <div class="card b" style="overflow-x: auto">
-          <div class="vs2" role="img" aria-label="다중 센서 스마트 폴대 제작비 100만 원 이상, INFU RETRO 실질 판매원가 8만 원">
-            <p><span>다중 센서 스마트 폴대 · 제작비</span><i style="--v: 100"></i><b>100만 원+</b></p>
-            <p class="us"><span>INFU RETRO · 실질 판매원가</span><i style="--v: 8; --j: 1"></i><b>8만 원</b></p>
-          </div>
+          <img class="pyc-w pyc-vs" src="charts/cost-vs.svg" alt="다중 센서 스마트 폴대 제작비 100만 원 이상, INFU RETRO 실질 판매원가 8만 원">
           <h3>1대 기준 원가 구조</h3>
-          <div class="stackbar" role="img" aria-label="제조 35,000원, 운영 20,000원, 유통 25,000원"><i style="--w: 35">제조 3.5만</i><i style="--w: 20; --j: 1">운영 2만</i><i style="--w: 25; --j: 2">유통 2.5만</i></div>
+          <img class="pyc-w pyc-stack" src="charts/cost-stack.svg" alt="1대 원가 구조 — 제조 35,000원, 운영 20,000원, 유통 25,000원">
           <table class="cost">
             <tbody>
               <tr><th scope="row" rowspan="4">제조</th><td>하드웨어 BOM (PCB · 로드셀 · 배터리, MOQ 10,000ea)</td><td>15,000원</td></tr>
@@ -1507,10 +1445,7 @@ small { font-size: .8em; }
           </div>
           <div class="card mini mini2">
             <p class="k">병원 1곳 · 입원장 5대 도입비</p>
-            <div class="cmpbar">
-              <span class="lab2">펌프 5대</span><span class="row"><i style="--v: 100"></i><b>550만</b></span>
-              <span class="lab2" style="color: var(--honey)">INFU RETRO 5대</span><span class="row"><i class="ac" style="--v: 22.7; --j: 1"></i><b>125만</b></span>
-            </div>
+            <img class="pyc-w" src="charts/entry.svg" alt="입원장 5대 도입비 — 펌프 550만 원, INFU RETRO 125만 원">
             <p class="big3"><b>−77%</b>도입비</p>
             <p>+ 관제 구독 월 60만 원 (관리비 포함)</p>
           </div>
@@ -1570,14 +1505,14 @@ small { font-size: .8em; }
           </ul>
         </div>
       </div>
-      <p class="next b"><b>다음 단계</b>제품 생산 · 인증을 마치면 수량 · 단가 · 납기를 정해 본계약으로 전환합니다<button type="button" class="more" data-goid="a-cn">문서 전문 보기</button></p>
+      <p class="next b"><b>다음 단계</b>제품 생산 · 인증을 마치면 수량 · 단가 · 납기를 정해 본계약으로 전환합니다<span class="more">전문 · 부록 A6 · A7</span></p>
     </div>
   </div>
   <div class="note" hidden><p>판로는 문서로 확인했습니다. 전남대 수의과대학 구매의향서, ㈜씨엔 최소 300개 공급 약정, 그리고 유통사 SKM&amp;M과 5,000만 원 규모 MOU입니다.</p></div>
 </section>
 
 <!-- ================= 09 시장 진입 전략 ================= -->
-<section class="slide" id="gtm" data-sec="9" data-time="16" data-title="전북에서 증명하고, 전국 5,312곳으로">
+<section class="slide" id="gtm" data-sec="9" data-time="11" data-title="전북에서 증명하고, 전국 5,312곳으로">
   <div class="frame">
     <p class="lab b">Go-to-Market <span>시장 진입 전략</span></p>
     <h2 class="h b">전북에서 증명하고, <mark>전국 5,312곳</mark>으로</h2>
@@ -1598,7 +1533,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 수의미래연구소 집계(농식품부 자료, 2025.6 전국 동물병원 5,312곳) · SAM · SOM은 아이디어 제안서 기준 · 금액은 병원당 5대 × 대당(장비 25만 원 + 연 구독 144만 원)</p></div>
   </div>
-  <div class="note" hidden><p>전국 5,312곳, 약 449억 원 시장 가운데 호남권 300곳을 먼저 공략해, 3년 안에 50곳 250대, 연 4억 원 규모를 만듭니다.</p><p>전북에서 증명하고, 유통망을 따라 전국으로 넓힙니다.</p></div>
+  <div class="note" hidden><p>전국 5,312곳, 약 449억 원 시장 가운데 호남권 300곳을 먼저 공략해, 3년 안에 50곳 250대, 연 4억 원 규모를 만듭니다.</p></div>
 </section>
 
 <!-- ================= 10 기대효과 ================= -->
@@ -1609,8 +1544,8 @@ small { font-size: .8em; }
     <div class="bd">
       <p class="evi-k b">사람 병원에서 먼저 확인된 효과</p>
       <div class="evi">
-        <div class="card b"><p class="num">−2.06<small>회</small></p><p>근무조당 병실 확인 방문<small>원격 수액 모니터링 · 핀란드 6개 병원 · 간호사 응답 216건</small></p></div>
-        <div class="card b"><p class="num">2.12<small>분</small></p><p>이상 알림 후 평균 대응<small>IoT 수액 모니터링 · 中 대학병원 2개 병동 · 도입 전후 1년</small></p></div>
+        <div class="card b"><p class="num">−2.06<small>회</small></p><p>근무조당 병실 확인 방문<small>원격 수액 모니터링 · 핀란드 6개 병원 · 간호사 응답 216건 · 근무조당 5.05분 확보 · ROI 2.63</small></p></div>
+        <div class="card b"><p class="num">2.12<small>분</small></p><p>이상 알림 후 평균 대응<small>IoT 수액 모니터링 · 中 대학병원 2개 병동 · 도입 전후 1년 · 알림 74%가 막힘 · 유속 이상 · 합병증 감소</small></p></div>
       </div>
       <ul class="who3 b">
         <li class="card"><svg class="ico"><use href="#i-hosp"/></svg><div><b>동물병원</b><p>순회 · 수기 기록 부담 ↓</p></div><p class="m"><strong>−77%</strong><small>도입비 (펌프 대비)</small></p></li>
@@ -1679,7 +1614,6 @@ small { font-size: .8em; }
       <h2 class="end-ttl b">감사합니다</h2>
       <p class="end-sub b">말하지 못해도, 먼저 알아챕니다</p>
       <p class="end-line b">입원 동물의 수액, INFUTECH가 지켜보겠습니다</p>
-      <div class="end-act b"><button type="button" data-go="0">처음으로</button><button type="button" data-open="toc">목차 보기</button></div>
     </div>
   </div>
   <div class="note" hidden><p>말하지 못해도, 먼저 알아채겠습니다. 감사합니다.</p></div>
@@ -1819,7 +1753,7 @@ small { font-size: .8em; }
             <li><span>국내</span><b>CNN 상태 패턴 분석 기반 정맥 수액 이상 감지 알고리즘 — 한국혁신산업학회 · 한국디지털정책학회 공동학술대회 (2026.07)</b></li>
             <li><span>국제</span><b>Design of a Dual-Track Algorithm for Real-Time IV Monitoring Based on Load Cell — AIT 2026 (2026.01)</b></li>
           </ul>
-          <p class="cs">쪽을 누르면 전문을 크게 볼 수 있습니다</p>
+          <p class="cs">왼쪽 두 쪽이 국내 학회 발표 논문 전문입니다</p>
         </div>
       </div>
     </div>
@@ -1843,7 +1777,7 @@ small { font-size: .8em; }
             <li><span>가격</span><b>170,000원 / 300개 MOQ 기준</b></li>
             <li><span>기간</span><b>2년, 이의 없으면 1년씩 연장</b></li>
           </ul>
-          <p class="cs">쪽을 누르면 전문을 크게 볼 수 있습니다</p>
+          <p class="cs">왼쪽 두 쪽이 물품공급 및 판매 약정서 전문입니다</p>
         </div>
       </div>
     </div>
@@ -1868,7 +1802,7 @@ small { font-size: .8em; }
             <li><span>협력</span><b>유통망 · 시장 정보로 판로 확보와 홍보 지원, 현장 의견 반영</b></li>
             <li><span>본계약</span><b>생산 · 인허가 완료 후 수량 · 단가 · 납기 확정</b></li>
           </ul>
-          <p class="cs">쪽을 누르면 전문을 크게 볼 수 있습니다</p>
+          <p class="cs">왼쪽 두 쪽이 구매의향 및 사업협력 업무협약서 전문입니다</p>
         </div>
       </div>
     </div>
@@ -1885,15 +1819,7 @@ small { font-size: .8em; }
         <div class="card chart b">
           <h3>동물병원 의료용 마약류 처방량 <small style="color: var(--mute)">(만 개)</small></h3>
           <p class="cs">3년 새 +37%</p>
-          <div class="bars" style="--max: 353">
-            <div class="plot" style="gap: 1.4em">
-              <div><i style="--v: 257.6"><b>257.6</b></i></div>
-              <div><i style="--v: 299.2"><b>299.2</b></i></div>
-              <div><i style="--v: 323.6"><b>323.6</b></i></div>
-              <div><i class="hl" style="--v: 353"><b>353</b></i></div>
-            </div>
-            <div class="xl" style="gap: 1.4em"><span>2022</span><span>2023</span><span>2024</span><span>2025</span></div>
-          </div>
+          <img class="pyc" src="charts/rx-large.svg" alt="동물병원 의료용 마약류 처방량(만 개) 2022년 257.6, 2023년 299.2, 2024년 323.6, 2025년 353">
         </div>
         <div class="card b">
           <h3>기록을 요구하는 흐름</h3>
@@ -2026,13 +1952,8 @@ small { font-size: .8em; }
   });
   slides.forEach(s => {
     s.querySelectorAll('.b').forEach((el, i) => el.style.setProperty('--i', i));
-    s.querySelectorAll('.plot').forEach(p => [...p.children].forEach((c, j) => c.firstElementChild?.style.setProperty('--j', j)));
     s._steps = [...s.querySelectorAll('[data-step]')];
     s._max = s._steps.reduce((m, el) => Math.max(m, +el.dataset.step), 0);
-  });
-  document.querySelectorAll('[data-dots]').forEach(el => {
-    const n = +el.dataset.dots, on = +el.dataset.on;
-    el.innerHTML = Array.from({ length: n }, (_, k) => k < on ? '<i class="on"></i>' : '<i></i>').join('');
   });
 
   const bySec = SECTIONS.map((_, si) => slides.map((s, k) => +s.dataset.sec === si ? k : -1).filter(k => k >= 0));
@@ -2144,8 +2065,6 @@ small { font-size: .8em; }
   });
   document.addEventListener('click', e => {
     const g = e.target.closest('.slide [data-go]'); if (g) go(+g.dataset.go);
-    const gi = e.target.closest('.slide [data-goid]'); if (gi) go(slides.findIndex(x => x.id === gi.dataset.goid));
-    if (e.target.closest('.slide [data-open="toc"]')) toggleToc(true);
   });
   $('#btn-prev').addEventListener('click', prev);
   $('#btn-next').addEventListener('click', next);
@@ -2197,6 +2116,7 @@ small { font-size: .8em; }
       case 'o': case 'O': case 'g': case 'G': toggleToc(true); e.preventDefault(); break;
       case 'n': case 'N': toggleNotes(); break;
       case 'f': case 'F': toggleFs(); break;
+      case 'F5': toggleFs(); e.preventDefault(); break;
       case 'b': case 'B': case '.': black.hidden = false; break;
       case 'Escape': if (!notes.hidden) toggleNotes(false); break;
     }
@@ -2266,10 +2186,12 @@ small { font-size: .8em; }
   }
   addEventListener('hashchange', () => go(fromHash()));
   go(fromHash(), { quiet: true });
-  wake();
-  setTimeout(() => say(matchMedia('(pointer: coarse)').matches
-    ? (isRot() ? '휴대폰을 가로로 돌려 보세요 · 탭하거나 밀어서 넘깁니다' : '탭하거나 밀어서 넘깁니다 · 왼쪽을 탭하면 이전 장')
-    : '<kbd>→</kbd> · <kbd>Space</kbd> · 클릭으로 넘기기 · <kbd>N</kbd> 발표 노트 · <kbd>O</kbd> 목차', 4200), 900);
+  // a presenter's clicker only sends next / previous: on a laptop nothing pops up over the first slide and
+  // the control bar appears only when the mouse moves. Touch screens (the web viewer on phones) get a short hint
+  if (matchMedia('(pointer: coarse)').matches) {
+    wake();
+    setTimeout(() => say(isRot() ? '휴대폰을 가로로 돌려 보세요 · 탭하거나 밀어서 넘깁니다' : '탭하거나 밀어서 넘깁니다 · 왼쪽을 탭하면 이전 장', 4200), 900);
+  } else chrome.classList.add('idle');
 })();
 </script>
 </body>
