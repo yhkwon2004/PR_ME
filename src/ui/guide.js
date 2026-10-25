@@ -288,7 +288,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
     setScene(i, hasDeck) {
       current = i;
       // 좁은 화면은 첫 장면 아래에 자리가 없어, 처음 방문 사용법을 위쪽 알림으로 한 번
-      if (i === 0 && firstVisit && !coachTold && matchMedia('(max-width: 820px), (max-height: 500px)').matches) {
+      if (i === 0 && firstVisit && !coachTold && matchMedia('(max-width: 820px), (orientation: portrait) and (max-width: 1100px), (max-height: 500px)').matches) {
         coachTold = true;
         setTimeout(() => current === 0 && say(touch ? '위로 밀면 다음 장면 · 카드는 옆으로 넘기고 탭하면 프로젝트 · ☰ 장면 목록' : '스크롤하면 다음 장면 · 카드를 누르면 프로젝트 · ☰ 장면 목록', { ms: 7000 }), reducedMotion ? 500 : 3200);
       }

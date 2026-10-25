@@ -546,14 +546,21 @@
     margin-top: 56px;
   }
 }
-/* 좁은 휴대폰: 보기 전환 탭 네 개가 한 줄에 들어가게 */
+/* 좁은 휴대폰: 보기 전환 탭 여섯 개가 한 줄에 들어가게 — 개수는 접고, 그래도 넘치면 옆으로 밀어 본다 */
 @media (max-width: 430px) {
+  .pg-tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .pg-tabs::-webkit-scrollbar {
+    display: none;
+  }
   .pg-tabs a {
     padding: 8px 11px;
     letter-spacing: 0.04em;
   }
   .pg-tabs a sup {
-    margin-left: 4px;
+    display: none;
   }
 }
 

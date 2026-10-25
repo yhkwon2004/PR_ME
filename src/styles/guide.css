@@ -71,7 +71,7 @@
 }
 .nc-t small {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.24em;
   color: var(--muted);
 }
@@ -97,7 +97,7 @@ body.index-open .next-cue {
   display: flex;
   align-items: center;
   gap: 10px;
-  max-width: min(92vw, 470px);
+  max-width: min(calc(92 * var(--vw)), 470px);
   padding: 10px 10px 10px 18px;
   border: 1px solid rgba(94, 242, 255, 0.4);
   border-radius: 999px;
@@ -402,7 +402,7 @@ body.page-open .guide-toast {
   line-height: 1;
 }
 .pl-t small {
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--muted);
 }
 .pull-cue.is-armed .pl-t small {
@@ -464,7 +464,7 @@ body.page-open .guide-toast {
 }
 .hc-t small {
   font-family: var(--mono);
-  font-size: 9.5px;
+  font-size: 10.5px;
   letter-spacing: 0.08em;
   color: var(--muted);
   white-space: nowrap;
@@ -537,7 +537,7 @@ body.deck-cue .panel:not([hidden]) .deck-count {
   border-bottom-width: 2px;
   border-radius: 6px;
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: var(--fg);
 }
 
@@ -587,7 +587,7 @@ body.deck-cue .panel:not([hidden]) .deck-count {
 }
 
 /* ── 좁은 화면 ── */
-@media (max-width: 820px) {
+@media (max-width: 820px), (orientation: portrait) and (max-width: 1100px) {
   /* 좁은 화면은 장면마다 아래쪽에 카드 · 시트가 있어 첫 장면에서만 다음 버튼을 둔다(그다음은 스와이프) */
   body:not([data-scene='intro']) .next-cue {
     display: none;
@@ -644,7 +644,7 @@ body.deck-cue .panel:not([hidden]) .deck-count {
     pointer-events: none;
   }
   .hint.is-coach {
-    max-width: calc(100vw - 2 * var(--pad));
+    max-width: calc(calc(100 * var(--vw)) - 2 * var(--pad));
     padding: 8px 2px;
   }
   .hc-item {
@@ -660,7 +660,7 @@ body.deck-cue .panel:not([hidden]) .deck-count {
     font-size: 11px;
   }
   .hc-t small {
-    font-size: 8.5px;
+    font-size: 9.5px;
     letter-spacing: 0.02em;
   }
   .to-top {
@@ -684,7 +684,7 @@ body.deck-cue .panel:not([hidden]) .deck-count {
     right: auto;
     bottom: 6px;
     width: auto;
-    max-width: min(72vw, 480px);
+    max-width: min(calc(72 * var(--vw)), 480px);
     padding: 5px 6px 5px 14px;
     font-size: 12px;
   }

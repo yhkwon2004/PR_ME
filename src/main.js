@@ -36,6 +36,19 @@ import { createGuide } from './ui/guide.js';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 // 검증용(?capture)에서는 자동 진입하지 않는다
 const CAPTURE = new URLSearchParams(location.search).has('capture');
+
+// 세로 태블릿: 휴대폰 배치(세로 1100px까지 같은 배치)를 화면에 맞게 키운다 — 폭 600px · 높이 860px를 기준으로 최대 1.7배.
+// 휴대폰 · 가로 화면 · 데스크톱은 1(main.css의 zoom: var(--tz)). 다른 resize 처리보다 먼저 맞춘다
+function fitZoom() {
+  const w = innerWidth;
+  const h = innerHeight;
+  const tz = w >= 600 && w <= 1100 && h > w ? Math.min(1.7, Math.max(1, Math.min(w / 600, h / 860))) : 1;
+  if (tz > 1.01) document.documentElement.style.setProperty('--tz', tz.toFixed(3));
+  else document.documentElement.style.removeProperty('--tz');
+}
+fitZoom();
+addEventListener('resize', fitZoom);
+const zoomOf = () => parseFloat(document.documentElement.style.getPropertyValue('--tz')) || 1;
 bindCardFx({ reducedMotion: reduced });
 const canvas = document.getElementById('gl');
 const $ = (id) => document.getElementById(id);
@@ -311,7 +324,7 @@ function frameBeat() {
   const top = el?.beats && el.querySelectorAll('.beat')[el.beats.index]?.querySelector('.bt-top');
   let at = null;
   if (top) {
-    const hud = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top')) || 0;
+    const hud = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top')) || 0) * zoomOf();
     const room = top.getBoundingClientRect().top - hud;
     if (room > 70) at = (hud + room / 2) / innerHeight;
   }
@@ -684,7 +697,7 @@ function splashUp(bootEl) {
   const tl = gsap.timeline({ onComplete: () => bootEl.remove() });
   tl.to(copy, { autoAlpha: 0, y: -28, ...(lite ? {} : { filter: 'blur(3px)' }), duration: 0.42, stagger: 0.04, ease: 'power2.in' }, 0)
     .to(bootLeader, { scale: 1.08, autoAlpha: 0, duration: 0.45, ease: 'power2.in' }, 0)
-    .to(bootEl, { y: -(innerHeight + 48), duration: 1.05, ease: 'power3.inOut' }, 0.1);
+    .to(bootEl, { y: -(innerHeight / zoomOf() + 48), duration: 1.05, ease: 'power3.inOut' }, 0.1);
   return tl;
 }
 
@@ -717,7 +730,7 @@ function bindLift(bootEl, go) {
     if (dy < -6) {
       e.preventDefault();
       bootEl.classList.add('is-lifting');
-      gsap.set(bootEl, { y: reduced ? 0 : dy * 0.85 });
+      gsap.set(bootEl, { y: reduced ? 0 : (dy * 0.85) / zoomOf() }); // 키운 화면(세로 태블릿)에서도 손가락만큼
     }
   }, { passive: false });
   const end = () => {

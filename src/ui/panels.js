@@ -512,7 +512,8 @@ function deckReel(el, reducedMotion) {
 
   // 끌기: 끌기가 시작된 순간의 위치 기준(그 사이 자동 재생이 넘겨도 손 아래 덱이 튀지 않게).
   // 한 장 거리는 가운데 카드가 손가락 밑에 붙어 다니도록 원근으로 줄어드는 만큼 짧게, 끝에서는 고무줄처럼 점점 덜 끌린다
-  const span = () => Math.max(80, width * 0.84);
+  // 손가락 거리는 화면 px, 카드 폭은 배치 px — 세로 태블릿에서 필름 층을 키웠으면(--tz) 그만큼 늘려 맞춘다
+  const span = () => Math.max(80, width * 0.84 * (parseFloat(document.documentElement.style.getPropertyValue('--tz')) || 1));
   const RUB = 0.6; // 끝에서 더 끌려 나가는 최대(카드 수)
   const rubber = (o) => RUB * Math.tanh((o * 0.4) / RUB);
   const unrubber = (d) => (RUB / 0.4) * Math.atanh(Math.max(-0.995, Math.min(0.995, d / RUB)));
