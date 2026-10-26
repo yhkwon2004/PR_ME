@@ -21,10 +21,35 @@ export const profile = {
   span: '2023 – 2026',
   // 학력 — 본인이 알려 준 순서 그대로(입학 → 소속 변경 → 복수전공)
   education: [
-    { period: '2023', school: '원광대학교', major: '인공지능학과', note: '입학' },
-    { period: '2024', school: '원광대학교', major: '컴퓨터소프트웨어공학과', note: '소속 변경 · 재학' },
+    { period: '2023', school: '원광대학교', major: '인공지능융합학과', note: '입학' },
+    { period: '2024', school: '원광대학교', major: '컴퓨터소프트웨어공학전공', note: '소속 변경 · 재학' },
     { period: '2024 2학기 –', school: 'JST 공유대학 (전북대학교)', major: '스마트 모빌리티 SW공학', note: '복수전공' },
   ],
+  // 학과 이름표(본인 제공)
+  depts: [
+    { src: M('profile/dept-ai.png'), w: 289, h: 101, alt: '원광대학교 인공지능융합학과' },
+    { src: M('profile/dept-cse.png'), w: 375, h: 98, alt: '원광대학교 컴퓨터소프트웨어공학전공' },
+  ],
+  // 장학 — 장학증서(본인 제공, 생년월일은 가려서 올림)
+  scholarship: {
+    title: '국가우수(이공계) 장학생',
+    by: '부총리 겸 과학기술정보통신부 장관',
+    no: '제2025-0263호',
+    date: '2025.10.13',
+    school: '원광대학교(본교) 학부',
+    sheet: { src: M('profile/scholarship.webp'), md: M('profile/scholarship.md.webp'), thumb: M('profile/scholarship.thumb.webp'), sm: M('profile/scholarship.sm.webp'), w: 1132, h: 1600 },
+  },
+  // 봉사 — 시간인증형 봉사시간 조회 화면(본인 제공) 그대로
+  volunteer: {
+    hours: 626,
+    minutes: 30,
+    count: 196,
+    by: [
+      { name: '청소년활동정보서비스', hours: 389, minutes: 0 },
+      { name: '1365 자원봉사포털', hours: 229, minutes: 30 },
+      { name: '사회복지 자원봉사인증관리', hours: 8, minutes: 0 },
+    ],
+  },
   email: 'yhkwon2004@gmail.com',
   links: [
     { label: 'Email', value: 'yhkwon2004@gmail.com', url: 'mailto:yhkwon2004@gmail.com' },

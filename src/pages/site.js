@@ -631,7 +631,7 @@ function journeyPage() {
   const deck = presentDeck({ esc, pad, img, certSheet, certCaption });
   const html = `<div class="pg pg-journey" data-owner="${esc(profile.name)} · ${esc(profile.role)}">
     ${bar({ href: '/', label: '3D 필름' }, { full: true })}
-    <nav class="jr-tabs" aria-label="발표 순서">${PR_SECS.map(([id, ko, en, short], k) => `<button type="button" data-go="${id}" aria-current="false" aria-label="${pad(k + 1)} ${ko}"><small>${pad(k + 1)} ${en}</small><span class="jr-tab-l">${ko}</span><span class="jr-tab-s" aria-hidden="true">${short}</span></button>`).join('')}</nav>
+    <nav class="jr-tabs" aria-label="발표 순서">${PR_SECS.map(([id, ko, en, short]) => `<button type="button" data-go="${id}" aria-current="false" aria-label="${en} ${ko}"><small>${en}</small><span class="jr-tab-l">${ko}</span><span class="jr-tab-s" aria-hidden="true">${short}</span></button>`).join('')}</nav>
     <div class="jr-view" tabindex="-1" aria-roledescription="화면 넘김" aria-label="발표 자료 — 옆으로 끌거나 ← → 로 넘기기"><div class="jr-track"></div></div>
     <footer class="jr-pager">
       <button type="button" class="jr-nav" data-dir="-1" aria-label="이전 화면"><span aria-hidden="true">←</span></button>

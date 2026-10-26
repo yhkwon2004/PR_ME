@@ -35,7 +35,7 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
   const srcEl = root.querySelector('.jr-src');
   const fullBtn = root.querySelector('[data-full]');
 
-  const SECS = [...srcEl.querySelectorAll('[data-sec]')].map((s) => ({ id: s.dataset.sec, no: s.dataset.no || '', title: s.dataset.title || '', short: s.dataset.short || s.dataset.title || '' }));
+  const SECS = [...srcEl.querySelectorAll('[data-sec]')].map((s) => ({ id: s.dataset.sec, no: s.dataset.no || '', title: s.dataset.title || '', short: s.dataset.short || s.dataset.title || '', en: s.dataset.en || '' }));
   const GROUPS = [...srcEl.querySelectorAll('[data-grp]')].map((g) => ({
     id: g.dataset.grp,
     sec: SECS.find((s) => s.id === g.closest('[data-sec]').dataset.sec),
@@ -92,7 +92,7 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
       bg.append(im);
       s.querySelector('.jr-stage').prepend(bg);
     }
-    s.querySelector('.jr-eye b').textContent = g.sec.no;
+    s.querySelector('.jr-eye b').textContent = g.sec.en || g.sec.no;
     s.querySelector('.jr-eye-s').textContent = g.sec.title;
     s.querySelector('.jr-eye-g').textContent = g.title;
     const t = s.querySelector('.jr-eye-t');
@@ -855,10 +855,11 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     if (e.key === 'f' || e.key === 'F') return toggleFull(), true;
     if (e.key === 'b' || e.key === 'B' || e.key === '.') return black(true), true;
     if (e.key === 'Home') return go(0), true;
-    // 0 표지 · 1 — 4 그 장의 첫 화면(장 표지)
+    // 0 표지 · 1 — 4 그 번호의 장(STEP 1 — 4)의 첫 화면(장 표지)
     if (/^[0-9]$/.test(e.key)) {
+      const c = chapters.find((x) => +x.no === +e.key);
       if (e.key === '0') go(0);
-      else if (chapters[+e.key - 1]) goAnchor(chapters[+e.key - 1].id);
+      else if (c) goAnchor(c.id);
       return true;
     }
     if (e.key === 'End') return go(slides.length - 1), true;

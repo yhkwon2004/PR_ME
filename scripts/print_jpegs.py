@@ -6,8 +6,9 @@
   <사진>.print.jpg  같은 자리 · 같은 크기의 JPEG(품질 82)
     - 프로젝트마다 대표 사진(작은 것이 있으면 작은 것)
     - 상장 작은 것(.sm.webp, 240px)
-    - 장 표지 배경(src/pages/present.js의 shotOf('<프로젝트>', '<번호>'))
-    - 증명사진(content.js의 profile.photo)
+    - 덱에 쓰인 프로젝트 사진(src/pages/present.js의 shotOf · picOf('<프로젝트>', '<번호>'), ['<프로젝트>', '<번호>'] 목록,
+      { id: '<프로젝트>', shots: ['<번호>', …] }) — 큰 것과 작은 것(.thumb) 모두
+    - 증명사진 · 장학증서(content.js의 profile)
 덱은 인쇄할 때 사진 이름의 .webp를 .print.jpg로 바꿔 받고, 없으면 원래 WebP로 인쇄한다 — 기록이 바뀌면 다시 돌린다.
 """
 import glob
@@ -36,12 +37,18 @@ def targets():
         out.add(thumb if os.path.exists(media(thumb)) else cover)
     out.update(os.path.relpath(f, PUBLIC) for f in glob.glob(os.path.join(PUBLIC, 'media', 'awards', '*.sm.webp')))
     deck = open(os.path.join(ROOT, 'src', 'pages', 'present.js'), encoding='utf-8').read()
-    for pid, n in re.findall(r"shotOf\('([\w-]+)', '(\d+)'\)", deck):
-        out.add(f'media/projects/{pid}/{n}.webp')
+    pairs = re.findall(r"(?:shotOf|picOf)\('([\w-]+)', '(\d+)'\)", deck) + re.findall(r"\['([a-z][\w-]+)', '(\d+)'\]", deck)
+    for pid, shots in re.findall(r"\{ id: '([\w-]+)', shots: \[([^\]]+)\] \}", deck):
+        pairs += [(pid, n) for n in re.findall(r"'(\d+)'", shots)]
+    for pid, n in pairs:
+        for name in (f'{n}.webp', f'{n}.thumb.webp'):
+            if os.path.exists(media(f'media/projects/{pid}/{name}')):
+                out.add(f'media/projects/{pid}/{name}')
     content = open(os.path.join(ROOT, 'src', 'content.js'), encoding='utf-8').read()
     photo = re.search(r"photo:\s*\{\s*src:\s*M\('([^']+)'\)", content)
     if photo:
         out.add(f'media/{photo.group(1)}')
+    out.update(os.path.relpath(f, PUBLIC) for f in glob.glob(os.path.join(PUBLIC, 'media', 'profile', 'scholarship*.webp')))
     return sorted(out)
 
 
