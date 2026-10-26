@@ -452,12 +452,34 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     }
   }
 
-  // PDF로 저장: 모든 화면을 무대 한 장(1600×900)씩 — 사진을 다 받은 뒤 인쇄 창을 연다(인쇄가 끝나면 원래대로)
+  // PDF로 저장: 모든 화면을 무대 한 장(1600×900)씩 — 사진을 다 받은 뒤 인쇄 창을 연다(인쇄가 끝나면 원래대로).
+  // 인쇄에는 작은 사진(긴 변 720px — 무대의 사진 칸보다 크다)만 써서 PDF가 가볍다. 큰 사진 목록(srcset)은 인쇄 뒤에 되돌린다
+  // 인쇄할 사진: 무대에서 그 사진이 차지하는 폭보다 큰 것 가운데 가장 작은 파일(상장 240px · 사진 720px …).
+  // 같은 자리의 .print.jpg(scripts/print_jpegs.py)를 쓴다 — 크롬은 WebP를 PDF에 압축 없이 넣어 파일이 커진다. 없으면 WebP 그대로
+  function printSrc(im, set) {
+    if (!set) return im.dataset.src || im.src;
+    const k = parseFloat(view.style.getPropertyValue('--k')) || 1;
+    const want = im.getBoundingClientRect().width / k;
+    const list = set
+      .split(',')
+      .map((x) => x.trim().split(/\s+/))
+      .map(([u, w]) => [u, parseInt(w, 10) || 0])
+      .sort((a, b) => a[1] - b[1]);
+    return (list.find(([, w]) => w >= want) || list[list.length - 1])[0];
+  }
   function loadAll() {
-    const ims = [...track.querySelectorAll('img[data-src]')];
-    ims.forEach((im) => {
-      if (im.dataset.srcset) im.srcset = im.dataset.srcset;
-      im.src = im.dataset.src;
+    track.querySelectorAll('img').forEach((im) => {
+      const set = im.dataset.srcset || im.getAttribute('srcset');
+      if (!im.dataset.src && !set) return;
+      if (set) {
+        im.dataset.later = set;
+        im.removeAttribute('srcset');
+      }
+      const webp = printSrc(im, set);
+      if (/\.webp$/.test(webp)) {
+        im.addEventListener('error', () => (im.src = webp), { once: true });
+        im.src = webp.replace(/\.webp$/, '.print.jpg');
+      } else im.src = webp;
       im.removeAttribute('data-src');
       im.removeAttribute('data-srcset');
       im.classList.add('is-loaded');
@@ -477,6 +499,11 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     relayout(false, true);
   }
   const afterPrint = () => {
+    track.querySelectorAll('img[data-later]').forEach((im) => {
+      im.srcset = im.dataset.later;
+      im.removeAttribute('data-later');
+    });
+    track.querySelectorAll('img[src$=".print.jpg"]').forEach((im) => (im.src = im.src.replace(/\.print\.jpg$/, '.webp')));
     if (forced) {
       forced = false;
       relayout(false, true);
