@@ -38,7 +38,7 @@ z
      <g id="line2d_1"/>
      <g id="text_1">
       <!-- E62 -->
-      <g style="fill: #8c7c6f" transform="translate(20.007732 74.440771) scale(0.095 -0.095)">
+      <g style="fill: #76665a" transform="translate(20.007732 74.440771) scale(0.095 -0.095)">
        <defs>
         <path id="Pretendard-Regular-40" d="M 500 0 
 L 3275 0 
@@ -102,7 +102,7 @@ z
      <g id="line2d_2"/>
      <g id="text_2">
       <!-- E63 -->
-      <g style="fill: #8c7c6f" transform="translate(46.378391 74.440771) scale(0.095 -0.095)">
+      <g style="fill: #76665a" transform="translate(46.378391 74.440771) scale(0.095 -0.095)">
        <defs>
         <path id="Pretendard-Regular-32cc" d="M 1988 -63 
 C 2888 -63 3569 488 3563 1231 
@@ -136,7 +136,7 @@ z
      <g id="line2d_3"/>
      <g id="text_3">
       <!-- E64 -->
-      <g style="fill: #8c7c6f" transform="translate(72.860377 74.440771) scale(0.095 -0.095)">
+      <g style="fill: #76665a" transform="translate(72.860377 74.440771) scale(0.095 -0.095)">
        <defs>
         <path id="Pretendard-Regular-32cd" d="M 313 925 
 L 2506 925 
@@ -170,7 +170,7 @@ z
      <g id="line2d_4"/>
      <g id="text_4">
       <!-- E65 -->
-      <g style="fill: #8c7c6f" transform="translate(99.504903 74.440771) scale(0.095 -0.095)">
+      <g style="fill: #76665a" transform="translate(99.504903 74.440771) scale(0.095 -0.095)">
        <defs>
         <path id="Pretendard-Regular-32ce" d="M 1900 -63 
 C 2800 -63 3463 569 3463 1444 
@@ -202,7 +202,7 @@ z
      <g id="line2d_5"/>
      <g id="text_5">
       <!-- E66 -->
-      <g style="fill: #8c7c6f" transform="translate(125.940874 74.440771) scale(0.095 -0.095)">
+      <g style="fill: #76665a" transform="translate(125.940874 74.440771) scale(0.095 -0.095)">
        <use xlink:href="#Pretendard-Regular-40"/>
        <use xlink:href="#Pretendard-Regular-32cf" transform="translate(56.734375 0)"/>
        <use xlink:href="#Pretendard-Regular-32cf" transform="translate(118.0625 0)"/>
@@ -213,7 +213,7 @@ z
      <g id="line2d_6"/>
      <g id="text_6">
       <!-- E67 -->
-      <g style="fill: #8c7c6f" transform="translate(152.747939 74.440771) scale(0.095 -0.095)">
+      <g style="fill: #76665a" transform="translate(152.747939 74.440771) scale(0.095 -0.095)">
        <defs>
         <path id="Pretendard-Regular-32d0" d="M 569 0 
 L 1156 0 
@@ -244,7 +244,7 @@ L 203.4 52.83871
      <g id="line2d_8"/>
      <g id="text_7">
       <!-- 95 -->
-      <g style="fill: #8c7c6f" transform="translate(3.3025 57.359095) scale(0.095 -0.095)">
+      <g style="fill: #76665a" transform="translate(3.3025 57.359095) scale(0.095 -0.095)">
        <defs>
         <path id="Pretendard-Regular-32d2" d="M 1931 4588 
 C 969 4594 350 3913 350 3069 
@@ -280,7 +280,7 @@ L 203.4 14.593548
      <g id="line2d_10"/>
      <g id="text_8">
       <!-- 99 -->
-      <g style="fill: #8c7c6f" transform="translate(3.145156 19.113934) scale(0.095 -0.095)">
+      <g style="fill: #76665a" transform="translate(3.145156 19.113934) scale(0.095 -0.095)">
        <use xlink:href="#Pretendard-Regular-32d2"/>
        <use xlink:href="#Pretendard-Regular-32d2" transform="translate(61.328125 0)"/>
       </g>

@@ -25,32 +25,47 @@ z
   </g>
   <g id="axes_1">
    <g id="patch_2">
-    <path d="M 0 36 
-L 258.234375 36 
-L 258.234375 0 
-L 0 0 
+    <path d="M 4.5 0 
+L 256.921875 0 
+Q 256.921875 0 256.921875 0 
+L 256.921875 36 
+Q 256.921875 36 256.921875 36 
+L 4.5 36 
+Q 0 36 0 31.5 
+L 0 4.5 
+Q 0 0 4.5 0 
 z
 " clip-path="url(#p187a7bfb42)" style="fill: #ad6229"/>
    </g>
    <g id="patch_3">
-    <path d="M 258.234375 36 
-L 405.796875 36 
-L 405.796875 0 
-L 258.234375 0 
+    <path d="M 258.421875 0 
+L 405.234375 0 
+Q 405.234375 0 405.234375 0 
+L 405.234375 36 
+Q 405.234375 36 405.234375 36 
+L 258.421875 36 
+Q 258.421875 36 258.421875 36 
+L 258.421875 0 
+Q 258.421875 0 258.421875 0 
 z
 " clip-path="url(#p187a7bfb42)" style="fill: #edbb85"/>
    </g>
    <g id="patch_4">
-    <path d="M 405.796875 36 
-L 590.25 36 
-L 590.25 0 
-L 405.796875 0 
+    <path d="M 406.734375 0 
+L 585.75 0 
+Q 590.25 0 590.25 4.5 
+L 590.25 31.5 
+Q 590.25 36 585.75 36 
+L 406.734375 36 
+Q 406.734375 36 406.734375 36 
+L 406.734375 0 
+Q 406.734375 0 406.734375 0 
 z
 " clip-path="url(#p187a7bfb42)" style="fill: #efe5d8"/>
    </g>
    <g id="text_1">
     <!-- 제조 3.5만 -->
-    <g style="fill: #ffffff" transform="translate(103.048125 22.262695) scale(0.12 -0.12)">
+    <g style="fill: #ffffff" transform="translate(102.234375 22.32) scale(0.12 -0.12)">
      <defs>
       <path id="Pretendard-Bold-221c" d="M 5088 5113 
 L 4331 5113 
@@ -199,7 +214,7 @@ z
    </g>
    <g id="text_2">
     <!-- 운영 2만 -->
-    <g style="fill: #2a1f18" transform="translate(311.415 22.262695) scale(0.12 -0.12)">
+    <g style="fill: #2a1f18" transform="translate(311.226562 22.32) scale(0.12 -0.12)">
      <defs>
       <path id="Pretendard-Bold-20b4" d="M 5369 2344 
 L 163 2344 
@@ -298,7 +313,7 @@ z
    </g>
    <g id="text_3">
     <!-- 유통 2.5만 -->
-    <g style="fill: #5b4b3f" transform="translate(472.002188 22.262695) scale(0.12 -0.12)">
+    <g style="fill: #5b4b3f" transform="translate(472.435547 22.32) scale(0.12 -0.12)">
      <defs>
       <path id="Pretendard-Bold-2120" d="M 5369 1950 
 L 163 1950 

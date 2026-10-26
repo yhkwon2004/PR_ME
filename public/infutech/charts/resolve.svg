@@ -35,7 +35,7 @@ Q 0 136.5 0 130.5
 L 0 130.5 
 Q 0 124.5 6 124.5 
 z
-" clip-path="url(#p8d22519bea)" style="fill: #efe7dc"/>
+" clip-path="url(#p8d22519bea)" style="fill: #f2e5d9"/>
    </g>
    <g id="patch_3">
     <path d="M 233.625 124.5 
@@ -48,7 +48,7 @@ Q 227.625 136.5 227.625 130.5
 L 227.625 130.5 
 Q 227.625 124.5 233.625 124.5 
 z
-" clip-path="url(#p8d22519bea)" style="fill: #efe7dc"/>
+" clip-path="url(#p8d22519bea)" style="fill: #f0ece7"/>
    </g>
    <g id="patch_4">
     <path d="M 6 124.5 
@@ -294,7 +294,7 @@ z
    </g>
    <g id="text_5">
     <!-- 80건 중 24건 해결 -->
-    <g style="fill: #8c7c6f" transform="translate(0 152.25) scale(0.126 -0.126)">
+    <g style="fill: #76665a" transform="translate(0 152.25) scale(0.126 -0.126)">
      <defs>
       <path id="Pretendard-Regular-32d1" d="M 1938 -63 
 C 2881 -63 3544 463 3550 1200 
@@ -674,7 +674,7 @@ z
    </g>
    <g id="text_12">
     <!-- 41건 중 8건 해결 -->
-    <g style="fill: #8c7c6f" transform="translate(227.625 152.25) scale(0.126 -0.126)">
+    <g style="fill: #76665a" transform="translate(227.625 152.25) scale(0.126 -0.126)">
      <defs>
       <path id="Pretendard-Regular-32ca" d="M 2025 4525 
 L 1456 4525 

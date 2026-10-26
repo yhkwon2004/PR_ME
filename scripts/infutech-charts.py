@@ -9,6 +9,7 @@
   charts/gyro.svg       부록 A2 — 학습 장비의 자이로 신호와 무게 편차, 자이로로 보정한 뒤의 잔차
   charts/gyro-mini.svg  8장 — 같은 신호를 한 칸에: 보정 전 편차와 보정 뒤 편차 (본 발표용으로 글자를 크게)
   charts/filter.svg   7장 · 흔들림 구간 원신호와 칼만필터 출력 (썸네일)
+  charts/cnn-pattern.svg  7장 · CNN이 보는 4×4 상태 패턴 — 정상 · 이상 (썸네일)
 
 자료 그래프(덱의 막대 · 점 그래프는 모두 여기서 그린다 — HTML로 그리지 않는다)
   charts/clinic-24h.svg      3장 · 서울 동물병원 100곳 중 24시간 운영 약 8곳
@@ -16,6 +17,7 @@
   charts/resolve.svg         4장 · 진료기록 유무별 분쟁 해결률 (이름 · 숫자 · 막대 · 건수까지 한 장)
   charts/cases.svg           4장 · 기록이 없을 때 분쟁 5건 중 해결 1건
   charts/market.svg          17장 · 시장 규모 TAM · SAM · SOM (곳 수와 금액까지 한 장)
+  charts/grade.svg           14장 · 동물용 의료기기 등급 사다리 — INFU RETRO 구조는 1등급(신고)
   charts/visit.svg           12장 · 양육가구 최근 1년 동물병원 이용률 2021 → 2025 (출처의 두 해만)
   charts/cagr.svg            12장 · 동물용 인퓨전펌프 시장 CAGR 조사기관별 전망
   charts/rx.svg · rx-large.svg   12장 · 부록 A8 · 동물병원 의료용 마약류 처방량 2022 ~ 2025
@@ -23,6 +25,7 @@
   charts/cost-vs.svg · cost-stack.svg · entry.svg   15장 · 제작비 비교 · 원가 구조 · 입원장 5대 도입비
 
 그림 크기(인치)는 덱에서 차지하는 자리(1080p 기준 px ÷ 96)에 맞춰, 글자가 덱 본문과 같은 크기로 보이게 한다.
+막대는 한 기준선에서 자라고, 값 쪽 끝만 둥글게(기준선 쪽은 각지게) 그린다 — 막대 사이 · 조각 사이는 2px 틈으로 가른다.
 
 모든 신호는 모의 데이터입니다. 실측 로그(CSV)가 있으면 simulate() 대신 그 값을 넣으면 같은 차트가 나옵니다.
 """
@@ -33,14 +36,14 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 from matplotlib.ft2font import LoadFlags
-from matplotlib.patches import FancyBboxPatch, Polygon
-from matplotlib.transforms import blended_transform_factory
+from matplotlib.patches import FancyBboxPatch, PathPatch, Polygon
+from matplotlib.path import Path
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DECK = os.path.join(ROOT, 'public', 'infutech') if os.path.isdir(os.path.join(ROOT, 'public', 'infutech')) else ROOT
 OUT = os.path.join(DECK, 'charts')
 
-INK, INK2, MUTE, HONEY, ALERT, SAGE, RAW = '#2A1F18', '#5B4B3F', '#8C7C6F', '#AD6229', '#D04E2D', '#4C8744', '#A39282'
+INK, INK2, MUTE, HONEY, ALERT, SAGE, RAW = '#2A1F18', '#5B4B3F', '#76665A', '#AD6229', '#D04E2D', '#4C8744', '#A39282'
 GRID, LINE = '#EFE7DC', '#CDBFAF'
 
 
@@ -218,32 +221,6 @@ def px(w, h):
     return (w / 96, h / 96)
 
 
-def bare(ax):
-    for side in ('top', 'right', 'left'):
-        ax.spines[side].set_visible(False)
-    ax.spines['bottom'].set_color(LINE)
-    ax.set_yticks([])
-    ax.tick_params(axis='x', length=0, labelsize=12, labelcolor=MUTE, pad=7)
-
-
-def columns(values, labels, size, hl, fmt, value_pt=14, label_pt=12, width=.74, top=1.16):
-    """vertical bars from zero with the value on each bar; the highlighted bar(s) in honey"""
-    fig, ax = plt.subplots(figsize=px(*size))
-    x = np.arange(len(values))
-    cols = [HONEY if k in hl else BAR_OFF for k in range(len(values))]
-    ax.bar(x, values, width=width, color=cols, zorder=2)
-    for k, v in enumerate(values):
-        ax.text(k, v + max(values) * .025, fmt(v), ha='center', va='bottom', fontsize=value_pt, fontweight='bold',
-                color=HONEY if k in hl else INK2)
-    ax.set_xticks(x, labels)
-    ax.tick_params(axis='x', labelsize=label_pt)
-    bare(ax)
-    ax.set_ylim(0, max(values) * top)
-    ax.set_xlim(-.6, len(values) - .4)
-    fig.subplots_adjust(left=.01, right=.99, top=.99, bottom=.13 if any('\n' in l for l in labels) else .08)
-    return fig
-
-
 def chart_clinic24h():
     # 100 dots, 8 lit: 24-hour clinics in Seoul (7.95%)
     fig = plt.figure(figsize=px(300, 71))
@@ -257,12 +234,12 @@ def chart_clinic24h():
 def chart_dispute():
     vals = [9, 20, 11, 16, 27, 45]
     labs = ['2021', '2022', '2023', '2024', '2025', '2026\n1~6월']
-    return columns(vals, labs, (606, 559), {5}, lambda v: f'{v}', value_pt=15, label_pt=12.5)
+    return columns(vals, labs, (606, 559), {5}, lambda v: f'{v}', value_px=20, label_px=16.5)
 
 
 # ---- figures laid out in px like the deck's HTML: text runs on a baseline, rounded boxes, pills ----
 PT = .75  # 1 px on the 1080p stage = .75 pt
-WEIGHT = {400: 'regular', 600: 'semibold', 700: 'bold', 800: 'extra bold'}
+WEIGHT = {400: 'regular', 500: 'medium', 600: 'semibold', 700: 'bold', 800: 'extra bold'}
 
 
 def canvas(w, h):
@@ -285,7 +262,7 @@ def say(ax, x, y, runs, ha='left', z=3):
     letter-spacing is set glyph by glyph as CSS does. Returns the line's width."""
     runs = [r + (0, 0)[len(r) - 4:] if len(r) < 6 else r for r in runs]
     width = sum(g * sz + advance(t, sz, w) + tr * sz * len(t) for t, sz, w, _, tr, g in runs)
-    x0 = x - width if ha == 'right' else x
+    x0 = x - width if ha == 'right' else x - width / 2 if ha == 'center' else x
     for t, sz, w, col, tr, g in runs:
         x0 += g * sz
         for piece in (t if tr else [t]):
@@ -298,6 +275,61 @@ def rbox(ax, x, y, w, h, r, z=1, gid=None, **kw):
     p = FancyBboxPatch((x, y), w, h, boxstyle=f'round,pad=0,rounding_size={r}', zorder=z, gid=gid, **kw)
     ax.add_patch(p)
     return p
+
+
+def shape(x0, y0, x1, y1, tl=0, tr=0, br=0, bl=0):
+    """rectangle (px, y down) with its own radius on each corner — bars round only their data end"""
+    v = [(x0 + tl, y0), (x1 - tr, y0), (x1, y0), (x1, y0 + tr), (x1, y1 - br), (x1, y1), (x1 - br, y1),
+         (x0 + bl, y1), (x0, y1), (x0, y1 - bl), (x0, y0 + tl), (x0, y0), (x0 + tl, y0), (x0 + tl, y0)]
+    c = [Path.MOVETO, Path.LINETO, Path.CURVE3, Path.CURVE3, Path.LINETO, Path.CURVE3, Path.CURVE3,
+         Path.LINETO, Path.CURVE3, Path.CURVE3, Path.LINETO, Path.CURVE3, Path.CURVE3, Path.CLOSEPOLY]
+    return Path(v, c)
+
+
+def columns(values, labels, size, hl, fmt, value_px=20, label_px=16, bar_px=56, fill=BAR_OFF):
+    """vertical bars from one baseline (rounded data end, square on the baseline), the value on each cap and the
+    category under it; bars in hl are honey, the others `fill`"""
+    W, H = size
+    fig, ax = canvas(W, H)
+    lines = max(l.count('\n') + 1 for l in labels)
+    base = H - 10 - label_px * 1.25 * lines   # the category labels sit under the baseline
+    room = base - value_px * 1.9                # the tallest bar leaves room for its value
+    band = W / len(values)
+    ax.plot([0, W], [base, base], color=LINE, lw=PT, solid_capstyle='butt', zorder=3)
+    for k, (v, lab) in enumerate(zip(values, labels)):
+        xc, top, on = band * (k + .5), base - room * v / max(values), k in hl
+        r = min(6, bar_px / 2)
+        ax.add_patch(PathPatch(shape(xc - bar_px / 2, top, xc + bar_px / 2, base, tl=r, tr=r), facecolor=HONEY if on else fill, lw=0, zorder=2))
+        say(ax, xc, top - value_px * .45, [(fmt(v), value_px, 700, HONEY if on else INK2)], ha='center')
+        for i, line in enumerate(lab.split('\n')):
+            say(ax, xc, base + 8 + label_px * (.95 + 1.25 * i), [(line, label_px, 400, MUTE)], ha='center')
+    return fig
+
+
+def hbars(rows, size, label_w=None, value_px=17, label_px=16, bar_px=24):
+    """horizontal bars from one left baseline with a rounded data end, one row per
+    (label, value, text, colour, label colour, hatch). The label sits left of the bar (label_w px wide)
+    or, with label_w=None, on its own line above it so the bars get the full width."""
+    W, H = size
+    fig, ax = canvas(W, H)
+    n, vmax = len(rows), max(r[1] for r in rows)
+    x0 = label_w or 0
+    room = W - x0 - max(advance(r[2], value_px, 700) for r in rows) - 12
+    for k, (lab, v, txt, col, lcol, hatch) in enumerate(rows):
+        row = H / n
+        weight = 700 if lcol == HONEY else 500
+        if label_w:
+            cy = row * (k + .5)
+            say(ax, x0 - 14, cy + .36 * label_px, [(lab, label_px, weight, lcol)], ha='right')
+        else:
+            cy = row * k + label_px * 1.3 + bar_px / 2
+            say(ax, 0, row * k + label_px * .95, [(lab, label_px, weight, lcol)])
+        end = x0 + room * v / vmax
+        r = min(6, bar_px / 2)
+        ax.add_patch(PathPatch(shape(x0, cy - bar_px / 2, end, cy + bar_px / 2, tr=r, br=r), facecolor=col,
+                               edgecolor='#FFFFFF' if hatch else 'none', hatch=hatch, lw=0, zorder=2))
+        say(ax, end + 10, cy + .36 * value_px, [(txt, value_px, 700, HONEY if lcol == HONEY else INK)])
+    return fig
 
 
 def pill(ax, right, cy, text, size, col, bg, z):
@@ -318,7 +350,7 @@ def chart_resolve():
         x = k * (cw + GAP)
         say(ax, x, 20, [(lab, 20, 600, INK2)])
         say(ax, x, 122, [(f'{rate:g}', 92, 800, num, -.045), ('%', 38.6, 700, num, 0, .06)])
-        rbox(ax, x, 166, cw, 16, 8, color='#EFE7DC', lw=0)
+        rbox(ax, x, 166, cw, 16, 8, color='#F2E5D9' if k == 0 else '#F0ECE7', lw=0)  # track: a light step of the bar's hue
         rbox(ax, x, 166, cw * rate / 100, 16, 8, z=2, color=bar, lw=0)
         say(ax, x, 203, [(cases, 16.8, 400, MUTE)])
     return fig
@@ -382,17 +414,18 @@ def chart_visit():
 
 
 def chart_cagr():
+    # four firms' forecasts in one colour — the point is that all of them grow, not the highest one
     vals = [12.3, 7.4, 7.2, 6.55]
     labs = ['Data\nBridge', 'Grand\nView', 'GM\nInsights', 'MRF']
-    return columns(vals, labs, (402, 603), {0}, lambda v: f'{v:g}%', value_pt=14, label_pt=12, width=.78)
+    return columns(vals, labs, (402, 603), set(), lambda v: f'{v:g}%', value_px=19, label_px=16, fill='#E9BE8C')
 
 
 RX = [257.6, 299.2, 323.6, 353.0]
 def chart_rx(size, large=False):
     labs = ['2022', '2023', '2024', '2025']
     fmt = (lambda v: f'{v:g}') if large else (lambda v: f'{v:g}만')
-    return columns(RX, labs, size, {3}, fmt, value_pt=15 if large else 12.5, label_pt=12.5 if large else 11.5,
-                   width=.62 if large else .74, top=1.12)
+    return columns(RX, labs, size, {3}, fmt, value_px=20 if large else 16.5, label_px=16.5 if large else 15.5,
+                   bar_px=84 if large else 60)
 
 
 def chart_epoch():
@@ -415,45 +448,66 @@ def chart_epoch():
     return fig
 
 
-def hbars(rows, size, label_w, value_w, label_pt=12.5, value_pt=13, xmax=None, height=.56):
-    """horizontal bars: label | bar | value, one row per (label, value, text, colour, label colour, hatch)"""
-    fig = plt.figure(figsize=px(*size))
-    ax = fig.add_axes([label_w, .04, 1 - label_w - value_w, .92])
-    n = len(rows)
-    xmax = xmax or max(r[1] for r in rows)
-    left = blended_transform_factory(ax.transAxes, ax.transData)  # x in axes fraction, y in rows
-    for k, (lab, v, txt, col, lcol, hatch) in enumerate(rows):
-        y = n - 1 - k
-        ax.barh(y, v, height=height, color=col, hatch=hatch, edgecolor='#FFFFFF' if hatch else col, lw=0)
-        ax.text(-.03, y, lab, transform=left, ha='right', va='center', clip_on=False,
-                fontsize=label_pt, fontweight='bold' if lcol == HONEY else 'medium', color=lcol)
-        ax.text(v + xmax * .02, y, txt, ha='left', va='center', fontsize=value_pt, fontweight='bold', color=lcol if lcol == HONEY else INK)
-    ax.set_xlim(0, xmax * (1 + value_w * 3.2)); ax.set_ylim(-.6, n - .4); ax.axis('off')
-    return fig
-
-
 def chart_cost_vs():
     plt.rcParams['hatch.color'] = '#FFFFFF'; plt.rcParams['hatch.linewidth'] = 2
     return hbars([('다중 센서 스마트 폴대 · 제작비', 100, '100만 원+', BAR_DIM, INK2, '//'),
-                  ('INFU RETRO · 실질 판매원가', 8, '8만 원', HONEY, HONEY, None)], (787, 84), .3, .06, height=.62)
+                  ('INFU RETRO · 실질 판매원가', 8, '8만 원', HONEY, HONEY, None)], (787, 84), label_w=236,
+                 value_px=17.5, label_px=16.5, bar_px=26)
 
 
 def chart_cost_stack():
-    fig = plt.figure(figsize=px(787, 48))
-    ax = fig.add_axes([0, 0, 1, 1])
+    # 원가 8만 원의 구성: 조각 사이는 2px 틈(카드 바탕), 바깥 두 끝만 둥글게
+    W, H, GAP = 787, 48, 2
+    fig, ax = canvas(W, H)
     parts = [('제조 3.5만', 35, HONEY, '#FFFFFF'), ('운영 2만', 20, '#EDBB85', INK), ('유통 2.5만', 25, '#EFE5D8', INK2)]
-    x = 0
-    for lab, w, col, tcol in parts:
-        ax.barh(0, w, left=x, height=1, color=col, lw=0)
-        ax.text(x + w / 2, 0, lab, ha='center', va='center', fontsize=12, fontweight='bold', color=tcol)
-        x += w
-    ax.set_xlim(0, 80); ax.set_ylim(-.5, .5); ax.axis('off')
+    total, x = sum(p[1] for p in parts), 0
+    for k, (lab, w, col, tcol) in enumerate(parts):
+        seg = (W - GAP * (len(parts) - 1)) * w / total
+        l, r = (6 if k == 0 else 0), (6 if k == len(parts) - 1 else 0)
+        ax.add_patch(PathPatch(shape(x, 0, x + seg, H, tl=l, bl=l, tr=r, br=r), facecolor=col, lw=0))
+        say(ax, x + seg / 2, H / 2 + .36 * 16, [(lab, 16, 700, tcol)], ha='center')
+        x += seg + GAP
     return fig
 
 
 def chart_entry():
+    # labels above the bars so both bars use the card's full width
     return hbars([('펌프 5대', 550, '550만', BAR_DIM, INK2, None),
-                  ('INFU RETRO 5대', 125, '125만', HONEY, HONEY, None)], (331, 96), .4, .18, label_pt=12, value_pt=13.5, height=.6)
+                  ('INFU RETRO 5대', 125, '125만', HONEY, HONEY, None)], (331, 136), value_px=18, label_px=15.5, bar_px=28)
+
+
+def chart_cnn_pattern():
+    # 7장 썸네일: CNN이 보는 4×4 상태 패턴(최근 16초, 느림 −1 · 정상 0 · 빠름 +1) — 왼쪽 정상, 오른쪽 이상(유속 저하가 이어짐)
+    W, H, C, G, SEP = 112, 84, 10, 2, 10
+    fig, ax = canvas(W, H)
+    normal = [0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0]
+    anomaly = [0, 1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+    tone = {0: '#EFE7DC', 1: '#E9BE8C', -1: HONEY}
+    side = 4 * C + 3 * G
+    left = (W - 2 * side - SEP) / 2
+    for x0, pat in ((left, normal), (left + side + SEP, anomaly)):
+        for i, st in enumerate(pat):
+            r, c = divmod(i, 4)
+            rbox(ax, x0 + c * (C + G), (H - side) / 2 + r * (C + G), C, C, 2, color=tone[st], lw=0)
+    return fig
+
+
+def chart_grade():
+    # 14장: 동물용 의료기기 등급 — 위험이 클수록 위(좁게). INFU RETRO 구조는 1등급(신고) (덱의 자리 447 px 폭)
+    W, H, RH, GAP = 447, 312, 55, 9
+    fig, ax = canvas(W, H)
+    y = 4
+    for k, (grade, kind, frac) in enumerate([('4등급', '허가', .50), ('3등급', '허가', .65), ('2등급', '허가', .80), ('1등급', '신고', .95)]):
+        w, hit = W * frac, k == 3
+        x = (W - w) / 2
+        if hit:  # box-shadow: 0 .6em 1.4em rgba(173, 98, 41, .28)
+            rbox(ax, x, y + 12.6, w, RH, 11.5, z=1, gid='hitsh', color=HONEY, alpha=.28, lw=0)
+        rbox(ax, x, y, w, RH, 11.5, z=2, color=HONEY if hit else '#EFE5D8', lw=0)
+        say(ax, x + 23, y + RH / 2 + .36 * 21, [(grade, 21, 800 if hit else 700, '#FFFFFF' if hit else INK2)])
+        say(ax, x + w - 23, y + RH / 2 + .36 * 18.5, [(kind, 18.5, 800 if hit else 600, '#FFFFFF' if hit else MUTE)], ha='right')
+        y += RH + GAP
+    say(ax, W / 2, y - GAP + 7.6 + 16.8 * .95, [('INFU RETRO 구조', 16.8, 800, HONEY)], ha='center')
+    return fig
 
 
 def chart_filter():
@@ -490,4 +544,6 @@ if __name__ == '__main__':
     save(chart_cost_vs(), 'cost-vs.svg')
     save(chart_cost_stack(), 'cost-stack.svg')
     save(chart_entry(), 'entry.svg')
+    save(chart_cnn_pattern(), 'cnn-pattern.svg')
+    save(chart_grade(), 'grade.svg', blurs={'hitsh': 14.7})                     # CSS: 1.4em blur
     print(f'  자이로-편차 r={r:.2f}, RMS {a:.2f} → {b:.2f} g')

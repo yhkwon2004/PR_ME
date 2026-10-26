@@ -108,7 +108,7 @@ L -3 0
      </g>
      <g id="text_1">
       <!-- -40 -->
-      <g style="fill: #8c7c6f" transform="translate(19.16 83.254831) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(19.16 83.254831) scale(0.08 -0.08)">
        <defs>
         <path id="Pretendard-Regular-33c4" d="M 2375 2506 
 L 394 2506 
@@ -171,7 +171,7 @@ L 510.624 52.809962
      </g>
      <g id="text_2">
       <!-- 0 -->
-      <g style="fill: #8c7c6f" transform="translate(27.61375 56.616603) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(27.61375 56.616603) scale(0.08 -0.08)">
        <use xlink:href="#Pretendard-Regular-32c9"/>
       </g>
      </g>
@@ -189,7 +189,7 @@ L 510.624 26.171734
      </g>
      <g id="text_3">
       <!-- 40 -->
-      <g style="fill: #8c7c6f" transform="translate(22.62125 29.978375) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(22.62125 29.978375) scale(0.08 -0.08)">
        <use xlink:href="#Pretendard-Regular-32cd"/>
        <use xlink:href="#Pretendard-Regular-32c9" transform="translate(62.40625 0)"/>
       </g>
@@ -656,7 +656,7 @@ z
    </g>
    <g id="text_5">
     <!-- 흔들림 두 번 -->
-    <g style="fill: #8c7c6f" transform="translate(465.194703 17.176) scale(0.095 -0.095)">
+    <g style="fill: #76665a" transform="translate(465.194703 17.176) scale(0.095 -0.095)">
      <defs>
       <path id="Pretendard-Bold-3154" d="M 5356 1869 
 L 169 1869 
@@ -901,7 +901,7 @@ L 510.624 172.407921
      </g>
      <g id="text_6">
       <!-- -5 -->
-      <g style="fill: #8c7c6f" transform="translate(24.145 176.214562) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(24.145 176.214562) scale(0.08 -0.08)">
        <defs>
         <path id="Pretendard-Regular-32ce" d="M 1900 -63 
 C 2800 -63 3463 569 3463 1444 
@@ -941,7 +941,7 @@ L 510.624 152.064
      </g>
      <g id="text_7">
       <!-- 0 -->
-      <g style="fill: #8c7c6f" transform="translate(27.61375 155.870641) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(27.61375 155.870641) scale(0.08 -0.08)">
        <use xlink:href="#Pretendard-Regular-32c9"/>
       </g>
      </g>
@@ -959,7 +959,7 @@ L 510.624 131.720079
      </g>
      <g id="text_8">
       <!-- 5 -->
-      <g style="fill: #8c7c6f" transform="translate(27.60625 135.52672) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(27.60625 135.52672) scale(0.08 -0.08)">
        <use xlink:href="#Pretendard-Regular-32ce"/>
       </g>
      </g>
@@ -1765,7 +1765,7 @@ z
      </g>
      <g id="text_11">
       <!-- 0 -->
-      <g style="fill: #8c7c6f" transform="translate(36.496875 296.065281) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(36.496875 296.065281) scale(0.08 -0.08)">
        <use xlink:href="#Pretendard-Regular-32c9"/>
       </g>
      </g>
@@ -1778,7 +1778,7 @@ z
      </g>
      <g id="text_12">
       <!-- 2 -->
-      <g style="fill: #8c7c6f" transform="translate(115.1565 296.065281) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(115.1565 296.065281) scale(0.08 -0.08)">
        <defs>
         <path id="Pretendard-Regular-32cb" d="M 425 0 
 L 3363 0 
@@ -1810,7 +1810,7 @@ z
      </g>
      <g id="text_13">
       <!-- 4 -->
-      <g style="fill: #8c7c6f" transform="translate(193.63175 296.065281) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(193.63175 296.065281) scale(0.08 -0.08)">
        <use xlink:href="#Pretendard-Regular-32cd"/>
       </g>
      </g>
@@ -1823,7 +1823,7 @@ z
      </g>
      <g id="text_14">
       <!-- 6 -->
-      <g style="fill: #8c7c6f" transform="translate(272.298875 296.065281) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(272.298875 296.065281) scale(0.08 -0.08)">
        <defs>
         <path id="Pretendard-Regular-32cf" d="M 2000 -63 
 C 2950 -69 3575 613 3575 1463 
@@ -1857,7 +1857,7 @@ z
      </g>
      <g id="text_15">
       <!-- 8 -->
-      <g style="fill: #8c7c6f" transform="translate(350.950375 296.065281) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(350.950375 296.065281) scale(0.08 -0.08)">
        <defs>
         <path id="Pretendard-Regular-32d1" d="M 1938 -63 
 C 2881 -63 3544 463 3550 1200 
@@ -1897,7 +1897,7 @@ z
      </g>
      <g id="text_16">
       <!-- 10 -->
-      <g style="fill: #8c7c6f" transform="translate(427.863125 296.065281) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(427.863125 296.065281) scale(0.08 -0.08)">
        <defs>
         <path id="Pretendard-Regular-32ca" d="M 2025 4525 
 L 1456 4525 
@@ -1924,7 +1924,7 @@ z
      </g>
      <g id="text_17">
       <!-- 12 -->
-      <g style="fill: #8c7c6f" transform="translate(506.52275 296.065281) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(506.52275 296.065281) scale(0.08 -0.08)">
        <use xlink:href="#Pretendard-Regular-32ca"/>
        <use xlink:href="#Pretendard-Regular-32cb" transform="translate(43.84375 0)"/>
       </g>
@@ -2203,7 +2203,7 @@ L 510.624 271.661959
      </g>
      <g id="text_19">
       <!-- -5 -->
-      <g style="fill: #8c7c6f" transform="translate(24.145 275.468599) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(24.145 275.468599) scale(0.08 -0.08)">
        <use xlink:href="#Pretendard-Regular-33c4"/>
        <use xlink:href="#Pretendard-Regular-32ce" transform="translate(43.265625 0)"/>
       </g>
@@ -2222,7 +2222,7 @@ L 510.624 251.318038
      </g>
      <g id="text_20">
       <!-- 0 -->
-      <g style="fill: #8c7c6f" transform="translate(27.61375 255.124678) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(27.61375 255.124678) scale(0.08 -0.08)">
        <use xlink:href="#Pretendard-Regular-32c9"/>
       </g>
      </g>
@@ -2240,7 +2240,7 @@ L 510.624 230.974117
      </g>
      <g id="text_21">
       <!-- 5 -->
-      <g style="fill: #8c7c6f" transform="translate(27.60625 234.780757) scale(0.08 -0.08)">
+      <g style="fill: #76665a" transform="translate(27.60625 234.780757) scale(0.08 -0.08)">
        <use xlink:href="#Pretendard-Regular-32ce"/>
       </g>
      </g>
