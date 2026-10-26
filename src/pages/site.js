@@ -2,13 +2,13 @@ import gsap from 'gsap';
 import { projects, byId, CATEGORIES, categoryOf, FEATURED, ALIAS } from '../data/projects.js';
 import { profile, scenes } from '../content.js';
 import { ORGS, WALL, ORG_INDEX, orgsOf, awardOrgs } from '../data/orgs.js';
-import { AWARDS, awardsOf, bestOf, TIER_KEY, TIER_LABEL } from '../data/awards.js';
+import { AWARDS, awardsOf, bestOf, TIER_KEY } from '../data/awards.js';
 import { HISTORY, HISTORY_YEARS, historyItem } from '../data/history.js';
 import { PRESS, pressOf } from '../data/press.js';
 import { DOMAIN_SKILLS, SKILLS, CERTS, SKILL_COUNT } from '../data/skills.js';
-import { STAGES, VALUES, PRELUDE } from '../data/growth.js';
-import { SWOT, STRATEGY, PLAN, TARGET, JOURNEY_SOURCE } from '../data/journey.js';
+import { STAGES } from '../data/growth.js';
 import { createPager } from '../ui/pager.js';
+import { presentDeck, PR_SECS } from './present.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
@@ -623,394 +623,13 @@ function skillsPage() {
   </div>`;
 }
 
-// ── 발표 자료(/present · 예전 /growth/detail): 스크롤 없이 한 화면씩 넘기는 덱 ──
-// 쪽(data-sec) → 묶음(data-grp) → 블록(.jr-b)으로 적어 두면 ui/pager.js가 지금 화면 크기에 맞춰 화면마다 나눠 담는다.
-// data-split 블록은 줄 단위로 다음 화면에 이어지고(data-cont 한 줄을 달고), 'cols' 묶음은 넓은 화면에서 두 단.
-const PR_SECS = [
-  ['about', '자기소개', 'ABOUT ME', '소개'],
-  ['ability', '보유 역량 분석', 'COMPETENCY', '역량'],
-  ['work', '프로젝트 경험', 'PROJECTS', '프로젝트'],
-  ['plan', '미래 계획', 'FUTURE PLAN', '계획'],
-];
-const jrGroup = (id, o, inner) =>
-  `<div data-grp="${id}" data-title="${esc(o.title || '')}" data-layout="${o.layout || 'stack'}"${o.anchor ? ` data-anchor="${o.anchor}"` : ''}${o.stage ? ` data-stage="${o.stage}"` : ''}${o.q ? ` data-q="${o.q}"` : ''}>${inner}</div>`;
-const jrHead = (h, lead = '') => `<header class="jr-gh" data-head><h2>${h}</h2>${lead ? `<p>${lead}</p>` : ''}</header>`;
+// ── 발표 자료(/present · 예전 /growth/detail): 스크롤 없이 한 화면씩 넘기는 덱 — 내용은 pages/present.js, 넘기기는 ui/pager.js ──
 // 사진은 덱이 지금 화면 가까이에서만 받는다(src → data-src)
 const jrLazy = (html) => html.replace(/<img\b([^>]*)>/g, (m, a) => `<img${a.replace(/\sloading="lazy"/, '').replace(/\ssrcset=/, ' data-srcset=').replace(/\ssrc=/, ' data-src=')}>`);
-const stageOfYear = (year) => STAGES.find((s) => s.years.includes(year));
-
-// 해마다 프로젝트 · 수상 수(가로 막대 둘) — 한 축, 값은 막대 끝에 바로
-function jrChart() {
-  const rows = HISTORY.map((y) => ({ y: y.year, p: y.projects.length, a: y.awards.length }));
-  const max = Math.max(...rows.flatMap((r) => [r.p, r.a]));
-  const bar = (n, k, label) => `<span class="jr-bar is-${k}" style="--v:${(n / max).toFixed(3)}" title="${label} ${n}"><i></i><b>${n}</b></span>`;
-  return `<figure class="jr-b jr-chart" aria-labelledby="jr-chart-t">
-    <figcaption><b id="jr-chart-t">해마다 프로젝트 · 수상</b><span class="jr-legend"><i class="is-p"></i>프로젝트<i class="is-a"></i>수상</span></figcaption>
-    <ol>${rows.map((r) => `<li><span class="jr-cy">${r.y}</span><span class="jr-bars">${bar(r.p, 'p', `${r.y}년 프로젝트`)}${bar(r.a, 'a', `${r.y}년 수상`)}</span></li>`).join('')}</ol>
-    <table class="sr-only"><caption>해마다 프로젝트 · 수상 수</caption><tr><th>연도</th><th>프로젝트</th><th>수상</th></tr>${rows.map((r) => `<tr><td>${r.y}</td><td>${r.p}</td><td>${r.a}</td></tr>`).join('')}</table>
-  </figure>`;
-}
-// 사진 타일(사진 · 이름 · 연도) — 학년 · 계획의 대표 프로젝트
-const jrTile = (p) =>
-  `<a class="jr-tile" href="${p.path}" data-link data-cat="${esc(p.category)}"><span class="jr-tile-ph">${p.cover ? img(p.cover, { sizes: '(max-width: 600px) 46vw, 280px' }) : `<i>${esc(categoryOf(p.category).label)}</i>`}</span><span class="jr-tile-t"><b>${esc(p.title)}</b><small>${esc(p.year)} · ${esc(categoryOf(p.category).ko)}</small></span></a>`;
-// 작은 프로젝트 카드(사진 · 이름 · 연도) — 이력 항목 · 그 해 프로젝트
-const jrProj = (p) =>
-  `<a class="jr-pc" href="${p.path}" data-link data-cat="${esc(p.category)}"><span class="jr-pc-ph">${p.cover ? img(p.cover, { sizes: '96px' }) : `<i>${esc(categoryOf(p.category).label)}</i>`}</span><span class="jr-pc-t"><b>${esc(p.title)}</b><small>${esc(p.year)} · ${esc(categoryOf(p.category).ko)}</small></span></a>`;
-const jrProof = (id) => {
-  const p = byId(id);
-  return p ? `<a class="jr-chip" href="${p.path}" data-link data-cat="${esc(p.category)}">${esc(p.title)}</a>` : '';
-};
-
-function jrOverview() {
-  const path = `<ol class="jr-b jr-path" data-split data-cont="세 단계 — 이어서">${STAGES.map(
-    (g) => `<li data-stage="${g.id}"><a href="#s-${g.id}" data-jr-go="s-${g.id}"><span class="jr-k"><span class="jr-badge">${esc(g.code)}</span>${esc(g.grade)} · ${esc(g.span)}</span><strong>${esc(g.title)}</strong><small>${esc(g.headline)}</small><em>프로젝트 ${g.projects.length} · 수상 ${g.awards.length}${g.grand ? ` · 대상 ${g.grand}` : ''}</em><i aria-hidden="true">→</i></a></li>`
-  ).join('')}</ol>`;
-  const intro = jrGroup('ov', { title: '세 학년, 세 단계', layout: 'cols', anchor: 'overview' }, jrHead('세 학년, 세 단계', `<b>${esc(PRELUDE.year)}</b> ${esc(PRELUDE.text)}`) + jrChart() + path);
-  const stages = STAGES.map((g, k) =>
-    jrGroup(
-      `s-${g.id}`,
-      { title: `${g.grade} · ${g.title}`, layout: 'cols', anchor: `s-${g.id}`, stage: g.id },
-      `<header class="jr-sh" data-head>
-        <span class="jr-no">${pad(k + 1)}</span>
-        <div class="jr-sh-t"><p class="jr-k"><span class="jr-badge">${esc(g.code)}</span>${esc(g.grade)} · ${esc(g.span)}</p><h2>${esc(g.title)}</h2><p class="jr-hl">${esc(g.headline)}</p></div>
-        <dl class="jr-n"><div><dt>프로젝트</dt><dd>${g.projects.length}</dd></div><div><dt>수상</dt><dd>${g.awards.length}</dd></div><div><dt>대상</dt><dd>${g.grand}</dd></div><div><dt>자격</dt><dd>${g.certs.length}</dd></div></dl>
-      </header>
-      <div class="jr-b jr-story" data-split>${g.story.split(/(?<=다\.)\s+/).map((t) => `<p>${esc(t)}</p>`).join('')}</div>
-      <blockquote class="jr-b jr-learned"><span>이 시기에 배운 것</span>${esc(g.learned)}</blockquote>
-      <p class="jr-b jr-ylinks">${g.years.map((y) => `<a href="#y${y}" data-jr-go="y${y}">${y}년 이력 보기 →</a>`).join('')}</p>
-      <div class="jr-b jr-tiles" data-split data-cont="${esc(g.grade)} 대표 프로젝트 — 이어서">${g.featuredProjects.slice(0, 4).map(jrTile).join('')}</div>`
-    )
-  );
-  const values = jrGroup(
-    'values',
-    { title: '가치관', anchor: 'values' },
-    jrHead('가치관 — 이렇게 일합니다', '세 학년 동안의 프로젝트에서 되풀이된 일하는 방식입니다.') +
-      `<ol class="jr-b jr-values" data-split data-cont="가치관 — 이어서">${VALUES.map(
-        (v) => `<li><p class="jr-vk"><b>${esc(v.no)}</b>${esc(v.en)}</p><h3>${esc(v.title)}</h3><p class="jr-vt">${esc(v.text)}</p><p class="jr-chips">${v.proof.slice(0, 3).map(jrProof).join('')}</p></li>`
-      ).join('')}</ol>`
-  );
-  return intro + stages.join('') + values;
-}
-
-function jrYears(media) {
-  const total = HISTORY.reduce((n, y) => n + y.items.length, 0);
-  const tl = jrGroup(
-    'yr',
-    { title: `${HISTORY[0].year} — ${HISTORY[HISTORY.length - 1].year} 한눈에`, anchor: 'years' },
-    jrHead('해마다 한 일', `이력 ${total}개 · 프로젝트 ${projects.length} · 수상 ${AWARDS.length} — 해를 누르면 그 해의 기록으로`) +
-      `<ol class="jr-b jr-ytl" data-split data-cont="연도 — 이어서">${HISTORY.map((y) => {
-        const g = stageOfYear(y.year);
-        return `<li${g ? ` data-stage="${g.id}"` : ''}><a href="#y${y.year}" data-jr-go="y${y.year}"><span class="jr-ytl-h"><b>${y.year}</b>${g ? `<span class="jr-badge">${esc(g.code)}</span>` : ''}</span><span class="jr-ytl-n">이력 ${y.items.length} · 프로젝트 ${y.projects.length} · 수상 ${y.awards.length}</span><ul>${y.items.map((it) => `<li>${esc(it.title)}</li>`).join('')}</ul><i aria-hidden="true">→</i></a></li>`;
-      }).join('')}</ol>`
-  );
-  const years = HISTORY.map((y) => {
-    const g = stageOfYear(y.year);
-    const tiers = [1, 2, 3, 4, 5].map((t) => [t, y.awards.filter((a) => a.tier === t).length]).filter(([, n]) => n);
-    const items = y.items.map((it) => {
-      const certs = it.awards.filter((a) => a.certs.length || a.photo);
-      return `<article class="jr-b jr-it" data-split data-cont="↳ ${esc(it.title)}">
-        <div class="jr-it-h"><p class="jr-ik">${esc(it.kind)}</p><h3>${esc(it.title)}</h3>${it.note ? `<p class="jr-note">${esc(it.note)}</p>` : ''}</div>
-        ${it.projects.length ? `<div class="jr-pcs">${it.projects.map(jrProj).join('')}</div>` : ''}
-        ${
-          certs.length
-            ? `<ul class="jr-certs">${certs
-                .map((a) => {
-                  const at = media.length;
-                  a.certs.forEach((c) => media.push({ type: 'image', src: c.src, caption: certCaption(a) }));
-                  if (!a.certs.length) media.push({ type: 'image', src: a.photo.src, caption: certCaption(a) });
-                  return `<li><button type="button" data-cert="${at}" data-n="${a.certs.length || 1}" data-tier="${TIER_KEY[a.tier]}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기">${certSheet(a, { sizes: '96px' })}</button><span><b>${esc(a.grade)}</b>${esc(a.contest)}</span></li>`;
-                })
-                .join('')}</ul>`
-            : ''
-        }
-        ${it.press.length ? `<ul class="jr-press">${it.press.map((a) => `<li><a href="${esc(a.url)}" target="_blank" rel="noopener"><small>${esc(a.publisher)}${a.date ? ` · ${esc(a.date.replace(/-/g, '.'))}` : ''}</small><b>${esc(a.title)}</b><i aria-hidden="true">↗</i></a></li>`).join('')}</ul>` : ''}
-      </article>`;
-    });
-    return jrGroup(
-      `y${y.year}`,
-      { title: `${y.year}${g ? ` · ${g.grade} ${g.title}` : ''}`, layout: 'cols', anchor: `y${y.year}`, stage: g?.id },
-      `<header class="jr-yh" data-head>
-        <b class="jr-yy">${y.year}</b>
-        <div>
-          ${g ? `<p class="jr-k"><span class="jr-badge">${esc(g.code)}</span>${esc(g.grade)} · ${esc(g.title)}</p>` : ''}
-          <p class="jr-yn"><span><em>${y.items.length}</em>이력</span><span><em>${y.projects.length}</em>프로젝트</span><span><em>${y.awards.length}</em>수상</span>${tiers.length ? `<span class="jr-tiers">${tiers.map(([t, n]) => `${TIER_LABEL[t]} ${n}`).join(' · ')}</span>` : ''}</p>
-        </div>
-        <p class="jr-ya">${y.awards.length ? `<a href="/awards#y${y.year}" data-link>상장 ${y.awards.length}건 →</a>` : ''}<a href="/growth#y${y.year}" data-link>필름에서 보기 →</a></p>
-      </header>
-      ${items.join('')}
-      <div class="jr-b jr-yall" data-split data-cont="${y.year}년 프로젝트 — 이어서"><h3>${y.year}년 프로젝트 ${y.projects.length}개</h3>${y.projects.map(jrProj).join('')}</div>`
-    );
-  });
-  return tl + years.join('');
-}
-
-function jrSwot() {
-  const key = (q) => `swot-${q.key.toLowerCase()}`;
-  const mx = jrGroup(
-    'swot',
-    { title: '네 칸 한눈에', anchor: 'swot' },
-    jrHead('SWOT 분석', '기록으로 본 지금의 나 — 강점과 기회는 키우고, 보완할 점과 위협은 대응 방법과 함께 적었습니다.') +
-      `<div class="jr-b jr-mx" data-split data-cont="SWOT — 이어서">${SWOT.map(
-        (q) => `<a class="jr-mq" data-q="${q.key}" href="#${key(q)}" data-jr-go="${key(q)}"><span class="jr-mq-h"><b class="jr-ql">${q.key}</b><span><strong>${esc(q.title)}</strong><small>${esc(q.en)}</small></span><em>${q.items.length}</em></span><ul>${q.items.map((it) => `<li>${esc(it.h)}</li>`).join('')}</ul><i aria-hidden="true">자세히 →</i></a>`
-      ).join('')}</div>`
-  );
-  const quads = SWOT.map((q) =>
-    jrGroup(
-      key(q),
-      { title: `${q.key} · ${q.title}`, layout: 'cols', anchor: key(q), q: q.key },
-      `<header class="jr-qh" data-head><b class="jr-ql">${q.key}</b><h2>${esc(q.title)}<small>${esc(q.en)} · ${q.items.length}</small></h2></header>` +
-        q.items
-          .map(
-            (it) => `<article class="jr-b jr-qi" data-split data-cont="↳ ${esc(it.h)}"><h3>${esc(it.h)}</h3><p>${esc(it.t)}</p>${it.fix ? `<p class="jr-fix"><span>대응</span>${esc(it.fix)}</p>` : ''}${it.proof?.length ? `<p class="jr-chips">${it.proof.map(jrProof).join('')}</p>` : ''}</article>`
-          )
-          .join('')
-    )
-  );
-  const strat = jrGroup(
-    'strategy',
-    { title: '대응 전략', anchor: 'strategy' },
-    jrHead('대응 전략', '강점 · 기회를 키우고 보완할 점 · 위협을 줄이는 네 방향 — 미래 계획으로 이어집니다.') +
-      `<ol class="jr-b jr-strat" data-split data-cont="대응 전략 — 이어서">${STRATEGY.map((x) => `<li data-q="${x.key[0]}"><b>${esc(x.key)}</b><h3>${esc(x.h)}</h3><p>${esc(x.t)}</p></li>`).join('')}</ol>
-      <p class="jr-b jr-go"><a href="#plan" data-jr-go="plan">이 전략을 담은 미래 계획 보기 →</a></p>`
-  );
-  return mx + quads.join('') + strat;
-}
-
-function jrPlan() {
-  const related = [...new Set(PLAN.flatMap((c) => c.items.map((it) => it.proof)).filter(Boolean))].map(byId).filter(Boolean);
-  const top = jrGroup(
-    'plan',
-    { title: '지원 직무와 로드맵', anchor: 'plan' },
-    `<div class="jr-b jr-target">
-      <p class="jr-k"><span class="jr-badge">TARGET</span>지원 직무</p>
-      <h2>${esc(TARGET.role)}</h2>
-      <p class="jr-tl">${esc(TARGET.line)}</p>
-      <p class="jr-chips">${TARGET.domains.map((d) => `<span class="jr-chip is-plain">${esc(d)}</span>`).join('')}</p>
-      <p class="jr-kw">${TARGET.keywords.map((k) => `<span>#${esc(k)}</span>`).join('')}</p>
-    </div>
-    <ol class="jr-b jr-road" data-split data-cont="로드맵 — 이어서">${PLAN.map(
-      (c) => `<li data-step="${c.key}"><a href="#plan-${c.key}" data-jr-go="plan-${c.key}"><p class="jr-when">${esc(c.when)}</p><strong>${esc(c.title)}</strong><ul>${c.items.map((it) => `<li>${esc(it.h)}</li>`).join('')}</ul><i aria-hidden="true">→</i></a></li>`
-    ).join('')}</ol>`
-  );
-  const steps = PLAN.map((c) =>
-    jrGroup(
-      `plan-${c.key}`,
-      { title: `${c.when} · ${c.title}`, layout: 'cols', anchor: `plan-${c.key}` },
-      `<header class="jr-ph" data-head data-step="${c.key}"><p class="jr-when">${esc(c.when)}</p><h2>${esc(c.title)}</h2></header>` +
-        c.items.map((it) => `<article class="jr-b jr-pi" data-step="${c.key}" data-split data-cont="↳ ${esc(it.h)}"><h3>${esc(it.h)}</h3><p>${esc(it.t)}</p>${it.proof ? `<p class="jr-chips">${jrProof(it.proof)}</p>` : ''}</article>`).join('')
-    )
-  );
-  const end = jrGroup(
-    'plan-more',
-    { title: '이어진 프로젝트', anchor: 'plan-projects' },
-    jrHead('계획과 이어진 프로젝트') +
-      `<div class="jr-b jr-tiles is-wide" data-split data-cont="이어진 프로젝트 — 이어서">${related.map(jrTile).join('')}</div>
-      <p class="jr-b jr-srcnote">${esc(JOURNEY_SOURCE)}</p>`
-  );
-  return top + steps.join('') + end;
-}
-
-// ── 발표 자료: 표지 → 01 자기소개 → 02 보유 역량 분석 → 03 프로젝트 경험 → 04 미래 계획 → 감사합니다 ──
-// 필름과 같은 순서 — 발표할 때는 이 덱을 ← → (또는 프레젠터의 다음 · 이전)로 넘기고, F로 전체 화면
-function prCover() {
-  const grand = AWARDS.filter((a) => a.tier === 1).length;
-  const desc = {
-    about: '소개 · 학력 · 성장 과정 · 가치관',
-    ability: '핵심 역량 · 분야별 기술 · 자격 · SWOT',
-    work: `분야별 개요 · 대표 프로젝트 ${FEATURED.length} · 연도별 이력 · 성과`,
-    plan: '지원 직무 · 지금 → 다음 → 진로 목표',
-  };
-  return jrGroup(
-    'cover',
-    {},
-    `<div class="jr-b jr-cover">
-      ${profile.photo ? `<img class="pr-face" src="${esc(profile.photo.src)}" width="${profile.photo.w}" height="${profile.photo.h}" alt="" />` : ''}
-      <p class="pg-kicker">PORTFOLIO ${esc(profile.span)} — ${esc(profile.role)}</p>
-      <h1 class="pr-name">${esc(profile.name)}<span>${esc(profile.en)}</span></h1>
-      <p class="pr-role">${esc(profile.roleKo)}</p>
-      <p class="jr-motto">${esc(profile.motto)}</p>
-    </div>
-    <dl class="jr-b jr-sum">
-      <div><dt>프로젝트</dt><dd>${projects.length}</dd></div>
-      <div><dt>수상</dt><dd>${AWARDS.length}<small>대상 ${grand}</small></dd></div>
-      <div><dt>자격</dt><dd>${CERTS.length}</dd></div>
-      <div><dt>공식 보도</dt><dd>${PRESS.length}</dd></div>
-    </dl>
-    <nav class="jr-b jr-toc" aria-label="발표 순서" data-split data-cont="발표 순서 — 이어서">${PR_SECS.map(
-      ([id, ko], k) => `<a href="#${id}" data-jr-go="${id}"><b>${pad(k + 1)}</b><span><strong>${ko}</strong><small>${desc[id]}</small></span><i aria-hidden="true">→</i></a>`
-    ).join('')}</nav>
-    <p class="jr-b jr-hint"><span class="jr-hint-ico" aria-hidden="true"><i></i></span>옆으로 끌거나 위로 밀어 · 휠 · ← → 로 한 화면씩 · F 전체 화면</p>
-    <div class="jr-b jr-arch">${tabs('journey')}</div>`
-  );
-}
-
-// 01 자기소개: 소개(사진 · 이름 · 한 줄 · 사실 · 연락처) → 학력 · 기록 → 성장 과정(학년 세 단계 · 가치관)
-function prAbout() {
-  const edu = profile.education || [];
-  const now = edu.filter((e) => e.note !== '입학');
-  const links = profile.links.filter((l) => /Email|GitHub|Notion/.test(l.label));
-  const grand = AWARDS.filter((a) => a.tier === 1).length;
-  const me = jrGroup(
-    'me',
-    { title: '소개', anchor: 'about' },
-    `<article class="jr-b pr-card">
-      ${profile.photo ? `<figure class="pr-photo"><img src="${esc(profile.photo.src)}" width="${profile.photo.w}" height="${profile.photo.h}" alt="${esc(profile.name)} 증명사진" /></figure>` : ''}
-      <div class="pr-id">
-        <p class="pr-k">${esc(profile.role)}</p>
-        <h2 class="pr-nm">${esc(profile.name)}<span>${esc(profile.en)}</span></h2>
-        <p class="pr-motto">${esc(profile.motto)}</p>
-        <p class="pr-sum">${esc(profile.summary)}</p>
-        <dl class="pr-facts">
-          <div><dt>출생</dt><dd>${esc(profile.born)}년</dd></div>
-          <div><dt>기간</dt><dd>${esc(profile.span)} 대학 시절</dd></div>
-          ${now.map((e) => `<div><dt>${e.note.includes('복수') ? '복수전공' : '소속'}</dt><dd>${esc(e.school)} ${esc(e.major)}</dd></div>`).join('')}
-        </dl>
-        <ul class="pr-links">${links.map((l) => `<li><a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}><span>${esc(l.label)}</span>${esc(l.value)}</a></li>`).join('')}</ul>
-      </div>
-    </article>`
-  );
-  const record = jrGroup(
-    'edu',
-    { title: '학력 · 기록', layout: 'cols', anchor: 'education' },
-    jrHead('학력과 숫자로 본 기록', '인공지능학과로 입학해 컴퓨터소프트웨어공학과로 옮기고, 스마트 모빌리티 SW공학을 복수전공하고 있습니다.') +
-      `<ol class="jr-b pr-edu">${edu.map((e) => `<li><time>${esc(e.period)}</time><b>${esc(e.school)}</b><span>${esc(e.major)}</span><em>${esc(e.note)}</em></li>`).join('')}</ol>
-      <dl class="jr-b pr-nums">
-        <div><dt>프로젝트</dt><dd>${projects.length}</dd></div>
-        <div><dt>수상</dt><dd>${AWARDS.length}<small>대상 ${grand}</small></dd></div>
-        <div><dt>자격</dt><dd>${CERTS.length}</dd></div>
-        <div><dt>공식 보도</dt><dd>${PRESS.length}</dd></div>
-      </dl>`
-  );
-  return me + record + jrOverview();
-}
-
-// 02 보유 역량 분석: 핵심 역량 세 축 → 분야별 기술(근거 프로젝트 수) · 자격 → SWOT → 대응 전략
-function prAbility() {
-  const comp = scenes.find((s) => s.id === 'competency') || {};
-  const core = jrGroup(
-    'core',
-    { title: '핵심 역량 세 축', anchor: 'competency' },
-    jrHead('AI · 하드웨어 · 기획을 한 시스템으로', '세 축은 2026 Notion 포트폴리오의 핵심 역량 문장 그대로 — 칩은 그 축을 보여 주는 프로젝트입니다.') +
-      `<ol class="jr-b pr-axes" data-split data-cont="핵심 역량 — 이어서">${(comp.pillars || [])
-        .map((p) => `<li><p class="pr-ax-no">${esc(p.no)}</p><h3>${esc(p.title)}</h3><p class="pr-ax-tag">${esc(p.text)}</p><p class="pr-ax-d">${esc(p.detail)}</p><p class="jr-chips">${p.projects.map(jrProof).join('')}</p></li>`)
-        .join('')}</ol>`
-  );
-  const max = Math.max(...DOMAIN_SKILLS.map((d) => d.projects.length));
-  const certs = [...CERTS].sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999'));
-  const skills = jrGroup(
-    'skills',
-    { title: '분야별 기술 · 자격', layout: 'cols', anchor: 'skills' },
-    jrHead('분야별 기술 — 근거 프로젝트로 셉니다', `숙련도 점수 대신, 그 분야의 기술이 쓰인 프로젝트를 셉니다 · 기술 ${SKILL_COUNT}개 · 자격 ${CERTS.length}개`) +
-      `<figure class="jr-b jr-chart pr-dchart" aria-labelledby="pr-dc-t">
-        <figcaption><b id="pr-dc-t">분야마다 근거 프로젝트 수</b></figcaption>
-        <ol>${DOMAIN_SKILLS.map((d) => `<li><span class="jr-cy">${esc(d.ko)}</span><span class="jr-bars"><span class="jr-bar is-p" style="--v:${(d.projects.length / max).toFixed(3)}" title="${esc(d.ko)} ${d.projects.length}"><i></i><b>${d.projects.length}</b></span></span></li>`).join('')}</ol>
-        <table class="sr-only"><caption>분야마다 근거 프로젝트 수</caption><tr><th>분야</th><th>프로젝트</th></tr>${DOMAIN_SKILLS.map((d) => `<tr><td>${esc(d.ko)}</td><td>${d.projects.length}</td></tr>`).join('')}</table>
-      </figure>
-      <ol class="jr-b pr-doms" data-split data-cont="분야별 기술 — 이어서">${DOMAIN_SKILLS.map((d) => {
-        const done = d.skills.filter((s) => s.state !== 'explore');
-        const explore = d.skills.length - done.length;
-        return `<li><h3>${esc(d.ko)}</h3><p>${done.slice(0, 6).map((s) => `<span>${esc(s.name)}${s.evidence.length ? `<sup>${s.evidence.length}</sup>` : ''}</span>`).join('')}${explore ? `<span class="is-explore">탐구 중 ${explore}</span>` : ''}</p></li>`;
-      }).join('')}</ol>
-      <div class="jr-b pr-certs" data-split data-cont="자격 — 이어서"><h3>자격 ${CERTS.length}</h3>${certs.map((c) => `<p><b>${esc(c.name)}</b>${c.year ? `<time>${esc(c.year)}</time>` : ''}</p>`).join('')}<p class="pr-more"><a href="/skills" data-link>기술마다 근거 프로젝트 전체 보기 →</a></p></div>`
-  );
-  return core + skills + jrSwot();
-}
-
-// 03 프로젝트 경험: 분야별 개요 → 대표 프로젝트(한 화면씩: 사진 · 요약 · 역할 · 과정 · 결과) → 연도별 이력 → 성과(수상 · 보도)
-const prFeatTile = (p, k) =>
-  `<a class="jr-tile" href="#p-${p.id}" data-jr-go="p-${p.id}" data-cat="${esc(p.category)}"><span class="jr-tile-ph">${p.cover ? img(p.cover, { sizes: '(max-width: 600px) 46vw, 240px' }) : `<i>${esc(categoryOf(p.category).label)}</i>`}</span><span class="jr-tile-t"><b>${pad(k + 1)} · ${esc(p.title)}</b><small>${esc(p.year)} · ${esc(categoryOf(p.category).ko)}</small></span></a>`;
-function prWork(media) {
-  const feat = FEATURED.map(byId).filter(Boolean);
-  const fields = CATEGORIES.map((c) => ({ c, n: projects.filter((p) => p.category === c.id).length })).filter((x) => x.n);
-  const max = Math.max(...fields.map((x) => x.n));
-  const intro = jrGroup(
-    'fields',
-    { title: '분야별 프로젝트', layout: 'cols', anchor: 'projects' },
-    jrHead(`프로젝트 ${projects.length} — ${fields.length}개 분야`, `그중 대표 프로젝트 ${feat.length}개를 한 화면씩 소개합니다 — 누르면 그 프로젝트로.`) +
-      `<figure class="jr-b jr-chart pr-dchart" aria-labelledby="pr-fc-t">
-        <figcaption><b id="pr-fc-t">분야마다 프로젝트 수</b></figcaption>
-        <ol>${fields.map((x) => `<li><span class="jr-cy">${esc(x.c.ko)}</span><span class="jr-bars"><span class="jr-bar is-p" style="--v:${(x.n / max).toFixed(3)}" title="${esc(x.c.ko)} ${x.n}"><i></i><b>${x.n}</b></span></span></li>`).join('')}</ol>
-        <table class="sr-only"><caption>분야마다 프로젝트 수</caption><tr><th>분야</th><th>프로젝트</th></tr>${fields.map((x) => `<tr><td>${esc(x.c.ko)}</td><td>${x.n}</td></tr>`).join('')}</table>
-      </figure>
-      <div class="jr-b jr-tiles pr-feat" data-split data-cont="대표 프로젝트 — 이어서">${feat.map(prFeatTile).join('')}</div>`
-  );
-  const shots = feat.map((p, k) => {
-    const c = categoryOf(p.category);
-    const aw = awardsOf(p.id);
-    const steps = (p.story || []).filter((s) => s.text);
-    const facts = [
-      p.role.length && ['역할', p.role.join(' · ')],
-      p.tools.length && ['도구', p.tools.join(' · ')],
-      aw.length && ['수상', aw.map((a) => `${a.grade} — ${a.contest}`).join(' · ')],
-    ].filter(Boolean);
-    return jrGroup(
-      `p-${p.id}`,
-      { title: `${pad(k + 1)} · ${p.title}`, layout: 'cols', anchor: `p-${p.id}` },
-      `<header class="pr-ph" data-head>
-        <p class="jr-k"><span class="jr-badge">${esc(c.label)}</span>${esc(p.year)} · 대표 프로젝트 ${pad(k + 1)} / ${pad(feat.length)}</p>
-        <h2>${esc(p.title)}</h2>
-        <p class="jr-hl">${esc(p.oneLiner)}</p>
-      </header>
-      ${p.cover ? `<figure class="jr-b pr-cover">${img(p.cover, { sizes: '(max-width: 820px) 100vw, 600px' })}</figure>` : ''}
-      ${p.metrics.length ? `<dl class="jr-b pr-met">${p.metrics.slice(0, 3).map((m) => `<div><dd>${esc(m.value)}</dd><dt>${esc(m.label)}</dt></div>`).join('')}</dl>` : ''}
-      <p class="jr-b pr-sum">${esc(p.summary)}</p>
-      ${facts.length ? `<dl class="jr-b pr-facts2" data-split>${facts.map(([k2, v]) => `<div><dt>${k2}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
-      ${
-        steps.length
-          ? `<ol class="jr-b pr-steps" data-split data-cont="${esc(p.title)} — 과정 이어서">${steps
-              .map((s) => {
-                const im = s.image && p.images.find((x) => x.file === s.image);
-                return `<li>${im ? `<span class="pr-st-ph">${img(im, { sizes: '120px' })}</span>` : ''}<div><p class="pr-st-l">${esc(s.label)}</p><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div></li>`;
-              })
-              .join('')}<li class="pr-more"><a href="${p.path}" data-link>사진 · 영상과 함께 자세히 →</a></li></ol>`
-          : `<p class="jr-b jr-go"><a href="${p.path}" data-link>사진 · 영상과 함께 자세히 →</a></p>`
-      }`
-    );
-  });
-  const tiers = [1, 2, 3, 4, 5].map((t) => [t, AWARDS.filter((a) => a.tier === t).length]).filter(([, n]) => n);
-  const tmax = Math.max(...tiers.map(([, n]) => n));
-  const grand = AWARDS.filter((a) => a.tier === 1);
-  const results = jrGroup(
-    'results',
-    { title: '성과 — 수상 · 보도', layout: 'cols', anchor: 'results' },
-    jrHead(`수상 ${AWARDS.length} · 공식 보도 ${PRESS.length}`, '대회에서 멈추지 않고 판매 · 입점 · 기부 · 전시로 이어 간 기록입니다.') +
-      `<figure class="jr-b jr-chart pr-dchart is-tier" aria-labelledby="pr-tc-t">
-        <figcaption><b id="pr-tc-t">등급마다 수상 수</b></figcaption>
-        <ol>${tiers.map(([t, n]) => `<li><span class="jr-cy">${TIER_LABEL[t]}</span><span class="jr-bars"><span class="jr-bar is-a" style="--v:${(n / tmax).toFixed(3)}" title="${TIER_LABEL[t]} ${n}"><i></i><b>${n}</b></span></span></li>`).join('')}</ol>
-        <table class="sr-only"><caption>등급마다 수상 수</caption><tr><th>등급</th><th>수</th></tr>${tiers.map(([t, n]) => `<tr><td>${TIER_LABEL[t]}</td><td>${n}</td></tr>`).join('')}</table>
-      </figure>
-      <div class="jr-b pr-list" data-split data-cont="대상 — 이어서"><h3>대상 ${grand.length}</h3>${grand.map((a) => `<p><b>${esc(a.contest)}</b><small>${esc(a.date.replace(/-/g, '.'))}${a.project ? ` · ${esc(a.project.title)}` : ''}</small></p>`).join('')}</div>
-      <div class="jr-b pr-list is-press" data-split data-cont="공식 보도 — 이어서"><h3>공식 보도 ${PRESS.length}</h3>${PRESS.map((a) => `<p><a href="${esc(a.url)}" target="_blank" rel="noopener"><b>${esc(a.title)}</b><small>${esc(a.publisher)}${a.date ? ` · ${esc(a.date.replace(/-/g, '.'))}` : ''}</small></a></p>`).join('')}<p class="pr-more"><a href="/awards" data-link>상장 ${AWARDS.length}건 모두 보기 →</a></p></div>`
-  );
-  return intro + shots.join('') + jrYears(media) + results;
-}
-
-// 마치며: 감사 인사 · 한 줄 · 연락처 · 더 볼 곳
-function prThanks() {
-  return jrGroup(
-    'thanks',
-    { title: '마치며', anchor: 'thanks' },
-    `<div class="jr-b pr-thanks">
-      <p class="pg-kicker">THANK YOU</p>
-      <h2>감사합니다</h2>
-      <p class="pr-thanks-m">${esc(profile.motto)}</p>
-      <p class="pr-thanks-q">질문과 피드백을 기다립니다</p>
-      <ul class="pr-links">${profile.links.map((l) => `<li><a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}><span>${esc(l.label)}</span>${esc(l.value)}</a></li>`).join('')}</ul>
-      <p class="jr-endlinks"><a href="/" data-link>3D 포트폴리오 필름 →</a><a href="/resume" data-link>이력서 한 장 →</a><a href="/works" data-link>프로젝트 ${projects.length} 전체 →</a></p>
-    </div>`
-  );
-}
 
 function journeyPage() {
-  const media = [];
-  const src = jrLazy(
-    `<section data-sec="intro" data-title="PORTFOLIO" data-short="표지">${prCover()}</section>
-    <section data-sec="about" data-no="01" data-title="자기소개">${prAbout()}</section>
-    <section data-sec="ability" data-no="02" data-title="보유 역량 분석" data-short="보유 역량">${prAbility()}</section>
-    <section data-sec="work" data-no="03" data-title="프로젝트 경험">${prWork(media)}</section>
-    <section data-sec="plan" data-no="04" data-title="미래 계획">${jrPlan()}${prThanks()}</section>`
-  );
-  const html = `<div class="pg pg-journey">
+  const deck = presentDeck({ esc, pad, img, certSheet, certCaption });
+  const html = `<div class="pg pg-journey" data-owner="${esc(profile.name)} · ${esc(profile.role)}">
     ${bar({ href: '/', label: '3D 필름' }, { full: true })}
     <nav class="jr-tabs" aria-label="발표 순서">${PR_SECS.map(([id, ko, en, short], k) => `<button type="button" data-go="${id}" aria-current="false" aria-label="${pad(k + 1)} ${ko}"><small>${pad(k + 1)} ${en}</small><span class="jr-tab-l">${ko}</span><span class="jr-tab-s" aria-hidden="true">${short}</span></button>`).join('')}</nav>
     <div class="jr-view" tabindex="-1" aria-roledescription="화면 넘김" aria-label="발표 자료 — 옆으로 끌거나 ← → 로 넘기기"><div class="jr-track"></div></div>
@@ -1021,16 +640,16 @@ function journeyPage() {
       <button type="button" class="jr-nav" data-dir="1" aria-label="다음 화면"><span aria-hidden="true">→</span></button>
     </footer>
     <p class="sr-only jr-live" aria-live="polite"></p>
-    <div class="jr-src" hidden>${src}</div>
+    <div class="jr-src" hidden>${jrLazy(deck.html)}</div>
   </div>`;
-  return { html, media };
+  return { html, media: deck.media };
 }
 
 function bar(back, { full = false } = {}) {
   return `<header class="pg-bar">
     <a class="pg-back" href="${back.href}" data-link>← ${esc(back.label)}</a>
     <a class="pg-brand" href="/" data-link aria-label="메인 화면으로">KWON</a>
-    ${full ? '<button type="button" class="pg-full" data-full aria-label="전체 화면 (F)" aria-pressed="false"><i aria-hidden="true"></i><span>전체 화면</span></button>' : ''}
+    ${full ? '<button type="button" class="pg-full pg-pdf" data-deck-print aria-label="PDF로 저장 — 화면 한 장이 한 쪽"><b aria-hidden="true">PDF</b><span>저장</span></button><button type="button" class="pg-full" data-full aria-label="전체 화면 (F)" aria-pressed="false"><i aria-hidden="true"></i><span>전체 화면</span></button>' : ''}
     <button type="button" class="pg-close" data-close aria-label="닫기"><i></i><i></i></button>
     <i class="pg-progress" aria-hidden="true"></i>
   </header>`;
