@@ -19,28 +19,24 @@ OUT = os.path.join(ROOT, 'public', 'og')
 FONTS = os.path.join(ROOT, 'node_modules', 'pretendard', 'dist', 'public', 'static')
 SITE = 'kwon-physical-ai.vercel.app'
 W, H = 1200, 630
-# 밝은 카드(사이트와 같은 밝은 테마): 흰 바탕 · 검은 글 · 흰 바탕에서 읽히는 진한 강조색
-BG = (249, 251, 253)
-FG = (17, 19, 23)
-FG2 = (61, 67, 76)
-MUTED = (107, 114, 125)
-CYAN = (0, 125, 137)
-ORANGE = (209, 77, 0)
-# 홈 화면 아이콘은 favicon.svg와 같은 어두운 판 그대로
-ICON_BG = (5, 7, 12)
-ICON_CYAN = (94, 242, 255)
-ICON_ORANGE = (255, 107, 26)
+BG = (5, 7, 12)
+FG = (238, 242, 247)
+FG2 = (196, 204, 216)
+MUTED = (141, 151, 167)
+CYAN = (94, 242, 255)
+ORANGE = (255, 107, 26)
+ICON_BG, ICON_CYAN, ICON_ORANGE = BG, CYAN, ORANGE
 
-# 분야 색 · 이름(src/styles/pages.css · src/data/projects.js와 같게 — 흰 바탕용으로 진하게)
+# 분야 색 · 이름(src/styles/pages.css · src/data/projects.js와 같게)
 CATS = {
-    'mobility': ((52, 96, 214), 'DRONE · MOBILITY', '드론 · 모빌리티'),
-    'robotics': ((209, 77, 0), 'ROBOTICS', '로봇'),
-    'ai': ((128, 66, 214), 'AI', 'AI · 데이터'),
-    'iot': ((0, 135, 78), 'IOT', '임베디드 · 하드웨어'),
-    'product': ((166, 116, 0), 'PRODUCT', '제품 · 창업'),
-    'software': ((84, 100, 122), 'SOFTWARE', '소프트웨어'),
+    'mobility': ((127, 168, 255), 'DRONE · MOBILITY', '드론 · 모빌리티'),
+    'robotics': ((255, 107, 26), 'ROBOTICS', '로봇'),
+    'ai': ((196, 139, 255), 'AI', 'AI · 데이터'),
+    'iot': ((61, 255, 154), 'IOT', '임베디드 · 하드웨어'),
+    'product': ((255, 207, 90), 'PRODUCT', '제품 · 창업'),
+    'software': ((159, 179, 200), 'SOFTWARE', '소프트웨어'),
 }
-TIERS = [('대상', (176, 128, 0)), ('최우수', (84, 96, 112)), ('우수상', (104, 115, 130)), ('장려', (184, 98, 36))]
+TIERS = [('대상', (244, 207, 115)), ('최우수', (226, 232, 240)), ('우수상', (203, 213, 225)), ('장려', (230, 160, 110))]
 
 
 def font(weight, size):

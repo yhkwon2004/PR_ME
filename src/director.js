@@ -13,6 +13,10 @@ const SHOTS = {
   // 로보틱스: 덱 양옆의 두 무리(휴머노이드 + 4족 · 매니퓰레이터 작업 셀)를 조금 낮고 가깝게
   robotics: { pos: add(SETS.robotics, 0.2, 5.6, 12.0), target: add(SETS.robotics, 0.3, 0.9, -0.9), fov: 40, shift: [0, 0.12] },
   intelligence: { pos: add(SETS.core, 19.8, 3.24, 31.5), target: add(SETS.core, 0, 0, 0), fov: 40, shift: [0, 0.11] },
+  // 제품 · 창업: 격납고 패드 위에 떠 있는 드론을 비스듬히 — 이륙 직전의 장면
+  build: { pos: add(SETS.hangar, -13, 9.5, 21), target: add(SETS.hangar, 1.5, 3.2, -10), fov: 40, shift: [0.34, 0.16] },
+  // 보도: 데이터 링크가 켜진 세계 전체를 높이서 — 소식이 세트마다 퍼져 나가는 장면
+  press: { pos: V(0, 34, 52), target: V(0, 1, -8), fov: 44, shift: [0, 0.12] },
   record: { pos: add(SETS.record, -1.73, 6.05, 20.13), target: add(SETS.record, 0, 2.6, 0), fov: 40, shift: [0, 0.1] },
   finale: { pos: add(SETS.hangar, 0, 7.5, 17), target: add(SETS.hangar, 0, 2.8, -4), fov: 40, shift: [0, -0.085] },
 };
@@ -39,6 +43,7 @@ export class Director {
     this.pointerSmooth = new THREE.Vector2();
     this.drag = new THREE.Vector2();
     this.dragSmooth = new THREE.Vector2();
+    this.flyover = this.makeFlyover();
     this.coreOrbit = this.makeOrbit(SETS.core, 5.4, 1.2);
     this.tmp = new THREE.Vector3();
     this.tmp2 = new THREE.Vector3();
@@ -66,6 +71,11 @@ export class Director {
       const a = (i / 16) * Math.PI * 2;
       pts.push(V(c.x + Math.cos(a) * r, c.y + Math.sin(a * 2) * h, c.z + Math.sin(a) * r));
     }
+    return new THREE.CatmullRomCurve3(pts, true, 'centripetal');
+  }
+
+  makeFlyover() {
+    const pts = [SETS.hangar, SETS.aerial, SETS.ground, SETS.robotics, SETS.record].map((p) => p.clone().setY(7));
     return new THREE.CatmullRomCurve3(pts, true, 'centripetal');
   }
 
@@ -213,13 +223,13 @@ export class Director {
     const { drone, hangar, ground, records, core, links, video } = this.a;
     drone.targetThrottle = 1;
     drone.stiffness = 1.4;
-    hangar.coneLevel = id === 'intro' || id === 'finale' ? 1 : id === 'prologue' ? 0.5 : 0;
+    hangar.coneLevel = id === 'intro' || id === 'finale' ? 1 : id === 'prologue' || id === 'build' ? 0.5 : 0;
     // 바닥 글자(00 — HANGAR, 02 — AERIAL)는 카드 · 제목과 겹쳐 모든 장면에서 끈다
     hangar.floorLevel = 0;
     this.a.aerial.floorLevel = 0;
-    // 엔딩: 세트를 잇는 데이터 링크가 은은하게 켜진다
-    links.level = id === 'finale' ? 0.35 : 0;
-    core.energy = id === 'intelligence' ? 1 : 0.15;
+    // 보도 장면: 세트를 잇는 데이터 링크가 켜져 소식이 퍼져 나가듯
+    links.level = id === 'press' ? 1 : id === 'finale' ? 0.35 : 0;
+    core.energy = id === 'intelligence' ? 1 : id === 'press' ? 0.5 : 0.15;
     if (id === 'record') {
       records.reveal = 0;
       records.revealTarget = 1;
@@ -244,6 +254,12 @@ export class Director {
         break;
       case 'intelligence':
         drone.fly(this.coreOrbit, 0.035, 0.1);
+        break;
+      case 'build':
+        drone.hold(add(SETS.hangar, 0.4, 2.9, 0), 0.6);
+        break;
+      case 'press':
+        drone.fly(this.flyover, 0.022, 0.0);
         break;
       case 'record':
         drone.hold(add(SETS.record, 6.2, 4.0, 1.4));
@@ -348,9 +364,9 @@ export class Director {
     if (id !== 'robotics') robotics.lookWorld.copy(drone.pos);
 
     // 세로 화면에서는 코어 라벨이 장면 제목·수치와 겹치므로 숨긴다
-    if (core.tag) core.tag.visible = cam.aspect >= 0.85 && id !== 'intelligence';
+    if (core.tag) core.tag.visible = cam.aspect >= 0.85 && id !== 'intelligence' && id !== 'press';
     // 오프닝·엔딩: 위쪽 가장자리·타임코드 뒤에 걸리는 코어를 부드럽게 접어 드론에 집중
-    const hideCore = (id === 'intro' || id === 'finale') && !this.trans;
+    const hideCore = (id === 'intro' || id === 'finale' || id === 'build') && !this.trans;
     this.coreK += ((hideCore ? 0 : 1) - this.coreK) * Math.min(1, dt * 2.5);
     core.group.scale.setScalar(Math.max(0.001, this.coreK));
     core.group.visible = this.coreK > 0.01;

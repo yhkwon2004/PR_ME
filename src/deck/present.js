@@ -1,8 +1,9 @@
 // ── 발표 자료(/present) — 2026-1 포트폴리오 경진대회 안내서의 목차 그대로 ──
 // 표지 · 목차 → 00 나를 소개합니다 → STEP1 자기이해 → STEP2 직업탐색 → STEP3 진로계획 및 비교과 설계 → STEP4 미래설계 → 마치며
 // 28장 · 10분 발표 — 글은 짧게, 사진은 크게. 문장 · 숫자는 모두 기록(content · data)에서 가져온다(지어내지 않는다).
-// 본인만 아는 CarHub 기록(검사 결과 · 캡처 · 롤모델 · WON+ 계획 · 10년/30년 후)은 data/carhub.js — 비어 있으면 '입력 예정' 자리로 보인다.
-// 쪽(data-sec) → 화면(data-grp) → 블록(.jr-b)으로 적는다. ui/pager.js가 넓은 화면에서는 1600×900 무대에 화면 한 장씩(data-layout의 구도대로),
+// 본인만 아는 CarHub 기록(검사 결과 · 캡처 · 롤모델 · WON+ 계획 · 10년/30년 후)은 deck/carhub.js — 비어 있으면 '입력 예정' 자리로 보인다.
+// 발표 자료는 포트폴리오(3D 필름 · 아카이브)와 따로 산다: 내용 deck/present.js · 넘기기 deck/pager.js · 모양 deck/deck.css(밝은 종이) · SWOT · 계획 deck/plan.js
+// 쪽(data-sec) → 화면(data-grp) → 블록(.jr-b)으로 적는다. deck/pager.js가 넓은 화면에서는 1600×900 무대에 화면 한 장씩(data-layout의 구도대로),
 // 휴대폰 · 세로 화면에서는 블록을 화면 크기에 맞춰 나눠 담는다.
 import { projects, byId, categoryOf, FEATURED } from '../data/projects.js';
 import { profile } from '../content.js';
@@ -11,8 +12,8 @@ import { HISTORY } from '../data/history.js';
 import { PRESS } from '../data/press.js';
 import { CERTS, SKILLS } from '../data/skills.js';
 import { STAGES, VALUES, PRELUDE } from '../data/growth.js';
-import { SWOT, STRATEGY, PLAN, TARGET } from '../data/journey.js';
-import { CARHUB } from '../data/carhub.js';
+import { SWOT, STRATEGY, PLAN, TARGET } from './plan.js';
+import { CARHUB } from './carhub.js';
 
 // 발표 순서(위 탭 · 목차 · 장 표지): id · 이름 · 영문 · 짧은 이름 · 번호
 export const PR_SECS = [
@@ -60,7 +61,7 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
       .join('')}</ol><table class="sr-only"><caption>${title}</caption>${rows.map((r) => `<tr><td>${esc(r.label)}</td><td>${r.v || r.n}</td></tr>`).join('')}</table></figure>`;
   };
   const link = (href, text, go = '') => `<a class="pv-more" href="${href}"${go ? ` data-jr-go="${go}"` : href.startsWith('#') ? '' : ' data-link'}>${text}<i aria-hidden="true">→</i></a>`;
-  // 본인이 채울 자리(data/carhub.js) — 캡처가 있으면 그 그림, 없으면 무엇을 넣을지 적힌 빈칸
+  // 본인이 채울 자리(deck/carhub.js) — 캡처가 있으면 그 그림, 없으면 무엇을 넣을지 적힌 빈칸
   const slot = (label, hint, must = false) => `<div class="pv-slot${must ? ' is-must' : ''}"><p><b>${must ? '★ 필수 · ' : ''}입력 예정</b>${esc(label)}</p><small>${esc(hint)}</small></div>`;
   const shot = (src, alt, label, hint, must = false) => (src ? `<figure class="pv-shot"><img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async" /></figure>` : slot(label, hint, must));
   const mail = profile.links.find((l) => l.label === 'Email');

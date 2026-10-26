@@ -6,13 +6,13 @@
 .beats,
 /* 학년마다 색: 1학년 탐색(청록) → 2학년 도전(호박) → 3학년 집중(주황) */
 [data-stage='explore'] {
-  --gc: #007d89;
+  --gc: #5ef2ff;
 }
 [data-stage='challenge'] {
-  --gc: #8d6400;
+  --gc: #ffcf5a;
 }
 [data-stage='focus'] {
-  --gc: #d14d00;
+  --gc: #ff6b1a;
 }
 .beat-stage,
 .beat {
@@ -21,13 +21,12 @@
 }
 .beats {
   --u: clamp(0.8px, min(calc(0.0694 * var(--vw)), calc(0.112 * var(--vh))), 1.5px);
-  --ink: #0c0d0f;
-  --ink-2: #3d434c;
-  --ink-3: #6b727d;
-  --paper: #ffffff;
-  --panel: linear-gradient(170deg, rgba(255, 255, 255, 0.94), rgba(248, 249, 251, 0.94));
-  --panel-line: rgba(17, 19, 23, 0.1);
-  --chip: rgba(13, 13, 13, 0.06);
+  --ink: #f4f7fb;
+  --ink-2: #d3dce8;
+  --ink-3: #9fb0c5;
+  --panel: linear-gradient(170deg, rgba(40, 56, 82, 0.9), rgba(25, 36, 56, 0.92));
+  --panel-line: rgba(186, 214, 255, 0.16);
+  --chip: rgba(255, 255, 255, 0.06);
 }
 /* 제목(위)과 본문을 한 덩어리로 화면 가운데에 — 위 HUD와 아래 화면 칸 사이의 한가운데.
    위아래 auto 여백으로 가운데에 두어, 화면보다 길어지면 위로 넘치지 않고 위에서부터 놓인다 */
@@ -57,7 +56,7 @@
   margin-bottom: auto;
 }
 .beat .bt-top {
-  text-shadow: 0 2px 14px rgba(255, 255, 255, 0.54);
+  text-shadow: 0 2px 14px rgba(4, 10, 20, 0.6);
 }
 .bt-h {
   font-size: calc(46 * var(--u));
@@ -74,7 +73,7 @@
   background: var(--panel);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 24px 50px -30px rgba(17, 19, 23, 0.27);
+    0 24px 50px -30px rgba(0, 0, 0, 0.6);
   text-shadow: none;
 }
 
@@ -88,7 +87,7 @@
   padding: 4px;
   border: 1px solid var(--line-2);
   border-radius: 999px;
-  background: rgba(211, 218, 229, 0.86);
+  background: rgba(20, 30, 46, 0.86);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   transform: translateX(-50%);
@@ -141,20 +140,20 @@
 /* ── 소개 1: 인적 사항 — 왼쪽 증명사진, 오른쪽 이름 · 한 줄 · 사실 · 연락처(이력서 첫머리) ── */
 .rs-card {
   display: grid;
-  grid-template-columns: calc(290 * var(--u)) minmax(0, 1fr);
+  grid-template-columns: calc(150 * var(--u)) minmax(0, 1fr);
   align-items: center;
-  gap: calc(46 * var(--u));
+  gap: calc(22 * var(--u)) calc(40 * var(--u));
   width: min(100%, calc(1120 * var(--u)));
   margin: 0 auto;
-  padding: calc(34 * var(--u)) calc(44 * var(--u)) calc(34 * var(--u)) calc(34 * var(--u));
+  padding: calc(24 * var(--u)) calc(36 * var(--u)) calc(22 * var(--u)) calc(28 * var(--u));
 }
 .rs-photo {
   overflow: hidden;
   aspect-ratio: 4 / 5;
-  border: 1px solid rgba(13, 13, 13, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: calc(16 * var(--u));
-  background: #0f1113;
-  box-shadow: 0 18px 40px -20px rgba(17, 19, 23, 0.315);
+  background: #e8edf3;
+  box-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.7);
 }
 .rs-photo img {
   display: block;
@@ -164,7 +163,7 @@
 }
 .rs-id {
   display: grid;
-  gap: calc(14 * var(--u));
+  gap: calc(10 * var(--u));
   min-width: 0;
 }
 .rs-role {
@@ -174,7 +173,7 @@
   color: var(--cyan);
 }
 .rs-name {
-  font-size: calc(68 * var(--u));
+  font-size: calc(56 * var(--u));
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -188,37 +187,17 @@
   color: var(--ink-3);
 }
 .rs-motto {
-  font-size: calc(25 * var(--u));
+  font-size: calc(21 * var(--u));
   font-weight: 700;
   line-height: 1.4;
   word-break: keep-all;
 }
-/* 국가우수(이공계) 장학생 — 검은 띠 하나 */
-.rs-sch {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-self: start;
-  gap: 4px calc(12 * var(--u));
-  padding: calc(9 * var(--u)) calc(18 * var(--u));
-  border-radius: 999px;
-  background: var(--ink);
-  color: var(--paper);
-}
-.rs-sch b {
-  font-size: calc(16 * var(--u));
-  font-weight: 800;
-}
-.rs-sch span {
-  font-size: calc(13.5 * var(--u));
-  opacity: 0.72;
-}
 .rs-facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: calc(10 * var(--u)) calc(24 * var(--u));
-  margin-top: calc(4 * var(--u));
-  padding-top: calc(16 * var(--u));
+  gap: calc(8 * var(--u)) calc(24 * var(--u));
+  margin-top: 0;
+  padding-top: calc(12 * var(--u));
   border-top: 1px solid var(--panel-line);
 }
 .rs-facts div {
@@ -263,8 +242,185 @@
   border-color: var(--cyan);
   outline: none;
 }
-.rs-links a.is-pdf {
-  border-color: var(--orange);
+
+/* 국가우수(이공계) 장학생 — 밝은 띠 하나 */
+.rs-sch {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-self: start;
+  gap: 4px calc(12 * var(--u));
+  padding: calc(8 * var(--u)) calc(16 * var(--u));
+  border-radius: 999px;
+  background: var(--ink);
+  color: #070a10;
+}
+.rs-sch b {
+  font-size: calc(15 * var(--u));
+  font-weight: 800;
+}
+.rs-sch span {
+  font-size: calc(13 * var(--u));
+  opacity: 0.7;
+}
+/* 대표 프로젝트 여덟: 작은 사진 + 이름 한 줄(누르면 그 프로젝트) */
+.rs-feat,
+.rs-aw {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-top: calc(14 * var(--u));
+  border-top: 1px solid var(--panel-line);
+}
+.rs-feat .rs-h,
+.rs-aw .rs-h {
+  margin-bottom: calc(10 * var(--u));
+}
+.rs-feat ul {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: calc(10 * var(--u));
+}
+.rs-feat a {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.rs-feat img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border: 1px solid var(--panel-line);
+  border-radius: calc(8 * var(--u));
+  transition:
+    transform 0.5s var(--ease),
+    border-color 0.3s;
+}
+.rs-feat b {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: calc(12.5 * var(--u));
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink-2);
+  word-break: keep-all;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+.rs-feat a:hover img,
+.rs-feat a:focus-visible img {
+  border-color: var(--cyan);
+  transform: translateY(-3px);
+}
+.rs-feat a:focus-visible {
+  outline: none;
+}
+/* 수상: 등급별 수 + 대상 상장 작게 */
+.rs-aw {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(10 * var(--u)) calc(22 * var(--u));
+}
+.rs-aw .rs-h {
+  margin: 0;
+}
+.rs-tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.rs-tiers span {
+  padding: calc(4 * var(--u)) calc(11 * var(--u));
+  border: 1px solid var(--panel-line);
+  border-radius: 999px;
+  background: var(--chip);
+  font-size: calc(13 * var(--u));
+  color: var(--ink-2);
+}
+.rs-tiers b {
+  font-family: var(--display);
+  color: var(--ink);
+}
+.rs-tiers .is-grand {
+  border-color: rgba(244, 207, 115, 0.55);
+  color: #f4cf73;
+}
+.rs-tiers .is-grand b {
+  color: #f4cf73;
+}
+.rs-sheets {
+  display: flex;
+  align-items: center;
+  gap: calc(6 * var(--u));
+  margin-left: auto;
+}
+.rs-sheets img {
+  width: calc(26 * var(--u));
+  height: auto;
+  aspect-ratio: 1132 / 1600;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.8);
+}
+.rs-sheets i {
+  margin-left: 4px;
+  font-style: normal;
+  color: var(--cyan);
+  transition: transform 0.4s var(--ease);
+}
+.rs-sheets:hover i,
+.rs-sheets:focus-visible i {
+  transform: translateX(4px);
+}
+.rs-sheets:focus-visible {
+  outline: none;
+}
+/* 다루는 언어 · 스킬: 분야마다 한 줄 */
+.rs-skills .rs-h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+.rs-skills .rs-h a {
+  margin-left: auto;
+  font-size: calc(13 * var(--u));
+  font-weight: 600;
+  color: var(--ink-3);
+  transition: color 0.3s;
+}
+.rs-skills .rs-h a:hover,
+.rs-skills .rs-h a:focus-visible {
+  color: var(--cyan);
+  outline: none;
+}
+.rs-skills dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(8 * var(--u)) calc(28 * var(--u));
+}
+.rs-skills dl > div {
+  display: grid;
+  grid-template-columns: calc(132 * var(--u)) minmax(0, 1fr);
+  align-items: baseline;
+  gap: calc(12 * var(--u));
+  padding: calc(4 * var(--u)) 0;
+  border-bottom: 1px solid var(--panel-line);
+}
+.rs-skills dt {
+  font-size: calc(13.5 * var(--u));
+  font-weight: 700;
+  color: var(--ink-3);
+}
+.rs-skills dd {
+  font-size: calc(14 * var(--u));
+  line-height: 1.45;
+  color: var(--ink);
+  word-break: keep-all;
+}
+.rs-skills dd i {
+  font-style: normal;
+  color: var(--ink-3);
 }
 
 /* ── 소개 2: 학력 · 기록 ── */
@@ -312,7 +468,7 @@
   height: 7px;
   border-radius: 50%;
   background: var(--cyan);
-  box-shadow: 0 0 0 4px rgba(0, 125, 137, 0.105);
+  box-shadow: 0 0 0 4px rgba(94, 242, 255, 0.15);
 }
 .rs-tl time {
   font-family: var(--mono);
@@ -373,56 +529,6 @@
   font-weight: 700;
   letter-spacing: 0;
   color: var(--orange);
-}
-/* 장학증서 한 장 + 발표 자료로 가는 길(성장 과정 · 보유 역량 · 미래 계획은 덱 안에서만) */
-.rs-more {
-  display: grid;
-  grid-template-columns: calc(84 * var(--u)) minmax(0, 1fr) auto;
-  align-items: center;
-  gap: calc(20 * var(--u));
-}
-.rs-sheet {
-  width: 100%;
-  height: auto;
-  border-radius: 3px;
-  box-shadow:
-    0 0 0 1px var(--panel-line),
-    0 10px 22px -12px rgba(17, 19, 23, 0.203);
-}
-.rs-more p {
-  display: grid;
-  gap: 4px;
-}
-.rs-more p b {
-  font-size: calc(19 * var(--u));
-  font-weight: 800;
-  word-break: keep-all;
-}
-.rs-more p span {
-  font-size: calc(14.5 * var(--u));
-  color: var(--ink-2);
-  word-break: keep-all;
-}
-.rs-deck {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: calc(12 * var(--u)) calc(20 * var(--u));
-  border-radius: 999px;
-  background: var(--ink);
-  font-size: calc(15 * var(--u));
-  font-weight: 700;
-  color: var(--paper);
-  word-break: keep-all;
-  transition: transform 0.4s var(--ease);
-}
-.rs-deck i {
-  font-style: normal;
-}
-.rs-deck:hover,
-.rs-deck:focus-visible {
-  outline: none;
-  transform: translateX(4px);
 }
 .bt-p {
   display: inline-flex;
@@ -511,9 +617,61 @@
   .bt-h {
     font-size: 27px;
   }
+  .rs-feat ul {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .rs-feat img {
+    aspect-ratio: 1;
+    border-radius: 6px;
+  }
+  .rs-feat b,
+  .rs-facts,
+  .rs-links,
+  .rs-sheets {
+    display: none;
+  }
+  .rs-tiers span {
+    padding: 2px 8px;
+    font-size: 11px;
+  }
+  .rs-sch b {
+    font-size: 12.5px;
+  }
+  .rs-sch span {
+    font-size: 11px;
+  }
+  .rs-feat,
+  .rs-aw {
+    padding-top: 10px;
+  }
+  .rs-sheets {
+    margin-left: 0;
+  }
+  .rs-sheets img {
+    width: 20px;
+  }
+  .rs-skills dl {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .rs-skills dl > div {
+    grid-template-columns: 92px minmax(0, 1fr);
+    padding: 5px 0;
+  }
+  .rs-skills dt {
+    font-size: 11.5px;
+  }
+  .rs-skills dd {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 12px;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
   /* 인적 사항: 사진과 이름을 한 줄에, 나머지는 아래로 */
   .rs-card {
-    grid-template-columns: 104px minmax(0, 1fr);
+    grid-template-columns: 72px minmax(0, 1fr);
     gap: 12px 16px;
     padding: 16px;
   }
@@ -549,15 +707,6 @@
   }
   .rs-motto {
     font-size: 18px;
-  }
-  .rs-more {
-    grid-template-columns: 54px minmax(0, 1fr);
-    gap: 12px;
-  }
-  .rs-deck {
-    grid-column: 1 / -1;
-    justify-self: start;
-    font-size: 13.5px;
   }
   .rs-facts {
     gap: 8px 14px;
@@ -753,3 +902,31 @@
 /* 작은 휴대폰(높이 760 이하): 근거 칩 · 한 줄 꼬리표를 접고 글을 조금 줄인다 — 자세한 내용은 발표 자료(/present) */
 /* 더 작은 휴대폰(높이 700 이하): 대응 줄도 접는다 */
 /* 보통 휴대폰(높이 880 이하): 기술 스택 아래 안내 줄은 접는다(장면 표시 · 화면 칸과 겹치지 않게) */
+
+/* 낮은 노트북(높이 800 이하): 소개 카드는 대표 프로젝트 이름 · 사실 줄을 접고 간격을 줄여 아래 칸 위에서 멈춘다 */
+@media (min-width: 821px) and (max-height: 800px) {
+  .rs-card {
+    padding-top: calc(16 * var(--u));
+    padding-bottom: calc(14 * var(--u));
+    row-gap: calc(14 * var(--u));
+  }
+  .rs-feat b {
+    display: none;
+  }
+  .rs-feat,
+  .rs-aw {
+    padding-top: calc(10 * var(--u));
+  }
+  .rs-feat .rs-h {
+    margin-bottom: calc(6 * var(--u));
+  }
+  .rs-facts {
+    padding-top: calc(8 * var(--u));
+  }
+  .rs-skills dl > div {
+    padding: calc(2 * var(--u)) 0;
+  }
+  .rs-skills dd {
+    font-size: calc(13 * var(--u));
+  }
+}

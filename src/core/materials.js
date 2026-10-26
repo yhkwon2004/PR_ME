@@ -1,9 +1,8 @@
 import * as THREE from 'three';
 
-// 밝은 스튜디오: 흰 하늘 · 밝은 바닥 위에 어두운 기체 — 형광색은 빛나는 부분에만
 export const COLORS = {
-  bg: 0xf4f6f9,
-  horizon: 0xe6ebf1,
+  bg: 0x05070c,
+  horizon: 0x0a111c,
   cyan: 0x5ef2ff,
   orange: 0xff6b1a,
   red: 0xff3b3b,

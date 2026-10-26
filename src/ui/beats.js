@@ -1,11 +1,11 @@
 // 한 장면 안의 여러 화면(비트): 스크롤 없이 영화처럼 한 화면씩 바뀐다 — 휠 · 스와이프 · 방향키 · 아래 칸 · 자동 재생.
-// 필름은 프로젝트에 집중한다: 01 소개(이 두 화면) → 02 프로젝트(대표 8) → 03 성과. 성장 과정 · 보유 역량 · 미래 계획은 발표 자료(/present) 안에서만.
-// 소개(이력서): 인적 사항(사진) → 학력 · 기록 — 사진은 크게, 글은 짧게
+// 필름은 프로젝트에 집중한다: 01 소개(이 두 화면) → 02 프로젝트(드론 · 모빌리티 / 로봇 · AI / 창업 · 제품개발) → 03 보도 · 수상.
+// 성장 과정 · 보유 역량 · 미래 계획은 발표 자료(/present)에서만 다룬다.
 import gsap from 'gsap';
 import { profile } from '../content.js';
-import { projects } from '../data/projects.js';
-import { AWARDS } from '../data/awards.js';
-import { CERTS } from '../data/skills.js';
+import { projects, byId, FEATURED } from '../data/projects.js';
+import { AWARDS, TIER_LABEL } from '../data/awards.js';
+import { CERTS, STACK } from '../data/skills.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
@@ -15,18 +15,22 @@ function kicker(i, text) {
   return `<p class="kicker b-a"><span class="kicker-no">SC ${pad(i)}</span>${chapter ? `<span class="kicker-ch">CH ${esc(chapter[0])}<span class="kicker-chn"> · ${esc(chapter[1])}</span></span>` : ''}<span class="kicker-txt">${esc(text)}</span></p>`;
 }
 
-// ── 소개: 실제 이력서처럼 두 화면 — 다음 장면부터 대표 프로젝트 ──
+// ── 소개: 실제 이력서처럼 두 화면 — 다음 장면부터 프로젝트 ──
+// ① 소개: 작은 증명사진 · 이름 · 한 줄 · 장학 · 연락처 + 아래에 대표 프로젝트 여덟(작게) · 수상(대상 상장 작게)
+// ② 학력 · 기록: 학력 줄 · 숫자 넷 · 다루는 언어 · 스킬(분야마다 한 줄)
 function profileBeats(scene, i) {
   const email = profile.links.find((l) => l.url.startsWith('mailto:'));
-  const grand = AWARDS.filter((a) => a.tier === 1).length;
+  const grand = AWARDS.filter((a) => a.tier === 1);
   const vol = profile.volunteer;
   const sch = profile.scholarship;
   const nums = [
     [projects.length, '프로젝트'],
-    [AWARDS.length, '수상', `대상 ${grand}`],
+    [AWARDS.length, '수상', `대상 ${grand.length}`],
     [`${vol.hours}h`, '봉사', `${vol.count}건`],
     [CERTS.length, '자격증'],
   ];
+  const tiers = [1, 2, 3, 4, 5].map((t) => [TIER_LABEL[t], AWARDS.filter((a) => a.tier === t).length]).filter(([, n]) => n);
+  const feat = FEATURED.map(byId).filter(Boolean);
   const edu = profile.education || [];
   const now = edu.filter((e) => e.note !== '입학');
   const link = (l) => `<li><a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}><span>${esc(l.label)}</span>${esc(l.value)}</a></li>`;
@@ -49,8 +53,22 @@ function profileBeats(scene, i) {
               <dl class="rs-facts b-a">
                 ${now.map((e) => `<div><dt>${esc(e.note.includes('복수') ? '복수전공' : '소속')}</dt><dd>${esc(e.school)} ${esc(e.major)}</dd></div>`).join('')}
               </dl>
-              <ul class="rs-links b-a">${[email, ...profile.links.filter((l) => l !== email && /GitHub|Notion/.test(l.label))].filter(Boolean).map(link).join('')}<li><a class="is-pdf" href="/resume" data-link><span>PDF</span>이력서 한 장</a></li></ul>
+              <ul class="rs-links b-a">${[email, ...profile.links.filter((l) => l !== email && /GitHub|Notion/.test(l.label))].filter(Boolean).map(link).join('')}</ul>
             </div>
+            <section class="rs-feat b-a" aria-label="대표 프로젝트 ${feat.length}">
+              <h3 class="rs-h">대표 프로젝트 <span>${feat.length}</span></h3>
+              <ul>${feat
+                .map((p) => `<li><a href="${p.path}" data-link>${p.cover ? `<img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async" />` : ''}<b>${esc(p.title)}</b></a></li>`)
+                .join('')}</ul>
+            </section>
+            <section class="rs-aw b-a" aria-label="수상 ${AWARDS.length}건">
+              <h3 class="rs-h">수상 <span>${AWARDS.length}</span></h3>
+              <p class="rs-tiers">${tiers.map(([l, n]) => `<span${l === TIER_LABEL[1] ? ' class="is-grand"' : ''}>${esc(l)} <b>${n}</b></span>`).join('')}</p>
+              <a class="rs-sheets" href="/awards" data-link aria-label="대상 상장 ${grand.length}장 — 수상 기록 보기">${grand
+                .filter((a) => a.certs.length)
+                .map((a) => `<img src="${esc(a.certs[0].sm)}" alt="" loading="lazy" decoding="async" title="${esc(a.contest)}" />`)
+                .join('')}<i aria-hidden="true">→</i></a>
+            </section>
           </article>
         </div>`,
     },
@@ -59,7 +77,7 @@ function profileBeats(scene, i) {
       label: '학력 · 기록',
       cls: 'bt-prof',
       html: `<div class="bt-top panel-content">
-          ${kicker(i, 'EDUCATION — 학력 · 기록')}
+          ${kicker(i, 'EDUCATION — 학력 · 기록 · 스킬')}
           <h2 class="bt-h b-a">학력과 숫자로 본 기록</h2>
         </div>
         <div class="bt-body panel-content">
@@ -76,10 +94,9 @@ function profileBeats(scene, i) {
                 .map(([n, l, s]) => `<div><dt>${esc(l)}</dt><dd>${esc(n)}${s ? `<small>${esc(s)}</small>` : ''}</dd></div>`)
                 .join('')}</dl>
             </section>
-            <section class="rs-sec rs-wide rs-more b-a">
-              <img class="rs-sheet" src="${esc(sch.sheet.sm)}" width="240" height="339" alt="${esc(sch.title)} 장학증서" loading="lazy" decoding="async" />
-              <p><b>${esc(sch.title)}</b><span>${esc(sch.date)} · ${esc(sch.by)}</span></p>
-              <a class="rs-deck" href="/present" data-link>성장 과정 · 보유 역량 · 미래 계획은 발표 자료에서 <i aria-hidden="true">→</i></a>
+            <section class="rs-sec rs-wide rs-skills b-a">
+              <h3 class="rs-h">다루는 언어 · 스킬 <a href="/skills" data-link>근거와 함께 보기 →</a></h3>
+              <dl>${STACK.map((g) => `<div><dt>${esc(g.ko)}</dt><dd>${g.items.map((s) => esc(s.name)).join('<i> · </i>')}</dd></div>`).join('')}</dl>
             </section>
           </div>
         </div>`,

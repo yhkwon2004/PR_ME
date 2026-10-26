@@ -3,17 +3,17 @@
    premium.css 다음에 읽는다. */
 
 /* 분야 색 — 필름 장면과 같은 색(제작은 따로) */
-[data-dom='aerial'] { --dc: #007d89; }
-[data-dom='ground'] { --dc: #5477c3; }
-[data-dom='robotics'] { --dc: #d14d00; }
-[data-dom='ai'] { --dc: #905dc3; }
-[data-dom='embedded'] { --dc: #008833; }
-[data-dom='fab'] { --dc: #ba4a7d; }
-[data-dom='software'] { --dc: #363f47; }
-[data-dom='product'] { --dc: #8d6400; }
+[data-dom='aerial'] { --dc: #5ef2ff; }
+[data-dom='ground'] { --dc: #7fa8ff; }
+[data-dom='robotics'] { --dc: #ff6b1a; }
+[data-dom='ai'] { --dc: #c48bff; }
+[data-dom='embedded'] { --dc: #3dff9a; }
+[data-dom='fab'] { --dc: #ff7eb6; }
+[data-dom='software'] { --dc: #9fb3c8; }
+[data-dom='product'] { --dc: #ffcf5a; }
 
 .pg-skills .pg-bar {
-  background: rgba(249, 252, 255, 0.8);
+  background: rgba(5, 7, 12, 0.8);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
 }
@@ -43,7 +43,7 @@
   padding: 14px 16px 12px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(13, 13, 13, 0.02);
+  background: rgba(255, 255, 255, 0.02);
 }
 .sk-sum dd {
   font-family: var(--display);
@@ -106,7 +106,7 @@
   padding: 22px 20px 18px;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(13, 13, 13, 0.045), rgba(13, 13, 13, 0.01));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.01));
   overflow: hidden;
   isolation: isolate;
   transition:
@@ -235,7 +235,7 @@
 .sk-dcard a:focus-visible .sk-dgo {
   background: var(--dc);
   border-color: var(--dc);
-  color: #f9fcff;
+  color: #05070c;
 }
 
 /* 읽는 법 */
@@ -260,10 +260,10 @@
   width: 6px;
   height: 14px;
   border-radius: 2px;
-  background: linear-gradient(180deg, var(--cyan), #905dc3);
+  background: linear-gradient(180deg, var(--cyan), #c48bff);
 }
 .lg-aw {
-  color: #896c09;
+  color: #e8c66a;
 }
 .lg-cert,
 .lg-exp {
@@ -272,11 +272,11 @@
 }
 .lg-cert {
   color: var(--cyan);
-  border: 1px solid rgba(0, 125, 137, 0.4);
+  border: 1px solid rgba(94, 242, 255, 0.4);
 }
 .lg-exp {
   color: var(--orange);
-  border: 1px dashed rgba(209, 77, 0, 0.5);
+  border: 1px dashed rgba(255, 107, 26, 0.5);
 }
 
 /* ── 분야별 목록: 왼쪽은 분야와 근거 프로젝트, 오른쪽은 기술 ── */
@@ -509,15 +509,15 @@
 }
 .sk-flags .sk-exp {
   color: var(--orange);
-  border: 1px dashed rgba(209, 77, 0, 0.5);
+  border: 1px dashed rgba(255, 107, 26, 0.5);
 }
 .sk-cert-f {
   color: var(--cyan);
-  border-color: rgba(0, 125, 137, 0.4);
+  border-color: rgba(94, 242, 255, 0.4);
 }
 .sk-aw-f {
-  color: #896c09;
-  border-color: rgba(137, 108, 9, 0.35);
+  color: #e8c66a;
+  border-color: rgba(232, 198, 106, 0.35);
 }
 .sk-cnt {
   display: grid;
@@ -621,7 +621,7 @@
   padding: 10px 12px 10px 15px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: rgba(13, 13, 13, 0.02);
+  background: rgba(255, 255, 255, 0.02);
   transition:
     border-color 0.25s,
     background 0.25s;
@@ -637,7 +637,7 @@
   background: var(--cc, var(--dc));
 }
 .sk-evl .is-award a {
-  --cc: #896c09;
+  --cc: #e8c66a;
 }
 .sk-evl .is-cert a {
   --cc: var(--cyan);
@@ -666,7 +666,7 @@
   gap: 3px;
   font-family: var(--mono);
   font-size: 10.5px;
-  color: #896c09;
+  color: #e8c66a;
 }
 .sk-ev-aw .laurel {
   width: 12px;
@@ -719,7 +719,7 @@
   padding: 18px 20px 17px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(13, 13, 13, 0.045), rgba(13, 13, 13, 0.01));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.01));
   overflow: hidden;
 }
 .sk-cert::before {
@@ -785,7 +785,7 @@
 .index-archive a:hover,
 .index-archive a:focus-visible {
   border-color: var(--orange);
-  background: rgba(209, 77, 0, 0.14);
+  background: rgba(255, 107, 26, 0.14);
 }
 
 /* 엔드 카드: 버튼이 넷이 되어 서명 줄이 아래로 내려가므로, 낮은 데스크톱에서는 서명을 걷어 장면 막대와 겹치지 않게 */
@@ -970,7 +970,7 @@
 /* 휴대폰: 흐림 효과가 꺼지므로 위 막대를 더 짙게 */
 @media (max-width: 820px), (pointer: coarse) {
   .pg-skills .pg-bar {
-    background: rgba(249, 252, 255, 0.94);
+    background: rgba(5, 7, 12, 0.94);
   }
 }
 @media (pointer: coarse) {

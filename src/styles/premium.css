@@ -2,11 +2,11 @@
    pages.css 다음에 읽어 카드 표현을 덮어쓴다. */
 
 /* 등급 색: 대상 · 최우수상 · 우수상 · 장려상 · 그 밖 */
-[data-tier='grand'] { --tc: #876800; }
-[data-tier='gold'] { --tc: #211c0b; }
-[data-tier='silver'] { --tc: #1e2126; }
-[data-tier='bronze'] { --tc: #996c49; }
-[data-tier='merit'] { --tc: #333a42; }
+[data-tier='grand'] { --tc: #f4cf73; }
+[data-tier='gold'] { --tc: #eadbb0; }
+[data-tier='silver'] { --tc: #cdd6e2; }
+[data-tier='bronze'] { --tc: #dca77f; }
+[data-tier='merit'] { --tc: #a7b8cb; }
 
 .laurel {
   flex: none;
@@ -34,8 +34,8 @@
   isolation: isolate;
   border: 0;
   border-radius: var(--cr);
-  background: #f3f5fa;
-  box-shadow: 0 22px 44px -26px rgba(17, 19, 23, 0.427);
+  background: #080b11;
+  box-shadow: 0 22px 44px -26px rgba(0, 0, 0, 0.95);
   transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(var(--fs, 1));
   transition:
     transform 0.6s var(--ease),
@@ -90,14 +90,14 @@
   inset: 0;
   z-index: 6;
   border-radius: inherit;
-  background: rgba(249, 252, 255, 0.68);
+  background: rgba(3, 5, 9, 0.68);
   opacity: 0;
   pointer-events: none;
   transition: background 0.35s;
   will-change: opacity; /* 덱을 끄는 동안 매 프레임 바뀌어도 카드를 다시 칠하지 않게(합성만) */
 }
 .deck .r-card:not(.is-focus):hover .card-dim {
-  background: rgba(249, 252, 255, 0.35);
+  background: rgba(3, 5, 9, 0.35);
 }
 .deck .r-card:not(.is-focus) {
   cursor: pointer;
@@ -105,7 +105,7 @@
 .deck .r-card.is-focus .card-media {
   box-shadow:
     0 36px 70px -30px color-mix(in srgb, var(--cc, var(--cyan)) 55%, transparent),
-    0 22px 44px -26px rgba(17, 19, 23, 0.427);
+    0 22px 44px -26px rgba(0, 0, 0, 0.95);
 }
 .deck .r-card.is-focus .card-media::after {
   border-color: color-mix(in srgb, var(--cc, var(--cyan)) 62%, transparent);
@@ -123,7 +123,7 @@
   inset: 0;
   z-index: 7;
   pointer-events: none;
-  background: linear-gradient(105deg, transparent 30%, rgba(13, 13, 13, 0.12) 43%, rgba(13, 13, 13, 0.34) 50%, rgba(13, 13, 13, 0.12) 57%, transparent 70%);
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.12) 43%, rgba(255, 255, 255, 0.34) 50%, rgba(255, 255, 255, 0.12) 57%, transparent 70%);
   transform: translateX(-140%);
 }
 .r-card.is-landing .card-sweep {
@@ -148,7 +148,7 @@
   display: none;
 }
 .deck .card-shade {
-  background: linear-gradient(180deg, rgba(249, 252, 255, 0.55) 0%, rgba(249, 252, 255, 0) 26%, rgba(249, 252, 255, 0) 70%, rgba(249, 252, 255, 0.5) 100%);
+  background: linear-gradient(180deg, rgba(4, 6, 10, 0.55) 0%, rgba(4, 6, 10, 0) 26%, rgba(4, 6, 10, 0) 70%, rgba(4, 6, 10, 0.5) 100%);
 }
 /* 화면 캡처 · 도표도 덱에서는 카드를 꽉 채운다(전체는 상세 페이지에서) */
 .deck .r-card .card-media img.is-contain {
@@ -173,7 +173,7 @@
 }
 /* 덱 끝의 '전체 보기' 카드: 다른 작품 네 장을 2×2로 겹쳐 놓고 큰 숫자 */
 .deck-all .card-media {
-  background: #f6f9fe;
+  background: #060910;
 }
 .all-grid {
   position: absolute;
@@ -190,7 +190,7 @@
   transform: none;
 }
 .deck-all .card-shade {
-  background: radial-gradient(70% 60% at 50% 50%, rgba(249, 252, 255, 0.55), rgba(249, 252, 255, 0.85));
+  background: radial-gradient(70% 60% at 50% 50%, rgba(4, 6, 10, 0.55), rgba(4, 6, 10, 0.85));
 }
 .all-copy {
   position: absolute;
@@ -230,7 +230,7 @@
   border-radius: 50%;
   font-style: normal;
   background: var(--orange);
-  color: #fff7ee;
+  color: #120600;
   transition: transform 0.4s var(--ease);
 }
 .deck-all:hover .all-copy i,
@@ -260,7 +260,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--fg-2);
-  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.855), 0 0 3px rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.8);
 }
 .di-cat {
   color: var(--cc, var(--cyan));
@@ -278,14 +278,14 @@
   width: auto;
   height: clamp(14px, calc(34px / sqrt(var(--r))), 26px);
   opacity: 0.85;
-  filter: drop-shadow(0 1px 6px rgba(17, 19, 23, 0.405));
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.9));
 }
 .di-award,
 .di-grade {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--tc, #876800);
+  color: var(--tc, #f4cf73);
   letter-spacing: 0.06em;
 }
 .di-grade {
@@ -312,7 +312,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-shadow: 0 2px 16px rgba(255, 255, 255, 0.72);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
 }
 .di-line {
   margin: 6px auto 0;
@@ -325,7 +325,7 @@
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
 }
 .di-actions {
   display: flex;
@@ -352,7 +352,7 @@
 }
 .di-open {
   background: var(--fg);
-  color: #f9fcff;
+  color: #05070c;
 }
 .di-open:hover,
 .di-open:focus-visible {
@@ -367,7 +367,7 @@
 }
 .di-ghost {
   border: 1px solid var(--line-2);
-  background: rgba(249, 252, 255, 0.5);
+  background: rgba(5, 7, 12, 0.5);
   color: var(--fg-2);
 }
 .di-ghost:hover,
@@ -377,7 +377,7 @@
 }
 .di-all .di-open {
   background: var(--orange);
-  color: #fff7ee;
+  color: #120600;
 }
 @media (max-height: 760px) and (min-width: 821px) and (orientation: landscape), (max-height: 760px) and (min-width: 1101px) {
   .deck-info {
@@ -428,7 +428,7 @@
     transform: translateY(-50%) rotate(0deg);
   }
   .deck .card-shade {
-    background: linear-gradient(180deg, rgba(249, 252, 255, 0.45) 0%, rgba(249, 252, 255, 0) 28%, rgba(249, 252, 255, 0.35) 52%, rgba(249, 252, 255, 0.9) 100%);
+    background: linear-gradient(180deg, rgba(4, 6, 10, 0.45) 0%, rgba(4, 6, 10, 0) 28%, rgba(4, 6, 10, 0.35) 52%, rgba(4, 6, 10, 0.9) 100%);
   }
   .all-copy {
     place-content: start center;
@@ -587,7 +587,7 @@
   height: 34px;
   border-radius: 50%;
   border: 1px solid var(--line-2);
-  background: rgba(249, 252, 255, 0.5);
+  background: rgba(5, 7, 12, 0.5);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   color: var(--fg);
@@ -630,13 +630,13 @@
   width: 6px;
   height: 2px;
   border-radius: 2px;
-  background: rgba(15, 17, 19, 0.22);
+  background: rgba(232, 237, 244, 0.22);
   transition:
     width 0.55s var(--ease),
     background 0.4s;
 }
 .deck-ticks i.is-past {
-  background: rgba(0, 125, 137, 0.42);
+  background: rgba(94, 242, 255, 0.42);
 }
 .deck-ticks i.is-on {
   width: 22px;
@@ -656,12 +656,12 @@
 }
 /* 전체 보기 링크는 막대에서도 눈에 띄게 */
 .deck-bar .reel-all {
-  background: rgba(209, 77, 0, 0.12);
-  box-shadow: inset 0 0 0 1px rgba(209, 77, 0, 0.35);
+  background: rgba(255, 107, 26, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 107, 26, 0.5);
 }
 .deck-bar .reel-all:hover {
   background: var(--orange);
-  color: #fff7ee;
+  color: #120600;
 }
 /* 휴대폰: 넘김은 스와이프로 — 버튼과 장 수 글자는 걷고 번호 · 눈금 · 전체 보기만 */
 @media (max-width: 820px), (orientation: portrait) and (max-width: 1100px) {
@@ -711,8 +711,8 @@
   inset: 0;
   z-index: 5;
   border-radius: inherit;
-  border: 1px solid rgba(13, 13, 13, 0.12);
-  background: linear-gradient(165deg, rgba(13, 13, 13, 0.07), transparent 28%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.07), transparent 28%);
   pointer-events: none;
   transition: border-color 0.45s;
 }
@@ -722,7 +722,7 @@
 .w-card:focus-visible .card-media {
   box-shadow:
     0 28px 60px -24px color-mix(in srgb, var(--cc, var(--cyan)) 42%, transparent),
-    0 22px 44px -26px rgba(17, 19, 23, 0.427);
+    0 22px 44px -26px rgba(0, 0, 0, 0.95);
 }
 .r-card:hover .card-media::after,
 .w-card:hover .card-media::after,
@@ -770,11 +770,11 @@
   z-index: 1;
   background: linear-gradient(
     180deg,
-    rgba(249, 252, 255, 0.74) 0%,
-    rgba(249, 252, 255, 0) 30%,
-    rgba(249, 252, 255, 0) 40%,
-    rgba(249, 252, 255, 0.72) 68%,
-    rgba(249, 252, 255, 0.96) 100%
+    rgba(4, 6, 10, 0.74) 0%,
+    rgba(4, 6, 10, 0) 30%,
+    rgba(4, 6, 10, 0) 40%,
+    rgba(4, 6, 10, 0.72) 68%,
+    rgba(4, 6, 10, 0.96) 100%
   );
   pointer-events: none;
 }
@@ -783,7 +783,7 @@
   position: absolute;
   inset: 0;
   z-index: 4;
-  background: radial-gradient(circle at var(--mx, 30%) var(--my, 0%), rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 52%);
+  background: radial-gradient(circle at var(--mx, 30%) var(--my, 0%), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 52%);
   opacity: 0;
   mix-blend-mode: overlay;
   pointer-events: none;
@@ -808,14 +808,14 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--fg-2);
-  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
   pointer-events: none;
 }
 .card-top .card-no {
   padding: 2px 7px;
   border-radius: 999px;
   color: var(--cc, var(--orange));
-  background: rgba(249, 252, 255, 0.66);
+  background: rgba(5, 7, 12, 0.66);
   backdrop-filter: blur(4px);
 }
 .card-top .card-cat::before {
@@ -843,10 +843,10 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--tc, #876800);
-  background: rgba(248, 246, 243, 0.66);
-  border: 1px solid color-mix(in srgb, var(--tc, #876800) 55%, transparent);
-  box-shadow: 0 0 22px -8px var(--tc, rgba(135, 104, 0, 0.7));
+  color: var(--tc, #f4cf73);
+  background: rgba(12, 10, 6, 0.66);
+  border: 1px solid color-mix(in srgb, var(--tc, #f4cf73) 55%, transparent);
+  box-shadow: 0 0 22px -8px var(--tc, #f4cf73);
   backdrop-filter: blur(8px);
   pointer-events: none;
 }
@@ -897,7 +897,7 @@
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.12em;
-  color: rgba(12, 13, 15, 0.62);
+  color: rgba(238, 242, 247, 0.62);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -909,11 +909,11 @@
   font-weight: 700;
   line-height: 1.3;
   letter-spacing: -0.015em;
-  color: #0d0d0d;
+  color: #fff;
   white-space: normal;
   word-break: keep-all;
   text-wrap: balance;
-  text-shadow: 0 1px 14px rgba(255, 255, 255, 0.495);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -963,14 +963,14 @@
   width: 28px;
   height: 28px;
   font-size: 12px;
-  border: 1px solid rgba(13, 13, 13, 0.25);
-  background: rgba(249, 252, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(5, 7, 12, 0.5);
 }
 .r-card:hover .card-open,
 .w-card:hover .card-open {
   border-color: transparent;
   background: var(--cc, var(--orange));
-  color: #f9fcff;
+  color: #05070c;
 }
 /* 터치 화면: 글자를 늘 선명하게, 호버 효과 없이 */
 @media (hover: none) {
@@ -1075,7 +1075,7 @@
   padding: 4px;
   border: 1px solid var(--line-2);
   border-radius: 999px;
-  background: rgba(13, 13, 13, 0.03);
+  background: rgba(255, 255, 255, 0.03);
 }
 .pg-tabs a {
   flex: none;
@@ -1114,11 +1114,11 @@
   display: block;
   aspect-ratio: 1132 / 1600;
   border-radius: 4px;
-  background: #100f0c;
+  background: #f3efe6;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.5) inset,
-    0 30px 50px -28px rgba(17, 19, 23, 0.427),
-    0 12px 24px -14px rgba(17, 19, 23, 0.315);
+    0 30px 50px -28px rgba(0, 0, 0, 0.95),
+    0 12px 24px -14px rgba(0, 0, 0, 0.7);
 }
 .sheet > img {
   display: block;
@@ -1136,13 +1136,13 @@
   inset: 0;
   z-index: -1;
   border-radius: 4px;
-  background: #1c1a16;
-  box-shadow: 0 14px 26px -14px rgba(17, 19, 23, 0.36);
+  background: #e4ded2;
+  box-shadow: 0 14px 26px -14px rgba(0, 0, 0, 0.8);
   transform: rotate(5deg) translate(7%, 2%);
 }
 .sheet.is-photo {
   overflow: hidden;
-  background: #eef1f5;
+  background: #0b0e14;
 }
 /* 가로 시상 사진은 자르지 않고 흐린 배경 위에 */
 .sheet.is-photo > img {
@@ -1164,9 +1164,9 @@
   place-content: center;
   justify-items: center;
   gap: 8px;
-  background: linear-gradient(160deg, #dfe2e8, #f0f2f7);
-  border: 1px solid color-mix(in srgb, var(--tc, #876800) 35%, transparent);
-  color: var(--tc, #876800);
+  background: linear-gradient(160deg, #141820, #0a0d13);
+  border: 1px solid color-mix(in srgb, var(--tc, #f4cf73) 35%, transparent);
+  color: var(--tc, #f4cf73);
 }
 .sheet.is-blank .laurel {
   width: 38px;
@@ -1263,7 +1263,7 @@
   right: auto;
 }
 .a-card .card-cap::before {
-  background: var(--tc, #876800);
+  background: var(--tc, #f4cf73);
 }
 .a-card .card-title {
   font-size: clamp(12.5px, 6.4cqi, 15.5px);
@@ -1293,14 +1293,15 @@
   margin: 12px auto 0;
   font-size: 13px;
   color: var(--fg-2);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
 }
 .rec-honor button {
   display: block;
   width: 26px;
   border-radius: 2px;
   box-shadow:
-    0 0 0 1px var(--line),
-    0 6px 12px -6px rgba(17, 19, 23, 0.4);
+    0 0 0 1px var(--line-2),
+    0 6px 12px -6px rgba(0, 0, 0, 0.8);
   transition: transform 0.4s var(--ease);
 }
 .rec-honor button:hover,
@@ -1353,7 +1354,7 @@
   font-size: 11px;
   letter-spacing: 0.08em;
   color: var(--fg-2);
-  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.81);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
 }
 .rec-years > span:first-child {
   color: var(--muted);
@@ -1374,7 +1375,7 @@
 /* 수치 아래로 3D 막대가 지나가도 글자가 읽히게 */
 .stage.has-reel .counters dd,
 .stage.has-reel .counters dt {
-  text-shadow: 0 2px 14px rgba(255, 255, 255, 0.81), 0 0 4px rgba(255, 255, 255, 0.72);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9), 0 0 4px rgba(0, 0, 0, 0.8);
 }
 
 /* ── 수상 아카이브(/awards) ── */
@@ -1396,7 +1397,7 @@
   padding: 14px 16px 12px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(13, 13, 13, 0.02);
+  background: rgba(255, 255, 255, 0.02);
   transition:
     border-color 0.35s,
     background 0.35s,
@@ -1458,9 +1459,9 @@
 /* 대상은 상장이 금빛으로 비친다 */
 .aw-cell[data-g='grand'] .sheet {
   box-shadow:
-    0 0 0 1px rgba(135, 104, 0, 0.245),
-    0 30px 60px -28px rgba(135, 104, 0, 0.315),
-    0 12px 24px -14px rgba(17, 19, 23, 0.315);
+    0 0 0 1px rgba(244, 207, 115, 0.35),
+    0 30px 60px -28px rgba(244, 207, 115, 0.45),
+    0 12px 24px -14px rgba(0, 0, 0, 0.7);
 }
 /* 겹친 상장(뒤 한 장)이 화면 밖으로 나가 가로 스크롤이 생기지 않게 */
 .aw-year,
@@ -1543,7 +1544,7 @@ button.aw-sheet:focus-visible .sheet {
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--tc) 70%, transparent),
     0 34px 60px -26px color-mix(in srgb, var(--tc) 40%, transparent),
-    0 12px 24px -14px rgba(17, 19, 23, 0.315);
+    0 12px 24px -14px rgba(0, 0, 0, 0.7);
 }
 button.aw-sheet:hover .sheet > img,
 button.aw-sheet:focus-visible .sheet > img {
@@ -1604,7 +1605,7 @@ button.aw-sheet:focus-visible {
   padding: 6px 12px 6px 6px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: linear-gradient(180deg, rgba(13, 13, 13, 0.05), rgba(13, 13, 13, 0.015));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
   text-align: left;
   transition: border-color 0.35s, background 0.35s;
 }
@@ -1619,7 +1620,7 @@ button.aw-sheet:focus-visible {
   height: 42px;
   overflow: hidden;
   border-radius: 8px;
-  background: #eef1f5;
+  background: #0b0e14;
 }
 .aw-proj-img img {
   width: 100%;
@@ -1633,7 +1634,7 @@ button.aw-sheet:focus-visible {
   font-size: 11px;
   letter-spacing: 0.08em;
   color: var(--cc, var(--cyan));
-  background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--cc, var(--cyan)) 32%, transparent), transparent 70%), #eef1f5;
+  background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--cc, var(--cyan)) 32%, transparent), transparent 70%), #0b0e14;
   border: 1px solid color-mix(in srgb, var(--cc, var(--cyan)) 30%, transparent);
 }
 .aw-proj-t {
@@ -1717,7 +1718,7 @@ button.aw-sheet:focus-visible {
   padding: 12px 22px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(13, 13, 13, 0.05), rgba(13, 13, 13, 0.012));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012));
 }
 .d-with li.is-text {
   padding-left: 22px;
@@ -1741,15 +1742,13 @@ button.aw-sheet:focus-visible {
   word-break: keep-all;
 }
 
-/* ── 기관 로고 ── (로고 그림은 흰 실루엣 — 밝은 바탕에서는 먹색으로) */
+/* ── 기관 로고 ── */
 .org-logo {
   display: block;
   width: auto;
   max-width: 100%;
   height: max(16px, calc(var(--lh) * 1px * var(--ls, 1)));
   object-fit: contain;
-  filter: brightness(0);
-  opacity: 0.78;
 }
 .org-word {
   display: grid;
@@ -1805,13 +1804,13 @@ button.aw-sheet:focus-visible {
   padding: 18px 18px 16px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(13, 13, 13, 0.045), rgba(13, 13, 13, 0.01));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.01));
   transition: border-color 0.35s, background 0.35s;
 }
 .ow:hover,
 .ow:focus-within {
-  border-color: rgba(0, 125, 137, 0.35);
-  background: linear-gradient(180deg, rgba(0, 125, 137, 0.07), rgba(13, 13, 13, 0.015));
+  border-color: rgba(94, 242, 255, 0.35);
+  background: linear-gradient(180deg, rgba(94, 242, 255, 0.07), rgba(255, 255, 255, 0.015));
 }
 .ow-mark {
   display: flex;
@@ -1844,7 +1843,7 @@ button.aw-sheet:focus-visible {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.12em;
-  color: #896c09;
+  color: #e8c66a;
 }
 .ow-proj {
   display: flex;
@@ -1866,7 +1865,7 @@ button.aw-sheet:focus-visible {
 .ow-proj a:hover,
 .ow-proj a:focus-visible {
   color: var(--fg);
-  border-color: rgba(0, 125, 137, 0.5);
+  border-color: rgba(94, 242, 255, 0.5);
 }
 /* 정부 상징 + 기관 이름 */
 .org-lockup {
@@ -2005,13 +2004,13 @@ button.aw-sheet:focus-visible {
   padding: 7cqw 7cqw 6cqw;
   /* 종이: 왼쪽 위의 빛 + 아주 옅은 가로 결 */
   background:
-    radial-gradient(120% 80% at 20% 0%, rgba(13, 13, 13, 0.55), transparent 60%),
-    repeating-linear-gradient(0deg, rgba(194, 188, 176, 0.035) 0 1px, transparent 1px 3px),
-    linear-gradient(180deg, #0f0e0b, #191711);
-  color: #e2e2e4;
+    radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, 0.55), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(60, 50, 30, 0.035) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #f4f0e6, #e9e3d4);
+  color: #17171a;
 }
 .p-card .card-media::after {
-  border-color: rgba(252, 252, 252, 0.12);
+  border-color: rgba(0, 0, 0, 0.12);
   background: none;
 }
 .pc-mast {
@@ -2042,15 +2041,15 @@ button.aw-sheet:focus-visible {
   display: block;
   height: 4px;
   margin: 2.6cqw 0 4cqw;
-  border-top: 2px solid #e2e2e4;
-  border-bottom: 1px solid #e2e2e4;
+  border-top: 2px solid #17171a;
+  border-bottom: 1px solid #17171a;
 }
 .pc-photo {
   position: relative;
   flex: none;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: #2d2a24;
+  background: #cfc8b8;
 }
 .pc-photo img {
   width: 100%;
@@ -2076,7 +2075,7 @@ button.aw-sheet:focus-visible {
   font-family: var(--mono);
   font-size: 4.4cqw;
   letter-spacing: 0.1em;
-  color: #96928b;
+  color: #5d574a;
 }
 .pc-title {
   margin-top: 1.6cqw;
@@ -2096,7 +2095,7 @@ button.aw-sheet:focus-visible {
   align-items: center;
   margin-top: auto;
   padding-top: 2cqw;
-  border-top: 1px solid rgba(226, 226, 228, 0.25);
+  border-top: 1px solid rgba(23, 23, 26, 0.25);
   font-size: 4.4cqw;
 }
 .pc-foot em {
@@ -2104,13 +2103,13 @@ button.aw-sheet:focus-visible {
   font-weight: 700;
   padding: 0.8cqw 2.6cqw;
   border-radius: 99px;
-  background: #e2e2e4;
-  color: #0f0e0b;
+  background: #17171a;
+  color: #f4f0e6;
 }
 .p-card[data-rel='related'] .pc-foot em {
   background: transparent;
-  color: #e2e2e4;
-  box-shadow: inset 0 0 0 1px rgba(17, 19, 23, 0.45);
+  color: #17171a;
+  box-shadow: inset 0 0 0 1px #17171a;
 }
 .pc-foot i {
   font-style: normal;
@@ -2121,27 +2120,27 @@ button.aw-sheet:focus-visible {
 /* 가운데 카드: 종이 그림자와 붉은 잉크 테두리 */
 .deck .p-card.is-focus .card-media {
   box-shadow:
-    0 40px 70px -30px rgba(17, 19, 23, 0.427),
-    0 0 0 1px rgba(181, 52, 26, 0.245),
-    0 30px 90px -40px rgba(133, 99, 42, 0.315);
+    0 40px 70px -30px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(181, 52, 26, 0.35),
+    0 30px 90px -40px rgba(255, 214, 150, 0.45);
 }
 .deck .p-card.is-focus .card-media::after {
   border-color: rgba(181, 52, 26, 0.4);
 }
 /* 설명 줄 */
 .di-press .di-cat {
-  color: #1a150b;
+  color: #f1e3c6;
 }
 .di-rel {
   padding: 2px 8px;
   border-radius: 99px;
-  border: 1px solid rgba(26, 21, 11, 0.5);
-  color: #1a150b;
+  border: 1px solid rgba(241, 227, 198, 0.5);
+  color: #f1e3c6;
   letter-spacing: 0.06em;
 }
 .di-rel[data-rel='direct'] {
-  background: #1a150b;
-  color: #e2e2e4;
+  background: #f1e3c6;
+  color: #17171a;
 }
 .di-press .di-line {
   max-width: 62ch;
@@ -2163,8 +2162,8 @@ button.aw-sheet:focus-visible {
   overflow: hidden;
   background:
     radial-gradient(120% 90% at 88% 6%, rgba(181, 52, 26, 0.42), transparent 62%),
-    #e2e2e4;
-  color: #0f0e0b;
+    #17171a;
+  color: #f4f0e6;
 }
 .pc-quote {
   position: absolute;
@@ -2181,7 +2180,7 @@ button.aw-sheet:focus-visible {
   font-family: var(--mono);
   font-size: 4cqw;
   letter-spacing: 0.3em;
-  color: rgba(15, 14, 11, 0.7);
+  color: rgba(244, 240, 230, 0.7);
 }
 .pc-iv b {
   font-size: 13cqw;
@@ -2194,7 +2193,7 @@ button.aw-sheet:focus-visible {
   font-size: 4.2cqw;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(15, 14, 11, 0.75);
+  color: rgba(244, 240, 230, 0.75);
 }
 .pc-iv > .pc-iv-q {
   font-family: var(--sans);
@@ -2203,7 +2202,7 @@ button.aw-sheet:focus-visible {
   line-height: 1.38;
   letter-spacing: -0.01em;
   text-transform: none;
-  color: #0f0e0b;
+  color: #f4f0e6;
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
@@ -2213,8 +2212,8 @@ button.aw-sheet:focus-visible {
 .pc-iv.is-text {
   justify-content: center;
   background:
-    radial-gradient(120% 90% at 88% 6%, rgba(0, 125, 137, 0.18), transparent 62%),
-    #dee0e4;
+    radial-gradient(120% 90% at 88% 6%, rgba(94, 242, 255, 0.18), transparent 62%),
+    #17191e;
 }
 .pc-iv.is-text b {
   display: -webkit-box;
@@ -2229,7 +2228,7 @@ button.aw-sheet:focus-visible {
   padding: 0.4cqw 1.8cqw;
   border-radius: 2px;
   background: #b5341a;
-  color: #0d0d0d;
+  color: #fff;
 }
 .deck .p-card.is-interview.is-landing .pc-quote {
   animation: iv-quote 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -2279,7 +2278,7 @@ button.aw-sheet:focus-visible {
   font-weight: 650;
 }
 .aw-guide b.g {
-  color: #876800;
+  color: #f4cf73;
 }
 .aw-y-tiers {
   display: inline-flex;
@@ -2294,6 +2293,6 @@ button.aw-sheet:focus-visible {
   align-self: center;
 }
 .aw-y-tiers span[data-tier='grand'] {
-  color: #876800;
+  color: #f4cf73;
 }
 

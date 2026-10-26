@@ -6,8 +6,8 @@ import { AWARDS, awardsOf, bestOf, TIER_KEY } from '../data/awards.js';
 import { HISTORY, HISTORY_YEARS } from '../data/history.js';
 import { PRESS, pressOf } from '../data/press.js';
 import { DOMAIN_SKILLS, SKILLS, CERTS, SKILL_COUNT } from '../data/skills.js';
-import { createPager } from '../ui/pager.js';
-import { presentDeck, PR_SECS } from './present.js';
+import { createPager } from '../deck/pager.js';
+import { presentDeck, PR_SECS } from '../deck/present.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
@@ -622,7 +622,7 @@ function skillsPage() {
   </div>`;
 }
 
-// ── 발표 자료(/present · 예전 /growth/detail): 스크롤 없이 한 화면씩 넘기는 덱 — 내용은 pages/present.js, 넘기기는 ui/pager.js ──
+// ── 발표 자료(/present · 예전 /growth/detail): 스크롤 없이 한 화면씩 넘기는 덱 — 포트폴리오와 따로 산다(src/deck/: 내용 present.js · 넘기기 pager.js · 모양 deck.css) ──
 // 사진은 덱이 지금 화면 가까이에서만 받는다(src → data-src)
 const jrLazy = (html) => html.replace(/<img\b([^>]*)>/g, (m, a) => `<img${a.replace(/\sloading="lazy"/, '').replace(/\ssrcset=/, ' data-srcset=').replace(/\ssrc=/, ' data-src=')}>`);
 
@@ -899,9 +899,9 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (cols !== gridCols) gridCols = layoutGrid(grid);
   });
 
-  // 성장 · 이력(/growth · /history)과 예전 필름 장면(성장 · 보유 역량 · 미래 계획 · 보도)은 이제 발표 자료 안에만 있다 — 그 화면으로:
+  // 성장 · 이력(/growth · /history)과 예전 필름 장면(성장 · 보유 역량 · 미래 계획)은 이제 발표 자료 안에만 있다 — 그 화면으로:
   // /growth#gr-<학년> → 걸어온 길 · #gr-values → 일하는 방식 · /history#y2025 · #h-<항목> → 학년별 비교과 · 경력
-  const FILM_GONE = { '#growth': 'overview', '#history': 'years', '#competency': 'swot', '#future': 'goals', '#press': 'certs', '#build': 'p-recap-jbmotors' };
+  const FILM_GONE = { '#growth': 'overview', '#history': 'years', '#competency': 'swot', '#future': 'goals' };
   const deckOf = (path, hash) => {
     const y = hash.match(/^#y(\d{4})$/);
     if (y) return `y${y[1]}`;
@@ -1013,7 +1013,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     document.title = '권용현 — Physical AI Portfolio';
   }
 
-  // 성장 · 이력 상세: 스크롤 없는 화면 넘김 덱(ui/pager.js) — 주소의 #(#years · #swot · #y2025 · #s-<학년> …)로 그 화면부터
+  // 발표 자료: 스크롤 없는 화면 넘김 덱(deck/pager.js) — 주소의 #(#years · #swot · #y2025 · #s-<학년> …)로 그 화면부터
   function bindJourney() {
     deck?.destroy();
     deck = createPager(page.querySelector('.pg-journey'), { reducedMotion, start: decodeURIComponent(location.hash.slice(1)) });
