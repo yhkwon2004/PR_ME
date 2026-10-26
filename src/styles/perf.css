@@ -22,15 +22,15 @@ html.q-lite .hud-nav button,
 html.q-lite .hero-tags li,
 html.q-lite .pg-back,
 html.q-lite .pg-close {
-  background-color: rgba(5, 7, 12, 0.66);
+  background-color: rgba(249, 252, 255, 0.66);
 }
 html.q-lite .deck-btn {
-  background-color: rgba(5, 7, 12, 0.72);
+  background-color: rgba(249, 252, 255, 0.72);
 }
 /* 첫 화면 버튼: 뒤 흐림이 빠진 만큼 조금 더 짙게 */
 html.q-lite .btn-enter,
 html.q-lite .btn-present {
-  background-color: rgba(5, 7, 12, 0.86);
+  background-color: rgba(249, 252, 255, 0.86);
 }
 
 /* 낮음 이하: 칠하기가 많은 효과(필터 · 큰 색 그림자 · 표면을 훑는 빛 · 사진 확대)를 걷는다 */
@@ -51,7 +51,7 @@ html.q-low .w-card .card-media {
     opacity 0.6s var(--ease);
 }
 html.q-low .deck .r-card.is-focus .card-media {
-  box-shadow: 0 22px 44px -26px rgba(0, 0, 0, 0.95);
+  box-shadow: 0 22px 44px -26px rgba(17, 19, 23, 0.427);
 }
 html.q-low .deck-stage::before {
   filter: none;

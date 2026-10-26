@@ -25,7 +25,7 @@
   margin: 0 24px 10px 0;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #e8edf3;
+  background: #0f1113;
 }
 .ab-photo img {
   display: block;
@@ -91,7 +91,7 @@
   padding: 12px 16px;
   border: 1px solid var(--line-2);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(13, 13, 13, 0.03);
   font-size: 14px;
   font-weight: 600;
   text-align: left;
@@ -125,7 +125,7 @@
   color: var(--bg);
 }
 .ab-btn.is-main small {
-  color: rgba(5, 7, 12, 0.62);
+  color: rgba(249, 252, 255, 0.62);
 }
 .ab-btn.is-main:hover {
   background: var(--cyan);
@@ -176,7 +176,7 @@
   padding: 16px 18px 14px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(13, 13, 13, 0.02);
 }
 .ab-nums dd {
   font-family: var(--display);
@@ -257,7 +257,7 @@
   padding: 20px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(13, 13, 13, 0.02);
 }
 .ab-pillars b {
   font-size: 17px;
@@ -313,7 +313,7 @@
   padding: 18px 20px 18px 24px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(13, 13, 13, 0.02);
   transition:
     border-color 0.3s,
     background 0.3s;
@@ -330,7 +330,7 @@
 }
 .ab-proj a:hover {
   border-color: var(--cc, var(--fg));
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(13, 13, 13, 0.04);
 }
 .ab-pk {
   font-family: var(--mono);
@@ -487,7 +487,7 @@
   padding: 12px 18px;
   border: 1px solid var(--line-2);
   border-radius: 999px;
-  background: rgba(5, 7, 12, 0.92);
+  background: rgba(249, 252, 255, 0.92);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   font-size: 13px;
@@ -576,7 +576,7 @@
     margin: 12mm 12mm 13mm;
   }
   /* 프로필 페이지가 열려 있을 때만: 페이지 하나를 종이에 펼친다.
-     어두운 화면 설정(color-scheme: dark)이면 종이 여백까지 검게 칠해지므로 인쇄는 밝게 */
+     어두운 화면 설정(color-scheme: light)이면 종이 여백까지 검게 칠해지므로 인쇄는 밝게 */
   :root:has(.pg-about) {
     color-scheme: light;
   }

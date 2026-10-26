@@ -1,11 +1,11 @@
 /* ── 분야별 색 ─────────────────────────── */
-[data-cat='drone'] { --cc: #5ef2ff; }
-[data-cat='mobility'] { --cc: #7fa8ff; }
-[data-cat='robotics'] { --cc: #ff6b1a; }
-[data-cat='ai'] { --cc: #c48bff; }
-[data-cat='iot'] { --cc: #3dff9a; }
-[data-cat='product'] { --cc: #ffcf5a; }
-[data-cat='software'] { --cc: #9fb3c8; }
+[data-cat='drone'] { --cc: #007d89; }
+[data-cat='mobility'] { --cc: #5477c3; }
+[data-cat='robotics'] { --cc: #d14d00; }
+[data-cat='ai'] { --cc: #905dc3; }
+[data-cat='iot'] { --cc: #008833; }
+[data-cat='product'] { --cc: #8d6400; }
+[data-cat='software'] { --cc: #363f47; }
 
 /* ── HUD 보강 ──────────────────────────── */
 .hud-nav a {
@@ -20,12 +20,12 @@
   font-size: 10.5px;
   letter-spacing: 0.14em;
   color: var(--fg);
-  background: rgba(255, 107, 26, 0.12);
+  background: rgba(209, 77, 0, 0.12);
   backdrop-filter: blur(6px);
   transition: background 0.3s;
 }
 .hud-nav a:hover {
-  background: rgba(255, 107, 26, 0.3);
+  background: rgba(209, 77, 0, 0.3);
 }
 .ico-grid {
   display: grid;
@@ -59,7 +59,7 @@
   inset: -30px -10% -40px;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(50% 60% at 50% 45%, rgba(5, 7, 12, 0.72), rgba(5, 7, 12, 0) 100%);
+  background: radial-gradient(50% 60% at 50% 45%, rgba(249, 252, 255, 0.72), rgba(249, 252, 255, 0) 100%);
 }
 .reel-head .title {
   display: flex;
@@ -88,7 +88,7 @@
 .mini-stats li {
   padding: 6px 16px 7px;
   border-radius: 10px;
-  background: rgba(5, 7, 12, 0.62);
+  background: rgba(249, 252, 255, 0.62);
   backdrop-filter: blur(8px);
 }
 .mini-stats b {
@@ -115,7 +115,7 @@
 .reel-stats {
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(5, 7, 12, 0.66);
+  background: rgba(249, 252, 255, 0.66);
   backdrop-filter: blur(6px);
 }
 .reel-all {
@@ -140,7 +140,7 @@
   position: relative;
   margin: 0;
   overflow: hidden;
-  background: #0a0d12;
+  background: #f0f2f6;
   border: 1px solid var(--line-2);
   transition: border-color 0.4s;
 }
@@ -178,7 +178,7 @@
   place-items: center;
   border-radius: 50%;
   font-size: 13px;
-  background: rgba(5, 7, 12, 0.6);
+  background: rgba(249, 252, 255, 0.6);
   opacity: 0;
   transform: scale(0.7);
   transition: opacity 0.35s, transform 0.35s var(--ease), background 0.35s;
@@ -188,7 +188,7 @@
   opacity: 1;
   transform: none;
   background: var(--orange);
-  color: #120600;
+  color: #fff7ee;
 }
 .card-meta > span:last-child {
   min-width: 0;
@@ -227,9 +227,9 @@
   justify-content: space-between;
   padding: 14px;
   background:
-    radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--cc, #5ef2ff) 28%, transparent), transparent 60%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 22px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 22px), #070a10;
+    radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--cc, #007d89) 28%, transparent), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(13, 13, 13, 0.04) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(90deg, rgba(13, 13, 13, 0.04) 0 1px, transparent 1px 22px), #f4f7fc;
   overflow: hidden;
 }
 .type-cover b {
@@ -323,14 +323,14 @@
   padding: 13px 24px;
   border-radius: 999px;
   border: 1px solid var(--orange);
-  background: rgba(255, 107, 26, 0.14);
+  background: rgba(209, 77, 0, 0.14);
   font-weight: 650;
   font-size: 14px;
   transition: background 0.3s, transform 0.3s;
 }
 .btn-works:hover {
   background: var(--orange);
-  color: #120600;
+  color: #fff7ee;
   transform: translateY(-2px);
 }
 
@@ -374,12 +374,12 @@ body.page-open .title-card {
   justify-content: space-between;
   height: 72px;
   padding: 0 var(--pad);
-  background: linear-gradient(180deg, rgba(5, 7, 12, 0.92), rgba(5, 7, 12, 0));
+  background: linear-gradient(180deg, rgba(249, 252, 255, 0.92), rgba(249, 252, 255, 0));
 }
 /* 아카이브 · 수상 페이지는 카드와 상장이 막대 밑으로 지나가므로 반투명 막 + 흐림 */
 .pg-works .pg-bar,
 .pg-awards .pg-bar {
-  background: rgba(5, 7, 12, 0.8);
+  background: rgba(249, 252, 255, 0.8);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
 }
@@ -395,7 +395,7 @@ body.page-open .title-card {
   padding: 9px 14px;
   border: 1px solid var(--line-2);
   border-radius: 999px;
-  background: rgba(5, 7, 12, 0.4);
+  background: rgba(249, 252, 255, 0.4);
   backdrop-filter: blur(6px);
   transition: border-color 0.3s;
 }
@@ -418,7 +418,7 @@ body.page-open .title-card {
   height: 44px;
   border-radius: 50%;
   border: 1px solid var(--line-2);
-  background: rgba(5, 7, 12, 0.4);
+  background: rgba(249, 252, 255, 0.4);
   backdrop-filter: blur(6px);
   transition: border-color 0.3s, transform 0.4s var(--ease);
 }
@@ -581,8 +581,8 @@ body.page-open .title-card {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(0deg, rgba(5, 7, 12, 0.96) 0%, rgba(5, 7, 12, 0.55) 34%, rgba(5, 7, 12, 0.05) 66%),
-    linear-gradient(180deg, rgba(5, 7, 12, 0.55), transparent 22%);
+    linear-gradient(0deg, rgba(249, 252, 255, 0.96) 0%, rgba(249, 252, 255, 0.55) 34%, rgba(249, 252, 255, 0.05) 66%),
+    linear-gradient(180deg, rgba(249, 252, 255, 0.55), transparent 22%);
   pointer-events: none;
 }
 .d-hero-text {
@@ -592,7 +592,7 @@ body.page-open .title-card {
   bottom: 9vh;
   z-index: 2;
   max-width: 1200px;
-  text-shadow: 0 1px 14px rgba(5, 7, 12, 0.55);
+  text-shadow: 0 1px 14px rgba(255, 255, 255, 0.495);
 }
 .d-cat {
   display: flex;
@@ -765,7 +765,7 @@ body.page-open .title-card {
   width: 100%;
   overflow: hidden;
   border-radius: 3px;
-  background: #0a0d12;
+  background: #f0f2f6;
 }
 .st-media img {
   display: block;
@@ -790,7 +790,7 @@ body.page-open .title-card {
   font-size: 12px;
   line-height: 1.4;
   text-align: left;
-  background: rgba(5, 7, 12, 0.78);
+  background: rgba(249, 252, 255, 0.78);
   backdrop-filter: blur(6px);
   word-break: keep-all;
 }
@@ -861,7 +861,7 @@ body.page-open .title-card {
   display: block;
   flex: calc(var(--ar) * 100) 1 calc(var(--ar) * var(--row));
   overflow: hidden;
-  background: #0a0d12;
+  background: #f0f2f6;
   aspect-ratio: var(--ar);
 }
 .gal-item img {
@@ -898,7 +898,7 @@ body.page-open .title-card {
   width: 100%;
   aspect-ratio: 16 / 9;
   border: 1px solid var(--line-2);
-  background: #000;
+  background: #fcfcfc;
 }
 .yt {
   position: relative;
@@ -906,7 +906,7 @@ body.page-open .title-card {
 }
 /* 썸네일이 없을 때도 영상 자리로 보이게 */
 .vid .yt {
-  background: radial-gradient(60% 70% at 50% 50%, rgba(255, 122, 40, 0.16), transparent 70%), #07090e;
+  background: radial-gradient(60% 70% at 50% 50%, rgba(200, 82, 0, 0.16), transparent 70%), #f7f8fd;
 }
 .yt img {
   width: 100%;
@@ -924,7 +924,7 @@ body.page-open .title-card {
   place-items: center;
   border-radius: 50%;
   background: var(--orange);
-  color: #120600;
+  color: #fff7ee;
   font-size: 22px;
   transition: transform 0.4s var(--ease);
 }
@@ -963,18 +963,18 @@ body.page-open .title-card {
   padding: 10px 16px 10px 10px;
   border: 1px solid var(--line-2);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(13, 13, 13, 0.02);
   transition: border-color 0.3s, background 0.3s;
 }
 .d-press a:hover {
   border-color: var(--cc, var(--cyan));
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(13, 13, 13, 0.05);
 }
 .dp-img {
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 8px;
-  background: #11151c;
+  background: #e3e6ec;
 }
 .dp-img.is-text {
   display: grid;
@@ -1028,7 +1028,7 @@ body.page-open .title-card {
 }
 .d-links a:hover {
   border-color: var(--cc, var(--cyan));
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(13, 13, 13, 0.04);
 }
 .d-links i {
   font-style: normal;
@@ -1278,7 +1278,7 @@ body.page-open .title-card {
   display: grid;
   place-items: center;
   visibility: hidden;
-  background: #05070c;
+  background: #f9fcff;
   pointer-events: none;
 }
 .curtain::before {
@@ -1356,7 +1356,7 @@ body.page-open .title-card {
     right: 0;
     top: 45%;
     bottom: calc(-1 * var(--bottom) - 10px);
-    background: linear-gradient(180deg, rgba(5, 7, 12, 0), rgba(5, 7, 12, 0.94) 38%);
+    background: linear-gradient(180deg, rgba(249, 252, 255, 0), rgba(249, 252, 255, 0.94) 38%);
     pointer-events: none;
   }
   .card-title {
@@ -1426,7 +1426,7 @@ body.page-open .title-card {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(0deg, var(--bg) 0%, rgba(5, 7, 12, 0) 34%);
+    background: linear-gradient(0deg, var(--bg) 0%, rgba(249, 252, 255, 0) 34%);
   }
   .d-hero.is-land .d-hero-text {
     position: relative;

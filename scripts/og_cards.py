@@ -4,7 +4,7 @@
   python3 scripts/og_cards.py
 
   public/og/<프로젝트 id>.jpg  프로젝트마다: 대표 사진 + 분야 · 연도 · 제목 · 한 줄 소개 · 수상
-  public/og/about.jpg · growth.jpg · history.jpg · works.jpg · awards.jpg · skills.jpg  모아 보기 페이지
+  public/og/about.jpg · growth.jpg(발표 자료) · history.jpg · works.jpg · awards.jpg · skills.jpg  모아 보기 페이지
   public/icons/apple-touch-icon.png · icon-192.png · icon-512.png  홈 화면 아이콘(favicon.svg와 같은 그림)
 모든 글은 src/data/*.json과 src/content.js에 이미 있는 기록에서 가져온다. 프로젝트 기록이 바뀌면 다시 돌린다.
 """
@@ -19,23 +19,28 @@ OUT = os.path.join(ROOT, 'public', 'og')
 FONTS = os.path.join(ROOT, 'node_modules', 'pretendard', 'dist', 'public', 'static')
 SITE = 'kwon-physical-ai.vercel.app'
 W, H = 1200, 630
-BG = (5, 7, 12)
-FG = (238, 242, 247)
-FG2 = (196, 204, 216)
-MUTED = (141, 151, 167)
-CYAN = (94, 242, 255)
-ORANGE = (255, 107, 26)
+# 밝은 카드(사이트와 같은 밝은 테마): 흰 바탕 · 검은 글 · 흰 바탕에서 읽히는 진한 강조색
+BG = (249, 251, 253)
+FG = (17, 19, 23)
+FG2 = (61, 67, 76)
+MUTED = (107, 114, 125)
+CYAN = (0, 125, 137)
+ORANGE = (209, 77, 0)
+# 홈 화면 아이콘은 favicon.svg와 같은 어두운 판 그대로
+ICON_BG = (5, 7, 12)
+ICON_CYAN = (94, 242, 255)
+ICON_ORANGE = (255, 107, 26)
 
-# 분야 색 · 이름(src/styles/pages.css · src/data/projects.js와 같게)
+# 분야 색 · 이름(src/styles/pages.css · src/data/projects.js와 같게 — 흰 바탕용으로 진하게)
 CATS = {
-    'mobility': ((127, 168, 255), 'DRONE · MOBILITY', '드론 · 모빌리티'),
-    'robotics': ((255, 107, 26), 'ROBOTICS', '로봇'),
-    'ai': ((196, 139, 255), 'AI', 'AI · 데이터'),
-    'iot': ((61, 255, 154), 'IOT', '임베디드 · 하드웨어'),
-    'product': ((255, 207, 90), 'PRODUCT', '제품 · 창업'),
-    'software': ((159, 179, 200), 'SOFTWARE', '소프트웨어'),
+    'mobility': ((52, 96, 214), 'DRONE · MOBILITY', '드론 · 모빌리티'),
+    'robotics': ((209, 77, 0), 'ROBOTICS', '로봇'),
+    'ai': ((128, 66, 214), 'AI', 'AI · 데이터'),
+    'iot': ((0, 135, 78), 'IOT', '임베디드 · 하드웨어'),
+    'product': ((166, 116, 0), 'PRODUCT', '제품 · 창업'),
+    'software': ((84, 100, 122), 'SOFTWARE', '소프트웨어'),
 }
-TIERS = [('대상', (244, 207, 115)), ('최우수', (226, 232, 240)), ('우수상', (203, 213, 225)), ('장려', (230, 160, 110))]
+TIERS = [('대상', (176, 128, 0)), ('최우수', (84, 96, 112)), ('우수상', (104, 115, 130)), ('장려', (184, 98, 36))]
 
 
 def font(weight, size):
@@ -239,14 +244,14 @@ def app_icons():
     os.makedirs(d_out, exist_ok=True)
     for name, size in (('apple-touch-icon', 180), ('icon-192', 192), ('icon-512', 512)):
         k = size * 4 / 64
-        im = Image.new('RGB', (size * 4, size * 4), BG)  # 모서리는 기기가 둥글게 깎는다
+        im = Image.new('RGB', (size * 4, size * 4), ICON_BG)  # 모서리는 기기가 둥글게 깎는다
         d = ImageDraw.Draw(im)
         sw = round(3 * k)
         for cx, cy in ((16, 16), (48, 16), (16, 48), (48, 48)):
-            d.ellipse([(cx - 8) * k, (cy - 8) * k, (cx + 8) * k, (cy + 8) * k], outline=CYAN, width=sw)
-        d.line([(22 * k, 22 * k), (42 * k, 42 * k)], fill=CYAN, width=sw)
-        d.line([(42 * k, 22 * k), (22 * k, 42 * k)], fill=CYAN, width=sw)
-        d.rounded_rectangle([26 * k, 26 * k, 38 * k, 38 * k], radius=2 * k, fill=ORANGE)
+            d.ellipse([(cx - 8) * k, (cy - 8) * k, (cx + 8) * k, (cy + 8) * k], outline=ICON_CYAN, width=sw)
+        d.line([(22 * k, 22 * k), (42 * k, 42 * k)], fill=ICON_CYAN, width=sw)
+        d.line([(42 * k, 22 * k), (22 * k, 42 * k)], fill=ICON_CYAN, width=sw)
+        d.rounded_rectangle([26 * k, 26 * k, 38 * k, 38 * k], radius=2 * k, fill=ICON_ORANGE)
         im.resize((size, size), Image.LANCZOS).save(os.path.join(d_out, f'{name}.png'), optimize=True)
 
 
@@ -276,11 +281,12 @@ def main():
                  [(str(len(projects)), '프로젝트'), (str(len(awards)), '수상'), (str(n_certs), '자격증'), (str(len(press)), '보도')], covers[:4], '/about')
     # 성장 과정: 학년마다 대표 프로젝트 한두 개의 사진(1학년 해커톤 로봇 → 2학년 자작차 → 3학년 링거폴대 · 4족보행)
     grown = [by_id[i]['cover'] for i in ['robot-push-hackathon', 'baja-ev-formula', 'iot-iv-pole', 'quadruped-robot'] if i in by_id and by_id[i].get('cover')]
-    section_card(os.path.join(OUT, 'growth.jpg'), 'GROWTH STORY — 학년별 성장 과정과 가치관', 'Growth · 1학년 → 3학년',
-                 '전공 탐색(2023) → 도전(2024) → 인턴십 · Physical AI 집중(2025 — 2026), 그리고 일하는 방식 세 가지',
-                 [('3', '학년'), ('3', '가치관'), (str(len(projects)), '프로젝트')], grown, '/growth')
-    section_card(os.path.join(OUT, 'history.jpg'), 'HISTORY — 연도별 이력', 'History · 2023 — 2026',
-                 '연구실 · 동아리 · 전공 · 창업 · 수상 — 해마다 한 일과 이어진 프로젝트 · 상장 · 기사',
+    # 발표 자료(/present · /growth): 경진대회 안내서의 목차 그대로 — 학년마다 대표 프로젝트 사진
+    section_card(os.path.join(OUT, 'growth.jpg'), 'PRESENTATION — 10분 포트폴리오 발표', '발표 자료 · 28장',
+                 '나를 소개합니다 → STEP 1 자기이해 → STEP 2 직업탐색 → STEP 3 진로계획 · 비교과 → STEP 4 미래설계',
+                 [('28', '장'), ('10', '분'), (str(len(awards)), '수상')], grown, '/present')
+    section_card(os.path.join(OUT, 'history.jpg'), 'BY GRADE — 학년별 비교과 · 경력', 'History · 2023 — 2026',
+                 '연구실 · 인턴십 · 동아리 · 전공 · 창업 · 수상 — 학년마다 한 일',
                  [('4', '연도'), (str(len(projects)), '프로젝트'), (str(len(awards)), '수상')], covers[:4], '/history')
     section_card(os.path.join(OUT, 'works.jpg'), 'PROJECT ARCHIVE — 권용현이 만든 것들', f'Works · 프로젝트 {len(projects)}',
                  '드론 · 모빌리티 · 로봇 · AI · 임베디드 · 창업 — 분야별로 모아 보는 프로젝트 아카이브',

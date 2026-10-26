@@ -286,7 +286,7 @@ export class GroundSet {
       l.position.set(-1.8 + i * 1.2, 0.025, 0);
       park.add(l);
     }
-    const P = makeFloorText('P', { size: 200, color: 'rgba(94,242,255,0.75)', width: 256, height: 256 });
+    const P = makeFloorText('P', { size: 200, color: 'rgba(0,125,137,0.75)', width: 256, height: 256 });
     P.scale.setScalar(1.1);
     P.position.set(-1.2, 0.03, 0);
     park.add(P);
@@ -310,7 +310,7 @@ export class GroundSet {
     this.group.add(this.light.group);
     this.obstacles.push({ x: this.light.group.position.x, z: this.light.group.position.z, r: 0.1, h: 3.2 });
 
-    const floor = makeFloorText('03 — GROUND', { size: 120, color: 'rgba(94,242,255,0.28)' });
+    const floor = makeFloorText('03 — GROUND', { size: 120, color: 'rgba(0,125,137,0.2)' });
     floor.scale.setScalar(3);
     floor.position.set(0, 0.03, 9.6);
     this.group.add(floor);

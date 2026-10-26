@@ -1,67 +1,32 @@
 // 한 장면 안의 여러 화면(비트): 스크롤 없이 영화처럼 한 화면씩 바뀐다 — 휠 · 스와이프 · 방향키 · 아래 칸 · 자동 재생.
-// 발표 순서: 01 자기소개(소개 → 성장 과정) → 02 보유 역량 분석 → 03 프로젝트 경험(분야별 장면) → 04 미래 계획
-// 자기소개(이력서): 인적 사항(사진) → 학력 · 기록
-// 보유 역량: 핵심 역량 세 축 → 기술 스택 → SWOT(강점 · 보완 / 기회 · 위협) → 대응 전략
-// 미래 계획: 지원 직무와 세 단계 길 → 지금 → 다음 단계 → 진로 목표
-// 성장 · 이력(/growth): 학년 길 → 가치관 → 학년마다 [이야기 → 그 학년의 연도별 이력] — 연도 화면은 파노라마 창이
-// 가는 틈에서 열리며 그 해의 사진들이 펼쳐지고, 아래에 항목이 같은 칸에 맞춰 선다
-// 상세에 들어가지 않아도 화면에서 바로 읽히도록 — 글은 짧게(항목마다 한 줄), 사진은 누르면 프로젝트, 상장은 누르면 크게
+// 필름은 프로젝트에 집중한다: 01 소개(이 두 화면) → 02 프로젝트(대표 8) → 03 성과. 성장 과정 · 보유 역량 · 미래 계획은 발표 자료(/present) 안에서만.
+// 소개(이력서): 인적 사항(사진) → 학력 · 기록 — 사진은 크게, 글은 짧게
 import gsap from 'gsap';
 import { profile } from '../content.js';
-import { projects, byId, categoryOf } from '../data/projects.js';
-import { AWARDS, TIER_KEY, TIER_LABEL } from '../data/awards.js';
-import { PRESS } from '../data/press.js';
-import { CERTS, STACK } from '../data/skills.js';
-import { HISTORY } from '../data/history.js';
-import { STAGES, VALUES, PRELUDE, stageOf } from '../data/growth.js';
-import { SWOT, STRATEGY, PLAN, TARGET } from '../data/journey.js';
+import { projects } from '../data/projects.js';
+import { AWARDS } from '../data/awards.js';
+import { CERTS } from '../data/skills.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
-const dot = (d = '') => d.replace(/-/g, '.');
-
-// 상장 한 장 → 라이트박스 미디어(상장이 없으면 시상 사진)
-const certCaption = (a) => `${a.contest} — ${a.grade}${a.date ? ` (${dot(a.date)})` : ''}`;
-function mediaOf(list) {
-  const out = [];
-  list.forEach((a) => {
-    a.filmAt = out.length;
-    a.certs.forEach((c) => out.push({ type: 'image', src: c.src, caption: certCaption(a) }));
-    if (!a.certs.length && a.photo) out.push({ type: 'image', src: a.photo.src, caption: certCaption(a) });
-  });
-  return out;
-}
-
-// 화면에 바로 보이는 근거: 프로젝트 사진 · 상장 · 기사
-const projChip = (p) =>
-  `<a class="bt-p" href="${p.path}" data-link data-cat="${esc(p.category)}"><span class="bt-pi">${
-    p.cover ? `<img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async" />` : `<i>${esc(categoryOf(p.category).label)}</i>`
-  }</span><b>${esc(p.title)}</b></a>`;
-const certChip = (a) => {
-  const src = a.certs[0]?.sm || a.photo?.thumb;
-  if (!src) return '';
-  return `<button type="button" class="bt-c" data-film-cert="${a.filmAt}" data-tier="${TIER_KEY[a.tier]}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기"><img src="${esc(src)}" alt="" loading="lazy" decoding="async" /><i>${esc(a.grade)}</i></button>`;
-};
-const pressChip = (a) =>
-  `<a class="bt-n" href="${esc(a.url)}" target="_blank" rel="noopener"><small>${esc(a.publisher)}${a.date ? ` · ${esc(dot(a.date))}` : ''}</small><b>${esc(a.title)}</b></a>`;
-
 // 장면 표시: 장면 번호 · 장(발표 순서) · 이 화면 — 장은 renderBeats가 그 장면의 것으로 정해 둔다
 let chapter = null;
 function kicker(i, text) {
   return `<p class="kicker b-a"><span class="kicker-no">SC ${pad(i)}</span>${chapter ? `<span class="kicker-ch">CH ${esc(chapter[0])}<span class="kicker-chn"> · ${esc(chapter[1])}</span></span>` : ''}<span class="kicker-txt">${esc(text)}</span></p>`;
 }
 
-// ── 자기소개: 실제 이력서처럼 두 화면 — 다음 장면이 성장 과정 · 연도별 이력 ──
+// ── 소개: 실제 이력서처럼 두 화면 — 다음 장면부터 대표 프로젝트 ──
 function profileBeats(scene, i) {
   const email = profile.links.find((l) => l.url.startsWith('mailto:'));
   const grand = AWARDS.filter((a) => a.tier === 1).length;
+  const vol = profile.volunteer;
+  const sch = profile.scholarship;
   const nums = [
     [projects.length, '프로젝트'],
     [AWARDS.length, '수상', `대상 ${grand}`],
+    [`${vol.hours}h`, '봉사', `${vol.count}건`],
     [CERTS.length, '자격증'],
-    [PRESS.length, '공식 보도'],
   ];
-  const certs = [...CERTS].sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999'));
   const edu = profile.education || [];
   const now = edu.filter((e) => e.note !== '입학');
   const link = (l) => `<li><a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}><span>${esc(l.label)}</span>${esc(l.value)}</a></li>`;
@@ -80,10 +45,8 @@ function profileBeats(scene, i) {
               <p class="rs-role b-a">${esc(profile.role)}</p>
               <h2 class="rs-name b-a">${esc(profile.name)}<span>${esc(profile.en)}</span></h2>
               <p class="rs-motto b-a">${esc(profile.motto)}</p>
-              <p class="rs-sum b-a">${esc(profile.summary)}</p>
+              <p class="rs-sch b-a"><b>${esc(sch.title)}</b><span>${esc(sch.date.slice(0, 4))} · 과학기술정보통신부</span></p>
               <dl class="rs-facts b-a">
-                <div><dt>출생</dt><dd>${esc(profile.born)}년</dd></div>
-                <div><dt>기간</dt><dd>${esc(profile.span)} 대학 시절</dd></div>
                 ${now.map((e) => `<div><dt>${esc(e.note.includes('복수') ? '복수전공' : '소속')}</dt><dd>${esc(e.school)} ${esc(e.major)}</dd></div>`).join('')}
               </dl>
               <ul class="rs-links b-a">${[email, ...profile.links.filter((l) => l !== email && /GitHub|Notion/.test(l.label))].filter(Boolean).map(link).join('')}<li><a class="is-pdf" href="/resume" data-link><span>PDF</span>이력서 한 장</a></li></ul>
@@ -113,9 +76,10 @@ function profileBeats(scene, i) {
                 .map(([n, l, s]) => `<div><dt>${esc(l)}</dt><dd>${esc(n)}${s ? `<small>${esc(s)}</small>` : ''}</dd></div>`)
                 .join('')}</dl>
             </section>
-            <section class="rs-sec rs-wide b-a">
-              <h3 class="rs-h">자격증 <span>${CERTS.length}</span></h3>
-              <ul class="rs-certs">${certs.map((c) => `<li>${esc(c.name)}${c.year ? `<time>${esc(c.year)}</time>` : ''}</li>`).join('')}</ul>
+            <section class="rs-sec rs-wide rs-more b-a">
+              <img class="rs-sheet" src="${esc(sch.sheet.sm)}" width="240" height="339" alt="${esc(sch.title)} 장학증서" loading="lazy" decoding="async" />
+              <p><b>${esc(sch.title)}</b><span>${esc(sch.date)} · ${esc(sch.by)}</span></p>
+              <a class="rs-deck" href="/present" data-link>성장 과정 · 보유 역량 · 미래 계획은 발표 자료에서 <i aria-hidden="true">→</i></a>
             </section>
           </div>
         </div>`,
@@ -124,311 +88,9 @@ function profileBeats(scene, i) {
   ];
 }
 
-// ── 연도별 이력: 연도마다 한 화면 — 파노라마 창(그 해의 사진이 항목 수만큼 나란히) + 같은 칸에 맞춘 항목 글 ──
-// 칸의 그림: 이어진 프로젝트 사진(이름을 사진 위에) → 없으면 상장(최대 3장) → 기사 사진 → 아무것도 없으면 학년 색 글자판.
-// { html, project, certs } — 그림에 쓴 프로젝트 · 상장은 아래 근거 줄에서 뺀다
-function heroOf(it) {
-  const p = it.projects.find((x) => x.cover);
-  if (p) {
-    // 같은 해에 같은 프로젝트가 두 번 나오면 항목이 고른 다른 사진(photo)으로
-    const im = (it.photo && p.images.find((x) => x.file === it.photo)) || p.cover;
-    return {
-      project: p,
-      html: `<a class="pn-col" href="${p.path}" data-link data-cat="${esc(p.category)}"><img src="${esc(im.thumb)}" alt="" loading="lazy" decoding="async" /><span class="pn-cap">${esc(p.title)}</span></a>`,
-    };
-  }
-  const certs = it.awards.filter((a) => a.certs.length || a.photo).slice(0, 3);
-  if (certs.length)
-    return {
-      certs: true,
-      html: `<div class="pn-col is-certs">${certs
-        .map(
-          (a) =>
-            `<button type="button" data-film-cert="${a.filmAt}" data-tier="${TIER_KEY[a.tier]}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기"><img src="${esc(a.certs[0]?.thumb || a.photo.thumb)}" alt="" loading="lazy" decoding="async" /><i>${esc(a.grade)}</i></button>`
-        )
-        .join('')}</div>`,
-    };
-  const n = it.press.find((x) => x.image);
-  if (n)
-    return {
-      html: `<a class="pn-col" href="${esc(n.url)}" target="_blank" rel="noopener"><img src="${esc(n.image.thumb)}" alt="" loading="lazy" decoding="async" /><span class="pn-cap">${esc(n.publisher)}</span></a>`,
-    };
-  return { html: `<div class="pn-col is-type" aria-hidden="true"><b>${esc(it.kind)}</b><small>${esc(it.year)}</small></div>` };
-}
-
-// 연도 화면: 큰 연도 · 학년 · 그 해의 수, 아래에 파노라마 창과 항목
-function yearBeat(y, i) {
-  const awards = [...new Set(y.items.flatMap((it) => it.awards))];
-  const media = mediaOf(awards);
-  const tiers = [1, 2, 3, 4, 5].map((t) => [t, y.awards.filter((a) => a.tier === t).length]).filter(([, n]) => n);
-  const g = stageOf(y.year);
-  const cols = y.items.map((it) => {
-    const hero = heroOf(it);
-    // 근거는 한두 개만(그림에 쓴 것은 빼고) — 글이 길어지지 않게
-    const chips = [
-      ...it.projects.filter((p) => p !== hero.project).map(projChip),
-      ...(hero.certs ? [] : it.awards.map(certChip)),
-      ...it.press.map(pressChip),
-    ].filter(Boolean);
-    return { it, hero, chips };
-  });
-  return {
-    key: y.year,
-    label: y.year,
-    cls: 'bt-year',
-    media,
-    html: `<div class="bt-top panel-content">
-        ${kicker(i, `HISTORY — ${y.year}${g ? ` · ${g.grade} 연도별 이력` : ''}`)}
-      </div>
-      <div class="bt-body panel-content">
-        <header class="bt-yh b-a">
-          <b class="bt-yy">${esc(y.year)}</b>
-          <div class="bt-ys">
-            ${g ? `<span class="bt-g" data-stage="${esc(g.id)}">${esc(g.grade)} · ${esc(g.title)}</span>` : ''}
-            <p class="bt-yn"><span><em>${y.items.length}</em>이력</span><span><em>${y.projects.length}</em>프로젝트</span><span><em>${y.awards.length}</em>수상</span></p>
-          </div>
-          ${
-            y.awards.length
-              ? `<p class="bt-more">${tiers.map(([t, n]) => `${TIER_LABEL[t]} ${n}`).join(' · ')}<a href="/awards#y${y.year}" data-link>${y.year}년 상장 ${y.awards.length}건 모두 보기 →</a><a href="/present#y${y.year}" data-link>${y.year}년 이력 자세히 →</a></p>`
-              : `<p class="bt-more"><a href="/present#y${y.year}" data-link>${y.year}년 이력 자세히 →</a></p>`
-          }
-        </header>
-        <div class="pano" style="--n: ${y.items.length}"${g ? ` data-stage="${esc(g.id)}"` : ''}>
-          <div class="pn-win" data-pano>${cols.map((c) => c.hero.html).join('')}</div>
-          <ol class="pn-items">${cols
-            .map(
-              ({ it, chips }) => `<li class="pn-item b-a">
-              <p class="pn-k">${esc(it.kind)}</p>
-              <h3>${esc(it.title)}</h3>
-              ${it.brief ? `<p class="pn-brief" title="${esc(it.note)}">${esc(it.brief)}</p>` : ''}
-              ${chips.length ? `<div class="bt-media">${chips.slice(0, 2).join('')}</div>` : ''}
-            </li>`
-            )
-            .join('')}</ol>
-        </div>
-      </div>`,
-  };
-}
-
-// ── 성장 · 이력: 학년 길 → 가치관 → 학년마다 [이야기 → 그 학년의 연도 화면] ──
-// 학년 카드 · 이야기의 사진은 그 학년의 대표 프로젝트(growth.js featured · cover)
-const photoOf = (p) => p?.cover && `<img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async" />`;
-function storyBeat(s, k, i) {
-  const pics = s.featuredProjects.filter((p) => p.cover).slice(0, 4);
-  return {
-    key: s.id,
-    label: s.grade,
-    cls: 'bt-gstory',
-    html: `<div class="bt-top panel-content">
-        ${kicker(i, `GROWTH ${pad(k + 1)} — ${s.grade} · ${s.span}`)}
-      </div>
-      <div class="bt-body panel-content">
-        <article class="gw-story" data-stage="${esc(s.id)}">
-          <div class="gw-mosaic b-a" style="--m: ${pics.length}">${pics
-            .map((p) => `<a class="gw-m" href="${p.path}" data-link data-cat="${esc(p.category)}">${photoOf(p)}<span>${esc(p.title)}</span></a>`)
-            .join('')}</div>
-          <div class="gw-copy">
-            <p class="gw-k b-a"><span class="gw-badge">${esc(s.code)}</span>${esc(s.grade)} · ${esc(s.span)}<a class="gw-more" href="/present#s-${esc(s.id)}" data-link>이 시기 자세히 →</a></p>
-            <h2 class="gw-h b-a">${esc(s.title)}</h2>
-            <p class="gw-hl b-a">${esc(s.headline)}</p>
-            <dl class="gw-nums b-a">
-              <div><dt>프로젝트</dt><dd>${s.projects.length}</dd></div>
-              <div><dt>수상</dt><dd>${s.awards.length}</dd></div>
-              <div><dt>대상</dt><dd>${s.grand}</dd></div>
-              <div><dt>자격</dt><dd>${s.certs.length}</dd></div>
-            </dl>
-            <p class="gw-text b-a">${esc(s.story)}</p>
-            <blockquote class="gw-learned b-a"><span>이 시기에 배운 것</span>${esc(s.learned)}</blockquote>
-          </div>
-        </article>
-      </div>`,
-  };
-}
-
-function growthBeats(scene, i) {
-  const total = (k) => STAGES.reduce((n, s) => n + s[k].length, 0);
-  const cover = {
-    key: 'top',
-    label: '성장',
-    cls: 'bt-gcover',
-    html: `<div class="bt-top panel-content">
-        ${kicker(i, `GROWTH — 대학 시절 ${profile.span}`)}
-        <h2 class="bt-h b-a">탐색에서 도전으로, 도전에서 집중으로</h2>
-      </div>
-      <div class="bt-body panel-content">
-        <ol class="gw-road">${STAGES.map((s, k) => {
-          const p = byId(s.cover) || s.featuredProjects.find((x) => x.cover);
-          return `<li class="b-a" data-stage="${esc(s.id)}">
-            <button type="button" class="gw-card" data-goto="${esc(s.id)}" aria-label="${esc(s.grade)} ${esc(s.title)} 이야기로">
-              <span class="gw-ph">${photoOf(p) || ''}<span class="gw-no">${pad(k + 1)}</span></span>
-              <span class="gw-g"><b>${esc(s.grade)}</b><small>${esc(s.span)}</small></span>
-              <b class="gw-t">${esc(s.title)}</b>
-              <span class="gw-s">${esc(s.short)}</span>
-              <span class="gw-n"><span><em>${s.projects.length}</em>프로젝트</span><span><em>${s.awards.length}</em>수상</span>${s.grand ? `<span><em>${s.grand}</em>대상</span>` : ''}</span>
-            </button>
-          </li>`;
-        }).join('')}</ol>
-        <p class="bt-more b-a"><b>${esc(PRELUDE.year)}</b>${esc(PRELUDE.text)} · 3년 동안 프로젝트 ${projects.length} · 수상 ${AWARDS.length}</p>
-        <nav class="gw-links b-a" aria-label="성장 과정 자세히"><a href="/present#overview" data-link>성장 과정 자세히</a><a href="/present#years" data-link>연도별 이력 전체</a></nav>
-      </div>`,
-  };
-  const values = {
-    key: 'values',
-    label: '가치관',
-    cls: 'bt-gvalues',
-    html: `<div class="bt-top panel-content">
-        ${kicker(i, 'VALUES — 가치관')}
-        <h2 class="bt-h b-a">이렇게 일합니다</h2>
-      </div>
-      <div class="bt-body panel-content">
-        <ol class="gw-values">${VALUES.map((v) => {
-          const proof = v.proof.map(byId).filter(Boolean);
-          const lead = proof.find((p) => p.cover);
-          return `<li class="b-a">
-            ${lead ? `<a class="gw-v-ph" href="${lead.path}" data-link data-cat="${esc(lead.category)}">${photoOf(lead)}<span>${esc(lead.title)}</span></a>` : ''}
-            <div class="gw-v-in">
-              <p class="gw-v-k"><span>${esc(v.no)}</span>${esc(v.en)}</p>
-              <h3>${esc(v.title)}</h3>
-              <p class="gw-v-t">${esc(v.text)}</p>
-              <ul class="gw-v-proof" aria-label="근거 프로젝트">${proof
-                .filter((p) => p !== lead)
-                .map((p) => `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}">${esc(p.title)}</a></li>`)
-                .join('')}</ul>
-            </div>
-          </li>`;
-        }).join('')}</ol>
-      </div>`,
-  };
-  return [
-    cover,
-    values,
-    ...STAGES.flatMap((s, k) => [storyBeat(s, k, i), ...s.years.map((y) => HISTORY.find((h) => h.year === y)).filter(Boolean).map((y) => yearBeat(y, i))]),
-  ];
-}
-
-
-// 기술 스택(보유 역량의 둘째 화면): 분야마다 언어 · 툴 — 숫자는 그 기술을 쓴 프로젝트 수
-const stackBeat = (i) => ({
-  key: 'stack',
-  label: '기술 스택',
-  cls: 'bt-stack',
-  html: `<div class="bt-top panel-content">
-      ${kicker(i, 'SKILLS — 기술 스택')}
-      <h2 class="bt-h b-a">다룰 수 있는 언어 · 툴</h2>
-    </div>
-    <div class="bt-body panel-content">
-      <div class="rs-sec rs-stack">${STACK.map(
-        (g) => `<div class="rs-row b-a">
-          <h3>${esc(g.ko)}<small>${esc(g.en)}</small></h3>
-          <ul>${g.items.map((s) => `<li${s.state === 'explore' ? ' class="is-explore"' : ''}>${esc(s.name)}${s.evidence.length ? `<sup title="이 기술을 쓴 프로젝트">${s.evidence.length}</sup>` : ''}</li>`).join('')}</ul>
-        </div>`
-      ).join('')}</div>
-      <p class="rs-note b-a">숫자는 그 기술을 쓴 프로젝트 수 · <a href="/skills" data-link>근거와 함께 전체 보기 →</a></p>
-    </div>`,
-});
-
-// ── 보유 역량 분석: 핵심 역량 세 축 → 기술 스택 → SWOT → 대응 전략 — 다음 장면부터 그 역량으로 만든 프로젝트 ──
-const topOf = (i, k, h) => `<div class="bt-top panel-content">${kicker(i, k)}<h2 class="bt-h b-a">${esc(h)}</h2></div>`;
-function quadrant(q) {
-  return `<section class="cp-q b-a" data-q="${q.key}">
-    <header><b class="cp-ql">${q.key}</b><h3>${esc(q.title)}<small>${esc(q.en)}</small></h3><em>${q.items.length}</em></header>
-    <ol>${q.items.map((it) => `<li><b>${esc(it.h)}</b><span class="cp-t">${esc(it.t)}</span>${it.fix ? `<span class="cp-fix"><i>대응</i>${esc(it.fix)}</span>` : ''}</li>`).join('')}</ol>
-  </section>`;
-}
-function competencyBeats(scene, i) {
-  const q = (k) => SWOT.find((x) => x.key === k);
-  return [
-    {
-      key: 'core',
-      label: '핵심 역량',
-      cls: 'bt-core',
-      html: `${topOf(i, 'CORE — 핵심 역량 세 축', 'AI · 하드웨어 · 기획을 한 시스템으로 잇습니다')}
-        <div class="bt-body panel-content">
-          <ol class="cp-axes">${(scene.pillars || [])
-            .map(
-              (p) => `<li class="b-a">
-              <p class="cp-no">${esc(p.no)}</p>
-              <h3>${esc(p.title)}</h3>
-              <p class="cp-tag">${esc(p.text)}</p>
-              <p class="cp-d">${esc(p.detail)}</p>
-              <div class="cp-proof">${p.projects.map(byId).filter(Boolean).map(projChip).join('')}</div>
-            </li>`
-            )
-            .join('')}</ol>
-        </div>`,
-    },
-    stackBeat(i),
-    {
-      key: 'sw',
-      label: '강점 · 보완',
-      cls: 'bt-swot',
-      html: `${topOf(i, 'SWOT — 강점 · 보완할 점', '기록으로 본 강점과 보완할 점')}
-        <div class="bt-body panel-content"><div class="cp-swot">${quadrant(q('S'))}${quadrant(q('W'))}</div></div>`,
-    },
-    {
-      key: 'ot',
-      label: '기회 · 위협',
-      cls: 'bt-swot',
-      html: `${topOf(i, 'SWOT — 기회 · 위협', '닿을 수 있는 기회와 대비할 위협')}
-        <div class="bt-body panel-content"><div class="cp-swot">${quadrant(q('O'))}${quadrant(q('T'))}</div></div>`,
-    },
-    {
-      key: 'strategy',
-      label: '대응 전략',
-      cls: 'bt-strat',
-      html: `${topOf(i, 'STRATEGY — 대응 전략', '강점은 키우고, 보완할 점은 줄이는 네 방향')}
-        <div class="bt-body panel-content">
-          <ol class="cp-strat">${STRATEGY.map((x) => `<li class="b-a" data-q="${x.key[0]}"><b>${esc(x.key)}</b><span>${esc(x.h)}</span><p>${esc(x.t)}</p></li>`).join('')}</ol>
-          <p class="bt-more b-a">다음 장면부터 — 이 역량으로 만든 프로젝트 ${projects.length}개<a href="/present#swot" data-link>SWOT 자세히 →</a></p>
-        </div>`,
-    },
-  ];
-}
-
-// ── 미래 계획: 지원 직무와 세 단계 길 → 지금 → 다음 단계 → 진로 목표 — 다음 장면이 엔딩 · 연락처 ──
-const STEP_LABEL = { now: '지금', next: '다음 단계', goal: '진로 목표' };
-function futureBeats(scene, i) {
-  const target = {
-    key: 'target',
-    label: '지원 직무',
-    cls: 'bt-target',
-    html: `${topOf(i, 'TARGET — 지원 직무', '이런 개발자가 되려 합니다')}
-      <div class="bt-body panel-content">
-        <div class="fp-target b-a">
-          <p class="fp-role"><span>지원 직무</span>${esc(TARGET.role)}</p>
-          <p class="fp-line">${esc(TARGET.line)}</p>
-          <ul class="fp-dom">${TARGET.domains.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>
-        </div>
-        <ol class="fp-road">${PLAN.map(
-          (c) => `<li class="b-a" data-step="${c.key}"><button type="button" data-goto="${c.key}" aria-label="${esc(c.when)} ${esc(c.title)}"><span class="fp-when">${esc(c.when)}</span><b>${esc(c.title)}</b><span class="fp-hs">${c.items.map((it) => `<i>${esc(it.h)}</i>`).join('')}</span></button></li>`
-        ).join('')}</ol>
-      </div>`,
-  };
-  const steps = PLAN.map((c) => ({
-    key: c.key,
-    label: STEP_LABEL[c.key] || c.title,
-    cls: `bt-step is-${c.key}`,
-    html: `${topOf(i, `${c.when} — ${c.title}`, c.title)}
-      <div class="bt-body panel-content">
-        <ol class="fp-items">${c.items
-          .map((it, k) => {
-            const p = it.proof && byId(it.proof);
-            const ph = c.key === 'now' && p?.cover;
-            return `<li class="b-a${ph ? ' has-ph' : ''}">${
-              ph ? `<a class="fp-ph" href="${p.path}" data-link data-cat="${esc(p.category)}">${photoOf(p)}<span>${esc(p.title)}</span></a>` : `<span class="fp-no">${pad(k + 1)}</span>`
-            }<div class="fp-in"><h3>${esc(it.h)}</h3><p>${esc(it.t)}</p>${p && !ph ? `<div class="fp-proof">${projChip(p)}</div>` : ''}</div></li>`;
-          })
-          .join('')}</ol>
-        ${c.key === 'goal' ? `<p class="fp-close b-a">${esc(profile.motto)}<a href="/present#plan" data-link>미래 계획 자세히 →</a></p>` : ''}
-      </div>`,
-  }));
-  return [target, ...steps];
-}
-
-const BUILDERS = { growth: growthBeats, competency: competencyBeats, future: futureBeats };
 export function renderBeats(scene, i) {
   chapter = scene.chapter || null;
-  const beats = (BUILDERS[scene.beats] || profileBeats)(scene, i);
+  const beats = profileBeats(scene, i);
   chapter = null;
   return `<div class="beats" data-kind="${esc(scene.beats)}">
     <div class="beat-stage">${beats

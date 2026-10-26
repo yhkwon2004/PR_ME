@@ -15,7 +15,7 @@ export class HangarSet {
     const ring = new THREE.Mesh(new THREE.RingGeometry(2.2, 2.26, 96), glow(COLORS.cyan, 2.2));
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.085;
-    const H = makeFloorText('H', { size: 210, color: 'rgba(232,237,244,0.85)', width: 256, height: 256, weight: 700 });
+    const H = makeFloorText('H', { size: 210, color: 'rgba(17,19,23,0.78)', width: 256, height: 256, weight: 700 });
     H.scale.setScalar(2.2);
     H.position.y = 0.09;
     this.group.add(pad, ring, H);
@@ -31,7 +31,7 @@ export class HangarSet {
     this.cone = lightCone({ top: 0.2, bottom: 2.6, height: 14, opacity: 0.2 });
     this.cone.position.y = 14;
     this.group.add(this.cone);
-    const floor = makeFloorText('00 — HANGAR', { size: 120, color: 'rgba(94,242,255,0.13)' });
+    const floor = makeFloorText('00 — HANGAR', { size: 120, color: 'rgba(0,125,137,0.13)' });
     floor.scale.setScalar(2.2);
     floor.position.set(0, 0.03, -4.6);
     this.group.add(floor);
@@ -132,7 +132,7 @@ export class AerialSet {
     homeRing.position.y = 0.065;
     this.group.add(home, homeRing);
 
-    const floor = makeFloorText('02 — AERIAL', { size: 120, color: 'rgba(94,242,255,0.28)' });
+    const floor = makeFloorText('02 — AERIAL', { size: 120, color: 'rgba(0,125,137,0.22)' });
     floor.scale.setScalar(3);
     floor.position.set(0, 0.03, 10.2);
     this.group.add(floor);
@@ -347,7 +347,7 @@ export class RecordSet {
     this.years.forEach(([y, count], i) => {
       const x = (i - 1.5) * 2.5;
       for (let j = 0; j < count; j++) this.slots.push({ x, y: 0.12 + j * step, col: i, row: j });
-      const yl = makeFloorText(y, { size: 150, color: 'rgba(232,237,244,0.75)', width: 512, height: 256 });
+      const yl = makeFloorText(y, { size: 150, color: 'rgba(17,19,23,0.7)', width: 512, height: 256 });
       yl.scale.setScalar(1.3);
       yl.position.set(x, 0.03, 1.5);
       this.group.add(yl);
@@ -365,7 +365,7 @@ export class RecordSet {
     const base = new THREE.Mesh(new THREE.BoxGeometry(11.5, 0.04, 2.4), mats.pad);
     base.position.y = 0.02;
     this.group.add(base);
-    const floor = makeFloorText('08 — RECORD', { size: 120, color: 'rgba(94,242,255,0.22)' });
+    const floor = makeFloorText('08 — RECORD', { size: 120, color: 'rgba(0,125,137,0.2)' });
     floor.scale.setScalar(2);
     floor.position.set(0, 0.03, -3.4);
     this.group.add(floor);

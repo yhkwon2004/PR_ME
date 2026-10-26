@@ -68,9 +68,9 @@ const FilmShader = {
       col += uTint * uTintAmt * 0.012 * (1.0 - lum);
       col += uTint * uPulse * 0.12 * smoothstep(0.22, 0.85, d);
       float vig = smoothstep(0.92, 0.28, d);
-      col *= mix(0.55 + 0.3 * uRead, 1.0, vig);
-      // 읽기 모드 밝힘: 전체를 올리고 가장 어두운 곳은 검정 대신 남색으로 띄운다(밝은 곳은 덜 올려 하얗게 날리지 않게)
-      col = col * (1.0 + 0.5 * uRead * (1.0 - 0.5 * lum)) + vec3(0.03, 0.045, 0.07) * uRead;
+      col *= mix(0.9, 1.0, vig);
+      // 읽기 모드: 흐린 3D를 흰 안개 쪽으로 걷어 글이 앞에 선다
+      col = mix(col, vec3(0.965, 0.972, 0.982), 0.45 * uRead);
       float g = rand(uv * uRes * 0.5 + fract(uTime * 13.7)) - 0.5;
       col += g * uGrain;
       col *= uExposure;
@@ -92,26 +92,26 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxDpr));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.0;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(COLORS.horizon);
-  scene.fog = new THREE.FogExp2(COLORS.horizon, 0.019);
+  scene.fog = new THREE.FogExp2(COLORS.horizon, 0.013);
 
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.32;
+  scene.environmentIntensity = 0.55;
 
   const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 400);
   camera.position.set(0, 1.4, 44);
 
   // 조명
-  scene.add(new THREE.HemisphereLight(0x9cc4ff, 0x0b0d12, 0.55));
-  const key = new THREE.DirectionalLight(0xdfe9ff, 1.5);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xc9d2dd, 1.15));
+  const key = new THREE.DirectionalLight(0xffffff, 1.9);
   key.position.set(-20, 40, 30);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0x5ef2ff, 0.6);
+  const rim = new THREE.DirectionalLight(0x9fdcff, 0.7);
   rim.position.set(30, 10, -40);
   scene.add(rim);
 
@@ -128,7 +128,7 @@ export function createStage(canvas, { reducedMotion = false } = {}) {
   const composer = new EffectComposer(renderer, rt);
   composer.setPixelRatio(renderer.getPixelRatio());
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(size.x / 2, size.y / 2), 0.85, 0.55, 0.82);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(size.x / 2, size.y / 2), 0.5, 0.5, 1.15);
   // 블룸 버퍼 크기 배율(성능 단계) — 블룸은 받은 크기의 절반부터 다섯 단계로 흐리므로, 받는 크기를 줄이면 그만큼 가볍다
   let bloomScale = isMobile ? 0.6 : 1;
   const bloomSetSize = bloom.setSize.bind(bloom);
@@ -201,9 +201,9 @@ function createSky() {
     depthWrite: false,
     fog: false,
     uniforms: {
-      uTop: { value: new THREE.Color(0x010204) },
+      uTop: { value: new THREE.Color(0xfbfcfe) },
       uHorizon: { value: new THREE.Color(COLORS.horizon) },
-      uGlow: { value: new THREE.Color(0x16304a) },
+      uGlow: { value: new THREE.Color(0xd5e6f5) },
     },
     vertexShader: /* glsl */ `
       varying vec3 vDir;
@@ -212,15 +212,10 @@ function createSky() {
     fragmentShader: /* glsl */ `
       uniform vec3 uTop, uHorizon, uGlow;
       varying vec3 vDir;
-      float hash(vec3 p){ return fract(sin(dot(p, vec3(127.1,311.7,74.7))) * 43758.5453); }
       void main(){
         float h = vDir.y;
         vec3 col = mix(uHorizon, uTop, smoothstep(0.0, 0.55, h));
-        col += uGlow * exp(-abs(h) * 9.0) * 0.6;
-        // 희미한 별
-        vec3 p = floor(vDir * 420.0);
-        float s = step(0.9975, hash(p)) * smoothstep(0.12, 0.5, h);
-        col += vec3(s) * 0.55;
+        col = mix(col, uGlow, exp(-abs(h) * 9.0) * 0.35);
         gl_FragColor = vec4(col, 1.0);
       }
     `,
@@ -236,10 +231,10 @@ function createGround() {
   const mat = new THREE.ShaderMaterial({
     fog: false,
     uniforms: {
-      uBase: { value: new THREE.Color(0x070b11) },
+      uBase: { value: new THREE.Color(0xf1f4f7) },
       uFog: { value: new THREE.Color(COLORS.horizon) },
-      uLine: { value: new THREE.Color(0x3a7f9a) },
-      uMajor: { value: new THREE.Color(COLORS.cyan) },
+      uLine: { value: new THREE.Color(0x8796a8) },
+      uMajor: { value: new THREE.Color(0x2b4cf0) },
     },
     vertexShader: /* glsl */ `
       varying vec3 vWorld;
@@ -261,8 +256,8 @@ function createGround() {
         float fade = exp(-dist * 0.024);
         float near = exp(-dist * 0.06);
         vec3 col = uBase;
-        col += uLine * minor * 0.10 * (0.3 + near);
-        col += uMajor * major * 0.16;
+        col = mix(col, uLine, minor * 0.22 * (0.3 + near));
+        col = mix(col, uMajor, major * 0.22);
         col = mix(uFog, col, fade);
         gl_FragColor = vec4(col, 1.0);
       }
@@ -288,7 +283,6 @@ function createDust(count) {
   const mat = new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
-    blending: THREE.AdditiveBlending,
     uniforms: { uTime: { value: 0 }, uPx: { value: Math.min(window.devicePixelRatio, 2) } },
     vertexShader: /* glsl */ `
       attribute float aSeed;
@@ -309,7 +303,7 @@ function createDust(count) {
       void main(){
         float d = length(gl_PointCoord - 0.5);
         float a = smoothstep(0.5, 0.0, d) * vA;
-        gl_FragColor = vec4(vec3(0.62, 0.9, 1.0) * a * 0.9, a);
+        gl_FragColor = vec4(vec3(0.36, 0.45, 0.56), a * 0.35);
       }
     `,
   });

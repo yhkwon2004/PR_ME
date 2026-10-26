@@ -263,7 +263,7 @@ const site = createSite({
     video?.pause();
     if (!started) $('boot').hidden = true;
   },
-  // route.scene: 프로필(/about) · 성장 · 이력(/growth · /history)처럼 필름의 한 장면으로 가는 주소
+  // route.scene: 프로필(/about)처럼 필름의 한 장면으로 가는 주소
   onClose: (route) => {
     pageCovered = false;
     if (route?.scene && started) goScene(route.scene, route.beat);
@@ -309,7 +309,7 @@ function onTransition(i, prev, duration) {
 
 // 주소의 장면(#robotics 등) — 예전 이력 장면 주소(#history)는 지금의 성장 · 이력 장면으로
 function sceneOfHash(h) {
-  return scenes.findIndex((s) => `#${s.id}` === (h === '#history' ? '#growth' : h));
+  return scenes.findIndex((s) => `#${s.id}` === h);
 }
 
 function goTo(i, opts) {
@@ -422,14 +422,13 @@ createInput({
   },
 });
 
-// 이력 화면의 상장: 누르면 그 화면의 상장들을 크게(라이트박스)
+// 성과 장면의 장학증서: 누르면 크게(라이트박스)
 $('stage').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-film-cert]');
+  const b = e.target.closest('[data-honor]');
   if (!b) return;
-  const media = JSON.parse(b.closest('[data-media]')?.dataset.media || '[]');
-  if (!media.length) return;
+  const sch = profile.scholarship;
   takeOver();
-  lightbox.show({ media }, +b.dataset.filmCert, b);
+  lightbox.show({ media: [{ type: 'image', src: sch.sheet.src, caption: `${sch.title} 장학증서 — ${sch.date} · ${sch.by} (생년월일은 가림)` }] }, 0, b);
 });
 // 표지의 발표 순서: 누르면 그 장의 첫 장면으로
 $('stage').addEventListener('click', (e) => {
@@ -638,7 +637,7 @@ function start(withSound) {
   }
   // 주소에 장면이 있으면(#robotics 등) 그 장면으로, 없으면 처음부터 — 지난번 멈춘 곳이 있으면 이어 보기를 권한다
   const deep = sceneOfHash(location.hash);
-  // /growth#gr-challenge · /history#y2025로 들어왔다면 그 화면부터
+  // 주소가 그 장면의 한 화면을 가리키면(route.beat) 그 화면부터
   if (deep > 0 && site.initial?.beat != null && !pendingNav) pendingNav = { beat: site.initial.beat };
   director.go(deep > 0 ? deep : 0);
   if (deep <= 0) setTimeout(() => !site.open && guide.offerResume(), reduced ? 600 : 3200);

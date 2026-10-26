@@ -1,12 +1,11 @@
 import gsap from 'gsap';
 import { projects, byId, CATEGORIES, categoryOf, FEATURED, ALIAS } from '../data/projects.js';
-import { profile, scenes } from '../content.js';
+import { profile, PILLARS } from '../content.js';
 import { ORGS, WALL, ORG_INDEX, orgsOf, awardOrgs } from '../data/orgs.js';
 import { AWARDS, awardsOf, bestOf, TIER_KEY } from '../data/awards.js';
-import { HISTORY, HISTORY_YEARS, historyItem } from '../data/history.js';
+import { HISTORY, HISTORY_YEARS } from '../data/history.js';
 import { PRESS, pressOf } from '../data/press.js';
 import { DOMAIN_SKILLS, SKILLS, CERTS, SKILL_COUNT } from '../data/skills.js';
-import { STAGES } from '../data/growth.js';
 import { createPager } from '../ui/pager.js';
 import { presentDeck, PR_SECS } from './present.js';
 
@@ -438,7 +437,7 @@ function skillRow(s) {
 const yearsOf = (y = '') => (String(y).match(/20\d{2}/g) || []).map(Number);
 const dot = (d = '') => d.replace(/-/g, '.');
 function aboutPage() {
-  const intro = scenes.find((s) => s.id === 'competency') || {}; // 핵심 역량 세 축(필름의 보유 역량 장면)
+  const intro = { pillars: PILLARS }; // 핵심 역량 세 축(content.js)
   const email = profile.links.find((l) => l.url.startsWith('mailto:'));
   const links = profile.links.filter((l) => l !== email);
   const years = [...projects.flatMap((p) => yearsOf(p.year)), ...AWARDS.map((a) => +a.year), ...CERTS.map((c) => +c.year), ...HISTORY_YEARS.map(Number)].filter(Boolean);
@@ -900,28 +899,31 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (cols !== gridCols) gridCols = layoutGrid(grid);
   });
 
-  // 성장 · 이력 주소의 자리 → 필름 '성장 · 이력' 장면의 그 화면:
-  // /growth#gr-<학년>(그 학년 이야기) · #gr-values · #y2025 · #h-<이력 항목>(그 해) — 예전 /growth#gr-<학년>-more는 그 학년의 첫 해
-  const growthBeat = (hash) => {
+  // 성장 · 이력(/growth · /history)과 예전 필름 장면(성장 · 보유 역량 · 미래 계획 · 보도)은 이제 발표 자료 안에만 있다 — 그 화면으로:
+  // /growth#gr-<학년> → 걸어온 길 · #gr-values → 일하는 방식 · /history#y2025 · #h-<항목> → 학년별 비교과 · 경력
+  const FILM_GONE = { '#growth': 'overview', '#history': 'years', '#competency': 'swot', '#future': 'goals', '#press': 'certs', '#build': 'p-recap-jbmotors' };
+  const deckOf = (path, hash) => {
     const y = hash.match(/^#y(\d{4})$/);
-    if (y) return y[1];
-    const h = hash.match(/^#h-([\w-]+)$/);
-    if (h) return historyItem(h[1])?.year || null;
+    if (y) return `y${y[1]}`;
+    if (/^#h-[\w-]+$/.test(hash)) return 'years';
     const g = hash.match(/^#gr-([\w-]+?)(-more)?$/);
-    if (!g) return null;
-    if (g[1] === 'values') return 'values';
-    const st = STAGES.find((x) => x.id === g[1]);
-    return st ? (g[2] ? st.years[0] : st.id) : null;
+    if (g) return g[1] === 'values' ? 'values' : `s-${g[1]}`;
+    return path === '/history' ? 'years' : 'overview';
+  };
+  const toDeck = (anchor) => {
+    history.replaceState(history.state, '', `/present#${anchor}`);
+    return { name: 'journey' };
   };
   const parse = () => {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (path.toLowerCase() === '/awards') return { name: 'awards' };
     if (path.toLowerCase() === '/skills') return { name: 'skills' };
-    // 발표 자료(화면 넘김 덱) — #about · #competency · #projects · #plan · #y2025 · #s-<학년> · #p-<프로젝트> …(예전 주소 /growth/detail도)
+    // 발표 자료(화면 넘김 덱) — #about-me · #swot · #projects · #p-<프로젝트> · #goals …(예전 주소 /growth/detail도)
     if (path.toLowerCase() === '/present' || path.toLowerCase() === '/growth/detail') return { name: 'journey' };
-    // 프로필 · 성장 · 이력은 필름의 장면(한 화면씩) — /growth#gr-challenge는 2학년 이야기, /history#y2025는 그 해의 화면
+    // 프로필은 필름의 소개 장면(한 화면씩), 성장 · 이력은 발표 자료의 그 화면
     if (path.toLowerCase() === '/about') return { name: 'film', scene: 'prologue' };
-    if (path.toLowerCase() === '/growth' || path.toLowerCase() === '/history') return { name: 'film', scene: 'growth', beat: growthBeat(location.hash) };
+    if (path.toLowerCase() === '/growth' || path.toLowerCase() === '/history') return toDeck(deckOf(path.toLowerCase(), location.hash));
+    if (path === '/' && FILM_GONE[location.hash]) return toDeck(FILM_GONE[location.hash]);
     if (path.toLowerCase() === '/resume') return { name: 'resume' };
     const m = path.match(/^\/works(?:\/([\w-]+))?$/);
     if (!m) return { name: 'film' };
@@ -1228,7 +1230,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     current = route.name === 'film' ? null : route;
     toTop.classList.remove('is-on');
     if (route.name === 'film') {
-      // 필름의 한 장면으로 가는 주소(/about · /growth · /history)는 필름 주소(/#prologue · /#growth)로 바꿔 둔다
+      // 필름의 한 장면으로 가는 주소(/about)는 필름 주소(/#prologue)로 바꿔 둔다
       if (route.scene) history.replaceState(history.state, '', `/${location.search}#${route.scene}`);
       if (!prev) return onClose?.(route);
       const back = () => {

@@ -16,7 +16,7 @@ const pad = (n) => String(n).padStart(2, '0');
 
 const lines = (arr, cls = '') => arr.map((l) => `<span class="line ${cls}"><span>${esc(l)}</span></span>`).join('');
 
-// 장면 표시: 장면 번호 · 장(발표 순서: 01 자기소개 · 02 보유 역량 분석 · 03 프로젝트 경험 · 04 미래 계획) · 장면 이름
+// 장면 표시: 장면 번호 · 장(01 소개 · 02 프로젝트 · 03 성과) · 장면 이름
 function kicker(scene, i) {
   const ch = scene.chapter ? `<span class="kicker-ch">CH ${esc(scene.chapter[0])}<span class="kicker-chn"> · ${esc(scene.chapter[1])}</span></span>` : '';
   return `<p class="kicker" data-r><span class="kicker-no">SC ${pad(i)}</span>${ch}<span class="kicker-txt">${esc(scene.kicker)}</span></p>`;
@@ -237,7 +237,7 @@ function render(scene, i) {
         </dl>
         <div class="endcard-actions" data-r>
           <a class="btn-works" href="/resume" data-link>이력서 · PDF <span aria-hidden="true">↗</span></a>
-          <a class="btn-works" href="/present" data-link>발표 자료 — 자기소개 · 역량 · 프로젝트 · 미래 계획 <span aria-hidden="true">↗</span></a>
+          <a class="btn-works" href="/present" data-link>발표 자료 — 성장 과정 · 보유 역량 · 미래 계획 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/works" data-link>모든 프로젝트 보기 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/awards" data-link>수상 기록 · 상장 <span aria-hidden="true">↗</span></a>
           <a class="btn-works" href="/skills" data-link>보유 스킬 <span aria-hidden="true">↗</span></a>
@@ -256,6 +256,11 @@ function render(scene, i) {
       head += `<dl class="counters" data-r>${scene.counters
         .map((c) => `<div><dd><b data-count="${c.value}">${c.value}</b></dd><dt>${esc(c.label)}</dt></div>`)
         .join('')}</dl>`;
+    // 국가우수(이공계) 장학생 — 장학증서 한 장(누르면 크게)
+    if (scene.honor) {
+      const sch = profile.scholarship;
+      head += `<p class="rec-honor" data-r><button type="button" data-honor aria-label="${esc(sch.title)} 장학증서 크게 보기"><img src="${esc(sch.sheet.sm)}" width="240" height="339" alt="" loading="lazy" decoding="async" /></button><span><b>${esc(sch.title)}</b>${esc(sch.date)} · ${esc(sch.by)}</span><span class="rec-vol"><b>봉사 ${profile.volunteer.hours}시간 ${profile.volunteer.minutes}분</b>시간인증형 ${profile.volunteer.count}건</span></p>`;
+    }
     if (scene.awardReel) {
       const years = [...new Set(AWARDS.map((a) => a.year))].sort();
       head += `<p class="rec-years" data-r><span>연도별 수상</span>${years
