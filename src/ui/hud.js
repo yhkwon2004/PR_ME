@@ -23,10 +23,12 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
       </button></li>`
     )
     .join('');
+  // 목차는 발표 순서(자기소개 → 보유 역량 → 프로젝트 → 미래 계획)대로 장마다 머리줄을 둔다
   indexList.innerHTML = scenes
-    .map(
-      (s, i) => `<li><button type="button" data-i="${i}"><span class="ix-no">${pad(i)}</span><span class="ix-name">${s.ko}</span><span class="ix-code">${s.label}</span></button></li>`
-    )
+    .map((s, i) => {
+      const ch = s.chapter && s.chapter[0] !== scenes[i - 1]?.chapter?.[0] ? `<li class="ix-chap"><b>${s.chapter[0]}</b>${s.chapter[1]}</li>` : '';
+      return `${ch}<li><button type="button" data-i="${i}"><span class="ix-no">${pad(i)}</span><span class="ix-name">${s.ko}</span><span class="ix-code">${s.label}</span></button></li>`;
+    })
     .join('');
   const tlButtons = [...timeline.querySelectorAll('button')];
   const fills = tlButtons.map((b) => b.querySelector('.tl-fill'));

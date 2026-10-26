@@ -27,19 +27,10 @@ html.q-lite .pg-close {
 html.q-lite .deck-btn {
   background-color: rgba(5, 7, 12, 0.72);
 }
-/* 부팅 글자: 흐림 없이 떠오르기만 */
-html.q-lite .boot-kicker,
-html.q-lite .boot-name,
-html.q-lite .bn-en,
-html.q-lite .boot-role,
-html.q-lite .boot-stats {
-  animation-name: boot-rise-lite;
-}
-@keyframes boot-rise-lite {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
+/* 첫 화면 버튼: 뒤 흐림이 빠진 만큼 조금 더 짙게 */
+html.q-lite .btn-enter,
+html.q-lite .btn-present {
+  background-color: rgba(5, 7, 12, 0.86);
 }
 
 /* 낮음 이하: 칠하기가 많은 효과(필터 · 큰 색 그림자 · 표면을 훑는 빛 · 사진 확대)를 걷는다 */

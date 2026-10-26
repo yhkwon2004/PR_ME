@@ -329,38 +329,32 @@ body.is-moving .letterbox i {
   height: calc(7.5 * var(--vh));
 }
 
-/* ── 부팅: 필름 리더 — 레티클 · 카운트다운 · 아이리스 아웃 ──────────────── */
+/* ── 첫 화면: 이름 · 역할 · 두 갈래(3D 포트폴리오 / 발표 자료) ──────────────
+   뒤에서는 3D 격납고의 드론이 로딩만큼 떠오른다(드론 자리 = .boot-leader — 그 둘레만 밝게 비운다).
+   '포트폴리오 보기' 버튼이 로딩을 함께 보여 주고, 다 차면 누르거나 Enter · 휠 · 위로 밀기로 시작 → 화면이 위로 걷힌다 */
 #boot {
-  /* 레티클 크기와 가운데(3D 드론이 오는 자리) — 가운데는 JS가 매 프레임 맞춘다 */
-  --lw: clamp(176px, calc(30 * var(--vh)), 280px);
+  --lw: clamp(150px, calc(25 * var(--vh)), 250px);
   --fx: 50%;
-  --fy: 34%;
+  --fy: 30%;
+  --p: 0;
   position: fixed;
   inset: 0;
   z-index: 50;
   display: grid;
-  place-items: center;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
-  font-family: var(--mono);
-  /* 레티클 안은 비워 뒤의 격납고와 드론이 보이고, 그 밖은 조명이 꺼진 듯 어둡게 */
+  padding: 0 var(--pad);
+  font-family: var(--sans);
+  color: var(--fg);
+  /* 드론 둘레는 비워 뒤의 격납고가 보이고, 그 밖은 차분하게 어둡게 */
   background:
-    radial-gradient(circle calc(var(--lw) * 0.95) at var(--fx) var(--fy), rgba(3, 4, 9, 0) 46%, rgba(3, 4, 9, 0.5) 100%),
-    linear-gradient(180deg, rgba(3, 4, 9, 0.45) 0%, rgba(3, 4, 9, 0) 22%, rgba(3, 4, 9, 0) 46%, rgba(3, 4, 9, 0.7) 100%);
+    radial-gradient(circle calc(var(--lw) * 0.9) at var(--fx) var(--fy), rgba(3, 4, 9, 0) 40%, rgba(3, 4, 9, 0.62) 100%),
+    linear-gradient(180deg, rgba(3, 4, 9, 0.55) 0%, rgba(3, 4, 9, 0.35) 30%, rgba(3, 4, 9, 0.72) 62%, rgba(3, 4, 9, 0.92) 100%);
 }
-/* WebGL이 없으면 예전처럼 어두운 화면 */
 body.no-webgl #boot {
   background:
-    radial-gradient(60% 55% at 50% 46%, rgba(94, 242, 255, 0.07), transparent 70%),
-    radial-gradient(120% 90% at 50% 50%, rgba(5, 7, 12, 0.86), #030409 78%);
-}
-/* 필름 결 — 아주 옅은 주사선 */
-#boot::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 3px);
-  mix-blend-mode: overlay;
+    radial-gradient(60% 50% at 50% 30%, rgba(94, 242, 255, 0.08), transparent 70%),
+    radial-gradient(120% 90% at 50% 50%, rgba(5, 7, 12, 0.9), #030409 78%);
 }
 /* 시작(스플래시 업): 화면 전체가 위로 걷히고, 빛나는 아래 끝이 필름 위를 쓸고 올라간다 */
 #boot::after {
@@ -390,398 +384,157 @@ body.no-webgl #boot {
 #boot.is-leaving * {
   animation: none !important;
 }
-/* 걷어 올리는 안내: 아래 글줄 가운데의 갈매기표 — 준비되면 위로 떠오르기를 되풀이 */
-.boot-lift {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transform: translateX(-50%);
-  font-weight: 400;
-  white-space: nowrap;
-  color: rgba(214, 246, 255, 0.8);
-  transition: opacity 0.6s;
-}
-.boot-lift i {
-  width: 9px;
-  height: 9px;
-  margin-top: 4px;
-  border-left: 1.5px solid var(--cyan);
-  border-top: 1.5px solid var(--cyan);
-  transform: rotate(45deg);
-  filter: drop-shadow(0 0 5px rgba(94, 242, 255, 0.8));
-}
-#boot:not(.is-ready) .boot-lift {
-  opacity: 0;
-}
-#boot.is-ready .boot-lift i {
-  animation: boot-lift 1.6s cubic-bezier(0.3, 0, 0.2, 1) infinite;
-}
-@keyframes boot-lift {
-  0% {
-    opacity: 0;
-    translate: 0 6px;
-  }
-  35% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    translate: 0 -7px;
-  }
-}
-/* 모서리 · 위아래 글줄은 흐름 밖에 — 가운데 내용만 격자의 한 칸을 차지한다 */
-.boot-corners {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.boot-corners i {
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  border: 1px solid rgba(94, 242, 255, 0.5);
-  animation: boot-fade 0.9s 0.1s var(--ease) both;
-}
-.boot-corners i:nth-child(1) {
-  top: 22px;
-  left: 22px;
-  border-right: 0;
-  border-bottom: 0;
-}
-.boot-corners i:nth-child(2) {
-  top: 22px;
-  right: 22px;
-  border-left: 0;
-  border-bottom: 0;
-}
-.boot-corners i:nth-child(3) {
-  bottom: 22px;
-  left: 22px;
-  border-right: 0;
-  border-top: 0;
-}
-.boot-corners i:nth-child(4) {
-  bottom: 22px;
-  right: 22px;
-  border-left: 0;
-  border-top: 0;
-}
+
+/* 위: 표지 글자 두 개만 */
 .boot-top,
 .boot-bottom {
-  position: absolute;
-  left: 60px;
-  right: 60px;
-  pointer-events: none;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  font-size: 11.5px;
-  letter-spacing: 0.22em;
-  color: var(--muted);
-  animation: boot-fade 0.8s 0.3s var(--ease) both;
+  gap: 16px;
+  animation: boot-fade 0.8s 0.2s var(--ease) both;
 }
 .boot-top {
-  top: 29px;
+  height: 72px;
 }
-.boot-bottom {
-  bottom: 29px;
+.boot-mark {
+  padding: 3px 8px;
+  border: 1px solid var(--fg);
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
 }
-#boot-clock {
-  font-variant-numeric: tabular-nums;
+.boot-span {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--muted);
 }
-#boot-status {
-  color: var(--cyan);
-}
+
+/* 가운데: 드론 자리 → 이름 → 두 갈래 → 순서 */
 .boot-center {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 22px;
+  min-height: 0;
   text-align: center;
-  padding: 0 24px;
 }
-/* ── 레티클: 눈금 · 진행 고리 · 십자선 · 위아래 표찰 ── */
 .boot-leader {
   position: relative;
+  flex: none;
   width: var(--lw);
-  aspect-ratio: 1;
+  height: var(--lw);
 }
-/* 필름 리더처럼 도는 빛(고리 안쪽 띠만) */
-.boot-leader::before {
-  content: '';
+/* 드론 아래의 옅은 빛 — 로딩이 차오를수록 조금 밝아진다 */
+.boot-glow {
   position: absolute;
-  inset: 4%;
+  inset: 12%;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, rgba(94, 242, 255, 0.12), rgba(94, 242, 255, 0) 24%);
-  -webkit-mask-image: radial-gradient(closest-side, transparent 72%, #000 100%);
-  mask-image: radial-gradient(closest-side, transparent 72%, #000 100%);
-  animation: leader-sweep 2.4s linear infinite, boot-fade 1s 0.5s both;
+  background: radial-gradient(circle, rgba(94, 242, 255, 0.16), transparent 70%);
+  opacity: calc(0.35 + var(--p) * 0.65);
+  filter: blur(6px);
 }
-#boot.is-ready .boot-leader::before {
-  opacity: 0;
-  transition: opacity 0.6s;
-}
-.boot-leader svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.bl-ticks,
-.bl-track,
-.bl-inner,
-.bl-cross {
-  fill: none;
-  stroke: rgba(232, 237, 244, 0.16);
-  stroke-width: 1;
-}
-/* 바깥 눈금 60개 — 굵은 선을 짧게 끊어 바늘처럼 */
-.bl-ticks {
-  stroke-width: 3;
-  stroke-dasharray: 0.35 3.65;
-  stroke: rgba(232, 237, 244, 0.22);
-  animation: boot-fade 1.2s 0.7s var(--ease) both;
-}
-.bl-track {
-  stroke-dasharray: 100;
-  animation: ring-draw 1.6s 0.2s var(--ease) both;
-}
-.bl-inner {
-  stroke-dasharray: 1 7;
-  stroke: rgba(94, 242, 255, 0.28);
-  transform-origin: 100px 100px;
-  animation: boot-fade 1s 0.9s both, inner-spin 40s linear infinite;
-}
-/* 십자선은 고리 바깥 끝에서만 — 가운데의 드론을 가리지 않게 */
-.bl-cross {
-  stroke: rgba(94, 242, 255, 0.55);
-  animation: boot-fade 0.8s 1s both;
-}
-.bl-prog {
-  fill: none;
-  stroke: var(--cyan);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-  filter: drop-shadow(0 0 6px rgba(94, 242, 255, 0.7));
-}
-#boot.is-ready .bl-prog {
-  animation: ring-lock 0.9s var(--ease);
-}
-/* 고리 위아래에 걸친 표찰: 위는 상태, 아래는 진행률 → 카운트다운 */
-.boot-lock,
-.boot-pct {
-  position: absolute;
-  left: 50%;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 2px;
-  padding: 4px 11px;
-  border: 1px solid var(--line-2);
-  border-radius: 999px;
-  background: rgba(3, 4, 9, 0.88);
-  white-space: nowrap;
-  transform: translate(-50%, -50%);
-  animation: boot-fade 0.7s 1s both;
-}
-.boot-lock {
-  top: 4%;
-  font-size: 10.5px;
-  letter-spacing: 0.3em;
-  padding-right: 8px;
-  color: var(--muted);
-}
-#boot.is-ready .boot-lock {
-  color: var(--cyan);
-  border-color: rgba(94, 242, 255, 0.55);
-}
-.boot-pct {
-  top: 96%;
-  min-width: 58px;
-  justify-content: center;
-}
-.boot-pct b {
-  display: inline-block;
-  font-family: var(--display);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--fg);
-  font-variant-numeric: tabular-nums;
-}
-.boot-pct small {
-  font-size: 11px;
-  color: var(--muted);
-}
-/* 카운트다운: 표찰이 조금 커지고 시안 테두리 */
-#boot.is-counting .boot-pct {
-  min-width: 48px;
-  padding: 5px 14px;
-  border-color: rgba(94, 242, 255, 0.7);
-  box-shadow: 0 0 18px rgba(94, 242, 255, 0.25);
-}
-#boot.is-counting .boot-pct b {
-  font-size: 22px;
-  line-height: 1;
-}
-/* ── 이름 · 분야 ── */
 .boot-copy {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: clamp(26px, calc(4.6 * var(--vh)), 44px);
-}
-/* 글자 뒤로만 옅은 어둠 — 바닥의 H 패드 · 격납고 글자와 겹쳐도 이름이 또렷하게 */
-.boot-copy::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: -28% -22%;
-  background: radial-gradient(closest-side, rgba(3, 4, 9, 0.74), rgba(3, 4, 9, 0.42) 58%, rgba(3, 4, 9, 0));
-  pointer-events: none;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
 }
 .boot-kicker {
-  font-size: 11.5px;
-  letter-spacing: 0.46em;
-  margin-right: -0.46em;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
   color: var(--cyan);
-  animation: boot-rise 1s 0.7s var(--ease) both;
+  animation: boot-rise 0.9s 0.35s var(--ease) both;
 }
 .boot-name {
-  margin-top: 14px;
-}
-.bn-ko {
-  display: block;
-  font-family: var(--display);
-  font-size: clamp(44px, calc(6 * var(--vw)), 80px);
-  font-weight: 700;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  font-size: clamp(54px, calc(9 * var(--vh)), 92px);
+  font-weight: 800;
   line-height: 1;
-  letter-spacing: -0.045em;
-  color: var(--fg);
-  text-shadow: 0 2px 24px rgba(3, 4, 9, 0.6);
-  animation: name-in 1.5s 0.85s var(--ease) both;
+  letter-spacing: -0.04em;
+  animation: boot-rise 1s 0.45s var(--ease) both;
 }
 .bn-en {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px 0;
-  margin-top: 16px;
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
+  font-family: var(--display);
+  font-size: 0.24em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   color: var(--fg-2);
-  animation: boot-rise 1s 1.1s var(--ease) both;
-}
-.bn-en span + span::before {
-  content: '·';
-  margin: 0 0.9em 0 0.64em;
-  color: var(--dim);
 }
 .boot-role {
   max-width: 30em;
-  margin-top: 14px;
-  font-family: var(--sans);
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.5;
-  text-align: center;
+  font-size: 16px;
+  line-height: 1.55;
   color: var(--fg-2);
   word-break: keep-all;
-  animation: boot-rise 1s 1.15s var(--ease) both;
-}
-/* 기록 네 개: 숫자는 로딩 진행만큼 올라간다 — 대상은 주황 */
-.boot-stats {
-  display: flex;
-  margin-top: 18px;
-  animation: boot-rise 1s 1.3s var(--ease) both;
-}
-.boot-stats div {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  gap: 3px;
-  min-width: 74px;
-  padding: 0 16px;
-}
-.boot-stats div + div {
-  border-left: 1px solid var(--line-2);
-}
-.boot-stats dd {
-  font-family: var(--display);
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  color: var(--fg);
-}
-.boot-stats div:nth-child(3) dd {
-  color: var(--orange);
-}
-.boot-stats dt {
-  font-family: var(--sans);
-  font-size: 11.5px;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-}
-/* ── 시작 버튼 ── */
-/* 버튼 자리는 처음부터 잡아 두어(보이지만 않게) 준비가 끝나도 레티클이 움직이지 않게 */
-#boot:not(.is-ready) .boot-actions {
-  visibility: hidden;
+  text-wrap: balance;
+  animation: boot-rise 1s 0.55s var(--ease) both;
 }
 .boot-actions {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 12px;
-  margin-top: clamp(22px, calc(4 * var(--vh)), 36px);
+  animation: boot-rise 1s 0.65s var(--ease) both;
 }
-.btn-enter {
+.btn-enter,
+.btn-present {
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 14px;
-  min-height: 52px;
-  padding: 7px 26px 7px 7px;
-  border: 1px solid rgba(94, 242, 255, 0.55);
+  min-width: 248px;
+  height: 64px;
+  padding: 0 22px 0 14px;
+  overflow: hidden;
   border-radius: 999px;
-  background: rgba(4, 12, 18, 0.72);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
   text-align: left;
-  box-shadow: 0 0 0 0 rgba(94, 242, 255, 0.3);
-  animation: enter-pulse 2.6s 1s ease-out infinite;
-  transition: background 0.3s, border-color 0.3s, transform 0.3s;
+  transition:
+    transform 0.4s var(--ease),
+    border-color 0.3s,
+    background 0.3s,
+    box-shadow 0.4s;
+}
+.btn-enter {
+  border: 1px solid rgba(94, 242, 255, 0.55);
+  background: rgba(8, 20, 30, 0.72);
+  color: var(--fg);
+}
+.btn-present {
+  padding: 0 22px;
+  border: 1px solid var(--line-2);
+  background: rgba(5, 7, 12, 0.5);
+  color: var(--fg);
 }
 .btn-enter:hover,
-.btn-enter:focus-visible {
-  background: rgba(10, 34, 44, 0.82);
-  border-color: var(--cyan);
-  transform: translateY(-1px);
+.btn-enter:focus-visible,
+.btn-present:hover,
+.btn-present:focus-visible {
+  transform: translateY(-2px);
+  outline: none;
 }
-.btn-enter:focus-visible {
-  outline-color: rgba(94, 242, 255, 0.6);
-  outline-offset: 4px;
+.btn-enter:focus-visible,
+.btn-present:focus-visible {
+  box-shadow: 0 0 0 3px rgba(94, 242, 255, 0.35);
 }
+.btn-present:hover,
+.btn-present:focus-visible {
+  border-color: var(--fg);
+}
+/* 재생 표시: 다 차면 청록 원 안의 삼각형 */
 .btn-enter-icon {
   position: relative;
   flex: none;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: var(--cyan);
-  box-shadow: 0 0 20px rgba(94, 242, 255, 0.5);
+  background: rgba(94, 242, 255, 0.14);
+  transition: background 0.4s;
 }
 .btn-enter-icon::after {
   content: '';
@@ -789,79 +542,156 @@ body.no-webgl #boot {
   top: 50%;
   left: 54%;
   border-style: solid;
-  border-width: 6px 0 6px 10px;
-  border-color: transparent transparent transparent #021015;
+  border-width: 7px 0 7px 12px;
+  border-color: transparent transparent transparent var(--cyan);
   transform: translate(-50%, -50%);
+  transition: border-color 0.4s;
 }
 .btn-enter-text {
   display: grid;
   gap: 3px;
+  min-width: 0;
 }
-.btn-enter b {
-  font-family: var(--display);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  line-height: 1.1;
+.btn-enter-text b {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
-.btn-enter small {
-  font-family: var(--sans);
-  font-size: 11.5px;
-  line-height: 1.2;
-  color: var(--fg-2);
-  word-break: keep-all;
-}
-/* 자동 시작까지 남은 시간 — 재생 아이콘 둘레의 가는 고리가 차오른다 */
-.btn-enter-icon::before {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  border-radius: 50%;
-  background: conic-gradient(var(--cyan) calc(var(--auto, 0) * 360deg), rgba(94, 242, 255, 0.16) 0);
-  -webkit-mask-image: radial-gradient(closest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1px));
-  mask-image: radial-gradient(closest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1px));
-}
-.boot-note {
-  font-family: var(--sans);
-  font-size: 11.5px;
+.btn-enter-text small {
+  font-size: 12.5px;
   color: var(--muted);
-  word-break: keep-all;
-  text-shadow: 0 0 10px rgba(3, 4, 9, 0.9);
+  font-variant-numeric: tabular-nums;
 }
-/* ── 부팅 로그(넓은 화면) ── */
-.boot-log {
+.btn-present > i {
+  margin-left: auto;
+  font-size: 18px;
+  font-style: normal;
+  color: var(--fg-2);
+  transition: transform 0.4s var(--ease);
+}
+.btn-present:hover > i {
+  transform: translateX(4px);
+}
+/* 로딩: 버튼 아래 끝의 가는 막대가 차오른다 */
+.btn-enter-bar {
   position: absolute;
-  left: 60px;
-  bottom: 68px;
-  width: min(380px, calc(30 * var(--vw)));
-  pointer-events: none;
-  font-size: 11px;
-  line-height: 1.9;
-  color: var(--dim);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), #b9fbff);
+  transform: scaleX(var(--p));
+  transform-origin: left;
+  transition: opacity 0.6s;
 }
-.boot-log li {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
-  gap: 12px;
+#boot.is-ready .btn-enter {
+  border-color: var(--cyan);
+  background: rgba(10, 40, 52, 0.82);
+  animation: enter-pulse 2.4s 0.6s ease-out infinite;
+}
+#boot.is-ready .btn-enter-icon {
+  background: var(--cyan);
+}
+#boot.is-ready .btn-enter-icon::after {
+  border-left-color: #04121a;
+}
+#boot.is-ready .btn-enter-text small {
+  color: var(--cyan);
+}
+#boot.is-ready .btn-enter-bar {
   opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.5s, transform 0.5s;
 }
-.boot-log li.is-in {
-  opacity: 0.8;
-  transform: none;
+/* 무엇을 보게 되는지: 네 장의 순서(글자만 — 누르는 곳이 아니다) */
+.boot-agenda {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 10px;
+  font-size: 13px;
+  color: var(--muted);
+  animation: boot-fade 1s 0.9s var(--ease) both;
 }
-.bl-a {
-  color: rgba(94, 242, 255, 0.7);
+.boot-agenda li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
 }
-.bl-b {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.boot-agenda li + li::before {
+  content: '→';
+  margin-right: 4px;
+  color: rgba(232, 237, 244, 0.32);
 }
-.bl-c {
+.boot-agenda b {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
   color: var(--orange);
 }
+
+/* 아래: 시작하는 다른 방법 · 바로 보기(프로젝트 · 수상 · 이력서) */
+.boot-bottom {
+  min-height: 64px;
+  padding-bottom: 6px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.boot-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* 마우스 · 키보드 화면은 Enter · 휠, 터치 화면은 위로 밀기 */
+.bh-touch {
+  display: none;
+}
+@media (hover: none) and (pointer: coarse) {
+  .bh-key {
+    display: none;
+  }
+  .bh-touch {
+    display: inline;
+  }
+}
+.boot-lift {
+  position: relative;
+  width: 18px;
+  height: 26px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+}
+.boot-lift i {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 3px;
+  height: 6px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--cyan);
+}
+#boot.is-ready .boot-lift i {
+  animation: boot-lift 1.6s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+}
+.boot-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+.boot-links a {
+  color: var(--fg-2);
+  transition: color 0.3s;
+}
+.boot-links a:hover,
+.boot-links a:focus-visible {
+  color: var(--cyan);
+  outline: none;
+}
+.boot-links b {
+  margin-left: 4px;
+  font-family: var(--display);
+  color: var(--fg);
+}
+
 @keyframes boot-fade {
   from {
     opacity: 0;
@@ -870,250 +700,140 @@ body.no-webgl #boot {
 @keyframes boot-rise {
   from {
     opacity: 0;
-    transform: translateY(12px);
-    filter: blur(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
+    transform: translateY(16px);
   }
 }
-/* 이름: 흐린 채 넓게 벌어졌다가 제자리로 모인다 */
-@keyframes name-in {
-  from {
+@keyframes boot-lift {
+  0% {
+    transform: translateY(6px);
     opacity: 0;
-    letter-spacing: 0.08em;
-    filter: blur(12px);
   }
-  to {
+  35% {
     opacity: 1;
-    filter: none;
   }
-}
-@keyframes ring-draw {
-  from {
-    stroke-dashoffset: 100;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-@keyframes ring-lock {
-  30% {
-    stroke-width: 5;
-    filter: drop-shadow(0 0 14px rgba(94, 242, 255, 0.95));
-  }
-}
-@keyframes leader-sweep {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes inner-spin {
-  to {
-    transform: rotate(360deg);
+  100% {
+    transform: translateY(-2px);
+    opacity: 0;
   }
 }
 @keyframes enter-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(94, 242, 255, 0.3);
+    box-shadow: 0 0 0 0 rgba(94, 242, 255, 0.32);
   }
   70%,
   100% {
     box-shadow: 0 0 0 14px rgba(94, 242, 255, 0);
   }
 }
-/* 부팅 로그는 시작 버튼과 겹치지 않을 만큼 넓은 화면에서만 */
-@media (max-width: 1279px), (max-height: 700px) {
-  .boot-log {
-    display: none;
-  }
-}
+
+/* 휴대폰 · 세로 태블릿: 두 갈래는 위아래로 한 줄씩, 아래 줄은 가운데로 */
 @media (max-width: 820px), (orientation: portrait) and (max-width: 1100px) {
-  .boot-top,
-  .boot-bottom {
-    left: 44px;
-    right: 44px;
-    font-size: 10.5px;
-    letter-spacing: 0.16em;
-  }
-  .boot-bottom span:last-child,
-  .bt-reel {
-    display: none;
-  }
-}
-/* 세로 휴대폰: 레티클은 화면 폭에 맞추고, 영문 이름은 두 줄로 */
-@media (max-width: 600px) and (orientation: portrait) {
   #boot {
-    --lw: min(calc(70 * var(--vw)), calc(35 * var(--vh)));
-  }
-  .boot-corners i {
-    width: 18px;
-    height: 18px;
-  }
-  .boot-corners i:nth-child(-n + 2) {
-    top: 18px;
-  }
-  .boot-corners i:nth-child(n + 3) {
-    bottom: 18px;
-  }
-  .boot-corners i:nth-child(odd) {
-    left: 18px;
-  }
-  .boot-corners i:nth-child(even) {
-    right: 18px;
+    --lw: clamp(120px, calc(22 * var(--vh)), 200px);
   }
   .boot-top {
-    top: 24px;
-  }
-  .boot-bottom {
-    bottom: 24px;
-  }
-  .boot-top,
-  .boot-bottom {
-    left: 46px;
-    right: 46px;
-  }
-  .bn-ko {
-    font-size: 46px;
-  }
-  .bn-en {
-    flex-direction: column;
-    align-items: center;
-    margin-top: 14px;
-    font-size: 11.5px;
-  }
-  .bn-en span + span::before {
-    content: none;
-  }
-  .boot-role {
-    max-width: 22em;
-    margin-top: 12px;
-    font-size: 14px;
-  }
-  .boot-stats {
-    margin-top: 14px;
-  }
-  .boot-stats div {
-    min-width: 0;
-    padding: 0 12px;
-  }
-  .boot-stats dd {
-    font-size: 21px;
-  }
-  .boot-stats dt {
-    font-size: 11px;
-  }
-}
-/* 가로로 눕힌 휴대폰(낮은 화면): 왼쪽은 레티클과 드론, 오른쪽은 이름과 시작 버튼 */
-/* 세로 휴대폰: 위 글줄은 한 줄로(자간을 줄여) — 높이 700 이하에서는 역할 한 줄을 접고 간격을 줄여 버튼 · 안내가 아래 글줄과 겹치지 않게 */
-@media (max-width: 600px) and (orientation: portrait) {
-  .boot-kicker {
-    font-size: 11px;
-    letter-spacing: 0.28em;
-    margin-right: -0.28em;
-  }
-}
-@media (max-width: 600px) and (orientation: portrait) and (max-height: 700px) {
-  .boot-role {
-    display: none;
-  }
-  .boot-name {
-    margin-top: 10px;
-  }
-  .bn-en {
-    margin-top: 10px;
-  }
-  .boot-stats {
-    margin-top: 12px;
-  }
-  .boot-actions {
-    margin-top: 16px;
-  }
-}
-@media (max-height: 520px) and (orientation: landscape) {
-  #boot {
-    --lw: min(calc(58 * var(--vh)), 230px);
+    height: 56px;
   }
   .boot-center {
-    display: grid;
-    grid-template-columns: auto minmax(0, auto);
-    grid-template-areas: 'leader copy' 'leader actions';
-    align-items: center;
-    align-content: center;
-    column-gap: clamp(28px, calc(6 * var(--vw)), 64px);
-    text-align: left;
-  }
-  .boot-leader {
-    grid-area: leader;
-  }
-  .boot-copy {
-    grid-area: copy;
-    align-items: flex-start;
-    align-self: end;
-    margin-top: 0;
-  }
-  .boot-copy::before {
-    inset: -30% -16% -30% -24%;
-  }
-  .boot-kicker {
-    margin-right: 0;
+    gap: 18px;
   }
   .boot-name {
-    margin-top: 10px;
-  }
-  .bn-ko {
-    font-size: 40px;
-  }
-  .bn-en {
-    justify-content: flex-start;
-    margin-top: 10px;
-    font-size: 11px;
+    font-size: clamp(46px, calc(13 * var(--vw)), 64px);
   }
   .boot-role {
-    margin-top: 8px;
-    font-size: 13px;
-    text-align: left;
-  }
-  .boot-stats {
-    margin-top: 10px;
-  }
-  .boot-stats div:first-child {
-    padding-left: 0;
-  }
-  .boot-stats dd {
-    font-size: 19px;
+    max-width: 21em;
+    font-size: 14.5px;
   }
   .boot-actions {
-    grid-area: actions;
-    align-self: start;
-    align-items: flex-start;
-    gap: 8px;
-    margin-top: 18px;
+    flex-direction: column;
+    align-items: stretch;
+    width: min(100%, 340px);
+    gap: 10px;
   }
-  .btn-enter {
-    min-height: 46px;
+  .btn-enter,
+  .btn-present {
+    min-width: 0;
+    height: 60px;
   }
-  .btn-enter-icon {
-    width: 32px;
-    height: 32px;
+  /* 순서는 두 줄 두 칸 — 줄 머리에 화살표가 남지 않게 번호로만 잇는다 */
+  .boot-agenda {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 6px 22px;
+    font-size: 12.5px;
   }
-  .boot-corners i {
-    width: 16px;
-    height: 16px;
-  }
-  .boot-top {
-    top: 16px;
+  .boot-agenda li + li::before {
+    content: none;
   }
   .boot-bottom {
-    bottom: 16px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    min-height: 0;
+    padding: 10px 0 14px;
   }
-  .boot-corners i:nth-child(-n + 2) {
-    top: 10px;
+  .boot-links {
+    justify-content: center;
   }
-  .boot-corners i:nth-child(n + 3) {
-    bottom: 10px;
+}
+/* 작은 휴대폰(높이 700 이하): 드론 자리와 순서 줄을 줄인다 */
+@media (max-width: 820px) and (max-height: 700px) and (orientation: portrait) {
+  #boot {
+    --lw: clamp(96px, calc(17 * var(--vh)), 140px);
+  }
+  .boot-center {
+    gap: 14px;
+  }
+  .boot-agenda,
+  .boot-hint {
+    display: none;
+  }
+}
+/* 가로로 눕힌 휴대폰: 드론 자리를 접고 글 · 버튼을 두 칸으로 */
+@media (max-height: 500px) and (orientation: landscape) {
+  #boot {
+    overflow-y: auto;
+  }
+  .boot-top {
+    height: 44px;
+  }
+  .boot-leader,
+  .boot-agenda,
+  .boot-hint {
+    display: none;
+  }
+  .boot-center {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 14px 36px;
+    text-align: left;
+  }
+  .boot-copy {
+    justify-items: start;
+    gap: 6px;
+  }
+  .boot-name {
+    justify-items: start;
+    font-size: 46px;
+  }
+  .boot-role {
+    max-width: 18em;
+    font-size: 13.5px;
+  }
+  .boot-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 280px;
+    gap: 8px;
+  }
+  .btn-enter,
+  .btn-present {
+    min-width: 0;
+    height: 54px;
+  }
+  .boot-bottom {
+    justify-content: center;
+    min-height: 40px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -3053,6 +2773,31 @@ body.is-started.has-pointer .cursor {
 #index-list button.is-active .ix-name {
   color: var(--orange);
 }
+/* 장 머리줄: 번호 · 장 이름(누르는 곳이 아니다) */
+#index-list .ix-chap {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 22px 0 8px;
+  border-top: 1px solid var(--line-2);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--fg-2);
+}
+#index-list .ix-chap:first-child {
+  padding-top: 4px;
+  border-top: 0;
+}
+#index-list .ix-chap b {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: var(--orange);
+}
+#index-list .ix-chap + li button {
+  border-top-color: transparent;
+}
 .ix-no,
 .ix-code {
   font-family: var(--mono);
@@ -3480,12 +3225,6 @@ body.is-started.has-pointer .cursor {
     --top: 52px;
     --bottom: 46px;
     --pad: 16px;
-  }
-  /* 부팅 화면: 시작 버튼이 첫 화면에 보이도록 */
-  #boot {
-    overflow-y: auto;
-    place-items: safe center;
-    padding-block: 12px;
   }
   /* HUD는 휴대폰 규칙과 같게 */
   .brand-sub,

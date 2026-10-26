@@ -1565,11 +1565,15 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       page.querySelectorAll('[data-gallery]').forEach((b) =>
         b.addEventListener('click', () => lightbox.show({ media }, +b.dataset.gallery, b))
       );
-      page.querySelectorAll('[data-yt]').forEach((b) =>
+      page.querySelectorAll('[data-yt]').forEach((b) => {
+        // 썸네일을 못 받으면(막힌 망) 깨진 그림 대신 재생 단추만 남긴다
+        const img = b.querySelector('img');
+        const drop = () => img.remove();
+        if (img) img.complete && !img.naturalWidth ? drop() : img.addEventListener('error', drop, { once: true });
         b.addEventListener('click', () => {
           b.outerHTML = `<iframe class="yt-frame" src="https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
-        })
-      );
+        });
+      });
       const heroMedia = page.querySelectorAll('.d-hero-media > *');
       if (heroMedia.length && !reducedMotion) gsap.fromTo(heroMedia, { scale: 1.12 }, { scale: 1, duration: 2.2, ease: 'expo.out' });
       fitHero();

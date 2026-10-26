@@ -16,9 +16,8 @@ import './styles/clarity.css';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { scenes, profile } from './content.js';
-import { projects, CATEGORIES } from './data/projects.js';
+import { projects } from './data/projects.js';
 import { AWARDS } from './data/awards.js';
-import { PRESS } from './data/press.js';
 import { createStage } from './core/stage.js';
 import { createPerf } from './core/perf.js';
 import { SETS } from './core/layout.js';
@@ -38,8 +37,6 @@ import { createSite } from './pages/site.js';
 import { createGuide } from './ui/guide.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-// 검증용(?capture)에서는 자동 진입하지 않는다
-const CAPTURE = new URLSearchParams(location.search).has('capture');
 
 // 세로 태블릿: 휴대폰 배치(세로 1100px까지 같은 배치)를 화면에 맞게 키운다 — 폭 600px · 높이 860px를 기준으로 최대 1.7배.
 // 휴대폰 · 가로 화면 · 데스크톱은 1(main.css의 zoom: var(--tz)). 다른 resize 처리보다 먼저 맞춘다
@@ -506,97 +503,63 @@ function pick() {
   }
 }
 
-// ── 부팅 시퀀스 ────────────────────────────────────────────
-// 부팅 로그: 기체 점검 흉내 대신 이 포트폴리오가 담은 것을 차례로 불러온다(숫자는 데이터에서)
-const GRAND = AWARDS.filter((a) => a.tier === 1).length;
-const FIELDS = new Set(projects.map((p) => p.category)).size;
-const bootLines = [
-  ['BOOT', `kwon.portfolio — ${profile.span || '2023 – 2026'}`, ''],
-  ['PROF', `${profile.name} · ${profile.role}`, 'OK'],
-  ['EDU', `${(profile.education || []).map((e) => e.major).slice(-2).join(' · ')}`, 'OK'],
-  ['PROJ', `${projects.length} PROJECTS · ${Math.min(FIELDS, CATEGORIES.length)} FIELDS`, 'OK'],
-  ['AWRD', `${AWARDS.length} AWARDS · ${GRAND} GRAND PRIZE`, 'OK'],
-  ['PRESS', `${PRESS.length} ARTICLES · INTERVIEW`, 'OK'],
-  ['SETS', 'HANGAR · SKY · GROUND · ROBOTICS', 'READY'],
-];
-// 부팅 화면의 기록 네 개 — 로딩 진행만큼 0에서 올라간다
-const BOOT_STATS = [
-  [projects.length, '프로젝트'],
-  [AWARDS.length, '수상'],
-  [GRAND, '대상'],
-  [PRESS.length, '공식 보도'],
-];
-function fillBootStats() {
-  const dl = $('boot-stats');
-  if (!dl) return [];
-  dl.innerHTML = BOOT_STATS.map(([, l]) => `<div><dt>${l}</dt><dd>0</dd></div>`).join('');
+// ── 첫 화면 ────────────────────────────────────────────
+// 네 장의 순서(장면의 chapter에서)와 바로 보기 줄(숫자는 데이터에서)을 채운다
+function fillBoot() {
+  const agenda = $('boot-agenda');
+  if (agenda) {
+    const seen = new Map();
+    scenes.forEach((s) => s.chapter && !seen.has(s.chapter[0]) && seen.set(s.chapter[0], s.chapter[1]));
+    agenda.innerHTML = [...seen].map(([no, ko]) => `<li><b>${no}</b>${ko}</li>`).join('');
+  }
+  const links = $('boot-links');
+  if (links)
+    links.innerHTML = [
+      ['/works', '프로젝트', projects.length],
+      ['/awards', '수상', AWARDS.length],
+      ['/resume', '이력서 한 장', ''],
+    ]
+      .map(([href, label, n]) => `<a href="${href}" data-link>${label}${n !== '' ? `<b>${n}</b>` : ''}</a>`)
+      .join('');
   if (profile.roleKo && $('boot-role')) $('boot-role').textContent = profile.roleKo;
-  return [...dl.querySelectorAll('dd')];
-}
-
-// 카운트다운 한 프레임: 표찰의 숫자, 초마다 다시 차는 고리, 재생 아이콘 둘레의 자동 시작 고리
-function countdown(left, total) {
-  const pct = $('boot-pct');
-  const bootEl = $('boot');
-  if (!pct || !bootEl) return;
-  if (!bootEl.classList.contains('is-counting')) {
-    bootEl.classList.add('is-counting');
-    const unit = pct.nextElementSibling;
-    if (unit) unit.hidden = true;
-  }
-  const n = Math.max(1, Math.ceil(left * (3 / total)));
-  if (pct.textContent !== String(n)) {
-    pct.textContent = String(n);
-    $('boot-status').textContent = `AUTO START — ${n}`;
-    if (!reduced) gsap.fromTo(pct, { scale: 1.35, autoAlpha: 0.3 }, { scale: 1, autoAlpha: 1, duration: 0.5, ease: 'power3.out' });
-  }
-  const frac = ((left * (3 / total)) % 1) || (left > 0 ? 1 : 0);
-  $('boot-ring').style.strokeDashoffset = String(100 - frac * 100);
-  $('boot-actions')?.style.setProperty('--auto', (1 - left / total).toFixed(3));
 }
 
 async function boot() {
-  const log = $('boot-log');
-  const pct = $('boot-pct');
-  const ring = $('boot-ring');
-  const clock = $('boot-clock');
+  const state = $('boot-state');
   const t0 = performance.now();
   booting = true;
   let ready = false;
-  // 화면을 누르면 그 순간 오디오를 깨워 두고, 준비가 끝났으면 바로 · 아직이면 준비되는 즉시 시작
   const bootEl = $('boot');
-  // 준비 전에 걷어 올렸다면 준비되는 즉시 들어간다
+  // 준비 전에 누르거나 걷어 올렸다면 준비되는 즉시 들어간다
   let queued = false;
   const go = () => {
     if (pageCovered || started) return; // 작품 · 수상 페이지가 덮고 있으면 필름을 열지 않는다
     if (ready) return start(true);
     queued = true;
-    $('boot-status').textContent = 'STARTING…';
+    state.textContent = '준비되는 대로 시작합니다';
   };
   const poke = () => {
     if (pageCovered) return;
     audio.unlock();
     go();
   };
-  bootEl.addEventListener('pointerdown', () => !pageCovered && audio.unlock());
-  bootEl.addEventListener('click', (e) => !e.target.closest('button') && poke());
-  addEventListener('keydown', (e) => !started && booting && !e.repeat && poke(), { capture: true });
+  $('enter-sound').addEventListener('pointerdown', () => !pageCovered && audio.unlock());
+  $('enter-sound').addEventListener('click', poke);
+  // Enter · Space · ↓ · PageDown으로도 시작(링크 · 버튼에 포커스가 있으면 그 동작대로)
+  addEventListener(
+    'keydown',
+    (e) => {
+      if (started || !booting || e.repeat || pageCovered) return;
+      if (!['Enter', ' ', 'ArrowDown', 'PageDown'].includes(e.key)) return;
+      if (e.target.closest?.('a, button')) return;
+      e.preventDefault();
+      poke();
+    },
+    { capture: true }
+  );
   bindLift(bootEl, go);
   let progress = 0;
-  let shown = 0;
-  const clockTimer = setInterval(() => {
-    const s = (performance.now() - t0) / 1000;
-    clock.textContent = `00:00:${String(Math.floor(s)).padStart(2, '0')}:${String(Math.floor((s % 1) * 24)).padStart(2, '0')}`;
-  }, 42);
-
-  const statEls = fillBootStats();
-  const addLine = (i) => {
-    const [a, b, c] = bootLines[i];
-    const li = document.createElement('li');
-    li.innerHTML = `<span class="bl-a">${a}</span><span class="bl-b">${b}</span><span class="bl-c">${c}</span>`;
-    log.appendChild(li);
-    requestAnimationFrame(() => li.classList.add('is-in'));
-  };
+  fillBoot();
 
   const tasks = [
     () => Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]),
@@ -631,56 +594,23 @@ async function boot() {
       progress += (Math.min(time, real * 0.4 + time * 0.6) - progress) * Math.min(1, dt * 7);
       if (real === 1 && time === 1 && progress > 0.97) progress = 1;
       if (bootPin >= 0) progress = bootPin; // 검증용 고정
-      pct.textContent = String(Math.round(progress * 100)).padStart(2, '0');
-      ring.style.strokeDashoffset = String(100 - progress * 100);
+      bootEl.style.setProperty('--p', progress.toFixed(3));
+      if (!queued) state.textContent = `불러오는 중 ${Math.round(progress * 100)}%`;
       bootProgress = progress;
-      statEls.forEach((el, k) => (el.textContent = String(Math.round(BOOT_STATS[k][0] * Math.min(1, progress * 1.08)))));
-      const want = Math.min(bootLines.length, Math.floor(progress * bootLines.length + 0.6));
-      while (shown < want) addLine(shown++);
       if (progress >= 1 || started) resolve();
       else requestAnimationFrame(step);
     };
     step();
   });
   await work;
-  clearInterval(clockTimer);
-  // 상세 페이지에서 바로 필름을 열었다면 부팅 화면은 이미 사라졌다
-  const actions = $('boot-actions');
-  if (started || !actions) return;
+  // 상세 페이지에서 바로 필름을 열었다면 첫 화면은 이미 사라졌다
+  if (started || !bootEl.isConnected) return;
   ready = true;
   if (queued && !pageCovered) return start(true);
-  $('boot').classList.add('is-ready');
-  $('boot-status').textContent = 'READY';
-  $('boot-lock').textContent = 'LOCKED';
-  actions.hidden = false;
-  // 필름 리더처럼 3 · 2 · 1을 세고 저절로 들어간다(누르면 바로)
-  if (!CAPTURE) {
-    // 실제 흐른 시간으로 센다(느린 기기에서 애니메이션 시계가 늦어져도 제때 들어가도록)
-    const total = reduced ? 1.2 : 3;
-    const c0 = performance.now();
-    const tick = () => {
-      if (started) return;
-      const left = Math.max(0, total - (performance.now() - c0) / 1000);
-      countdown(left, total);
-      if (left <= 0) {
-        if (!pageCovered) start(true);
-        return;
-      }
-      requestAnimationFrame(tick);
-    };
-    tick();
-  }
-  // 버튼이 보이게 된 뒤에 초점을 준다(그 사이 다른 곳을 눌렀다면 그대로 둔다)
-  gsap.fromTo(actions.children, { autoAlpha: 0, y: 14 }, {
-    autoAlpha: 1,
-    y: 0,
-    stagger: 0.12,
-    duration: 0.7,
-    ease: 'power3.out',
-    onComplete: () => {
-      if (!started && (!document.activeElement || document.activeElement === document.body)) $('enter-sound').focus({ preventScroll: true });
-    },
-  });
+  bootEl.classList.add('is-ready');
+  state.textContent = '소리와 함께 시작합니다';
+  // 버튼에 초점을 준다(그 사이 다른 곳을 눌렀다면 그대로 둔다)
+  if (!document.activeElement || document.activeElement === document.body) $('enter-sound').focus({ preventScroll: true });
 }
 
 function start(withSound) {
@@ -722,7 +652,7 @@ function splashUp(bootEl) {
   if (!bootEl) return null;
   bootEl.classList.add('is-leaving');
   if (reduced) return gsap.to(bootEl, { autoAlpha: 0, duration: 0.25, ease: 'power1.out', onComplete: () => bootEl.remove() });
-  const copy = bootEl.querySelectorAll('.boot-copy > *, .boot-actions, .boot-lift');
+  const copy = bootEl.querySelectorAll('.boot-top, .boot-copy > *, .boot-actions > *, .boot-agenda, .boot-bottom');
   const lite = document.documentElement.classList.contains('q-lite'); // 저사양: 흐림 없이
   const tl = gsap.timeline({ onComplete: () => bootEl.remove() });
   tl.to(copy, { autoAlpha: 0, y: -28, ...(lite ? {} : { filter: 'blur(3px)' }), duration: 0.42, stagger: 0.04, ease: 'power2.in' }, 0)
@@ -794,7 +724,6 @@ soundHint?.addEventListener('click', () => {
 });
 
 // 필름은 언제나 사운드와 함께 시작한다(사운드 버튼으로 끌 수 있다)
-$('enter-sound').addEventListener('click', () => start(true));
 
 // 넘길 카드가 남았으면 덱을 살짝 끌어 보이고(옆으로), 아니면 화면을 위로 끌어 올려 보인다(아래로 넘기면 다음 장면).
 // 휴대폰은 위로 밀면 바로 다음 장면이라 두 안내를 번갈아(장면 넘김부터)
@@ -967,8 +896,6 @@ if (stage && new URLSearchParams(location.search).has('capture')) {
     probe: () => ({ drone: actors.drone.pos.toArray().map((v) => +v.toFixed(2)), cam: stage.camera.position.toArray().map((v) => +v.toFixed(2)), exposure: +stage.film.uniforms.uExposure.value.toFixed(2), booting }),
     // 부팅 화면의 진행률을 고정(0~1) · 해제(-1)
     bootAt: (p) => (bootPin = p),
-    // 카운트다운 화면(n = 3 · 2 · 1, 그 초의 중간)
-    bootCount: (n = 2) => countdown(n - 0.5, 3),
     // 걷히는 움직임을 멈추고 sec초 지점을 보여 준다
     leaveAt: (sec) => leaveTl?.pause().seek(sec),
     freeze: () => (frozen = true),
