@@ -865,6 +865,48 @@ a.pv-chip:focus-visible {
   font-size: calc(var(--s-small) * 0.92);
   color: var(--t3);
 }
+/* 사진 위: 그 프로젝트가 받은 가장 높은 상 · 공식 보도 수 */
+.pv-tile {
+  position: relative;
+}
+.pv-marks {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  pointer-events: none;
+}
+.pv-marks i,
+.pv-news-p i {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 0.3em 0.7em;
+  border-radius: 999px;
+  background: rgba(17, 19, 23, 0.82);
+  font-size: calc(var(--s-small) * 0.9);
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fff;
+  white-space: nowrap;
+}
+.pv-marks small {
+  font-size: 0.85em;
+  font-weight: 600;
+  opacity: 0.75;
+}
+.pv-marks .is-grand,
+.pv-news-p .is-grand {
+  background: #f4cf73;
+  color: #111317;
+}
+.pv-marks .is-press {
+  background: var(--ac);
+}
 /* 가로 막대(한 축 · 값은 막대 끝) */
 .pv-bars {
   display: grid;
@@ -1005,6 +1047,57 @@ a.pv-chip:focus-visible {
   color: var(--t2);
   word-break: keep-all;
   text-wrap: balance;
+}
+/* 표지: 목표 · 준비 중, 그리고 기록 네 숫자 */
+.pv-goal {
+  display: grid;
+  gap: 6px;
+  padding: calc(var(--g) * 0.8) calc(var(--g) * 1);
+  border-left: 3px solid var(--ac);
+  background: var(--panel);
+  border-radius: 0 var(--r) var(--r) 0;
+}
+.pv-goal div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+.pv-goal dt {
+  flex: none;
+  width: 4.2em;
+  font-family: var(--mono);
+  font-size: var(--s-over);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ac);
+}
+.pv-goal dd {
+  font-size: var(--s-body);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  word-break: keep-all;
+}
+.pv-proof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  font-size: var(--s-small);
+  font-weight: 600;
+  color: var(--t2);
+}
+.pv-proof span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.pv-proof b {
+  font-family: var(--display);
+  font-size: 1.7em;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
 }
 .pv-mosaic {
   display: grid;
@@ -1618,18 +1711,59 @@ kbd {
   font-weight: 400;
   color: var(--t3);
 }
-.pv-tags {
+.pv-org {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-}
-.pv-tags span {
-  padding: 0.3em 0.85em;
-  border: 1px solid var(--hair-2);
-  border-radius: 999px;
+  align-items: baseline;
+  gap: 4px 14px;
   font-size: var(--s-small);
   font-weight: 600;
   color: var(--t2);
+}
+.pv-org a {
+  display: inline-flex;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 1px solid var(--hair-2);
+}
+.pv-org a i {
+  font-style: normal;
+  color: var(--ac);
+}
+.pv-org a:hover {
+  color: var(--ac);
+}
+/* 가는 길: 지금 → 다음 → 목표 */
+.pv-path {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.pv-path li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: calc(var(--g) * 0.7) calc(var(--g) * 0.8);
+  border-radius: calc(var(--r) * 0.8);
+  background: var(--panel);
+}
+.pv-path li:last-child {
+  background: color-mix(in srgb, var(--ac) 10%, #fff);
+}
+.pv-path small {
+  font-family: var(--mono);
+  font-size: var(--s-over);
+  letter-spacing: 0.1em;
+  color: var(--ac);
+}
+.pv-path b {
+  font-size: var(--s-small);
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--ink);
+  word-break: keep-all;
 }
 .pv-role-m p {
   display: grid;
@@ -1663,10 +1797,31 @@ kbd {
   gap: var(--g) calc(var(--g) * 0.7);
 }
 .pv-match > li {
+  position: relative;
   display: grid;
   align-content: start;
   gap: 8px;
   min-width: 0;
+}
+/* 사진 위: 무인 정찰의 흐름에서 맡는 자리 */
+.pv-mt-f {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  gap: 6px;
+  padding: 0.3em 0.75em;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: calc(var(--s-small) * 0.9);
+  font-weight: 700;
+  color: var(--ink);
+  pointer-events: none;
+}
+.pv-mt-f b {
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--ac);
 }
 .pv-match .pv-ph {
   aspect-ratio: 16 / 9;
@@ -1855,22 +2010,67 @@ kbd {
   color: var(--t3);
 }
 .pv-c-aw {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 6px;
 }
-.pv-c-aw span {
-  display: inline-flex;
-  gap: 8px;
-  padding: 0.35em 0.9em;
-  border-radius: 999px;
+.pv-c-aw li {
+  display: grid;
+  grid-template-columns: 4.6em minmax(0, 1fr);
+  align-items: baseline;
+  gap: 10px;
+  padding: 0.45em 0.9em;
+  border-radius: calc(var(--r) * 0.7);
   background: var(--panel);
   font-size: var(--s-small);
   font-weight: 600;
   color: var(--t2);
 }
 .pv-c-aw b {
+  font-weight: 800;
+  white-space: nowrap;
   color: var(--hot);
+}
+.pv-c-aw .is-press b {
+  color: var(--ink);
+}
+.pv-c-aw span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* 사례 끝 줄: 무인 정찰의 흐름 넷 가운데 이 사례가 맡는 자리 · 자세히 보기 */
+.pv-c-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 18px;
+}
+.pv-c-to {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: calc(var(--s-small) * 0.92);
+  font-weight: 600;
+  color: var(--t3);
+}
+.pv-c-to small {
+  margin-right: 6px;
+  font-family: var(--mono);
+  font-size: var(--s-over);
+  letter-spacing: 0.08em;
+  color: var(--t3);
+}
+.pv-c-to span {
+  padding: 0.25em 0.7em;
+  border: 1px solid var(--hair-2);
+  border-radius: 999px;
+}
+.pv-c-to .is-on {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
 }
 .pv-c-role {
   display: flex;
@@ -1991,32 +2191,116 @@ kbd {
   color: var(--ink);
   word-break: keep-all;
 }
-.pv-press {
+.pv-certs .is-key {
+  background: color-mix(in srgb, var(--ac) 10%, #fff);
+}
+/* 다루는 기술: 갈래 · 기술 이름 */
+.pv-stack {
   display: grid;
   border-top: 1px solid var(--hair-2);
 }
-.pv-press a {
+.pv-stack div {
   display: grid;
-  gap: 3px;
+  grid-template-columns: 9.5em minmax(0, 1fr);
+  gap: 12px;
   padding: calc(var(--g) * 0.55) 0;
   border-bottom: 1px solid var(--hair);
-  transition: color 0.3s;
 }
-.pv-press small {
+.pv-stack dt {
+  font-size: var(--s-small);
+  font-weight: 700;
+  color: var(--ac);
+  word-break: keep-all;
+}
+.pv-stack dd {
+  font-size: var(--s-small);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.pv-stack dd i {
+  font-style: normal;
+  color: var(--t3);
+}
+
+/* 공식 보도: 기사 사진 카드 */
+.pv-news {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--g) calc(var(--g) * 0.7);
+}
+.pv-news a {
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  height: 100%;
+}
+.pv-news .pv-ph {
+  aspect-ratio: 16 / 9;
+}
+.pv-news .pv-ph img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pv-news small {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
   font-size: calc(var(--s-small) * 0.92);
   font-weight: 600;
   color: var(--t3);
 }
-.pv-press b {
+.pv-news small em {
+  font-style: normal;
+  color: var(--ac);
+}
+.pv-news b {
+  display: -webkit-box;
   overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   font-size: var(--s-small);
   font-weight: 700;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  line-height: 1.4;
   color: var(--ink);
+  word-break: keep-all;
 }
-.pv-press a:hover b {
+.pv-news a:hover b {
   color: var(--ac);
+}
+.pv-news-p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-self: end;
+  gap: 6px;
+  font-size: calc(var(--s-small) * 0.92);
+  font-weight: 600;
+  color: var(--t2);
+}
+.pv-news-p i {
+  padding: 0.2em 0.65em;
+}
+.pv-news-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-size: calc(var(--s-small) * 0.92);
+  font-weight: 600;
+  color: var(--t3);
+}
+.pv-news-more a {
+  color: var(--t2);
+}
+.pv-news-more a:hover {
+  color: var(--ac);
+}
+.pv-news-more i {
+  font-style: normal;
 }
 
 /* 자기계발 계획 */
@@ -2268,6 +2552,24 @@ kbd {
 }
 .is-stage .pv-motto {
   font-size: 22px;
+}
+.is-stage .pv-cover .pv-goal {
+  margin-top: 14px;
+  gap: 10px;
+  padding: 18px 24px;
+}
+.is-stage .pv-goal dt {
+  font-size: 14px;
+}
+.is-stage .pv-goal dd {
+  font-size: 22px;
+}
+.is-stage .pv-proof {
+  gap: 10px 30px;
+  font-size: 16px;
+}
+.is-stage .pv-proof b {
+  font-size: 34px;
 }
 .is-stage .pv-mosaic {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2599,17 +2901,33 @@ kbd {
 }
 .is-stage .pv-target {
   align-content: center;
-  gap: 28px;
+  gap: 18px;
 }
 .is-stage .pv-target h2 {
-  font-size: 72px;
+  font-size: 56px;
+}
+.is-stage .pv-org {
+  margin-top: -4px;
+  font-size: 17px;
 }
 .is-stage .pv-flow li {
-  font-size: 22px;
+  font-size: 20px;
+}
+.is-stage .pv-target .pv-lead {
+  font-size: 19px;
+}
+.is-stage .pv-path li {
+  padding: 14px 18px;
+}
+.is-stage .pv-path small {
+  font-size: 13px;
+}
+.is-stage .pv-path b {
+  font-size: 15px;
 }
 .is-stage .pv-role-m .pv-slot {
   height: auto;
-  min-height: 110px;
+  min-height: 76px;
 }
 
 /* 요구 역량: 머리 + 3 × 2 */
@@ -2635,6 +2953,18 @@ kbd {
 }
 .is-stage .pv-mt b {
   font-size: 26px;
+}
+.is-stage .pv-mt-f {
+  top: 12px;
+  left: 12px;
+  font-size: 14px;
+}
+.is-stage .pv-marks {
+  top: 10px;
+  left: 10px;
+}
+.is-stage .pv-marks i {
+  font-size: 13.5px;
 }
 
 /* 비교과 이수 내역: 왼쪽 캡처, 오른쪽 숫자 여섯 */
@@ -2689,7 +3019,7 @@ kbd {
 }
 .is-stage .pv-ctext {
   align-content: center;
-  gap: 20px;
+  gap: 16px;
 }
 .is-stage .pv-ctext h2 {
   font-size: 48px;
@@ -2703,6 +3033,15 @@ kbd {
 .is-stage .pv-steps li {
   font-size: 18px;
   padding: 8px 0;
+}
+.is-stage .pv-c-aw li {
+  font-size: 15px;
+}
+.is-stage .pv-c-to {
+  font-size: 14px;
+}
+.is-stage .pv-c-to small {
+  font-size: 12.5px;
 }
 
 /* 수상: 왼쪽 — 제목 · 등급 막대 · 모두 보기, 오른쪽 — 대상 상장 일곱 장(네 장 + 세 장) */
@@ -2822,14 +3161,51 @@ kbd {
 .is-stage .pv-certs b {
   font-size: 17px;
 }
-.is-stage .pv-press {
+.is-stage .pv-stack {
   align-content: start;
 }
-.is-stage .pv-press a {
+.is-stage .pv-stack div {
+  grid-template-columns: 200px minmax(0, 1fr);
   padding: 15px 0;
 }
-.is-stage .pv-press b {
+.is-stage .pv-stack dt,
+.is-stage .pv-stack dd {
+  font-size: 17px;
+}
+
+/* 공식 보도: 머리 + 기사 사진 3 × 2 + 나머지 기사 한 줄 */
+.is-stage .jr-slide[data-layout='press'] .jr-fit {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 30px;
+}
+.is-stage .pv-news {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: 1fr 1fr;
+  gap: 26px 30px;
+}
+.is-stage .pv-news a {
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  gap: 8px;
+}
+.is-stage .pv-news .pv-ph {
+  aspect-ratio: auto;
+}
+.is-stage .pv-news small {
+  font-size: 13.5px;
+}
+.is-stage .pv-news b {
   font-size: 18px;
+  -webkit-line-clamp: 1;
+}
+.is-stage .pv-news-p {
+  font-size: 14px;
+}
+.is-stage .pv-news-p i {
+  font-size: 12.5px;
+}
+.is-stage .pv-news-more {
+  font-size: 14px;
 }
 
 /* 자기계발 계획: 머리 + 표 */
@@ -3066,11 +3442,23 @@ kbd {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .pv-certs,
-  .pv-wall {
+  .pv-wall,
+  .pv-news {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .pv-rec {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 599px) {
+  .pv-path {
+    grid-template-columns: 1fr;
+  }
+  .pv-path li {
+    grid-template-columns: 3.2em minmax(0, 1fr);
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 12px;
   }
 }
 @media (max-width: 380px) {
@@ -3184,8 +3572,17 @@ kbd {
   .pv-goals,
   .pv-years,
   .pv-match,
-  .pv-certs {
+  .pv-certs,
+  .pv-news {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .pv-news .pv-ph {
+    aspect-ratio: 16 / 7;
+  }
+  .pv-news-more,
+  .pv-c-to,
+  .pv-proof {
+    display: none;
   }
   .pv-grid8,
   .pv-wall,

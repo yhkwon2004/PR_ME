@@ -22,6 +22,7 @@ export const TARGET = {
   org: '국방과학연구소 Agency for Defense Development',
   job: '연구직 — 항공·무인기 · 감시정찰 분야',
   url: 'https://www.add.re.kr',
+  grad: '로보틱스 대학원(석사)',
   path: [
     ['지금', '원광대 컴퓨터소프트웨어공학 · JST 스마트 모빌리티 SW 복수전공'],
     ['다음', '로보틱스 대학원(석사) — 준비 중'],
