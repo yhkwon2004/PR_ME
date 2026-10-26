@@ -7,6 +7,7 @@
 //   data-layout이 stack · cols가 아닌 묶음은 무대에서 그 구도(CSS)대로 한 장에 담는다. 휴대폰 · 세로 화면은 블록을 화면 크기에 맞춰 나눠 담는다.
 // 넘기기: 끌기(손가락 · 마우스를 그대로 따라온다 — 옆으로, 위아래로) · 휠 · ← → · 쪽 탭 · 아래 진행 막대.
 // 화면 크기가 바뀌면 다시 나눠 담고(무대는 크기만 다시 맞춘다) 보던 자리를 지킨다.
+// 발표 노트(N): 묶음마다 권장 시간(data-time) · 대본(data-note) — 본편의 계획 시간과 지금까지 걸린 시간을 함께 보인다(T로 타이머를 처음부터).
 import gsap from 'gsap';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -16,6 +17,8 @@ const STAGE_H = 900;
 // 무대를 쓰는 화면: 넉넉한 가로 화면(가로세로 1.25 이상 · 폭 900 · 높이 500 이상)
 const stageFits = (w, h) => w >= 900 && h >= 500 && w / h >= 1.25;
 const pad = (n) => String(n).padStart(2, '0');
+const escH = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const clock = (sec) => `${Math.floor(sec / 60)}:${pad(Math.floor(sec % 60))}`;
 const hOf = (n) => n.getBoundingClientRect().height;
 const el = (tag, cls) => {
   const e = document.createElement(tag);
@@ -48,6 +51,8 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     anchors: (g.dataset.anchor || '').split(/\s+/).filter(Boolean),
     stage: g.dataset.stage || '',
     q: g.dataset.q || '',
+    time: +g.dataset.time || 0,
+    note: g.dataset.note || '',
     head: g.querySelector(':scope > [data-head]'),
     blocks: [...g.children].filter((b) => !b.hasAttribute('data-head')),
   }));
@@ -69,6 +74,41 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
 
   // 화면 한 장의 뼈대: 무대(넓은 화면에서 1600×900) 안에 위 한 줄(쪽 · 묶음 · 몇째 화면 · 네 장 표시) + 본문 + 아래 한 줄(이름 · 쪽수)
   const chapters = SECS.filter((x) => x.no);
+  // 본편의 계획: 묶음마다 '여기까지 끝났어야 할 시각'(초) — 시간이 없는 묶음(부록)은 계획 밖
+  const planEnd = new Map();
+  let planTotal = 0;
+  GROUPS.forEach((g) => {
+    if (!g.time) return;
+    planTotal += g.time;
+    planEnd.set(g, planTotal);
+  });
+  const notesEl = el('aside', 'jr-notes');
+  notesEl.hidden = true;
+  notesEl.setAttribute('aria-label', '발표 노트');
+  notesEl.innerHTML = '<p class="jr-notes-h"></p><p class="jr-notes-t"></p>';
+  root.append(notesEl);
+  let notesOn = false;
+  let t0 = 0; // 타이머: 표지에서 처음 넘길 때 시작
+  let tickT = 0;
+  function showNotes() {
+    if (!notesOn || !slides[index]) return;
+    const { g } = slides[index];
+    const sec = t0 ? (Date.now() - t0) / 1000 : 0;
+    const end = planEnd.get(g);
+    const late = end && sec > end + 3;
+    const plan = g.time ? `<span>권장 <b>${g.time}초</b></span><span>계획 ${clock(end - g.time)} → ${clock(end)} / ${clock(planTotal)}</span>` : '<span>부록 — 계획 시간 밖</span>';
+    notesEl.querySelector('.jr-notes-h').innerHTML = `<span><b>${pad(index + 1)}</b> / ${pad(slides.length)} · ${escH(g.title)}</span>${plan}<span class="${t0 ? (late ? 'is-late' : 'is-ok') : ''}">지금 <b>${clock(sec)}</b>${t0 ? (late ? ` · ${Math.round(sec - end)}초 늦음` : '') : ' · 넘기면 시작'}</span><span class="jr-notes-k">N 닫기 · T 처음부터</span>`;
+    notesEl.querySelector('.jr-notes-t').textContent = g.note || '대본 없음';
+  }
+  function toggleNotes(on = !notesOn) {
+    notesOn = on;
+    notesEl.hidden = !on;
+    clearInterval(tickT);
+    if (on) {
+      showNotes();
+      tickT = setInterval(showNotes, 1000);
+    }
+  }
   function shell(g) {
     const s = el('section', 'jr-slide');
     s.dataset.sec = g.sec.id;
@@ -422,6 +462,8 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     });
     barLine?.style.setProperty('--sp', slides.length > 1 ? (index / (slides.length - 1)).toFixed(4) : '1');
     live.textContent = s.el.getAttribute('aria-label');
+    if (index > 0 && !t0) t0 = Date.now();
+    showNotes();
   }
 
   // 지금 화면과 양옆만 그린다(나머지는 칠하지 않는다)
@@ -437,10 +479,24 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     near = want;
   }
 
+  // 사진 목록(srcset)에서 고를 크기: 그 사진이 지금 화면에 그려지는 크기(무대 배율 · 잘라 채우기까지) — 미리 적어 둔 sizes는
+  // 1600 무대 기준이라 전체 화면 · 큰 모니터에서 작은 파일을 골라 흐려진다. 화면 크기가 바뀌면 다시 재고, 브라우저가 더 큰 파일로 바꾼다
+  function sizeImg(im) {
+    if (!im.dataset.srcset && !im.getAttribute('srcset')) return;
+    const r = im.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4) return;
+    const ar = +im.getAttribute('width') / +im.getAttribute('height') || 0;
+    const need = Math.max(r.width, getComputedStyle(im).objectFit === 'cover' && ar ? r.height * ar : 0);
+    const v = `${Math.ceil(need)}px`;
+    if (im.getAttribute('sizes') !== v) im.setAttribute('sizes', v);
+  }
+  const sizeAll = () => track.querySelectorAll('img[srcset]').forEach(sizeImg);
+
   // 사진은 지금 화면과 가까운 화면 것만 받는다
   function warm() {
     for (let k = index - 1; k <= index + 2; k++) {
       slides[k]?.el.querySelectorAll('img[data-src]').forEach((im) => {
+        sizeImg(im);
         if (im.dataset.srcset) im.srcset = im.dataset.srcset;
         im.src = im.dataset.src;
         im.removeAttribute('data-src');
@@ -515,9 +571,21 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
   };
   addEventListener('beforeprint', beforePrint);
   addEventListener('afterprint', afterPrint);
+  // 글꼴을 미리 받아 둔다 — 한글 글꼴은 글자 묶음(subset)마다 따로 받으므로 덱의 모든 글자를 한 번에 요청한다.
+  // 그래야 넘길 때 글자가 대체 글꼴로 잠깐 바뀌어 보이지 않고, PDF에도 대체 글꼴이 찍히지 않는다
+  let fontsP = null;
+  function loadFonts() {
+    if (!document.fonts?.load) return Promise.resolve();
+    if (!fontsP) {
+      const text = [...new Set(root.textContent)].join('');
+      fontsP = Promise.all(['700 16px "Pretendard Variable"', '600 16px "Space Grotesk Variable"', '500 16px "JetBrains Mono"'].map((f) => document.fonts.load(f, text).catch(() => null)));
+    }
+    return fontsP;
+  }
   async function printDeck() {
     forPrint();
-    await loadAll();
+    await Promise.all([loadAll(), loadFonts()]);
+    await document.fonts?.ready;
     print();
   }
 
@@ -539,6 +607,7 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     setNear([index - 1, index, index + 1]);
     paint(state.x);
     warm();
+    sizeAll();
     hash();
     // 보던 화면이 숨겨지면 포커스를 덱으로(사라진 링크에 남지 않게)
     if (document.activeElement && !document.activeElement.isConnected) view.focus({ preventScroll: true });
@@ -853,6 +922,12 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
       return true;
     }
     if (e.key === 'f' || e.key === 'F') return toggleFull(), true;
+    if (e.key === 'n' || e.key === 'N') return toggleNotes(), true;
+    if (e.key === 't' || e.key === 'T') {
+      t0 = index > 0 ? Date.now() : 0;
+      showNotes();
+      return true;
+    }
     if (e.key === 'b' || e.key === 'B' || e.key === '.') return black(true), true;
     if (e.key === 'Home') return go(0), true;
     // 0 표지 · 1 — 4 그 번호의 장(STEP 1 — 4)의 첫 화면(장 표지)
@@ -885,6 +960,7 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
   });
   ro.observe(view);
   if (view.clientWidth && view.clientHeight) relayout(true);
+  (window.requestIdleCallback || ((f) => setTimeout(f, 900)))(() => alive && loadFonts());
   // 글꼴이 늦게 오면 다시 잰다 — 한글 글꼴은 글자 묶음마다 나중에 받아 오므로(dynamic subset) 받을 때마다.
   // 무대는 구도가 그대로라 넘침만 다시 맞추고, 흘려 담는 화면은 다시 나눠 담는다
   let ft = 0;
@@ -935,6 +1011,7 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     destroy() {
       alive = false;
       clearTimeout(ft);
+      clearInterval(tickT);
       document.fonts?.removeEventListener?.('loadingdone', onFonts);
       document.removeEventListener('fullscreenchange', onFull);
       removeEventListener('beforeprint', beforePrint);

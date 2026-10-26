@@ -122,12 +122,12 @@ export const scenes = [
     category: 'robotics',
     kicker: 'ROBOTICS & AI — 로봇 · AI',
     title: ['ROBOTICS', '& AI'],
-    subtitle: '몸을 가진 지능과 보는 지능 — 4족보행 · 해커톤 로봇에서 포즈 추천 · 증거 정리 · 음성 합성 AI까지',
+    subtitle: '몸을 가진 지능과 보는 지능 — 4족보행 · 해커톤 로봇에서 포즈 추천 · 증거 정리 · 작업자 안전 · 음성 합성 AI까지',
     stats: [
       { value: '전국 2위', label: 'HUSS AI 경진대회' },
       { value: '33.7%', label: '작성·정리 속도 향상' },
     ],
-    projects: ['ai-pose-guide', 'huss-evidence-ai', 'legal-ai-platform', 'gan-tts', 'robot-push-hackathon', 'quadruped-robot'],
+    projects: ['ai-pose-guide', 'huss-evidence-ai', 'worker-posture-ios', 'legal-ai-platform', 'gan-tts', 'robot-push-hackathon', 'quadruped-robot'],
   },
   {
     // 창업 · 제품개발: 격납고 위 크레인 숏 — 직접 만들어 팔고 · 입점하고 · 기부한 제품들
@@ -194,10 +194,13 @@ export const scenes = [
     layout: 'finale',
     hold: 0,
     kicker: 'END CREDITS',
-    // 엔딩 크레딧: 네 장면(비트) — 한 장씩 가운데에 들어와 잠깐 머문 뒤 넘어간다(약 6초)
+    // 엔딩 크레딧: 여섯 장면(비트) — 한 장씩 가운데에 들어와 잠깐 머문 뒤 넘어간다(약 10초)
+    // 이름 → 분야 → 주연(대표 프로젝트 사진 · 받은 상) → 기록(수상 · 대상 · 보도 · 대상 받은 대회) → 함께한 곳(로고) → 감사
     credits: [
       { beat: 'lead', role: 'Written, Directed & Engineered by', name: '권용현', en: 'Yonghyun Kwon' },
       { beat: 'words', role: 'Featuring', words: ['Drone', 'Robot', 'Mobility', 'AI'] },
+      { beat: 'cast', role: 'Starring', title: '대표 프로젝트' },
+      { beat: 'record', role: 'Awards & Press', title: '대상을 받은 대회' },
       { beat: 'with', role: 'With', title: '함께한 학교 · 기관 · 상을 준 곳' },
       { beat: 'thanks', role: 'Special Thanks', line: '함께 만든 팀원들 · 지도해 주신 교수님들', big: '끝까지 봐 주셔서 감사합니다' },
     ],

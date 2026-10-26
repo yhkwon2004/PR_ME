@@ -480,8 +480,8 @@
     "file": "media/projects/airsim-driving/01.webp",
     "caption": "교차로에서 정지 표지판 옆을 돌아 나가는 차량",
     "kind": "screenshot",
-    "w": 640,
-    "h": 360
+    "w": 1280,
+    "h": 720
    },
    {
     "file": "media/projects/airsim-driving/02.webp",
@@ -494,22 +494,22 @@
     "file": "media/projects/airsim-driving/03.webp",
     "caption": "주택가 도로를 직진하는 차량 (API 제어 모드)",
     "kind": "screenshot",
-    "w": 640,
-    "h": 360
+    "w": 1280,
+    "h": 720
    },
    {
     "file": "media/projects/airsim-driving/04.webp",
     "caption": "교차로에 접근하는 차량과 조향 값 표시",
     "kind": "screenshot",
-    "w": 640,
-    "h": 360
+    "w": 1280,
+    "h": 720
    },
    {
     "file": "media/projects/airsim-driving/05.webp",
     "caption": "회전 후 그늘진 주택가 도로를 주행",
     "kind": "screenshot",
-    "w": 640,
-    "h": 360
+    "w": 1280,
+    "h": 720
    },
    {
     "file": "media/projects/carla-e2e/01.webp",

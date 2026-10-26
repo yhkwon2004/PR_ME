@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import { profile, scenes } from '../content.js';
-import { byId, projects as ALL_PROJECTS, categoryOf } from '../data/projects.js';
-import { AWARDS, AWARD_REEL } from '../data/awards.js';
+import { byId, projects as ALL_PROJECTS, categoryOf, FEATURED } from '../data/projects.js';
+import { AWARDS, AWARD_REEL, bestOf } from '../data/awards.js';
 import { ORGS, WALL } from '../data/orgs.js';
 import { projectCard, awardCard, pressCard, orgMark, deckInfo, deckAwardInfo, deckPressInfo, deckAllCard, deckAllInfo } from '../pages/site.js';
 import { PRESS } from '../data/press.js';
@@ -74,6 +74,35 @@ function creditBeat(c, kicker) {
       <p ${a(0)}><span class="cb-role">${esc(c.role)}</span></p>
       <ul>${c.words.map((w, j) => `<li ${a(j + 1)}>${esc(w)}</li>`).join('')}</ul>
     </section>`;
+  // 주연: 대표 프로젝트 여덟 — 사진 · 이름 · 받은 가장 높은 상
+  if (c.beat === 'cast') {
+    const feat = FEATURED.map(byId).filter((p) => p && p.cover);
+    return `<section class="cb cb-cast">
+      <p ${a(0)}><span class="cb-role">${esc(c.role)}</span> <span class="cb-title">${esc(c.title)} <b>${feat.length}</b></span></p>
+      <ul class="cb-cast-list">${feat
+        .map((p, j) => {
+          const b = bestOf(p);
+          return `<li ${a(1 + j)}><span class="cb-ph"><img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async" /></span><b>${esc(p.title)}</b><small>${esc(p.year)}${b ? ` · <em class="is-${b.key}">${esc(b.label)}</em>` : ''}</small></li>`;
+        })
+        .join('')}</ul>
+    </section>`;
+  }
+  // 기록: 큰 숫자 넷 + 대상을 받은 대회 이름
+  if (c.beat === 'record') {
+    const grand = AWARDS.filter((x) => x.tier === 1);
+    const nums = [
+      [ALL_PROJECTS.length, 'Projects', '프로젝트'],
+      [AWARDS.length, 'Awards', '수상'],
+      [grand.length, 'Grand Prize', '대상'],
+      [PRESS.length, 'Press', '공식 보도'],
+    ];
+    return `<section class="cb cb-record">
+      <p ${a(0)}><span class="cb-role">${esc(c.role)}</span></p>
+      <dl class="cb-nums">${nums.map(([n, en, ko], j) => `<div ${a(1 + j)}><dd>${n}</dd><dt>${esc(en)}<span>${esc(ko)}</span></dt></div>`).join('')}</dl>
+      <p class="cb-grand-h" ${a(5)}>${esc(c.title)}</p>
+      <ul class="cb-grand">${grand.map((x, j) => `<li ${a(6 + Math.floor(j / 2))}><time>${esc(x.date.slice(0, 4))}</time>${esc(x.contest)}</li>`).join('')}</ul>
+    </section>`;
+  }
   if (c.beat === 'with')
     return `<section class="cb cb-with">
       <p ${a(0)}><span class="cb-role">${esc(c.role)}</span> <span class="cb-title">${esc(c.title)} <b>${WALL.length}</b></span></p>
@@ -229,18 +258,16 @@ function render(scene, i) {
             (l) => `<li><a href="${esc(l.url)}" ${l.url.startsWith('mailto') ? '' : 'target="_blank" rel="noopener"'}><span>${esc(l.label)}</span><b>${esc(l.value)}</b><i aria-hidden="true">↗</i></a></li>`
           )
           .join('')}</ul>
-        <dl class="end-stats" data-r>
-          <div><dt>Projects</dt><dd>${ALL_PROJECTS.length}</dd></div>
-          <div><dt>Awards</dt><dd>${AWARDS.length}</dd></div>
-          <div><dt>Press</dt><dd>${PRESS.length}</dd></div>
-          <div><dt>With</dt><dd>${WALL.length}</dd></div>
-        </dl>
+        <nav class="endcard-links" data-r aria-label="더 보기">${[
+          ['/present', '발표 자료'],
+          ['/works', `프로젝트 ${ALL_PROJECTS.length}`],
+          ['/awards', `수상 ${AWARDS.length} · 상장`],
+          ['/skills', '보유 스킬'],
+          ['/resume', '이력서 · PDF'],
+        ]
+          .map(([href, t]) => `<a href="${href}" data-link>${esc(t)}<i aria-hidden="true">↗</i></a>`)
+          .join('')}</nav>
         <div class="endcard-actions" data-r>
-          <a class="btn-works" href="/resume" data-link>이력서 · PDF <span aria-hidden="true">↗</span></a>
-          <a class="btn-works" href="/present" data-link>발표 자료 — 성장 과정 · 보유 역량 · 미래 계획 <span aria-hidden="true">↗</span></a>
-          <a class="btn-works" href="/works" data-link>모든 프로젝트 보기 <span aria-hidden="true">↗</span></a>
-          <a class="btn-works" href="/awards" data-link>수상 기록 · 상장 <span aria-hidden="true">↗</span></a>
-          <a class="btn-works" href="/skills" data-link>보유 스킬 <span aria-hidden="true">↗</span></a>
           <button type="button" class="btn-replay" id="btn-replay"><span aria-hidden="true">↺</span> 처음부터 다시 보기</button>
           <span class="sig">${esc(profile.name)} · ${esc(profile.en)} — ${esc(profile.role)}</span>
         </div>
@@ -1019,8 +1046,8 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
   // 엔딩 크레딧: 네 비트가 차례로 — 비트마다 가운데로 빠르게 들어와(글자 · 로고가 순서대로 켜지고) 잠깐 머문 뒤 넘어간다.
   // 휠 · 손가락으로 앞뒤로 넘겨 볼 수 있고(손을 떼면 2초 뒤 다시), 방향키 · 크레딧 밖 휠은 한 비트씩
   let creditsCtl = null;
-  // 비트마다 머무는 초 · 비트 사이를 넘어가는 초(약 6초에 네 비트)
-  const HOLD = { 'cb-lead': 1.05, 'cb-words': 1.1, 'cb-with': 1.3, 'cb-thanks': 1.15 };
+  // 비트마다 머무는 초 · 비트 사이를 넘어가는 초(약 10초에 여섯 비트 — 사진 · 글이 많은 비트는 조금 더)
+  const HOLD = { 'cb-lead': 1.05, 'cb-words': 0.95, 'cb-cast': 1.6, 'cb-record': 1.6, 'cb-with': 1.3, 'cb-thanks': 1.2 };
   const MOVE = 0.45;
   function runCredits(el, delay) {
     const roll = el.querySelector('.credits-roll');

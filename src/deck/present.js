@@ -1,7 +1,9 @@
 // ── 발표 자료(/present) — 2026-1 포트폴리오 경진대회 안내서의 목차 그대로 ──
-// 표지 · 목차 → 00 나를 소개합니다 → STEP1 자기이해 → STEP2 직업탐색 → STEP3 진로계획 및 비교과 설계 → STEP4 미래설계 → 마치며
+// 본편(약 4분): 표지 · 목차 → 00 나를 소개합니다 → STEP1 자기이해 → STEP2 직업탐색 → STEP3 진로계획 및 비교과 설계 → STEP4 미래설계 → 마치며
+// 부록(질문 대비): 배움의 길 · 일하는 방식 · 학년별 이력 · 사례 둘 · 공식 보도 · 수상 · 봉사 · 자격 — 본편에서 다 못 한 근거를 모아 둔다
 // 목표: ADD 무인 감시정찰 연구원(로보틱스 대학원을 거쳐) — 대표 프로젝트마다 받은 상 · 보도를 붙여 근거를 보인다
-// 29장 · 10분 발표 — 글은 짧게, 사진은 크게. 문장 · 숫자는 모두 기록(content · data)에서 가져온다(지어내지 않는다).
+// 화면마다 권장 시간(time, 초)과 발표 대본(note)을 단다 — 덱에서 N을 누르면 발표 노트 · 타이머가 뜬다.
+// 문장 · 숫자는 모두 기록(content · data)에서 가져온다(지어내지 않는다). 대본은 그 기록으로 쓴 제안이라, 본인 말투로 고쳐 쓰면 된다.
 // 본인만 아는 CarHub 기록(검사 결과 · 캡처 · 롤모델 · WON+ 계획 · 10년/30년 후)은 deck/carhub.js — 비어 있으면 '입력 예정' 자리로 보인다.
 // 발표 자료는 포트폴리오(3D 필름 · 아카이브)와 따로 산다: 내용 deck/present.js · 넘기기 deck/pager.js · 모양 deck/deck.css(밝은 종이) · SWOT · 계획 deck/plan.js
 // 쪽(data-sec) → 화면(data-grp) → 블록(.jr-b)으로 적는다. deck/pager.js가 넓은 화면에서는 1600×900 무대에 화면 한 장씩(data-layout의 구도대로),
@@ -16,13 +18,14 @@ import { STAGES, VALUES, PRELUDE } from '../data/growth.js';
 import { SWOT, STRATEGY, PLAN, TARGET } from './plan.js';
 import { CARHUB } from './carhub.js';
 
-// 발표 순서(위 탭 · 목차 · 장 표지): id · 이름 · 영문 · 짧은 이름 · 번호
+// 발표 순서(위 탭 · 목차 · 장 표지): id · 이름 · 영문 · 짧은 이름 · 번호(숫자 키)
 export const PR_SECS = [
   ['about', '나를 소개합니다', 'ABOUT ME', '소개', '00'],
   ['self', '자기이해', 'STEP 1', '자기이해', '01'],
   ['job', '직업탐색', 'STEP 2', '직업탐색', '02'],
   ['path', '진로계획 · 비교과', 'STEP 3', '진로 · 비교과', '03'],
   ['future', '미래설계', 'STEP 4', '미래설계', '04'],
+  ['more', '부록 — 질문 대비', 'APPENDIX', '부록', '05'],
 ];
 
 // 사이트 쪽 도우미(글자 이스케이프 · 사진 · 상장)를 받아 덱을 만든다
@@ -33,6 +36,9 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
   const vol = profile.volunteer;
   const volH = `${vol.hours}시간${vol.minutes ? ` ${vol.minutes}분` : ''}`;
   const sch = profile.scholarship;
+  const SW = Object.fromEntries(SWOT.map((q) => [q.key, q]));
+  const ST = Object.fromEntries(STRATEGY.map((x) => [x.key, x]));
+  const [now, next, goal] = ['now', 'next', 'goal'].map((k) => PLAN.find((c) => c.key === k));
   // 프로젝트의 n번째 사진(파일 이름 01 · 02 …) — 없으면 대표 사진. shotOf는 주소(장 표지 배경), picOf는 사진(타일 · 큰 사진)
   const picOf = (id, n) => {
     const p = byId(id);
@@ -42,8 +48,12 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
   const ph = (im, sizes, cls = '') => (im ? `<span class="pv-ph${cls ? ` ${cls}` : ''}">${img(im, { sizes })}</span>` : `<span class="pv-ph is-none${cls ? ` ${cls}` : ''}"></span>`);
 
   // 화면 하나: layout은 넓은 화면의 구도, bare는 위 · 아래 표시 없이(표지 · 장 표지 · 마치며)
-  const grp = (id, o, inner) =>
-    `<div data-grp="${id}" data-title="${esc(o.title || '')}" data-layout="${o.layout || 'stack'}"${o.flow ? ` data-flow="${o.flow}"` : ''}${o.anchor ? ` data-anchor="${o.anchor}"` : ''}${o.bg ? ` data-bg="${esc(o.bg)}"` : ''}${o.bare ? ' data-bare' : ''}>${inner}</div>`;
+  // time: 본편에서 이 화면에 쓸 권장 초 · note: 발표 대본(N을 누르면 보인다)
+  const plan = [];
+  const grp = (id, o, inner) => {
+    if (o.time) plan.push(o.time);
+    return `<div data-grp="${id}" data-title="${esc(o.title || '')}" data-layout="${o.layout || 'stack'}"${o.flow ? ` data-flow="${o.flow}"` : ''}${o.anchor ? ` data-anchor="${o.anchor}"` : ''}${o.bg ? ` data-bg="${esc(o.bg)}"` : ''}${o.bare ? ' data-bare' : ''}${o.time ? ` data-time="${o.time}"` : ''}${o.note ? ` data-note="${esc(o.note)}"` : ''}>${inner}</div>`;
+  };
   const head = (over, h, lead = '') => `<header class="pv-head" data-head>${over ? `<p class="pv-over">${over}</p>` : ''}<h2>${h}</h2>${lead ? `<p class="pv-lead">${lead}</p>` : ''}</header>`;
   const chip = (id) => {
     const p = byId(id);
@@ -73,13 +83,29 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
   const shot = (src, alt, label, hint, must = false) => (src ? `<figure class="pv-shot"><img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async" /></figure>` : slot(label, hint, must));
   const mail = profile.links.find((l) => l.label === 'Email');
   const gh = profile.links.find((l) => l.label === 'GitHub');
+  // 대상 상장 벽(누르면 크게) — 본편의 성과 화면과 부록의 수상 화면이 함께 쓴다
+  const certWall = (sizes) =>
+    grand.map((a) => {
+      const at = media.length;
+      a.certs.forEach((c2) => media.push({ type: 'image', src: c2.src, caption: certCaption(a) }));
+      if (!a.certs.length && a.photo) media.push({ type: 'image', src: a.photo.src, caption: certCaption(a) });
+      const can = a.certs.length || a.photo;
+      return `<li>${can ? `<button type="button" data-cert="${at}" data-n="${a.certs.length || 1}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기">${certSheet(a, { sizes })}</button>` : certSheet(a)}<p><b>${esc(a.contest)}</b><small>${esc(a.date.slice(0, 7).replace('-', '.'))}</small></p></li>`;
+    });
+  // 기사 사진 카드(누르면 기사로) — 기사마다 그 프로젝트와 받은 상
+  const newsCard = (a) => {
+    const b = a.project && bestOf(a.project);
+    return `<li><a href="${esc(a.url)}" target="_blank" rel="noopener"><span class="pv-ph"><img src="${esc(a.image.thumb)}"${a.image.w > 720 ? ` srcset="${esc(a.image.thumb)} 720w, ${esc(a.image.src)} ${a.image.w}w" sizes="(max-width: 700px) 46vw, 420px"` : ''} width="${a.image.w || ''}" height="${a.image.h || ''}" alt="${esc(a.title)} 기사 사진" loading="lazy" decoding="async" /></span><small>${esc(a.publisher)}${a.date ? ` · ${esc(a.date.slice(0, 7).replace('-', '.'))}` : ''}<em>${esc(a.relation)}</em></small><b>${esc(a.title)}</b>${a.project ? `<span class="pv-news-p">${esc(a.project.title)}${b ? `<i class="is-${b.key}">${esc(b.label)}</i>` : ''}</span>` : ''}</a></li>`;
+  };
+  const NEWS = ['huss-ai-2026', 'capstone-2025', 'recap-soldout-2026', 'driveup-2025', 'innovation-league-2025', 'won-pbl-2026'];
+  const news = NEWS.map((f) => PRESS.find((a) => a.image?.file.endsWith(`/${f}.webp`))).filter(Boolean);
 
-  // 장 표지: 왼쪽 큰 번호 · 장 이름 · 이 장에서 볼 화면들, 오른쪽 사진
+  // 장 표지: 왼쪽 큰 번호 · 장 이름 · 이 장에서 볼 화면들, 오른쪽 사진(부록 앞에만 쓴다)
   const chapter = (k, desc, list, bg) => {
     const [id, ko, en, , no] = PR_SECS[k];
     return grp(
       `ch-${id}`,
-      { title: ko, layout: 'chapter', anchor: id, bare: true, bg },
+      { title: ko, layout: 'chapter', anchor: id, bare: true, bg, note: '부록 — 질문이 나오면 아래 진행 막대나 숫자 5로 이 장들을 펼쳐 답합니다.' },
       `<div class="jr-b pv-ch">
         <p class="pv-ch-no" aria-hidden="true">${no}</p>
         <div class="pv-ch-t"><p class="pv-over">${en}</p><h2>${ko}</h2><p class="pv-ch-d">${desc}</p></div>
@@ -88,12 +114,18 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
     );
   };
 
-  // ── 표지 · 목차 ──
-  function intro() {
+  // ── 표지 · 목차 ── (본편 시간 합계를 적으므로 맨 뒤에 만든다)
+  function intro(total, mainN, moreN) {
     const shots = [picOf('baja-ev-formula', '01'), picOf('av-competition', '06'), picOf('recap-jbmotors', '01'), picOf('pixhawk-drone', '01'), picOf('quadruped-robot', '01')];
     const cover = grp(
       'cover',
-      { title: '표지', layout: 'cover', bare: true },
+      {
+        title: '표지',
+        layout: 'cover',
+        bare: true,
+        time: 10,
+        note: `안녕하세요, ${TARGET.short}을 꿈꾸는 ${profile.name}입니다. 드론 · 자율주행 · 로봇을 직접 만들며 배워 왔습니다.`,
+      },
       `<div class="jr-b pv-cover">
         <p class="pv-over">2026 PORTFOLIO</p>
         <h1 class="pv-name">${esc(profile.name)}<span>${esc(profile.en)}</span></h1>
@@ -112,29 +144,39 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
       <div class="jr-b pv-mosaic" aria-hidden="true">${shots.map((im) => ph(im, '(max-width: 700px) 50vw, 560px', 'pv-mo')).join('')}</div>`
     );
     const desc = {
-      about: '나 · 배움의 길 · 걸어온 길',
-      self: 'SWOT 분석 · 대응 전략 · CarHub 검사 · 일하는 방식',
+      about: '나 · 걸어온 길',
+      self: 'SWOT 분석 · 대응 전략 · CarHub 검사',
       job: 'ADD 무인 감시정찰 연구원 · 요구 역량 분석 · 롤모델',
-      path: '비교과 · 대표 프로젝트 · 공식 보도 · 수상 · 자기계발 계획',
+      path: '비교과 이수 내역 · 대표 프로젝트 · 상과 보도 · 자기계발 계획',
       future: '로보틱스 대학원 → ADD · 10년 · 30년 후 · 미래 명함',
+      more: '질문이 나오면 — 배움의 길 · 학년별 이력 · 사례 · 공식 보도 · 수상 · 봉사 · 자격',
     };
+    const min = Math.floor(total / 60);
+    const sec = total % 60;
     const agenda = grp(
       'agenda',
-      { title: '목차', layout: 'agenda', anchor: 'contents' },
-      head('CONTENTS', '목차') +
+      { title: '목차', layout: 'agenda', anchor: 'contents', time: 6, note: '안내서 순서대로, 소개 뒤 네 단계로 말씀드리겠습니다.' },
+      head('CONTENTS', '목차', `<b>본편 ${mainN}장 · 약 ${min}분${sec ? ` ${sec}초` : ''}</b>부록 ${moreN}장은 질문이 나오면 펼칩니다`) +
         `<nav class="jr-b pv-agenda" aria-label="목차" data-split>${PR_SECS.map(
-          ([id, ko, en, , no]) => `<a href="#${id}" data-jr-go="${id}" data-c="${id}"><b>${no}</b><span class="pv-ag-t"><em>${en}</em><strong>${ko}</strong></span><small>${desc[id]}</small><i aria-hidden="true">→</i></a>`
+          ([id, ko, en, , no]) => `<a href="#${id}" data-jr-go="${id}" data-c="${id}"${id === 'more' ? ' class="is-more"' : ''}><b>${no}</b><span class="pv-ag-t"><em>${en}</em><strong>${ko}</strong></span><small>${desc[id]}</small><i aria-hidden="true">→</i></a>`
         ).join('')}</nav>
-        <p class="jr-b pv-keys"><span><kbd>←</kbd><kbd>→</kbd>넘기기</span><span><kbd>1</kbd>—<kbd>4</kbd>STEP 이동</span><span><kbd>F</kbd>전체 화면</span><span class="pv-keys-t">옆으로 끌거나 위로 밀어도 넘어갑니다</span></p>`
+        <p class="jr-b pv-keys"><span><kbd>←</kbd><kbd>→</kbd>넘기기</span><span><kbd>1</kbd>—<kbd>5</kbd>STEP · 부록</span><span><kbd>N</kbd>발표 노트 · 타이머</span><span><kbd>F</kbd>전체 화면</span></p>`
     );
     return cover + agenda;
   }
 
   // ── 00 나를 소개합니다 ──
   function about() {
+    const edu = profile.education || [];
     const me = grp(
       'me',
-      { title: '나', layout: 'profile', anchor: 'about-me' },
+      {
+        title: '나',
+        layout: 'profile',
+        anchor: 'about-me',
+        time: 20,
+        note: `${edu[1]?.major || ''}에서 공부하며 ${edu[2]?.major || ''}을 복수전공하고 있습니다. 프로젝트 ${projects.length}개, 수상 ${AWARDS.length}건 — 대상 ${grand.length}건, 그리고 ${sch.date.slice(0, 4)}년 ${sch.title}입니다.`,
+      },
       `${profile.photo ? `<figure class="jr-b pv-photo"><img src="${esc(profile.photo.src)}" width="${profile.photo.w}" height="${profile.photo.h}" alt="${esc(profile.name)} 증명사진" /></figure>` : ''}
       <div class="jr-b pv-id">
         <p class="pv-over">${esc(profile.role)}</p>
@@ -142,42 +184,37 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
         <p class="pv-quote">${esc(profile.motto)}</p>
         <p class="pv-award"><b>${esc(sch.title)}</b><span>${esc(sch.date.slice(0, 4))} · 과학기술정보통신부</span></p>
         <dl class="pv-nums">${num(projects.length, '프로젝트')}${num(AWARDS.length, '수상', `대상 ${grand.length}`)}${num(PRESS.length, '공식 보도', `직접 소개 ${PRESS_DIRECT}`)}${num(`${vol.hours}<small>h</small>`, '봉사', `${vol.count}건`)}</dl>
+        <ol class="pv-me-edu">${edu.map((e) => `<li><time>${esc(e.period)}</time>${esc(e.major)}<small>${esc(e.note)}</small></li>`).join('')}</ol>
       </div>`
-    );
-    const edu = profile.education || [];
-    const dept = profile.depts || [];
-    const at = media.length;
-    media.push({ type: 'image', src: sch.sheet.src, caption: `${sch.title} 장학증서 — ${sch.date} · ${sch.by} (생년월일은 가림)` });
-    const record = grp(
-      'edu',
-      { title: '배움의 길', layout: 'edu', anchor: 'education', flow: 'cols' },
-      head('EDUCATION &amp; SCHOLARSHIP', '배움의 길') +
-        `<ol class="jr-b pv-edu">${edu
-          .map(
-            (e, i) => `<li><time>${esc(e.period)}</time>${dept[i] ? `<img class="pv-dept" src="${esc(dept[i].src)}" width="${dept[i].w}" height="${dept[i].h}" alt="${esc(dept[i].alt)}" />` : `<span class="pv-dept is-text">${esc(e.school)}</span>`}<p><b>${esc(e.major)}</b><em>${esc(e.note)}</em></p></li>`
-          )
-          .join('')}</ol>
-        <figure class="jr-b pv-scholar">
-          <button type="button" data-cert="${at}" data-n="1" aria-label="${esc(sch.title)} 장학증서 크게 보기"><span class="sheet"><img src="${esc(sch.sheet.thumb)}" srcset="${esc(sch.sheet.sm)} 240w, ${esc(sch.sheet.thumb)} 480w, ${esc(sch.sheet.md)} 720w, ${esc(sch.sheet.src)} 1132w" sizes="(max-width: 700px) 40vw, 300px" alt="${esc(sch.title)} 장학증서" width="1132" height="1600" loading="lazy" decoding="async" /></span></button>
-          <figcaption><small>SCHOLARSHIP</small><b>${esc(sch.title)}</b><span>${esc(sch.date)} · ${esc(sch.by)}</span></figcaption>
-        </figure>`
     );
     const stages = grp(
       'journey',
-      { title: '걸어온 길', layout: 'phases', anchor: 'overview s-explore s-challenge s-focus' },
+      {
+        title: '걸어온 길',
+        layout: 'phases',
+        anchor: 'overview s-explore s-challenge s-focus',
+        time: 15,
+        note: `${PRELUDE.year}년 드론 자격에서 시작해, ${STAGES.map((g) => `${g.grade} ${g.title}`).join(', ')}으로 — 하드웨어와 AI를 묶는 쪽으로 좁혀 왔습니다.`,
+      },
       head('MY JOURNEY', '걸어온 길', `<b>${esc(PRELUDE.year)}</b>${esc(PRELUDE.text)}`) +
         `<ol class="jr-b pv-phases" data-split>${STAGES.map(
           (g) => `<li data-stage="${g.id}">${ph(picOf(g.cover, '01'), '(max-width: 700px) 90vw, 420px')}<p class="pv-ph-k"><b>${esc(g.grade)}</b>${esc(g.span)}<span>${esc(g.code)}</span></p><h3>${esc(g.title)}</h3><p class="pv-text">${esc(g.headline)}</p></li>`
         ).join('')}</ol>`
     );
-    return me + record + stages;
+    return me + stages;
   }
 
   // ── STEP 1 자기이해 ──
   function self() {
     const mx = grp(
       'swot',
-      { title: 'SWOT 분석', layout: 'swot', anchor: 'swot competency' },
+      {
+        title: 'SWOT 분석',
+        layout: 'swot',
+        anchor: 'swot competency',
+        time: 20,
+        note: `강점은 ${SW.S.items[0].h}, 보완할 점은 ${SW.W.items[0].h}는 것입니다. 기회는 ${SW.O.items[0].h}, 위협은 ${SW.T.items[SW.T.items.length - 1].h}입니다.`,
+      },
       head('SWOT ANALYSIS', 'SWOT 분석으로 본 지금의 나') +
         `<div class="jr-b pv-mx" data-split>${SWOT.map(
           (q) => `<section class="pv-mq" data-q="${q.key}"><p class="pv-mq-h"><b>${q.key}</b><span><strong>${esc(q.title)}</strong><small>${esc(q.en)}</small></span></p><ul>${q.items.map((it) => `<li>${esc(it.h)}</li>`).join('')}</ul></section>`
@@ -187,10 +224,10 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
     const NAME = { SO: '강점을 살려 기회를 잡는 전략', ST: '강점을 살려 위기를 극복하는 전략', WO: '약점을 보완하여 기회를 잡는 전략', WT: '약점을 보완하여 위기를 돌파하는 전략' };
     const strat = grp(
       'strategy',
-      { title: 'SWOT 대응 전략', layout: 'strategy', anchor: 'strategy' },
+      { title: 'SWOT 대응 전략', layout: 'strategy', anchor: 'strategy', time: 15, note: '강점은 무인 감시정찰 연구로 잇고, 짧게 끝난 프로젝트가 많다는 약점은 대학원에서 한 주제를 오래 파는 연구로 바꾸겠습니다.' },
       head('STRATEGY', 'SWOT 대응 전략') +
         `<ol class="jr-b pv-strat" data-split>${['SO', 'ST', 'WO', 'WT']
-          .map((k) => STRATEGY.find((x) => x.key === k))
+          .map((k) => ST[k])
           .map((x) => `<li data-q="${x.key[0]}" data-q2="${x.key[1]}"><p class="pv-st-k"><b>${x.key}</b>${NAME[x.key]}</p><h3>${esc(x.t)}</h3></li>`)
           .join('')}</ol>`
     );
@@ -200,30 +237,21 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
       ['직업적성', CARHUB.aptitude],
       ['MBTI', CARHUB.mbti],
     ];
+    const done = hub.filter(([, v]) => v);
     const carhub = grp(
       'carhub',
-      { title: 'CarHub 검사', layout: 'carhub', anchor: 'carhub' },
+      {
+        title: 'CarHub 검사',
+        layout: 'carhub',
+        anchor: 'carhub',
+        time: 10,
+        note: done.length ? `CarHub 검사 결과 — ${done.map(([k, v]) => `${k} ${v}`).join(', ')}입니다.` : 'CarHub 직업흥미 · 가치관 · 적성 · MBTI 검사 결과입니다.',
+      },
       head('CARHUB', 'CarHub 검사로 본 나') +
         `<dl class="jr-b pv-hub">${hub.map(([k, v]) => `<div${v ? '' : ' class="is-empty"'}><dt>${k}</dt><dd>${v ? esc(v) : '입력 예정'}</dd></div>`).join('')}</dl>
         <div class="jr-b pv-hub-shot">${shot(CARHUB.resultShot, 'CarHub 검사 결과 화면', '검사 결과 화면 캡처', 'CarHub → 검사하기 → 결과 화면')}</div>`
     );
-    // 사진은 그 방식의 근거 프로젝트 가운데 다른 화면에 쓰지 않은 한 장
-    const VALUE_PICS = [
-      ['huss-evidence-ai', '01'],
-      ['pixhawk-drone', '03'],
-      ['givingplus-filament', '02'],
-    ];
-    const values = grp(
-      'values',
-      { title: '일하는 방식', layout: 'values', anchor: 'values' },
-      head('HOW I WORK', '이렇게 일합니다') +
-        `<ol class="jr-b pv-three" data-split>${VALUES.map((v, i) => {
-          const [id, n] = VALUE_PICS[i] || [v.proof[0], '01'];
-          const ids = [id, ...v.proof.filter((x) => x !== id)].slice(0, 2);
-          return `<li>${ph(picOf(id, n), '(max-width: 700px) 90vw, 420px')}<p class="pv-three-k"><b>${esc(v.no)}</b>${esc(v.en)}</p><h3>${esc(v.title)}</h3><p class="pv-chips">${ids.map(chip).join('')}</p></li>`;
-        }).join('')}</ol>`
-    );
-    return chapter(1, '기록으로 본 나의 강점과 보완할 점', ['SWOT 분석', 'SWOT 대응 전략', 'CarHub 검사', '일하는 방식'], shotOf('av-competition', '07')) + mx + strat + carhub + values;
+    return mx + strat + carhub;
   }
 
   // ── STEP 2 직업탐색 ──
@@ -240,7 +268,13 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
     const role = CARHUB.roleModel;
     const target = grp(
       'target',
-      { title: '희망 직무', layout: 'target', anchor: 'target plan-target' },
+      {
+        title: '희망 직무',
+        layout: 'target',
+        anchor: 'target plan-target',
+        time: 20,
+        note: `희망 직무는 ${TARGET.role}입니다. 직접 만들고 날려 본 경험을 무인 정찰 연구로 잇겠습니다. ${TARGET.grad}을 거쳐 ADD 연구직에 지원합니다.${role?.name ? ` 롤모델은 ${role.name}입니다.` : ''}`,
+      },
       `<div class="jr-b pv-target">
         <p class="pv-over">희망 직무 · TARGET</p>
         <h2>${esc(TARGET.role)}</h2>
@@ -266,7 +300,13 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
     });
     const match = grp(
       'match',
-      { title: '요구 역량 분석', layout: 'match', anchor: 'match skills' },
+      {
+        title: '요구 역량 분석',
+        layout: 'match',
+        anchor: 'match skills',
+        time: 15,
+        note: `${TARGET.flow[0]}부터 ${TARGET.flow[TARGET.flow.length - 1]}까지 — 무인 정찰의 단계마다 그 기술을 실제로 쓴 프로젝트가 있고, 자율비행에는 드론 자격도 있습니다.`,
+      },
       head('REQUIRED SKILLS', '요구 역량 ↔ 나의 근거', `무인 정찰의 흐름(${esc(TARGET.flow.join(' → '))})마다, 그 기술을 실제로 쓴 프로젝트를 셉니다`) +
         `<ol class="jr-b pv-match" data-split>${rows
           .map(
@@ -275,53 +315,27 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
           )
           .join('')}</ol>`
     );
-    return chapter(2, `${esc(TARGET.short)} — 하고 싶은 일과, 그 일에 필요한 역량`, ['희망 직무 · 가는 길 · 롤모델', '요구 역량 분석'], shotOf('av-competition', '08')) + target + match;
+    return target + match;
   }
 
   // ── STEP 3 진로계획 및 비교과 설계 ──
-  // 대표 사례 셋 — 무인 정찰의 흐름에서 맡는 자리(to: TARGET.flow의 번호)
+  // 대표 사례 — 본편에는 무인 정찰과 가장 가까운 하나, 나머지는 부록(to: TARGET.flow에서 맡는 자리)
   const CASES = [
     { id: 'pixhawk-drone', shots: ['01', '02', '05'], to: 3 },
     { id: 'airsim-driving', shots: ['01', '04', '02'], to: 2 },
     { id: 'iot-iv-pole', shots: ['01', '02', '04'], to: 0 },
   ];
-  // 공식 보도 슬라이드의 기사 여섯(사진이 있는 기사 가운데 — 대표 프로젝트 · 직접 소개 먼저)
-  const NEWS = ['huss-ai-2026', 'capstone-2025', 'recap-soldout-2026', 'driveup-2025', 'innovation-league-2025', 'won-pbl-2026'];
   const STEP = { PROBLEM: '문제', IDEA: '아이디어', BUILD: '만들기', TEST: '시험', RESULT: '결과', LEARNED: '배운 점', NEXT: '다음' };
-  function path() {
-    const record = grp(
-      'record',
-      { title: '비교과 이수 내역', layout: 'record', anchor: 'record' },
-      head('EXTRACURRICULAR', '비교과 이수 내역') +
-        `<div class="jr-b pv-rec-shot">${shot(CARHUB.courseShot, 'CarHub 비교과 이수 내역', '비교과 이수 내역 캡처', 'CarHub 이력관리 → 포트폴리오 → 비교과 이수 내역', true)}</div>
-        <dl class="jr-b pv-rec">${num(AWARDS.length, '경진대회 수상', `대상 ${grand.length}`)}${num(projects.length, '프로젝트')}${num(CERTS.length, '자격')}${num(`${vol.hours}<small>h</small>`, '봉사', `${vol.count}건`)}${num(PRESS.length, '공식 보도')}${num('<small>국가우수</small>', '장학', '이공계 · 2025')}</dl>`
-    );
-    // 학년마다 그 해의 이력(갈래 · 이름) — 인턴십 · 연구실 · 동아리 · 해외 교육 · 창업
-    const years = grp(
-      'years',
-      { title: '학년별 비교과 · 경력', layout: 'years', anchor: 'years y2023 y2024 y2025 y2026 career' },
-      head('BY GRADE', '학년별 비교과 · 경력') +
-        `<ol class="jr-b pv-years" data-split>${STAGES.map((g) => {
-          const items = HISTORY.filter((y) => g.years.includes(y.year)).flatMap((y) => y.items.map((it) => ({ ...it, y: y.year })));
-          return `<li data-stage="${g.id}"><p class="pv-yr-h"><b>${esc(g.grade)}</b>${esc(g.span)}<span>${items.length}</span></p><ul>${items.map((it) => `<li><small>${esc(it.kind)}</small>${esc(it.title)}</li>`).join('')}</ul></li>`;
-        }).join('')}</ol>`
-    );
-    const caseIds = CASES.map((c) => c.id);
-    const grid = grp(
-      'projects',
-      { title: `대표 프로젝트 ${feat.length}`, layout: 'grid8', anchor: `projects ${feat.filter((p) => !caseIds.includes(p.id)).map((p) => `p-${p.id}`).join(' ')}` },
-      head('PROJECTS', `대표 프로젝트 ${feat.length}`, `프로젝트 ${projects.length}개 가운데 — 사진 위는 그 프로젝트가 받은 상 · 공식 보도, 누르면 자세히`) + `<div class="jr-b pv-grid8" data-split>${feat.map((p, k) => tile(p, { no: pad(k + 1) })).join('')}</div>`
-    );
-    const cases = CASES.map((c, k) => {
-      const p = byId(c.id);
-      const aw = awardsOf(p.id).sort((a, b) => a.tier - b.tier);
-      const pr = pressOf(p.id);
-      const steps = (p.story || []).filter((s) => s.title);
-      const [main, ...more] = c.shots.map((n) => picOf(p.id, n));
-      return grp(
-        `p-${p.id}`,
-        { title: p.title, layout: 'case', anchor: `p-${p.id}`, flow: 'cols' },
-        `<div class="jr-b pv-cshots">${ph(main, '(max-width: 820px) 100vw, 820px', 'is-main')}${more.map((im) => ph(im, '(max-width: 820px) 50vw, 400px')).join('')}</div>
+  const caseSlide = (c, k, o = {}) => {
+    const p = byId(c.id);
+    const aw = awardsOf(p.id).sort((a, b) => a.tier - b.tier);
+    const pr = pressOf(p.id);
+    const steps = (p.story || []).filter((s) => s.title);
+    const [main, ...more] = c.shots.map((n) => picOf(p.id, n));
+    return grp(
+      `p-${p.id}`,
+      { title: p.title, layout: 'case', anchor: `p-${p.id}`, flow: 'cols', ...o },
+      `<div class="jr-b pv-cshots">${ph(main, '(max-width: 820px) 100vw, 820px', 'is-main')}${more.map((im) => ph(im, '(max-width: 820px) 50vw, 400px')).join('')}</div>
         <div class="jr-b pv-ctext">
           <p class="pv-over">CASE ${pad(k + 1)} — ${esc(categoryOf(p.category).ko)} · ${esc(p.year)}</p>
           <h2>${esc(p.title)}</h2>
@@ -332,64 +346,59 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
           ${p.role.length ? `<p class="pv-c-role"><small>역할</small>${esc(p.role.slice(0, 3).join(' · '))}</p>` : ''}
           <div class="pv-c-end"><p class="pv-c-to" aria-label="무인 정찰의 흐름에서 — ${esc(TARGET.flow[c.to])}"><small>무인 정찰로</small>${TARGET.flow.map((f, i) => `<span${i === c.to ? ' class="is-on"' : ''}>${esc(f)}</span>`).join('')}</p>${link(p.path, '자세히 보기')}</div>
         </div>`
-      );
+    );
+  };
+  function path() {
+    const record = grp(
+      'record',
+      {
+        title: '비교과 이수 내역',
+        layout: 'record',
+        anchor: 'record',
+        time: 10,
+        note: `CarHub 비교과 이수 내역입니다. 수상 ${AWARDS.length}건, 자격 ${CERTS.length}개, 봉사 ${vol.hours}시간을 쌓았습니다.`,
+      },
+      head('EXTRACURRICULAR', '비교과 이수 내역') +
+        `<div class="jr-b pv-rec-shot">${shot(CARHUB.courseShot, 'CarHub 비교과 이수 내역', '비교과 이수 내역 캡처', 'CarHub 이력관리 → 포트폴리오 → 비교과 이수 내역', true)}</div>
+        <dl class="jr-b pv-rec">${num(AWARDS.length, '경진대회 수상', `대상 ${grand.length}`)}${num(projects.length, '프로젝트')}${num(CERTS.length, '자격')}${num(`${vol.hours}<small>h</small>`, '봉사', `${vol.count}건`)}${num(PRESS.length, '공식 보도')}${num('<small>국가우수</small>', '장학', '이공계 · 2025')}</dl>`
+    );
+    const grid = grp(
+      'projects',
+      {
+        title: `대표 프로젝트 ${feat.length}`,
+        layout: 'grid8',
+        anchor: `projects ${feat.filter((p) => !CASES.some((c) => c.id === p.id)).map((p) => `p-${p.id}`).join(' ')}`,
+        time: 15,
+        note: `${projects.length}개 가운데 대표 ${feat.length}개입니다. 사진 위 표시가 그 프로젝트가 받은 상과 공식 보도입니다.`,
+      },
+      head('PROJECTS', `대표 프로젝트 ${feat.length}`, `프로젝트 ${projects.length}개 가운데 — 사진 위는 그 프로젝트가 받은 상 · 공식 보도, 누르면 자세히`) +
+        `<div class="jr-b pv-grid8" data-split>${feat.map((p, k) => tile(p, { no: pad(k + 1) })).join('')}</div>`
+    );
+    const c0 = byId(CASES[0].id);
+    const aw0 = awardsOf(c0.id).sort((a, b) => a.tier - b.tier)[0];
+    const case0 = caseSlide(CASES[0], 0, {
+      time: 15,
+      note: `대표 사례는 ${c0.oneLiner}입니다.${aw0 ? ` ${aw0.contest} ${aw0.grade}을 받았습니다.` : ''}`,
     });
-    // 수상: 등급별(막대) + 대상 상장 벽
-    const wall = grand.map((a) => {
-      const at = media.length;
-      a.certs.forEach((c2) => media.push({ type: 'image', src: c2.src, caption: certCaption(a) }));
-      if (!a.certs.length && a.photo) media.push({ type: 'image', src: a.photo.src, caption: certCaption(a) });
-      const can = a.certs.length || a.photo;
-      return `<li>${can ? `<button type="button" data-cert="${at}" data-n="${a.certs.length || 1}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기">${certSheet(a, { sizes: '(max-width: 700px) 30vw, 170px' })}</button>` : certSheet(a)}<p><b>${esc(a.contest)}</b><small>${esc(a.date.slice(0, 7).replace('-', '.'))}</small></p></li>`;
-    });
-    const tiers = [1, 2, 3, 4, 5].map((t) => ({ label: TIER_LABEL[t], n: AWARDS.filter((a) => a.tier === t).length })).filter((r) => r.n);
-    const awards = grp(
-      'results',
-      { title: '경진대회 · 수상', layout: 'awards', anchor: 'results awards' },
-      head('AWARDS', `수상 ${AWARDS.length}건`, `<b>대상 ${grand.length}</b>상장을 누르면 크게 봅니다`) +
-        bars('등급마다 수상 수', tiers) +
-        `<ol class="jr-b pv-wall" data-split>${wall.join('')}</ol>
-        <p class="jr-b pv-foot">${link('/awards', `상장 ${AWARDS.length}건 모두 보기`)}</p>`
-    );
-    const volunteer = grp(
-      'volunteer',
-      { title: '봉사', layout: 'volunteer', anchor: 'volunteer' },
-      `<div class="jr-b pv-vol">
-        <p class="pv-over">VOLUNTEER</p>
-        <h2>봉사</h2>
-        <p class="pv-vol-n"><b>${vol.hours}</b><small>시간</small>${vol.minutes ? `<b>${vol.minutes}</b><small>분</small>` : ''}</p>
-        <p class="pv-vol-c">시간인증형 봉사 <b>${vol.count}</b>건</p>
-      </div>` + bars('인증 기관마다 봉사 시간', vol.by.map((x) => ({ label: x.name, n: x.hours * 60 + x.minutes, v: `${x.hours}시간${x.minutes ? ` ${x.minutes}분` : ''}` })))
-    );
-    // 공식 보도: 기사 사진 여섯 — 기사마다 그 프로젝트와 받은 상
-    const news = NEWS.map((f) => PRESS.find((a) => a.image?.file.endsWith(`/${f}.webp`))).filter(Boolean);
-    const rest = PRESS.filter((a) => !news.includes(a));
-    const press = grp(
-      'press',
-      { title: '공식 보도', layout: 'press', anchor: 'press' },
-      head('PRESS', `공식 보도 ${PRESS.length}건`, `<b>직접 소개 ${PRESS_DIRECT}</b>대학 · 사업단 공식 기사 — 누르면 기사로`) +
-        `<ol class="jr-b pv-news" data-split>${news
-          .map((a) => {
-            const b = a.project && bestOf(a.project);
-            return `<li><a href="${esc(a.url)}" target="_blank" rel="noopener"><span class="pv-ph"><img src="${esc(a.image.thumb)}" alt="${esc(a.title)} 기사 사진" loading="lazy" decoding="async" /></span><small>${esc(a.publisher)}${a.date ? ` · ${esc(a.date.slice(0, 7).replace('-', '.'))}` : ''}<em>${esc(a.relation)}</em></small><b>${esc(a.title)}</b>${a.project ? `<span class="pv-news-p">${esc(a.project.title)}${b ? `<i class="is-${b.key}">${esc(b.label)}</i>` : ''}</span>` : ''}</a></li>`;
-          })
-          .join('')}</ol>
-        <p class="jr-b pv-news-more">${rest.map((a) => `<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.title)}</a>`).join('<i aria-hidden="true">·</i>')}</p>`
-    );
-    // 자격 · 다루는 기술(스킬 지도의 갈래마다)
-    const certList = [...CERTS].sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999'));
-    const certs = grp(
-      'certs',
-      { title: '자격 · 기술', layout: 'certs', anchor: 'certs stack' },
-      head('CERTIFICATIONS &amp; SKILLS', `자격 ${CERTS.length} · 다루는 기술`) +
-        `<ol class="jr-b pv-certs" data-split>${certList.map((c) => `<li${c.domain === 'aerial' ? ' class="is-key"' : ''}><time>${c.year ? esc(c.year) : '—'}</time><b>${esc(c.name)}</b></li>`).join('')}</ol>
-        <dl class="jr-b pv-stack">${['robot', 'hw', 'ai', 'lang', 'cad', 'web'].map((id) => STACK.find((g) => g.id === id)).filter(Boolean).map((g) => `<div><dt>${esc(g.ko)}</dt><dd>${g.items.map((it) => esc(it.en)).join('<i> · </i>')}</dd></div>`).join('')}</dl>`
+    // 상과 보도: 큰 숫자 넷 + 대상 상장 벽 + 기사 사진 셋
+    const proof = grp(
+      'proof',
+      {
+        title: '상과 보도',
+        layout: 'proof',
+        anchor: 'proof',
+        time: 15,
+        note: `수상 ${AWARDS.length}건 중 대상이 ${grand.length}건, 공식 보도 ${PRESS.length}건 중 ${PRESS_DIRECT}건은 저와 팀을 직접 소개한 기사입니다.`,
+      },
+      head('PROOF', '상과 보도로 확인된 성과', `<b>대상 ${grand.length}</b>상장 · 기사를 누르면 크게 · 원문으로`) +
+        `<dl class="jr-b pv-pnums">${num(AWARDS.length, '수상')}${num(grand.length, '대상')}${num(PRESS.length, '공식 보도')}${num(PRESS_DIRECT, '직접 소개', '이름 · 팀이 기사에')}</dl>
+        <ol class="jr-b pv-wall is-row" data-split>${certWall('(max-width: 700px) 30vw, 130px').join('')}</ol>
+        <ol class="jr-b pv-news is-row" data-split>${news.slice(0, 3).map(newsCard).join('')}</ol>`
     );
     // 졸업 전까지의 자기계발 계획 — 지금까지(기록) · 졸업 전까지(진행 중인 일 · 본인이 채울 자리)
     const intern = HISTORY.flatMap((y) => y.items).filter((it) => /인턴십|연구실/.test(it.kind));
-    const now = PLAN.find((c) => c.key === 'now');
-    const next = PLAN.find((c) => c.key === 'next');
     const won = (CARHUB.won || []).filter((w) => w.name);
+    const certList = [...CERTS].sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999'));
     const ROWS = [
       ['비교과 (WON+)', 'CarHub 이수 내역', won.length ? won.map((w) => `${esc(w.when)} ${esc(w.name)}`).join(' · ') : '', '학년마다 WON+ 프로그램 1개 이상', true],
       ['자격증', `${CERTS.length}개 — ${esc(certList.filter((c) => c.year).slice(-1)[0]?.name || '')}`, '', '졸업 전 취득할 자격'],
@@ -400,26 +409,21 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
       ['프로젝트', `${projects.length}개`, next.items.slice(0, 2).map((it) => esc(it.h)).join(' → '), ''],
       ['봉사', `${volH} · ${vol.count}건`, '', '이어 갈 봉사'],
     ];
-    const plan = grp(
+    const devplan = grp(
       'devplan',
-      { title: '자기계발 계획', layout: 'devplan', anchor: 'devplan' },
+      {
+        title: '자기계발 계획',
+        layout: 'devplan',
+        anchor: 'devplan',
+        time: 15,
+        note: `졸업 전까지 학년마다 WON+ 비교과를 듣고, 자격 · 외국어를 준비하며, ${TARGET.grad} 진학을 준비합니다.`,
+      },
       head('BEFORE GRADUATION', '졸업 전까지의 자기계발 계획') +
         `<table class="jr-b pv-dev"><thead><tr><th scope="col">분야</th><th scope="col">지금까지</th><th scope="col">졸업 전까지</th></tr></thead><tbody>${ROWS.map(
-          ([k, done, todo, hint, must]) => `<tr><th scope="row">${k}</th><td>${done || '<span class="pv-dash">—</span>'}</td><td>${todo || `<span class="pv-fill${must ? ' is-must' : ''}">${must ? '★ ' : ''}입력 예정 · ${hint}</span>`}</td></tr>`
+          ([k, d, todo, hint, must]) => `<tr><th scope="row">${k}</th><td>${d || '<span class="pv-dash">—</span>'}</td><td>${todo || `<span class="pv-fill${must ? ' is-must' : ''}">${must ? '★ ' : ''}입력 예정 · ${hint}</span>`}</td></tr>`
         ).join('')}</tbody></table>`
     );
-    return (
-      chapter(3, '쌓아 온 비교과 — 상과 보도로 확인된 프로젝트, 졸업까지의 계획', ['비교과 이수 내역', '학년별 비교과 · 경력', `대표 프로젝트 ${feat.length} · 사례 ${CASES.length}`, '공식 보도 · 수상', '봉사 · 자격 · 기술', '자기계발 계획'], shotOf('baja-ev-formula', '01')) +
-      record +
-      years +
-      grid +
-      cases.join('') +
-      press +
-      awards +
-      volunteer +
-      certs +
-      plan
-    );
+    return record + grid + case0 + proof + devplan;
   }
 
   // ── STEP 4 미래설계 ──
@@ -429,7 +433,13 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
     const GOAL_PICS = { now: ['quadruped-robot', '02'], next: ['airsim-driving', '03'], goal: ['pixhawk-drone', '04'] };
     const goals = grp(
       'goals',
-      { title: '단기 · 중기 · 장기 목표', layout: 'goals', anchor: 'plan goals plan-now plan-next plan-goal' },
+      {
+        title: '단기 · 중기 · 장기 목표',
+        layout: 'goals',
+        anchor: 'plan goals plan-now plan-next plan-goal',
+        time: 15,
+        note: `단기엔 ${now.title}, 중기엔 ${next.title}, 장기 목표는 ${goal.title}입니다.`,
+      },
       head('ROADMAP', '단기 · 중기 · 장기 목표') +
         `<ol class="jr-b pv-goals" data-split>${PLAN.map((c) => {
           const [id, n] = GOAL_PICS[c.key];
@@ -438,7 +448,13 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
     );
     const vision = grp(
       'vision',
-      { title: '10년 · 30년 후', layout: 'vision', anchor: 'vision card' },
+      {
+        title: '10년 · 30년 후',
+        layout: 'vision',
+        anchor: 'vision card',
+        time: 10,
+        note: `${CARHUB.vision10 ? `10년 후에는 ${CARHUB.vision10}. ` : ''}${CARHUB.vision30 ? `30년 후에는 ${CARHUB.vision30}. ` : ''}미래 명함의 직함은 ${TARGET.short}입니다.`,
+      },
       `<div class="jr-b pv-vision">
         <p class="pv-over">FUTURE ME</p>
         <h2>10년 · 30년 후의 나</h2>
@@ -462,7 +478,7 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
     );
     const thanks = grp(
       'thanks',
-      { title: '마치며', layout: 'thanks', anchor: 'thanks', bare: true },
+      { title: '마치며', layout: 'thanks', anchor: 'thanks', bare: true, time: 6, note: '들어 주셔서 감사합니다.' },
       `<div class="jr-b pv-thanks">
         <p class="pv-over">THANK YOU</p>
         <h2>감사합니다</h2>
@@ -473,7 +489,100 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
         <ul class="pv-links">${profile.links.slice(0, 3).map((l) => `<li><a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}><span>${esc(l.label)}</span>${esc(l.value)}</a></li>`).join('')}</ul>
       </div>`
     );
-    return chapter(4, `로보틱스 대학원을 거쳐 ${esc(TARGET.short)}으로 — 목표와 실행 계획, 그리고 미래의 나`, ['단기 · 중기 · 장기 목표', '10년 · 30년 후 · 미래 명함'], shotOf('quadruped-robot', '01')) + goals + vision + thanks;
+    return goals + vision + thanks;
+  }
+
+  // ── 부록: 질문이 나오면 펼치는 근거(본편 시간에 넣지 않는다) ──
+  function more() {
+    const edu = profile.education || [];
+    const dept = profile.depts || [];
+    const at = media.length;
+    media.push({ type: 'image', src: sch.sheet.src, caption: `${sch.title} 장학증서 — ${sch.date} · ${sch.by} (생년월일은 가림)` });
+    const school = grp(
+      'edu',
+      { title: '배움의 길', layout: 'edu', anchor: 'education', flow: 'cols', note: '질문 대비 — 학력(입학 · 소속 변경 · 복수전공)과 국가우수(이공계) 장학증서.' },
+      head('EDUCATION &amp; SCHOLARSHIP', '배움의 길') +
+        `<ol class="jr-b pv-edu">${edu
+          .map(
+            (e, i) => `<li><time>${esc(e.period)}</time>${dept[i] ? `<img class="pv-dept" src="${esc(dept[i].src)}" width="${dept[i].w}" height="${dept[i].h}" alt="${esc(dept[i].alt)}" />` : `<span class="pv-dept is-text">${esc(e.school)}</span>`}<p><b>${esc(e.major)}</b><em>${esc(e.note)}</em></p></li>`
+          )
+          .join('')}</ol>
+        <figure class="jr-b pv-scholar">
+          <button type="button" data-cert="${at}" data-n="1" aria-label="${esc(sch.title)} 장학증서 크게 보기"><span class="sheet"><img src="${esc(sch.sheet.thumb)}" srcset="${esc(sch.sheet.sm)} 240w, ${esc(sch.sheet.thumb)} 480w, ${esc(sch.sheet.md)} 720w, ${esc(sch.sheet.src)} 1132w" sizes="(max-width: 700px) 40vw, 300px" alt="${esc(sch.title)} 장학증서" width="1132" height="1600" loading="lazy" decoding="async" /></span></button>
+          <figcaption><small>SCHOLARSHIP</small><b>${esc(sch.title)}</b><span>${esc(sch.date)} · ${esc(sch.by)}</span></figcaption>
+        </figure>`
+    );
+    // 사진은 그 방식의 근거 프로젝트 가운데 다른 화면에 쓰지 않은 한 장
+    const VALUE_PICS = [
+      ['huss-evidence-ai', '01'],
+      ['pixhawk-drone', '03'],
+      ['givingplus-filament', '02'],
+    ];
+    const values = grp(
+      'values',
+      { title: '일하는 방식', layout: 'values', anchor: 'values', note: `질문 대비 — 일하는 방식 셋: ${VALUES.map((v) => v.title).join(' · ')}.` },
+      head('HOW I WORK', '이렇게 일합니다') +
+        `<ol class="jr-b pv-three" data-split>${VALUES.map((v, i) => {
+          const [id, n] = VALUE_PICS[i] || [v.proof[0], '01'];
+          const ids = [id, ...v.proof.filter((x) => x !== id)].slice(0, 2);
+          return `<li>${ph(picOf(id, n), '(max-width: 700px) 90vw, 420px')}<p class="pv-three-k"><b>${esc(v.no)}</b>${esc(v.en)}</p><h3>${esc(v.title)}</h3><p class="pv-chips">${ids.map(chip).join('')}</p></li>`;
+        }).join('')}</ol>`
+    );
+    // 학년마다 그 해의 이력(갈래 · 이름) — 인턴십 · 연구실 · 동아리 · 해외 교육 · 창업
+    const years = grp(
+      'years',
+      { title: '학년별 비교과 · 경력', layout: 'years', anchor: 'years y2023 y2024 y2025 y2026 career', note: '질문 대비 — 학년마다 한 일: 연구실 · 인턴십 · 동아리 · 해외 교육 · 창업.' },
+      head('BY GRADE', '학년별 비교과 · 경력') +
+        `<ol class="jr-b pv-years" data-split>${STAGES.map((g) => {
+          const items = HISTORY.filter((y) => g.years.includes(y.year)).flatMap((y) => y.items.map((it) => ({ ...it, y: y.year })));
+          return `<li data-stage="${g.id}"><p class="pv-yr-h"><b>${esc(g.grade)}</b>${esc(g.span)}<span>${items.length}</span></p><ul>${items.map((it) => `<li><small>${esc(it.kind)}</small>${esc(it.title)}</li>`).join('')}</ul></li>`;
+        }).join('')}</ol>`
+    );
+    const cases = CASES.slice(1).map((c, k) => caseSlide(c, k + 1, { note: `질문 대비 — 사례 ${pad(k + 2)}: ${byId(c.id).oneLiner}.` }));
+    // 공식 보도: 기사 사진 여섯 — 기사마다 그 프로젝트와 받은 상, 나머지 기사는 한 줄
+    const rest = PRESS.filter((a) => !news.includes(a));
+    const press = grp(
+      'press',
+      { title: '공식 보도', layout: 'press', anchor: 'press', note: `질문 대비 — 공식 보도 ${PRESS.length}건, 사진을 누르면 기사 원문이 열립니다.` },
+      head('PRESS', `공식 보도 ${PRESS.length}건`, `<b>직접 소개 ${PRESS_DIRECT}</b>대학 · 사업단 공식 기사 — 누르면 기사로`) +
+        `<ol class="jr-b pv-news" data-split>${news.map(newsCard).join('')}</ol>
+        <p class="jr-b pv-news-more">${rest.map((a) => `<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.title)}</a>`).join('<i aria-hidden="true">·</i>')}</p>`
+    );
+    // 수상: 등급별(막대) + 대상 상장 벽
+    const tiers = [1, 2, 3, 4, 5].map((t) => ({ label: TIER_LABEL[t], n: AWARDS.filter((a) => a.tier === t).length })).filter((r) => r.n);
+    const awards = grp(
+      'results',
+      { title: '경진대회 · 수상', layout: 'awards', anchor: 'results awards', note: `질문 대비 — 수상 ${AWARDS.length}건 등급별, 대상 상장 ${grand.length}장(누르면 크게).` },
+      head('AWARDS', `수상 ${AWARDS.length}건`, `<b>대상 ${grand.length}</b>상장을 누르면 크게 봅니다`) +
+        bars('등급마다 수상 수', tiers) +
+        `<ol class="jr-b pv-wall" data-split>${certWall('(max-width: 700px) 30vw, 170px').join('')}</ol>
+        <p class="jr-b pv-foot">${link('/awards', `상장 ${AWARDS.length}건 모두 보기`)}</p>`
+    );
+    const volunteer = grp(
+      'volunteer',
+      { title: '봉사', layout: 'volunteer', anchor: 'volunteer', note: `질문 대비 — 시간인증형 봉사 ${volH} · ${vol.count}건.` },
+      `<div class="jr-b pv-vol">
+        <p class="pv-over">VOLUNTEER</p>
+        <h2>봉사</h2>
+        <p class="pv-vol-n"><b>${vol.hours}</b><small>시간</small>${vol.minutes ? `<b>${vol.minutes}</b><small>분</small>` : ''}</p>
+        <p class="pv-vol-c">시간인증형 봉사 <b>${vol.count}</b>건</p>
+      </div>` + bars('인증 기관마다 봉사 시간', vol.by.map((x) => ({ label: x.name, n: x.hours * 60 + x.minutes, v: `${x.hours}시간${x.minutes ? ` ${x.minutes}분` : ''}` })))
+    );
+    // 자격 · 다루는 기술(스킬 지도의 갈래마다 — 무인 정찰과 가까운 갈래 먼저)
+    const certList = [...CERTS].sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999'));
+    const certs = grp(
+      'certs',
+      { title: '자격 · 기술', layout: 'certs', anchor: 'certs stack', note: `질문 대비 — 자격 ${CERTS.length}개(드론 자격 둘)와 다루는 기술.` },
+      head('CERTIFICATIONS &amp; SKILLS', `자격 ${CERTS.length} · 다루는 기술`) +
+        `<ol class="jr-b pv-certs" data-split>${certList.map((c) => `<li${c.domain === 'aerial' ? ' class="is-key"' : ''}><time>${c.year ? esc(c.year) : '—'}</time><b>${esc(c.name)}</b></li>`).join('')}</ol>
+        <dl class="jr-b pv-stack">${['robot', 'hw', 'ai', 'lang', 'cad', 'web']
+          .map((id) => STACK.find((g) => g.id === id))
+          .filter(Boolean)
+          .map((g) => `<div><dt>${esc(g.ko)}</dt><dd>${g.items.map((it) => esc(it.en)).join('<i> · </i>')}</dd></div>`)
+          .join('')}</dl>`
+    );
+    const list = ['배움의 길', '일하는 방식', '학년별 비교과 · 경력', `사례 ${pad(2)} · ${pad(3)}`, '공식 보도', '수상 · 봉사 · 자격'];
+    return chapter(5, '질문이 나오면 펼치는 근거 — 본편에서 다 못 보여 드린 기록', list, shotOf('av-competition', '07')) + school + values + years + cases.join('') + press + awards + volunteer + certs;
   }
 
   const secs = [
@@ -483,13 +592,16 @@ export function presentDeck({ esc, pad, img, certSheet, certCaption }) {
     ['path', path],
     ['future', future],
   ];
-  const html =
-    `<section data-sec="intro" data-title="PORTFOLIO" data-short="표지">${intro()}</section>` +
-    secs
-      .map(([id, fn]) => {
-        const [, ko, en, short, no] = PR_SECS.find((s) => s[0] === id);
-        return `<section data-sec="${id}" data-no="${no}" data-title="${esc(ko)}" data-short="${esc(short)}" data-en="${esc(en)}">${fn()}</section>`;
-      })
-      .join('');
+  const wrap = (id, inner) => {
+    const [, ko, en, short, no] = PR_SECS.find((s) => s[0] === id);
+    return `<section data-sec="${id}" data-no="${no}" data-title="${esc(ko)}" data-short="${esc(short)}" data-en="${esc(en)}">${inner}</section>`;
+  };
+  // 본편을 먼저 만들어 시간을 센 뒤 표지 · 목차를 앞에 붙인다(사진 확대 목록 순서는 상관없다)
+  const body = secs.map(([id, fn]) => wrap(id, fn())).join('');
+  const mainN = plan.length + 2;
+  const total = plan.reduce((a, b) => a + b, 0) + 10 + 6;
+  const moreHtml = more();
+  const moreN = (moreHtml.match(/data-grp=/g) || []).length;
+  const html = `<section data-sec="intro" data-title="PORTFOLIO" data-short="표지">${intro(total, mainN, moreN)}</section>` + body + wrap('more', moreHtml);
   return { html, media };
 }

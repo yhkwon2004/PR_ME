@@ -107,7 +107,7 @@
 }
 .jr-tabs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 3px;
   width: min(var(--jw), 820px);
   margin: 0 auto;
@@ -1149,6 +1149,17 @@ a.pv-chip:focus-visible {
 .pv-agenda a[data-c='future'] b {
   color: #0b7fa8;
 }
+/* 부록: 본편 아래에 한 칸 띄우고 옅게 */
+.pv-agenda a.is-more {
+  border-top: 1px dashed var(--hair-2);
+}
+.pv-agenda a.is-more b,
+.pv-agenda a.is-more strong {
+  color: var(--t3);
+}
+.jr-slide[data-sec='more'] {
+  --ac: #5b6270;
+}
 .pv-ag-t {
   display: flex;
   flex-wrap: wrap;
@@ -1341,6 +1352,34 @@ kbd {
 .pv-award span {
   font-size: var(--s-small);
   color: rgba(255, 255, 255, 0.7);
+}
+/* 나: 학력 세 줄(배움의 길은 부록에) */
+.pv-me-edu {
+  display: grid;
+  gap: 6px;
+  padding-top: calc(var(--g) * 0.8);
+  border-top: 1px solid var(--hair);
+}
+.pv-me-edu li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+  font-size: var(--s-small);
+  font-weight: 700;
+  color: var(--ink);
+  word-break: keep-all;
+}
+.pv-me-edu time {
+  min-width: 7.2em;
+  font-family: var(--display);
+  font-weight: 600;
+  color: var(--ac);
+}
+.pv-me-edu small {
+  font-size: 0.92em;
+  font-weight: 600;
+  color: var(--t3);
 }
 .pv-nums {
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2124,6 +2163,45 @@ kbd {
   font-family: var(--display);
   font-size: calc(var(--s-small) * 0.9);
   color: var(--t3);
+}
+
+/* 상과 보도: 큰 숫자 넷 · 대상 상장 한 줄 · 기사 사진 셋 */
+.pv-pnums {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.pv-pnums div {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  padding: calc(var(--g) * 0.8) calc(var(--g) * 1);
+  border-radius: var(--r);
+  background: var(--panel);
+}
+.pv-pnums dd {
+  font-family: var(--display);
+  font-size: var(--s-num);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+.pv-pnums div:nth-child(2) dd {
+  color: var(--hot);
+}
+.pv-pnums dt {
+  font-size: var(--s-small);
+  font-weight: 700;
+  color: var(--t2);
+}
+.pv-pnums dt small {
+  display: block;
+  font-weight: 600;
+  color: var(--t3);
+}
+.pv-wall.is-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 /* 봉사 */
@@ -3208,6 +3286,82 @@ kbd {
   font-size: 14px;
 }
 
+/* 상과 보도: 왼쪽 — 제목 · 숫자 넷, 오른쪽 — 대상 상장 일곱 장 한 줄 + 기사 사진 셋 */
+.is-stage .jr-slide[data-layout='proof'] .jr-fit {
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 64px;
+  row-gap: 26px;
+}
+.is-stage .jr-slide[data-layout='proof'] .pv-head {
+  grid-column: 1;
+  grid-row: 1;
+}
+.is-stage .jr-slide[data-layout='proof'] .pv-head h2 {
+  font-size: 52px;
+}
+.is-stage .pv-pnums {
+  grid-column: 1;
+  grid-row: 2 / span 2;
+  align-content: center;
+  gap: 14px;
+}
+.is-stage .pv-pnums div {
+  padding: 22px 24px;
+}
+.is-stage .pv-pnums dd {
+  font-size: 64px;
+}
+.is-stage .pv-pnums dt {
+  font-size: 16px;
+}
+.is-stage .pv-pnums dt small {
+  font-size: 13px;
+}
+.is-stage .pv-wall.is-row {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  align-self: stretch;
+  gap: 16px;
+}
+.is-stage .pv-wall.is-row li {
+  grid-template-rows: auto auto;
+  align-content: end;
+}
+.is-stage .pv-wall.is-row button,
+.is-stage .pv-wall.is-row .sheet {
+  width: 100%;
+  height: auto;
+}
+.is-stage .pv-wall.is-row b {
+  font-size: 13px;
+}
+.is-stage .pv-wall.is-row small {
+  font-size: 12px;
+}
+.is-stage .pv-news.is-row {
+  grid-column: 2;
+  grid-row: 3;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0 24px;
+}
+.is-stage .pv-news.is-row b {
+  font-size: 16px;
+}
+
+/* 나: 학력 세 줄 */
+.is-stage .pv-me-edu {
+  gap: 8px;
+  padding-top: 22px;
+}
+.is-stage .pv-me-edu li {
+  font-size: 17px;
+}
+
 /* 자기계발 계획: 머리 + 표 */
 .is-stage .pv-dev {
   height: 100%;
@@ -3589,7 +3743,8 @@ kbd {
   .pv-nums {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  .pv-wall {
+  .pv-wall,
+  .pv-wall.is-row {
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 10px;
   }
@@ -3651,5 +3806,72 @@ kbd {
   .pv-ph img,
   .pv-wall button {
     transition: none;
+  }
+}
+
+/* ── 발표 노트(N): 화면 아래 어두운 띠 — 권장 시간 · 계획 · 지금까지 걸린 시간 · 대본 ── */
+.jr-notes {
+  position: absolute;
+  left: 50%;
+  bottom: 74px;
+  z-index: 30;
+  display: grid;
+  gap: 8px;
+  width: min(940px, calc(100% - 32px));
+  padding: 14px 20px 16px;
+  border-radius: 14px;
+  background: rgba(17, 19, 23, 0.94);
+  box-shadow: 0 18px 50px rgba(17, 19, 23, 0.35);
+  color: #fff;
+  transform: translateX(-50%);
+  -webkit-user-select: text;
+  user-select: text;
+}
+.jr-notes[hidden] {
+  display: none;
+}
+.jr-notes-h {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.66);
+}
+.jr-notes-h b {
+  color: #fff;
+}
+.jr-notes-h .is-ok b {
+  color: #7ee2c0;
+}
+.jr-notes-h .is-late,
+.jr-notes-h .is-late b {
+  color: #ffa47e;
+}
+.jr-notes-k {
+  margin-left: auto;
+}
+.jr-notes-t {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+@media (max-width: 820px) {
+  .jr-notes {
+    bottom: 62px;
+    padding: 12px 14px 14px;
+  }
+  .jr-notes-k {
+    display: none;
+  }
+  .jr-notes-t {
+    font-size: 15px;
+  }
+}
+@media print {
+  .pg-journey .jr-notes {
+    display: none !important;
   }
 }
