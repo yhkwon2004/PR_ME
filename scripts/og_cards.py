@@ -278,9 +278,9 @@ def main():
     # 성장 과정: 학년마다 대표 프로젝트 한두 개의 사진(1학년 해커톤 로봇 → 2학년 자작차 → 3학년 링거폴대 · 4족보행)
     grown = [by_id[i]['cover'] for i in ['robot-push-hackathon', 'baja-ev-formula', 'iot-iv-pole', 'quadruped-robot'] if i in by_id and by_id[i].get('cover')]
     # 발표 자료(/present · /growth): 경진대회 안내서의 목차 그대로 — 학년마다 대표 프로젝트 사진
-    section_card(os.path.join(OUT, 'growth.jpg'), 'PRESENTATION — 10분 포트폴리오 발표', '발표 자료 · 28장',
-                 '나를 소개합니다 → STEP 1 자기이해 → STEP 2 직업탐색 → STEP 3 진로계획 · 비교과 → STEP 4 미래설계',
-                 [('28', '장'), ('10', '분'), (str(len(awards)), '수상')], grown, '/present')
+    section_card(os.path.join(OUT, 'growth.jpg'), 'PRESENTATION — 10분 포트폴리오 발표', '발표 자료 · 29장',
+                 '목표 ADD 무인 감시정찰 연구원 — 자기이해 → 직업탐색 → 진로계획 · 비교과 → 미래설계',
+                 [('29', '장'), ('10', '분'), (str(len(awards)), '수상')], grown, '/present')
     section_card(os.path.join(OUT, 'history.jpg'), 'BY GRADE — 학년별 비교과 · 경력', 'History · 2023 — 2026',
                  '연구실 · 인턴십 · 동아리 · 전공 · 창업 · 수상 — 학년마다 한 일',
                  [('4', '연도'), (str(len(projects)), '프로젝트'), (str(len(awards)), '수상')], covers[:4], '/history')
