@@ -13,7 +13,9 @@
 자료 그래프(덱의 막대 · 점 그래프는 모두 여기서 그린다 — HTML로 그리지 않는다)
   charts/clinic-24h.svg      3장 · 서울 동물병원 100곳 중 24시간 운영 약 8곳
   charts/dispute.svg         4장 · 동물병원 피해구제 접수 건수 2021 ~ 2026.6
-  charts/resolve-30.svg · resolve-19.svg   4장 · 진료기록 유무별 분쟁 해결률
+  charts/resolve.svg         4장 · 진료기록 유무별 분쟁 해결률 (이름 · 숫자 · 막대 · 건수까지 한 장)
+  charts/cases.svg           4장 · 기록이 없을 때 분쟁 5건 중 해결 1건
+  charts/market.svg          17장 · 시장 규모 TAM · SAM · SOM (곳 수와 금액까지 한 장)
   charts/visit.svg           12장 · 양육가구 최근 1년 동물병원 이용률 2021 → 2025 (출처의 두 해만)
   charts/cagr.svg            12장 · 동물용 인퓨전펌프 시장 CAGR 조사기관별 전망
   charts/rx.svg · rx-large.svg   12장 · 부록 A8 · 동물병원 의료용 마약류 처방량 2022 ~ 2025
@@ -24,12 +26,14 @@
 
 모든 신호는 모의 데이터입니다. 실측 로그(CSV)가 있으면 simulate() 대신 그 값을 넣으면 같은 차트가 나옵니다.
 """
-import glob, math, os
+import glob, math, os, re
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
+from matplotlib.ft2font import LoadFlags
+from matplotlib.patches import FancyBboxPatch, Polygon
 from matplotlib.transforms import blended_transform_factory
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -116,10 +120,27 @@ def use_font():
     })
 
 
-def save(fig, name):
+def save(fig, name, fills=None, blurs=None):
+    """fills: {gid: (x1, y1, x2, y2, [(offset, colour, opacity), ...])} — that patch gets an SVG linear gradient
+    (bounding-box units, like CSS); blurs: {gid: σ px} — that patch is blurred into a soft shadow"""
     path = os.path.join(OUT, name)
     fig.savefig(path, format='svg', transparent=True, metadata={'Date': None, 'Creator': None})
     plt.close(fig)
+    if fills or blurs:
+        svg, defs = open(path, encoding='utf-8').read(), []
+        for gid, (x1, y1, x2, y2, stops) in (fills or {}).items():
+            defs.append(f'<linearGradient id="{gid}-fill" x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}">'
+                        + ''.join(f'<stop offset="{o}" stop-color="{c}" stop-opacity="{a}"/>' for o, c, a in stops)
+                        + '</linearGradient>')
+            svg, n = re.subn(rf'(<g id="{gid}">\s*<path [^>]*?style="fill: )#[0-9a-f]{{6}}', rf'\1url(#{gid}-fill)', svg, count=1)
+            assert n == 1, gid
+        for gid, sd in (blurs or {}).items():
+            defs.append(f'<filter id="{gid}-blur" x="-40%" y="-80%" width="180%" height="260%">'
+                        f'<feGaussianBlur stdDeviation="{sd * .75:g}"/></filter>')  # px → pt, the SVG's units
+            assert f'<g id="{gid}">' in svg, gid
+            svg = svg.replace(f'<g id="{gid}">', f'<g id="{gid}" filter="url(#{gid}-blur)">', 1)
+        svg = svg.replace('<defs>', '<defs>\n  ' + '\n  '.join(defs), 1)
+        open(path, 'w', encoding='utf-8').write(svg)
     print(path, os.path.getsize(path) // 1024, 'KB')
 
 
@@ -175,7 +196,8 @@ def chart_gyro_mini():
     ax.set_title('흔들림이 만든 무게 편차 (g)', loc='left', fontsize=11, fontweight='semibold', color=INK2, pad=6)
     ax.set_title(f'자이로와 상관 r = {r:.2f}', loc='right', fontsize=11, fontweight='bold', color=HONEY, pad=6)
     lim = float(max(abs(dev).max(), abs(res).max()) * 1.15)
-    ax.set_ylim(-lim, lim * 1.6); ax.set_yticks([-5, 0, 5]);  # headroom above the traces for the legend ax.set_xlim(0, 12); ax.set_xticks(range(0, 13, 2))
+    ax.set_ylim(-lim, lim * 1.6); ax.set_yticks([-5, 0, 5])  # headroom above the traces for the legend
+    ax.set_xlim(0, 12); ax.set_xticks(range(0, 13, 2))
     ax.set_xlabel('시간 (s) · 학습 장비 20 Hz', fontsize=10, color=INK2, labelpad=3)
     ax.grid(axis='y', color=GRID, lw=.8); ax.set_axisbelow(True)
     for side in ('top', 'right'):
@@ -238,13 +260,112 @@ def chart_dispute():
     return columns(vals, labs, (606, 559), {5}, lambda v: f'{v}', value_pt=15, label_pt=12.5)
 
 
-def chart_resolve(rate, color):
-    fig = plt.figure(figsize=px(271, 14))
+# ---- figures laid out in px like the deck's HTML: text runs on a baseline, rounded boxes, pills ----
+PT = .75  # 1 px on the 1080p stage = .75 pt
+WEIGHT = {400: 'regular', 600: 'semibold', 700: 'bold', 800: 'extra bold'}
+
+
+def canvas(w, h):
+    """w × h px figure whose data coordinates are px from its top-left corner"""
+    fig = plt.figure(figsize=px(w, h))
     ax = fig.add_axes([0, 0, 1, 1])
-    from matplotlib.patches import FancyBboxPatch
-    ax.add_patch(FancyBboxPatch((0, .1), 100, .8, boxstyle='round,pad=0,rounding_size=.4', mutation_aspect=.04, color='#EFE7DC', lw=0))
-    ax.add_patch(FancyBboxPatch((0, .1), rate, .8, boxstyle='round,pad=0,rounding_size=.4', mutation_aspect=.04, color=color, lw=0))
-    ax.set_xlim(0, 100); ax.set_ylim(0, 1); ax.axis('off')
+    ax.set_xlim(0, w); ax.set_ylim(h, 0); ax.axis('off')
+    return fig, ax
+
+
+def advance(s, size, weight):
+    """advance width in px of s set at size px — what the browser lays out, so runs can follow each other"""
+    font = font_manager.get_font(font_manager.findfont(font_manager.FontProperties(family='Pretendard', weight=WEIGHT[weight])))
+    font.set_size(size, 72)
+    return sum(font.load_char(ord(c), flags=LoadFlags.NO_HINTING).linearHoriAdvance / 65536 for c in s)
+
+
+def say(ax, x, y, runs, ha='left', z=3):
+    """one line with its baseline at y: runs of (text, size px, weight, colour[, letter-spacing em, gap em]);
+    letter-spacing is set glyph by glyph as CSS does. Returns the line's width."""
+    runs = [r + (0, 0)[len(r) - 4:] if len(r) < 6 else r for r in runs]
+    width = sum(g * sz + advance(t, sz, w) + tr * sz * len(t) for t, sz, w, _, tr, g in runs)
+    x0 = x - width if ha == 'right' else x
+    for t, sz, w, col, tr, g in runs:
+        x0 += g * sz
+        for piece in (t if tr else [t]):
+            ax.text(x0, y, piece, fontsize=sz * PT, fontweight=WEIGHT[w], color=col, ha='left', va='baseline', zorder=z)
+            x0 += advance(piece, sz, w) + tr * sz * len(piece)
+    return width
+
+
+def rbox(ax, x, y, w, h, r, z=1, gid=None, **kw):
+    p = FancyBboxPatch((x, y), w, h, boxstyle=f'round,pad=0,rounding_size={r}', zorder=z, gid=gid, **kw)
+    ax.add_patch(p)
+    return p
+
+
+def pill(ax, right, cy, text, size, col, bg, z):
+    """CSS pill: padding .22em .75em, fully rounded, text right edge at right − padding"""
+    w = advance(text, size, 800)
+    h = size * 1.2 + size * .44
+    rbox(ax, right - w - size * 1.5, cy - h / 2, w + size * 1.5, h, h / 2, z=z, color=bg, lw=0)
+    say(ax, right - size * .75, cy + size * .37, [(text, size, 800, col)], ha='right', z=z + .1)
+
+
+def chart_resolve():
+    # 진료기록 유무별 분쟁 해결률: 두 칸에 이름 · 해결률 · 막대 · 건수 (4장 오른쪽 카드 폭 575 px)
+    W, H, GAP = 575, 211, 32
+    cw = (W - GAP) / 2
+    fig, ax = canvas(W, H)
+    for k, (lab, rate, cases, bar, num) in enumerate([('기록 있음', 30, '80건 중 24건 해결', HONEY, HONEY),
+                                                    ('기록 없음', 19.5, '41건 중 8건 해결', '#B8A797', INK2)]):
+        x = k * (cw + GAP)
+        say(ax, x, 20, [(lab, 20, 600, INK2)])
+        say(ax, x, 122, [(f'{rate:g}', 92, 800, num, -.045), ('%', 38.6, 700, num, 0, .06)])
+        rbox(ax, x, 166, cw, 16, 8, color='#EFE7DC', lw=0)
+        rbox(ax, x, 166, cw * rate / 100, 16, 8, z=2, color=bar, lw=0)
+        say(ax, x, 203, [(cases, 16.8, 400, MUTE)])
+    return fig
+
+
+def chart_cases():
+    # 기록이 없을 때 해결률 19.5% ≈ 분쟁 5건 중 1건: 해결 1칸(체크) · 미해결 4칸(가위표)
+    S, GAP = 56, 12
+    fig, ax = canvas(5 * S + 4 * GAP, 92)
+    for k in range(5):
+        x = k * (S + GAP)
+        rbox(ax, x, 0, S, S, 12, color=HONEY if k == 0 else '#EFE7DC', lw=0)
+        c = (x + S / 2, S / 2)
+        if k == 0:
+            ax.plot([c[0] - 12, c[0] - 3, c[0] + 13], [c[1] + 1, c[1] + 10, c[1] - 9], color='#FFFFFF', lw=4 * PT,
+                    solid_capstyle='round', solid_joinstyle='round', zorder=2)
+        else:
+            for d in (1, -1):
+                ax.plot([c[0] - 9, c[0] + 9], [c[1] - 9 * d, c[1] + 9 * d], color='#B8A797', lw=3 * PT,
+                        solid_capstyle='round', zorder=2)
+    say(ax, S / 2 - advance('해결', 16, 700) / 2, 84, [('해결', 16, 700, HONEY)])
+    mid = S + GAP + (4 * S + 3 * GAP) / 2
+    say(ax, mid - advance('해결 못 함 4건', 16, 600) / 2, 84, [('해결 못 함 4건', 16, 600, MUTE)])
+    ax.plot([S + GAP, S + GAP, 5 * S + 4 * GAP, 5 * S + 4 * GAP], [S + 6, S + 10, S + 10, S + 6], color=LINE, lw=1.1, zorder=1)
+    return fig
+
+
+def chart_market():
+    # 17장 시장 규모: TAM · SAM · SOM 상자를 계단처럼 겹치고 왼쪽에 위로 커지는 화살표 (덱의 자리 553 × 763 px)
+    W, H = 553, 763
+    fig, ax = canvas(W, H)
+    top = H * .04
+    arrow = [(15, 0), (30, 34), (20, 34), (20, 300), (10, 300), (10, 34), (0, 34)]
+    ax.add_patch(Polygon([(8 + x / 30 * 52, top + y / 300 * (H - top)) for x, y in arrow], closed=True, color='#A9723F', lw=0, gid='arrow'))
+    tiers = [  # left, top, height; label, value, money; box colour; text colours; pill background; shadow opacity
+        (88, 0, 301, 'TAM · 전국 동물병원', '5,312곳', '약 449억 원', '#F2EADF', (INK2, INK, HONEY), (173 / 255, 98 / 255, 41 / 255, .12), 0),
+        (136, 284, 247, 'SAM · 호남권', '약 300곳', '약 25억 원', '#EAD9C3', (INK2, INK, HONEY), (173 / 255, 98 / 255, 41 / 255, .12), .08),
+        (184, 515, 248, 'SOM · 3년', '50곳 · 250대', '약 4.2억 원', '#B46A2F', ((1, 1, 1, .85), '#FFFFFF', '#FFFFFF'), (1, 1, 1, .2), .18)]
+    for k, (x, y, h, lab, val, money, fill, (c_lab, c_val, c_money), bg, shadow) in enumerate(tiers):
+        z = 2 + k * 3
+        if shadow:  # box-shadow: 0 −.6em 1.6em — cast upward onto the tier behind
+            rbox(ax, x, y - 12, W - x, h, 20, z=z - 1, gid=f'sh{k}', color='#5C3E24', alpha=shadow, lw=0)
+        rbox(ax, x, y, W - x, h, 20, z=z, gid=f't{k}', facecolor=fill, edgecolor='#E6DBCD' if k == 0 else 'none', lw=PT if k == 0 else 0)
+        cy, right = y + h / 2, W - 28
+        say(ax, right, cy - 41.8, [(lab, 17.2, 600, c_lab)], ha='right', z=z + .2)
+        say(ax, right, cy + 11, [(val, 50, 800, c_val, -.035)], ha='right', z=z + .2)
+        pill(ax, right, cy + 41, money, 20.4, c_money, bg, z + .2)
     return fig
 
 
@@ -355,8 +476,12 @@ if __name__ == '__main__':
     save(chart_filter(), 'filter.svg')
     save(chart_clinic24h(), 'clinic-24h.svg')
     save(chart_dispute(), 'dispute.svg')
-    save(chart_resolve(30, HONEY), 'resolve-30.svg')
-    save(chart_resolve(19.5, '#B8A797'), 'resolve-19.svg')
+    save(chart_resolve(), 'resolve.svg')
+    save(chart_cases(), 'cases.svg')
+    save(chart_market(), 'market.svg',
+         fills={'arrow': (0, 1, 0, 0, [(0, '#A9723F', .25), (1, '#E3BC8C', 1)]),       # CSS: from the foot, faint → honey
+                't2': (.25, .067, .75, .933, [(0, '#C97F40', 1), (1, '#A35A22', 1)])},  # CSS: linear-gradient(150deg)
+         blurs={'sh1': 16, 'sh2': 16})                                                  # CSS: 1.6em blur → σ 16 px
     save(chart_visit(), 'visit.svg')
     save(chart_cagr(), 'cagr.svg')
     save(chart_rx((538, 318)), 'rx.svg')
