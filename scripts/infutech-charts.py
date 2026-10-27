@@ -15,9 +15,16 @@
   charts/clinic-24h.svg      3장 · 서울 동물병원 100곳 중 24시간 운영 약 8곳
   charts/dispute.svg         4장 · 동물병원 피해구제 접수 건수 2021 ~ 2026.6
   charts/resolve.svg         4장 · 진료기록 유무별 분쟁 해결률 (이름 · 숫자 · 막대 · 건수까지 한 장)
-  charts/cases.svg           4장 · 기록이 없을 때 분쟁 5건 중 해결 1건
+  charts/causes.svg          4장 · 피해구제 신청 사유(128건) — 진료상 과실의 네 갈래, 1위 처치 미흡
   charts/market.svg          17장 · 시장 규모 TAM · SAM · SOM (곳 수와 금액까지 한 장)
   charts/grade.svg           14장 · 동물용 의료기기 등급 사다리 — INFU RETRO 구조는 1등급(신고)
+  charts/dispute-split.svg   부록 A10 · 상담 → 신청 → 처리 → 해결 흐름과 진료부 확보 여부별 해결 · 미해결
+  charts/causes-all.svg      부록 A10 · 신청 사유 100% 누적 막대 (진료상 과실 75% + 그 외 25%)
+  charts/pivc.svg            부록 A11 · 수액 카테터 합병증 발생률 — 연구 3편 (영국 · 미국 · 이탈리아)
+  charts/treat-cost.svg      부록 A12 · 최근 2년 치료비 2023 → 2025 조사 (전체 가구 · 치료비를 쓴 가구)
+  charts/signals.svg         부록 A11 · 무게 곡선 예시(모의 신호) — 정상 · 막힘 · 빠짐이 기대 추세에서 벗어나는 모습
+  charts/petcost.svg         부록 A12 · 1마리 월 양육비 12.1만 원 중 병원비 3.7만 원(그중 치료 1.4만 원)
+  charts/revenue.svg         부록 A12 · 병원 1곳(5대) 연 매출 — 1년차 장비 + 구독, 2년차부터 구독
   charts/visit.svg           12장 · 양육가구 최근 1년 동물병원 이용률 2021 → 2025 (출처의 두 해만)
   charts/cagr.svg            12장 · 동물용 인퓨전펌프 시장 CAGR 조사기관별 전망
   charts/rx.svg · rx-large.svg   12장 · 부록 A8 · 동물병원 의료용 마약류 처방량 2022 ~ 2025
@@ -356,25 +363,197 @@ def chart_resolve():
     return fig
 
 
-def chart_cases():
-    # 기록이 없을 때 해결률 19.5% ≈ 분쟁 5건 중 1건: 해결 1칸(체크) · 미해결 4칸(가위표)
-    S, GAP = 56, 12
-    fig, ax = canvas(5 * S + 4 * GAP, 92)
-    for k in range(5):
-        x = k * (S + GAP)
-        rbox(ax, x, 0, S, S, 12, color=HONEY if k == 0 else '#EFE7DC', lw=0)
-        c = (x + S / 2, S / 2)
-        if k == 0:
-            ax.plot([c[0] - 12, c[0] - 3, c[0] + 13], [c[1] + 1, c[1] + 10, c[1] - 9], color='#FFFFFF', lw=4 * PT,
-                    solid_capstyle='round', solid_joinstyle='round', zorder=2)
-        else:
-            for d in (1, -1):
-                ax.plot([c[0] - 9, c[0] + 9], [c[1] - 9 * d, c[1] + 9 * d], color='#B8A797', lw=3 * PT,
-                        solid_capstyle='round', zorder=2)
-    say(ax, S / 2 - advance('해결', 16, 700) / 2, 84, [('해결', 16, 700, HONEY)])
-    mid = S + GAP + (4 * S + 3 * GAP) / 2
-    say(ax, mid - advance('해결 못 함 4건', 16, 600) / 2, 84, [('해결 못 함 4건', 16, 600, MUTE)])
-    ax.plot([S + GAP, S + GAP, 5 * S + 4 * GAP, 5 * S + 4 * GAP], [S + 6, S + 10, S + 10, S + 6], color=LINE, lw=1.1, zorder=1)
+# 한국소비자원 동물병원 소비자피해 분석(2026.9, 2021~2026.6): 피해구제 128건 기준 신청 사유 — 진료상 과실 96건(75%)
+CAUSES = [('처치 미흡', 32.0), ('수술 부작용', 26.6), ('진단 과실', 10.2), ('안전사고', 6.2)]
+
+
+def chart_causes():
+    # 4장 오른쪽 카드 아래(폭 575 px): 진료상 과실의 네 갈래 — 1위 처치 미흡만 honey
+    rows = [(lab, v, f'{v:.1f}%', HONEY if k == 0 else BAR_DIM, HONEY if k == 0 else INK2, None) for k, (lab, v) in enumerate(CAUSES)]
+    return hbars(rows, (575, 124), label_w=104, value_px=16.5, label_px=16, bar_px=15)
+
+
+def chart_dispute_split():
+    # 부록 A10 (529 × 606 px): 위 — 상담에서 해결까지 네 단계, 아래 — 처리 완료 121건을 진료부 확보 여부로 나눈 해결 · 미해결
+    W, H = 529, 606
+    fig, ax = canvas(W, H)
+    steps = [('1,941', '상담'), ('128', '피해구제 신청'), ('121', '처리 완료'), ('32', '분쟁 해결')]
+    bw, gap = 112, (W - 4 * 112) / 3
+    for k, (num, lab) in enumerate(steps):
+        x, last = k * (bw + gap), k == len(steps) - 1
+        rbox(ax, x, 0, bw, 84, 12, color='#FBEBDD' if last else '#F4EEE7', lw=0)
+        say(ax, x + bw / 2, 42, [(num, 27, 800, HONEY if last else INK)], ha='center')
+        say(ax, x + bw / 2, 68, [(lab, 14.5, 600, HONEY if last else MUTE)], ha='center')
+        if not last:  # arrow to the next step
+            ax.annotate('', xy=(x + bw + gap - 3, 42), xytext=(x + bw + 3, 42),
+                        arrowprops=dict(arrowstyle='-|>', color=LINE, lw=1.4, mutation_scale=11, shrinkA=0, shrinkB=0))
+    say(ax, 0, 146, [('처리 완료 121건 — 진료부 확보 여부별', 17, 700, INK)])
+    for k, (lab, col) in enumerate((('해결', HONEY), ('해결 못 함', '#E6DBCD'))):  # legend
+        x = 0 if k == 0 else 74
+        rbox(ax, x, 166, 13, 13, 3, color=col, lw=0)
+        say(ax, x + 20, 178, [(lab, 14.5, 500, INK2)])
+    rows = [('전체', 121, 32), ('진료부 확보', 80, 24), ('진료부 미확보', 41, 8)]
+    room = W - advance('해결 26.4%', 17, 700) - 14
+    for k, (lab, n, ok) in enumerate(rows):
+        top = 218 + k * 130
+        say(ax, 0, top + 16, [(lab, 16.5, 700, INK), (f'  {n}건', 15, 500, MUTE)])
+        y0, y1 = top + 30, top + 30 + 38
+        full, w_ok = room * n / 121, room * ok / 121
+        ax.add_patch(PathPatch(shape(0, y0, w_ok - 1, y1), facecolor=HONEY, lw=0))
+        ax.add_patch(PathPatch(shape(w_ok + 1, y0, full, y1, tr=6, br=6), facecolor='#E6DBCD', lw=0))
+        say(ax, w_ok / 2, (y0 + y1) / 2 + .36 * 15, [(f'{ok}', 15, 700, '#FFFFFF')], ha='center')
+        if full - w_ok > 30:
+            say(ax, (w_ok + full) / 2, (y0 + y1) / 2 + .36 * 15, [(f'{n - ok}', 15, 600, INK2)], ha='center')
+        say(ax, full + 12, (y0 + y1) / 2 + .36 * 17, [(f'해결 {ok / n * 100:.1f}%', 17, 700, HONEY if k else INK)])
+    return fig
+
+
+def chart_causes_all():
+    # 부록 A10 (466 × 606 px): 신청 사유 128건을 한 기둥에 — 진료상 과실 네 갈래(75%)와 그 외(25%), 조각 사이 2px 틈
+    W, H = 466, 606
+    fig, ax = canvas(W, H)
+    parts = CAUSES + [('그 외', 25.0)]
+    x0, x1, top, bottom, GAP = 150, 262, 8, 598, 2
+    span = bottom - top - GAP * (len(parts) - 1)
+    y = top
+    for k, (lab, v) in enumerate(parts):
+        h = span * v / 100
+        col = HONEY if k == 0 else ('#EFD3B4' if k < 4 else '#E6DBCD')
+        r = 8
+        ax.add_patch(PathPatch(shape(x0, y, x1, y + h, tl=r if k == 0 else 0, tr=r if k == 0 else 0,
+                                     bl=r if k == len(parts) - 1 else 0, br=r if k == len(parts) - 1 else 0), facecolor=col, lw=0))
+        cy = y + h / 2
+        say(ax, x1 + 16, cy + .36 * 17, [(lab, 17, 700 if k == 0 else 600, HONEY if k == 0 else INK), (f'  {v:.1f}%', 17, 700, HONEY if k == 0 else INK2)])
+        y += h + GAP
+    fault = span * .75 + GAP * 3   # bracket: the four kinds of clinical fault
+    ax.plot([x0 - 14, x0 - 22, x0 - 22, x0 - 14], [top, top, top + fault, top + fault], color=LINE, lw=1.1 * PT * 1.4, zorder=1)
+    say(ax, x0 - 34, top + fault / 2 - 4, [('진료상 과실', 16, 700, INK)], ha='right')
+    say(ax, x0 - 34, top + fault / 2 + 20, [('75% · 96건', 16, 700, HONEY)], ha='right')
+    return fig
+
+
+def chart_pivc():
+    # 부록 A11 (529 × 606 px): 수액 카테터 합병증 발생률 — 연구 3편, 카테터 기준. 발표에 쓴 영국 다기관 연구만 honey
+    W, H = 529, 606
+    fig, ax = canvas(W, H)
+    studies = [('이탈리아 테라모 대학병원 · 2022', '개 76 · 고양이 40 · 6개월 전향 연구', 46.6, False, []),
+               ('영국 19개 기관 다기관 연구 · 2024', '카테터 382개 · 개 325 · 고양이 57', 26.7, True, []),
+               ('미국 CSU 대학병원 · 2023', '개 396마리 · 카테터 412개', 19.9, False, [('중환자실', 24.2), ('중간 병동', 13.1)])]
+    room = W - advance('46.6%', 20, 800) - 14
+    BAR, SUB = 36, 12
+    heights = [58 + BAR + len(subs) * (SUB + 12) for *_, subs in studies]
+    gap = (H - 6 - sum(heights)) / (len(studies) - 1)   # spread the studies over the card
+    y = 4
+    for (title, detail, v, main, subs), h in zip(studies, heights):
+        say(ax, 0, y + 18, [(title, 17.5, 700, HONEY if main else INK)])
+        say(ax, 0, y + 43, [(detail, 15, 500, MUTE)])
+        y0 = y + 58
+        w = room * v / 46.6
+        ax.add_patch(PathPatch(shape(0, y0, w, y0 + BAR, tr=6, br=6), facecolor=HONEY if main else BAR_DIM, lw=0))
+        say(ax, w + 12, y0 + BAR / 2 + .36 * 20, [(f'{v:.1f}%', 20, 800, HONEY if main else INK)])
+        ys = y0 + BAR
+        for lab, sv in subs:   # ward split, thinner bars under the study's bar
+            ys += 12
+            sw = room * sv / 46.6
+            ax.add_patch(PathPatch(shape(0, ys, sw, ys + SUB, tr=4, br=4), facecolor='#E6DBCD', lw=0))
+            say(ax, sw + 10, ys + SUB / 2 + .36 * 14.5, [(f'{lab} {sv:.1f}%', 14.5, 600, INK2)])
+            ys += SUB
+        y += h + gap
+    return fig
+
+
+def chart_signals():
+    # 부록 A11 세 번째 카드(457 × 232 px): 기대 추세와의 차이(g), 모의 신호 20분 — 막힘은 덜 줄고, 빠짐은 당김이 튄 뒤 더 빨리 줆
+    W, H = 457, 232
+    fig, ax = canvas(W, H)
+    rows = [('정상', 'normal', 11), ('막힘 · 꺾임', 'drop', 12), ('빠짐 · 줄 끊김', 'line', 13)]
+    t0, t1, T = 1500, 2700, 1800
+    lab_w, rh = 116, H / 3
+    scale = rh * .5 / 45                        # the same g scale in every row: ±45 g fills a row
+    xs = lambda t: lab_w + (t - t0) / (t1 - t0) * (W - lab_w - 2)
+    for k, (lab, kind, seed) in enumerate(rows):
+        raw, kw, exp, score = simulate(kind, seed)
+        cy = rh * (k + .5)
+        say(ax, 0, cy + .36 * 15.5, [(lab, 15.5, 700 if k else 600, INK if k else INK2)])
+        rbox(ax, lab_w, cy - 5 * scale, W - lab_w - 2, 10 * scale, 2, color='#F2EBE2', lw=0)   # ±5 g: within normal
+        ax.plot([lab_w, W - 2], [cy, cy], color=LINE, lw=.6, zorder=1)
+        if k:
+            ax.plot([xs(T), xs(T)], [cy - rh * .46, cy + rh * .46], color=LINE, lw=.9, ls=(0, (2, 2)), zorder=1)
+        dev = np.convolve(raw - exp, np.ones(5) / 5, mode='same')   # 5-second moving average of the measured weight
+        t = np.arange(t0, t1, 2)
+        ax.plot(xs(t), cy - dev[t] * scale, color=HONEY if k else INK2, lw=2 * PT * 1.25, solid_joinstyle='round', zorder=2)
+    say(ax, xs(T) + 5, H - 3, [('이상 시작', 12.5, 600, MUTE)])
+    return fig
+
+
+def chart_treat_cost():
+    # 부록 A12 (529 × 632 px): 최근 2년 치료비(만 원) — KB 2023 · 2025 조사, 전체 가구 평균과 치료비를 쓴 가구 평균
+    W, H = 529, 632
+    fig, ax = canvas(W, H)
+    for k, (lab, col) in enumerate((('2023 조사', BAR_DIM), ('2025 조사', HONEY))):  # legend
+        x = k * 110
+        rbox(ax, x, 4, 13, 13, 3, color=col, lw=0)
+        say(ax, x + 20, 16, [(lab, 14.5, 500, INK2)])
+    groups = [('전체 가구 평균', 57.7, 102.7), ('치료비를 쓴 가구 평균', 78.7, 146.3)]
+    base, top, bar, inner = 560, 92, 76, 12
+    ax.plot([0, W], [base, base], color=LINE, lw=PT, solid_capstyle='butt', zorder=3)
+    for g, (lab, a, b) in enumerate(groups):
+        xc = W * (g + .5) / 2
+        for j, (v, col) in enumerate(((a, BAR_DIM), (b, HONEY))):
+            x = xc - inner / 2 - bar if j == 0 else xc + inner / 2
+            yt = base - (base - top) * v / 146.3
+            ax.add_patch(PathPatch(shape(x, yt, x + bar, base, tl=6, tr=6), facecolor=col, lw=0, zorder=2))
+            say(ax, x + bar / 2, yt - 10, [(f'{v:g}만', 18, 700, HONEY if j else INK2)], ha='center')
+        say(ax, xc, base + 30, [(lab, 16, 600, INK2)], ha='center')
+        say(ax, xc, base + 54, [(f'{b / a:.1f}배', 15, 700, HONEY)], ha='center')
+    return fig
+
+
+def chart_petcost():
+    # 부록 A12 (468 × 112 px): 1마리 월 양육비 12.1만 원 — 병원비 3.7만 원(31%, 그중 사고 · 상해 · 질병 치료 1.4만 원)과 그 외 8.4만 원
+    W, H, GAP = 468, 112, 2
+    fig, ax = canvas(W, H)
+    parts = [(1.4, HONEY, '치료 1.4만'), (2.3, '#EFD3B4', '그 외 병원비 2.3만'), (8.4, '#E6DBCD', '병원비 외 8.4만')]
+    total, x, y0, y1 = 12.1, 0, 40, 76
+    span = W - GAP * (len(parts) - 1)
+    edges = []
+    for k, (v, col, lab) in enumerate(parts):
+        w = span * v / total
+        l, r = (6 if k == 0 else 0), (6 if k == len(parts) - 1 else 0)
+        ax.add_patch(PathPatch(shape(x, y0, x + w, y1, tl=l, bl=l, tr=r, br=r), facecolor=col, lw=0))
+        edges.append((x, x + w))
+        x += w + GAP
+    say(ax, 0, 101, [(parts[0][2], 14.5, 700, HONEY)])
+    # the treatment slice is narrow: its neighbour's label starts after the first label, not at the slice edge
+    say(ax, max(edges[1][0], advance(parts[0][2], 14.5, 700) + 14), 101, [(parts[1][2], 14.5, 600, INK2)])
+    say(ax, W, 101, [(parts[2][2], 14.5, 600, INK2)], ha='right')
+    hx = edges[1][1]   # bracket over the hospital share
+    ax.plot([0, 0, hx, hx], [y0 - 6, y0 - 12, y0 - 12, y0 - 6], color=HONEY, lw=1.2, zorder=1)
+    say(ax, 0, y0 - 19, [('병원비 3.7만 원 · 31%', 15.5, 800, HONEY)])
+    return fig
+
+
+def chart_revenue():
+    # 부록 A12 (457 × 206 px): 병원 1곳(입원장 5대) 연 매출 — 1년차 장비 125만 + 구독 720만, 2년차부터 구독 720만
+    W, H = 457, 206
+    fig, ax = canvas(W, H)
+    for k, (lab, col) in enumerate((('구독(관리비 포함)', HONEY), ('장비', '#EFD3B4'))):  # legend
+        x = 0 if k == 0 else 150
+        rbox(ax, x, 2, 13, 13, 3, color=col, lw=0)
+        say(ax, x + 20, 14, [(lab, 14.5, 500, INK2)])
+    years = [('1년차', 720, 125), ('2년차', 720, 0), ('3년차', 720, 0)]
+    base, top, bar = 176, 52, 84
+    ax.plot([0, W], [base, base], color=LINE, lw=PT, solid_capstyle='butt', zorder=3)
+    scale = (base - top) / 845
+    for k, (lab, sub, equip) in enumerate(years):
+        xc = W * (k + .5) / 3
+        y_sub = base - sub * scale
+        ax.add_patch(PathPatch(shape(xc - bar / 2, y_sub, xc + bar / 2, base, tl=0 if equip else 6, tr=0 if equip else 6), facecolor=HONEY, lw=0, zorder=2))
+        if equip:
+            y_eq = y_sub - 2 - equip * scale
+            ax.add_patch(PathPatch(shape(xc - bar / 2, y_eq, xc + bar / 2, y_sub - 2, tl=6, tr=6), facecolor='#EFD3B4', lw=0, zorder=2))
+        say(ax, xc, (y_eq if equip else y_sub) - 9, [(f'{sub + equip}만', 17, 700, INK)], ha='center')
+        say(ax, xc, base + 22, [(lab, 15, 600, INK2)], ha='center')
     return fig
 
 
@@ -531,7 +710,14 @@ if __name__ == '__main__':
     save(chart_clinic24h(), 'clinic-24h.svg')
     save(chart_dispute(), 'dispute.svg')
     save(chart_resolve(), 'resolve.svg')
-    save(chart_cases(), 'cases.svg')
+    save(chart_causes(), 'causes.svg')
+    save(chart_dispute_split(), 'dispute-split.svg')
+    save(chart_causes_all(), 'causes-all.svg')
+    save(chart_pivc(), 'pivc.svg')
+    save(chart_treat_cost(), 'treat-cost.svg')
+    save(chart_signals(), 'signals.svg')
+    save(chart_petcost(), 'petcost.svg')
+    save(chart_revenue(), 'revenue.svg')
     save(chart_market(), 'market.svg',
          fills={'arrow': (0, 1, 0, 0, [(0, '#A9723F', .25), (1, '#E3BC8C', 1)]),       # CSS: from the foot, faint → honey
                 't2': (.25, .067, .75, .933, [(0, '#C97F40', 1), (1, '#A35A22', 1)])},  # CSS: linear-gradient(150deg)
