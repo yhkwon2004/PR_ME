@@ -18,16 +18,16 @@
   charts/causes.svg          4장 · 피해구제 신청 사유(128건) — 진료상 과실의 네 갈래, 1위 처치 미흡
   charts/market.svg          17장 · 시장 규모 TAM · SAM · SOM (곳 수와 금액까지 한 장)
   charts/grade.svg           14장 · 동물용 의료기기 등급 사다리 — INFU RETRO 구조는 1등급(신고)
-  charts/dispute-split.svg   부록 A14 · 상담 → 신청 → 처리 → 해결 흐름과 진료부 확보 여부별 해결 · 미해결
-  charts/causes-all.svg      부록 A14 · 신청 사유 100% 누적 막대 (진료상 과실 75% + 그 외 25%)
-  charts/pivc.svg            부록 A15 · 수액 카테터 합병증 발생률 — 연구 3편 (영국 · 미국 · 이탈리아)
-  charts/treat-cost.svg      부록 A16 · 최근 2년 치료비 2023 → 2025 조사 (전체 가구 · 치료비를 쓴 가구)
-  charts/signals.svg         부록 A15 · 무게 곡선 예시(모의 신호) — 정상 · 막힘 · 빠짐이 기대 추세에서 벗어나는 모습
-  charts/petcost.svg         부록 A16 · 1마리 월 양육비 12.1만 원 중 병원비 3.7만 원(그중 치료 1.4만 원)
-  charts/revenue.svg         부록 A16 · 병원 1곳(5대) 연 매출 — 1년차 장비 + 구독, 2년차부터 구독
+  charts/dispute-split.svg   부록 A15 · 상담 → 신청 → 처리 → 해결 흐름과 진료부 확보 여부별 해결 · 미해결
+  charts/causes-all.svg      부록 A15 · 신청 사유 100% 누적 막대 (진료상 과실 75% + 그 외 25%)
+  charts/pivc.svg            부록 A16 · 수액 카테터 합병증 발생률 — 연구 3편 (영국 · 미국 · 이탈리아)
+  charts/treat-cost.svg      부록 A17 · 최근 2년 치료비 2023 → 2025 조사 (전체 가구 · 치료비를 쓴 가구)
+  charts/signals.svg         부록 A16 · 무게 곡선 예시(모의 신호) — 정상 · 막힘 · 빠짐이 기대 추세에서 벗어나는 모습
+  charts/petcost.svg         부록 A17 · 1마리 월 양육비 12.1만 원 중 병원비 3.7만 원(그중 치료 1.4만 원)
+  charts/revenue.svg         부록 A17 · 병원 1곳(5대) 연 매출 — 1년차 장비 + 구독, 2년차부터 구독
   charts/visit.svg           12장 · 양육가구 최근 1년 동물병원 이용률 2021 → 2025 (출처의 두 해만)
   charts/cagr.svg            12장 · 동물용 인퓨전펌프 시장 CAGR 조사기관별 전망
-  charts/rx.svg · rx-large.svg   12장 · 부록 A12 · 동물병원 의료용 마약류 처방량 2022 ~ 2025
+  charts/rx.svg · rx-large.svg   12장 · 부록 A13 · 동물병원 의료용 마약류 처방량 2022 ~ 2025
   charts/epoch.svg           11장 · CNN 검증 정확도 최근 6 epoch
   charts/cost-vs.svg · cost-stack.svg · entry.svg   15장 · 제작비 비교 · 원가 구조 · 입원장 5대 도입비
   charts/bm.svg              18장 · 비즈니스 모델 — 제품 · 돈 흐름, 제공 서비스, 판매 대상과 확대 목표
@@ -35,7 +35,8 @@
   charts/t-chain.svg         부록 · 하드웨어 신호 경로와 잡음 대책 (PCB 레이아웃 사진의 ①~⑥과 같은 번호)
   charts/t-data.svg          부록 · 데이터 구축 → 전이학습 → 파인튜닝 → 실측 교차 검증 → 기기 배포, 검증 정확도 최근 6 epoch
   charts/t-gyroflow.svg · t-gyroscatter.svg   부록 · 자이로 상관 분석으로 자이로 없이 보정 — 단계와 상관 산점도(학습 장비 모의 신호)
-  charts/petins.svg          부록 A18 · 펫보험 보유계약 2022 → 2025 (손해보험업계 집계, 3년 새 3.5배)
+  charts/v-kaha.svg · v-rank.svg   부록 · 현장의 목소리 — 진료수의사 근무 어려움(한국동물병원협회) · 동물병원 서비스 40개 시장 중 37위(한국소비자원)
+  charts/petins.svg          부록 A19 · 펫보험 보유계약 2022 → 2025 (손해보험업계 집계, 3년 새 3.5배)
 
 그림 크기(인치)는 덱에서 차지하는 자리(1080p 기준 px ÷ 96)에 맞춰, 글자가 덱 본문과 같은 크기로 보이게 한다.
 막대는 한 기준선에서 자라고, 값 쪽 끝만 둥글게(기준선 쪽은 각지게) 그린다 — 막대 사이 · 조각 사이는 2px 틈으로 가른다.
@@ -380,7 +381,7 @@ def chart_causes():
 
 
 def chart_dispute_split():
-    # 부록 A14 (529 × 606 px): 위 — 상담에서 해결까지 네 단계, 아래 — 처리 완료 121건을 진료부 확보 여부로 나눈 해결 · 미해결
+    # 부록 A15 (529 × 606 px): 위 — 상담에서 해결까지 네 단계, 아래 — 처리 완료 121건을 진료부 확보 여부로 나눈 해결 · 미해결
     W, H = 529, 606
     fig, ax = canvas(W, H)
     steps = [('1,941', '상담'), ('128', '피해구제 신청'), ('121', '처리 완료'), ('32', '분쟁 해결')]
@@ -415,7 +416,7 @@ def chart_dispute_split():
 
 
 def chart_causes_all():
-    # 부록 A14 (466 × 606 px): 신청 사유 128건을 한 기둥에 — 진료상 과실 네 갈래(75%)와 그 외(25%), 조각 사이 2px 틈
+    # 부록 A15 (466 × 606 px): 신청 사유 128건을 한 기둥에 — 진료상 과실 네 갈래(75%)와 그 외(25%), 조각 사이 2px 틈
     W, H = 466, 606
     fig, ax = canvas(W, H)
     parts = CAUSES + [('그 외', 25.0)]
@@ -439,7 +440,7 @@ def chart_causes_all():
 
 
 def chart_pivc():
-    # 부록 A15 (529 × 606 px): 수액 카테터 합병증 발생률 — 연구 3편, 카테터 기준. 발표에 쓴 영국 다기관 연구만 honey
+    # 부록 A16 (529 × 606 px): 수액 카테터 합병증 발생률 — 연구 3편, 카테터 기준. 발표에 쓴 영국 다기관 연구만 honey
     W, H = 529, 606
     fig, ax = canvas(W, H)
     studies = [('이탈리아 테라모 대학병원 · 2022', '개 76 · 고양이 40 · 6개월 전향 연구', 46.6, False, []),
@@ -469,7 +470,7 @@ def chart_pivc():
 
 
 def chart_signals():
-    # 부록 A15 세 번째 카드(457 × 232 px): 기대 추세와의 차이(g), 모의 신호 20분 — 막힘은 덜 줄고, 빠짐은 당김이 튄 뒤 더 빨리 줆
+    # 부록 A16 세 번째 카드(457 × 232 px): 기대 추세와의 차이(g), 모의 신호 20분 — 막힘은 덜 줄고, 빠짐은 당김이 튄 뒤 더 빨리 줆
     W, H = 457, 232
     fig, ax = canvas(W, H)
     rows = [('정상', 'normal', 11), ('막힘 · 꺾임', 'drop', 12), ('빠짐 · 줄 끊김', 'line', 13)]
@@ -493,7 +494,7 @@ def chart_signals():
 
 
 def chart_treat_cost():
-    # 부록 A16 (529 × 632 px): 최근 2년 치료비(만 원) — KB 2023 · 2025 조사, 전체 가구 평균과 치료비를 쓴 가구 평균
+    # 부록 A17 (529 × 632 px): 최근 2년 치료비(만 원) — KB 2023 · 2025 조사, 전체 가구 평균과 치료비를 쓴 가구 평균
     W, H = 529, 632
     fig, ax = canvas(W, H)
     for k, (lab, col) in enumerate((('2023 조사', BAR_DIM), ('2025 조사', HONEY))):  # legend
@@ -516,7 +517,7 @@ def chart_treat_cost():
 
 
 def chart_petcost():
-    # 부록 A16 (468 × 112 px): 1마리 월 양육비 12.1만 원 — 병원비 3.7만 원(31%, 그중 사고 · 상해 · 질병 치료 1.4만 원)과 그 외 8.4만 원
+    # 부록 A17 (468 × 112 px): 1마리 월 양육비 12.1만 원 — 병원비 3.7만 원(31%, 그중 사고 · 상해 · 질병 치료 1.4만 원)과 그 외 8.4만 원
     W, H, GAP = 468, 112, 2
     fig, ax = canvas(W, H)
     parts = [(1.4, HONEY, '치료 1.4만'), (2.3, '#EFD3B4', '그 외 병원비 2.3만'), (8.4, '#E6DBCD', '병원비 외 8.4만')]
@@ -540,7 +541,7 @@ def chart_petcost():
 
 
 def chart_revenue():
-    # 부록 A16 (457 × 206 px): 병원 1곳(입원장 5대) 연 매출 — 1년차 장비 125만 + 구독 720만, 2년차부터 구독 720만
+    # 부록 A17 (457 × 206 px): 병원 1곳(입원장 5대) 연 매출 — 1년차 장비 125만 + 구독 720만, 2년차부터 구독 720만
     W, H = 457, 206
     fig, ax = canvas(W, H)
     for k, (lab, col) in enumerate((('구독(관리비 포함)', HONEY), ('장비', '#EFD3B4'))):  # legend
@@ -696,7 +697,7 @@ def chart_grade():
 
 
 def chart_petins():
-    # 부록 A18 (787 × 620 px): 펫보험 보유계약(손해보험업계 집계, 연말 기준) 2022 → 2025 — 3년 새 3.5배
+    # 부록 A19 (787 × 620 px): 펫보험 보유계약(손해보험업계 집계, 연말 기준) 2022 → 2025 — 3년 새 3.5배
     vals = [7.19, 10.91, 16.21, 25.18]   # 71,896 · 109,088 · 162,111 · 251,822건
     return columns(vals, ['2022', '2023', '2024', '2025'], (787, 620), {3}, lambda v: f'{v:.1f}만', value_px=20, label_px=16.5, bar_px=88)
 
@@ -1356,10 +1357,27 @@ def chart_t_data():
 
 
 def chart_v_kaha():
-    # 부록 · 현장의 목소리 (카드 안 520 × 210 px): 진료수의사가 꼽은 근무 어려움 상위 3개 — 한국동물병원협회 설문(FASAVA 2025 기간, 중복응답)
-    return hbars([('야간 · 휴일 근무 피로 · 번아웃', 53.4, '53.4%', HONEY, HONEY, None),
-                  ('인력 부족에 따른 업무 과중', 39.4, '39.4%', BAR_DIM, INK2, None),
-                  ('보호자 응대 · 민원 부담', 32.1, '32.1%', BAR_DIM, INK2, None)], (520, 210), value_px=18, label_px=15.5, bar_px=22)
+    # 부록 · 현장의 목소리 (카드 안 480 × 200 px): 진료수의사가 꼽은 근무 어려움 상위 3개 — 한국동물병원협회 설문(FASAVA 2025, 중복응답)
+    return hbars([('야간 · 휴일 근무로 인한 피로 · 번아웃', 53.4, '53.4%', HONEY, HONEY, None),
+                  ('인력 부족으로 인한 업무 과중', 39.4, '39.4%', BAR_DIM, INK2, None),
+                  ('보호자 응대 · 민원 대응 부담', 32.1, '32.1%', BAR_DIM, INK2, None)], (480, 200), value_px=18, label_px=15.5, bar_px=20)
+
+
+def chart_v_rank():
+    # 부록 · 현장의 목소리 (480 × 90 px): 동물병원 서비스 — 소비자시장평가지표 40개 시장 중 37위(한국소비자원, 2024 지표)
+    W, H = 480, 90
+    fig, ax = canvas(W, H)
+    n, hit, gap = 40, 37, 3
+    w = (W - gap * (n - 1)) / n
+    for i in range(n):
+        x = i * (w + gap)
+        on = i + 1 == hit
+        ax.add_patch(PathPatch(shape(x, 30 if not on else 12, x + w, 62, tl=2, tr=2, bl=2, br=2), facecolor=HONEY if on else ('#E8DFD3' if i < 36 else '#D9CBBA'), lw=0, zorder=2))
+    xh = (hit - 1) * (w + gap) + w / 2
+    say(ax, xh, 6 + .36 * 13, [('37위', 13, 800, HONEY)], ha='center')
+    say(ax, 0, 84, [('1위', 13, 600, MUTE)])
+    say(ax, W, 84, [('40위', 13, 600, MUTE)], ha='right')
+    return fig
 
 
 def chart_filter():
@@ -1414,6 +1432,8 @@ if __name__ == '__main__':
     save(chart_t_data(), 't-data.svg', blurs={f'dsh{k}': 14 for k in range(6)})
     save(chart_t_gyroflow(), 't-gyroflow.svg', blurs={f'gsh{k}': 14 for k in range(4)})
     save(chart_t_gyroscatter(), 't-gyroscatter.svg')
+    save(chart_v_kaha(), 'v-kaha.svg')
+    save(chart_v_rank(), 'v-rank.svg')
     save(chart_bm(), 'bm.svg', fills={'cnode': (.25, .067, .75, .933, [(0, '#C97F40', 1), (1, '#A35A22', 1)]),
                                       **{f'card{k}': hi for k in range(3)}},
          blurs={'cnsh': 18, 'nsh0': 16, 'nsh1': 16, **{f'csh{k}': 16 for k in range(3)}})
