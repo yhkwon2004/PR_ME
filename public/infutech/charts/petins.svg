@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="462pt" height="225pt" viewBox="0 0 462 225" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="590.25pt" height="465pt" viewBox="0 0 590.25 465" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -15,75 +15,75 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 225 
-L 462 225 
-L 462 0 
+   <path d="M 0 465 
+L 590.25 465 
+L 590.25 0 
 L 0 0 
-L 0 225 
+L 0 465 
 z
 " style="fill: none"/>
   </g>
   <g id="axes_1">
    <g id="patch_2">
-    <path d="M 35.25 152.408429 
-L 80.25 152.408429 
-Q 84.75 152.408429 84.75 156.908429 
-L 84.75 202.5 
-Q 84.75 202.5 84.75 202.5 
-L 30.75 202.5 
-Q 30.75 202.5 30.75 202.5 
-L 30.75 156.908429 
-Q 30.75 152.408429 35.25 152.408429 
+    <path d="M 45.28125 323.949849 
+L 102.28125 323.949849 
+Q 106.78125 323.949849 106.78125 328.449849 
+L 106.78125 442.03125 
+Q 106.78125 442.03125 106.78125 442.03125 
+L 40.78125 442.03125 
+Q 40.78125 442.03125 40.78125 442.03125 
+L 40.78125 328.449849 
+Q 40.78125 323.949849 45.28125 323.949849 
 z
-" clip-path="url(#pa2df7ab46c)" style="fill: #e3d8cb"/>
+" clip-path="url(#p8f3d9a07be)" style="fill: #e3d8cb"/>
    </g>
    <g id="patch_3">
-    <path d="M 150.75 126.491789 
-L 195.75 126.491789 
-Q 200.25 126.491789 200.25 130.991789 
-L 200.25 202.5 
-Q 200.25 202.5 200.25 202.5 
-L 146.25 202.5 
-Q 146.25 202.5 146.25 202.5 
-L 146.25 130.991789 
-Q 146.25 126.491789 150.75 126.491789 
+    <path d="M 192.84375 262.856272 
+L 249.84375 262.856272 
+Q 254.34375 262.856272 254.34375 267.356272 
+L 254.34375 442.03125 
+Q 254.34375 442.03125 254.34375 442.03125 
+L 188.34375 442.03125 
+Q 188.34375 442.03125 188.34375 442.03125 
+L 188.34375 267.356272 
+Q 188.34375 262.856272 192.84375 262.856272 
 z
-" clip-path="url(#pa2df7ab46c)" style="fill: #e3d8cb"/>
+" clip-path="url(#p8f3d9a07be)" style="fill: #e3d8cb"/>
    </g>
    <g id="patch_4">
-    <path d="M 266.25 89.567544 
-L 311.25 89.567544 
-Q 315.75 89.567544 315.75 94.067544 
-L 315.75 202.5 
-Q 315.75 202.5 315.75 202.5 
-L 261.75 202.5 
-Q 261.75 202.5 261.75 202.5 
-L 261.75 94.067544 
-Q 261.75 89.567544 266.25 89.567544 
+    <path d="M 340.40625 175.814349 
+L 397.40625 175.814349 
+Q 401.90625 175.814349 401.90625 180.314349 
+L 401.90625 442.03125 
+Q 401.90625 442.03125 401.90625 442.03125 
+L 335.90625 442.03125 
+Q 335.90625 442.03125 335.90625 442.03125 
+L 335.90625 180.314349 
+Q 335.90625 175.814349 340.40625 175.814349 
 z
-" clip-path="url(#pa2df7ab46c)" style="fill: #e3d8cb"/>
+" clip-path="url(#p8f3d9a07be)" style="fill: #e3d8cb"/>
    </g>
    <g id="patch_5">
-    <path d="M 381.75 27.075 
-L 426.75 27.075 
-Q 431.25 27.075 431.25 31.575 
-L 431.25 202.5 
-Q 431.25 202.5 431.25 202.5 
-L 377.25 202.5 
-Q 377.25 202.5 377.25 202.5 
-L 377.25 31.575 
-Q 377.25 27.075 381.75 27.075 
+    <path d="M 487.96875 28.5 
+L 544.96875 28.5 
+Q 549.46875 28.5 549.46875 33 
+L 549.46875 442.03125 
+Q 549.46875 442.03125 549.46875 442.03125 
+L 483.46875 442.03125 
+Q 483.46875 442.03125 483.46875 442.03125 
+L 483.46875 33 
+Q 483.46875 28.5 487.96875 28.5 
 z
-" clip-path="url(#pa2df7ab46c)" style="fill: #ad6229"/>
+" clip-path="url(#p8f3d9a07be)" style="fill: #ad6229"/>
    </g>
    <g id="line2d_1">
-    <path d="M 0 202.5 
-L 462 202.5 
-" clip-path="url(#pa2df7ab46c)" style="fill: none; stroke: #cdbfaf; stroke-width: 0.75"/>
+    <path d="M 0 442.03125 
+L 590.25 442.03125 
+" clip-path="url(#p8f3d9a07be)" style="fill: none; stroke: #cdbfaf; stroke-width: 0.75"/>
    </g>
    <g id="text_1">
     <!-- 7.2만 -->
-    <g style="fill: #5b4b3f" transform="translate(41.134277 145.995929) scale(0.1425 -0.1425)">
+    <g style="fill: #5b4b3f" transform="translate(56.291016 317.199849) scale(0.15 -0.15)">
      <defs>
       <path id="Pretendard-Bold-32d0" d="M 531 0 
 L 1506 0 
@@ -160,7 +160,7 @@ z
    </g>
    <g id="text_2">
     <!-- 2022 -->
-    <g style="fill: #76665a" transform="translate(43.611328 219.9) scale(0.12 -0.12)">
+    <g style="fill: #76665a" transform="translate(59.200745 459.7875) scale(0.12375 -0.12375)">
      <defs>
       <path id="Pretendard-Regular-32cb" d="M 425 0 
 L 3363 0 
@@ -201,7 +201,7 @@ z
    </g>
    <g id="text_3">
     <!-- 10.9만 -->
-    <g style="fill: #5b4b3f" transform="translate(152.459473 120.079289) scale(0.1425 -0.1425)">
+    <g style="fill: #5b4b3f" transform="translate(199.458984 256.106272) scale(0.15 -0.15)">
      <defs>
       <path id="Pretendard-Bold-32ca" d="M 2306 4525 
 L 1419 4525 
@@ -256,7 +256,7 @@ z
    </g>
    <g id="text_4">
     <!-- 2023 -->
-    <g style="fill: #76665a" transform="translate(158.929688 219.9) scale(0.12 -0.12)">
+    <g style="fill: #76665a" transform="translate(206.575928 459.7875) scale(0.12375 -0.12375)">
      <defs>
       <path id="Pretendard-Regular-32cc" d="M 1988 -63 
 C 2888 -63 3569 488 3563 1231 
@@ -288,7 +288,7 @@ z
    </g>
    <g id="text_5">
     <!-- 16.2만 -->
-    <g style="fill: #5b4b3f" transform="translate(268.314331 83.155044) scale(0.1425 -0.1425)">
+    <g style="fill: #5b4b3f" transform="translate(347.39502 169.064349) scale(0.15 -0.15)">
      <defs>
       <path id="Pretendard-Bold-32cf" d="M 2106 -63 
 C 3125 -69 3819 594 3819 1513 
@@ -319,7 +319,7 @@ z
    </g>
    <g id="text_6">
     <!-- 2024 -->
-    <g style="fill: #76665a" transform="translate(274.388672 219.9) scale(0.12 -0.12)">
+    <g style="fill: #76665a" transform="translate(354.09613 459.7875) scale(0.12375 -0.12375)">
      <defs>
       <path id="Pretendard-Regular-32cd" d="M 313 925 
 L 2506 925 
@@ -351,7 +351,7 @@ z
    </g>
    <g id="text_7">
     <!-- 25.2만 -->
-    <g style="fill: #ad6229" transform="translate(382.916748 20.6625) scale(0.1425 -0.1425)">
+    <g style="fill: #ad6229" transform="translate(494.012695 21.75) scale(0.15 -0.15)">
      <defs>
       <path id="Pretendard-Bold-32ce" d="M 2019 -63 
 C 3038 -63 3731 594 3731 1506 
@@ -382,7 +382,7 @@ z
    </g>
    <g id="text_8">
     <!-- 2025 -->
-    <g style="fill: #76665a" transform="translate(390.052734 219.9) scale(0.12 -0.12)">
+    <g style="fill: #76665a" transform="translate(501.82782 459.7875) scale(0.12375 -0.12375)">
      <defs>
       <path id="Pretendard-Regular-32ce" d="M 1900 -63 
 C 2800 -63 3463 569 3463 1444 
@@ -413,8 +413,8 @@ z
   </g>
  </g>
  <defs>
-  <clipPath id="pa2df7ab46c">
-   <rect x="0" y="0" width="462" height="225"/>
+  <clipPath id="p8f3d9a07be">
+   <rect x="0" y="0" width="590.25" height="465"/>
   </clipPath>
  </defs>
 </svg>
