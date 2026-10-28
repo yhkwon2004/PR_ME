@@ -139,7 +139,7 @@ async function autoplay(file, media) {
     const jpg = await sharp(png).resize(OUT_W, OUT_H).jpeg({ quality: 92, chromaSubsampling: '4:4:4', mozjpeg: true }).toBuffer();
     total += jpg.length;
 
-    const title = (s.sec >= 1 && s.sec < 12 ? String(s.sec).padStart(2, '0') + ' ' : '') + SECTIONS[s.sec];
+    const title = (s.sec >= 1 && s.sec < APPX - 1 ? String(s.sec).padStart(2, '0') + ' ' : '') + SECTIONS[s.sec];
     if (title !== section) { pres.addSection({ title }); section = title; }
     const slide = pres.addSlide({ sectionTitle: title });
     slide.addImage({ data: 'image/jpeg;base64,' + jpg.toString('base64'), x: 0, y: 0, w: W_IN, h: H_IN, altText: s.title });
