@@ -1355,6 +1355,13 @@ def chart_t_data():
     return fig
 
 
+def chart_v_kaha():
+    # 부록 · 현장의 목소리 (카드 안 520 × 210 px): 진료수의사가 꼽은 근무 어려움 상위 3개 — 한국동물병원협회 설문(FASAVA 2025 기간, 중복응답)
+    return hbars([('야간 · 휴일 근무 피로 · 번아웃', 53.4, '53.4%', HONEY, HONEY, None),
+                  ('인력 부족에 따른 업무 과중', 39.4, '39.4%', BAR_DIM, INK2, None),
+                  ('보호자 응대 · 민원 부담', 32.1, '32.1%', BAR_DIM, INK2, None)], (520, 210), value_px=18, label_px=15.5, bar_px=22)
+
+
 def chart_filter():
     raw, kw, *_ = simulate('shake', 23)
     t = np.arange(660, 1380)
