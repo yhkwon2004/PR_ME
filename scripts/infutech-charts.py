@@ -34,7 +34,7 @@
   charts/t-arch.svg · t-signal.svg · t-cnn.svg   부록 · 시스템 구성 · 판별 파이프라인(논문 식 · 그림) · 경량 CNN 구조
   charts/t-chain.svg         부록 · 하드웨어 신호 경로와 잡음 대책 (PCB 레이아웃 사진의 ①~⑥과 같은 번호)
   charts/t-data.svg          부록 · 데이터 구축 → 전이학습 → 파인튜닝 → 실측 교차 검증 → 기기 배포, 검증 정확도 최근 6 epoch
-  charts/t-gyroflow.svg · t-gyroscatter.svg   부록 · 자이로 상관 분석으로 자이로 없이 보정 — 단계와 상관 산점도(학습 장비 모의 신호)
+  charts/t-gyroflow.svg · t-gyroscatter.svg   부록 · 자이로 상관 분석을 학습한 AI 자이로로 보정 — 단계와 상관 산점도(학습 장비 모의 신호)
   charts/v-kaha.svg · v-rank.svg   부록 · 현장의 목소리 — 진료수의사 근무 어려움(한국동물병원협회) · 동물병원 서비스 40개 시장 중 37위(한국소비자원)
   charts/petins.svg          부록 A19 · 펫보험 보유계약 2022 → 2025 (손해보험업계 집계, 3년 새 3.5배)
 
@@ -1198,7 +1198,7 @@ def chart_t_gyroflow():
     cw = (W - 3 * gap) / 4
     # ③ is the gyro-input correction (simulated); ④ is the product, which learns to reproduce it from the load signal alone
     steps = [('동시 수집', '학습 장비: 로드셀 + 자이로 · 20 Hz', None),
-             ('상관 분석', '자이로 각속도 ↔ 무게 편차', f'r = {r:.2f}'),
+             ('상관 분석', '자이로 각속도 ↔ 무게 편차 · 모의 신호', f'r = {r:.2f}'),
              ('보정 튜닝', '자이로 입력으로 편차 보정 · 모의 신호', f'{rms0:.1f} g → {rms1:.1f} g'),
              ('제품 적용', '자이로 없이 하중센서 1개 · 실측 검증 중', '하중 신호만으로 보정')]
     for k, (t1, t2, big) in enumerate(steps):
