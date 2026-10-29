@@ -1632,7 +1632,7 @@ z
     </g>
    </g>
    <g id="text_2">
-    <!-- 막힘 · 꺾임 -->
+    <!-- 막힘 · 꼬임 -->
     <g style="fill: #2a1f18" transform="translate(0 91.185) scale(0.11625 -0.11625)">
      <defs>
       <path id="Pretendard-Bold-13c9" d="M 3069 4706 
@@ -1715,45 +1715,33 @@ C 613 2500 375 2269 381 1981
 C 375 1694 613 1456 906 1456 
 z
 " transform="scale(0.015625)"/>
-      <path id="Pretendard-Bold-8be" d="M 4931 5113 
-L 4119 5113 
-L 4119 3731 
-L 3388 3731 
-C 3444 4050 3469 4394 3469 4769 
-L 2056 4769 
-L 2056 4138 
-L 2713 4138 
-C 2631 3353 2356 2841 1725 2306 
-L 2288 1863 
-C 2728 2238 3019 2638 3206 3094 
-L 4119 3094 
-L 4119 1825 
-L 4931 1825 
-L 4931 5113 
+      <path id="Pretendard-Bold-92c" d="M 2388 4613 
+L 544 4613 
+L 544 3969 
+L 1588 3969 
+C 1572 3456 1506 2738 1188 1763 
+L 1981 1638 
+C 2388 2969 2388 3788 2388 4313 
+L 2388 4613 
 z
-M 1875 4769 
-L 350 4769 
-L 350 4138 
-L 1113 4138 
-C 1028 3438 741 3000 113 2550 
-L 631 2063 
-C 1594 2763 1869 3575 1875 4769 
+M 5356 825 
+L 3250 825 
+L 3250 2538 
+L 2463 2538 
+L 2463 825 
+L 169 825 
+L 169 181 
+L 5356 181 
+L 5356 825 
 z
-M 2763 1600 
-L 819 1600 
-L 819 956 
-L 1969 956 
-L 1969 -569 
-L 2763 -569 
-L 2763 1600 
-z
-M 4931 1600 
-L 2988 1600 
-L 2988 956 
-L 4131 956 
-L 4131 -569 
-L 4931 -569 
-L 4931 1600 
+M 4831 4613 
+L 2800 4613 
+L 2800 3969 
+L 4038 3969 
+C 4034 3444 4009 2716 3850 1750 
+L 4644 1663 
+C 4838 2869 4831 3688 4831 4231 
+L 4831 4613 
 z
 " transform="scale(0.015625)"/>
       <path id="Pretendard-Bold-2184" d="M 4931 5106 
@@ -1793,7 +1781,7 @@ z
      <use xlink:href="#Pretendard-Bold-2" transform="translate(172.84375 0)"/>
      <use xlink:href="#Pretendard-Bold-3362" transform="translate(195.890625 0)"/>
      <use xlink:href="#Pretendard-Bold-2" transform="translate(224.109375 0)"/>
-     <use xlink:href="#Pretendard-Bold-8be" transform="translate(247.15625 0)"/>
+     <use xlink:href="#Pretendard-Bold-92c" transform="translate(247.15625 0)"/>
      <use xlink:href="#Pretendard-Bold-2184" transform="translate(333.578125 0)"/>
     </g>
    </g>

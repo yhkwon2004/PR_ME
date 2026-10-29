@@ -473,7 +473,7 @@ def chart_signals():
     # 부록 A16 세 번째 카드(457 × 232 px): 기대 추세와의 차이(g), 모의 신호 20분 — 막힘은 덜 줄고, 빠짐은 당김이 튄 뒤 더 빨리 줆
     W, H = 457, 232
     fig, ax = canvas(W, H)
-    rows = [('정상', 'normal', 11), ('막힘 · 꺾임', 'drop', 12), ('빠짐 · 줄 끊김', 'line', 13)]
+    rows = [('정상', 'normal', 11), ('막힘 · 꼬임', 'drop', 12), ('빠짐 · 줄 끊김', 'line', 13)]
     t0, t1, T = 1500, 2700, 1800
     lab_w, rh = 116, H / 3
     scale = rh * .5 / 45                        # the same g scale in every row: ±45 g fills a row
