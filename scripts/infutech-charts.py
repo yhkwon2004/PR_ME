@@ -593,8 +593,8 @@ def chart_visit():
     ax = fig.add_axes([.02, .02, .96, .96])
     ax.plot([0, 1], [73.0, 95.1], color=HONEY, lw=2.4, solid_capstyle='round', zorder=2)
     ax.scatter([0, 1], [73.0, 95.1], s=[36, 64], color=[BAR_DIM, HONEY], zorder=3, linewidths=0)
-    ax.text(.04, 73.0 - 1.5, '2021  73.0%', ha='left', va='top', fontsize=10.5, color=MUTE)
-    ax.text(.96, 95.1 + 1.5, '2025  95.1%', ha='right', va='bottom', fontsize=10.5, fontweight='bold', color=HONEY)
+    ax.text(.04, 73.0 - 1.5, '2021  73.0%', ha='left', va='top', fontsize=11, color=MUTE)
+    ax.text(.96, 95.1 + 1.5, '2025  95.1%', ha='right', va='bottom', fontsize=11, fontweight='bold', color=HONEY)
     ax.set_xlim(-.03, 1.03); ax.set_ylim(58, 112); ax.axis('off')
     return fig
 
