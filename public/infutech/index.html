@@ -741,8 +741,12 @@ small { font-size: .8em; }
 .creds li { font-size: .84em; font-weight: 650; padding: .45em 1.05em; border-radius: 99em; background: var(--panel); border: 1px solid var(--line); color: var(--cream-2); }
 
 /* ================= 12 company ================= */
-.cpy { flex: 1; min-height: 0; display: grid; grid-template-columns: 29em 1fr; gap: 1.1em; }
-.cpy-l, .cpy-r { display: flex; flex-direction: column; gap: 1em; min-width: 0; min-height: 0; }
+.cpy { flex: 1; min-height: 0; display: grid; grid-template-columns: 29em minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 1em 1.1em; }
+.cpy-l, .cpy-r { display: contents; }
+.cpy-ci { grid-area: 1 / 1; }
+.cpy-tb { grid-area: 2 / 1; }
+.cpy-biz { grid-area: 1 / 2; align-self: center; }
+.cpy-hist { grid-area: 2 / 2; }
 .cpy-ci { display: flex; align-items: center; justify-content: center; gap: 1.1em; padding: 1.25em 1.5em; }
 .cpy-mark { flex: none; display: grid; place-items: center; width: 3.7em; height: 3.7em; border-radius: 1.05em; background: linear-gradient(150deg, #D08A47 0%, var(--honey) 100%); color: #FFFFFF; box-shadow: 0 .5em 1.2em rgba(173, 98, 41, .26); }
 .cpy-mark .ico { width: 2.05em; height: 2.05em; stroke-width: 1.8; }
@@ -754,7 +758,8 @@ small { font-size: .8em; }
 .cpy-tb td { padding: .5em 1.2em; border-top: 1px solid var(--line); font-size: 1.1em; font-weight: 650; line-height: 1.35; }
 .cpy-tb td:first-child { width: 7.2em; text-align: center; background: var(--panel-2); color: var(--cream-2); font-size: .98em; font-weight: 700; }
 .cpy-tb td small { display: block; margin-top: .1em; font-size: .78em; font-weight: 600; color: var(--mute); }
-.cpy-tb tr.hl td:last-child { color: var(--honey); font-size: 1.32em; font-weight: 820; letter-spacing: -.01em; }
+.cpy-tb tr.hl td { background: #FBEBD7; }
+.cpy-tb tr.hl td:last-child { color: var(--honey); font-size: 1.7em; font-weight: 820; letter-spacing: -.03em; }
 .cpy-tb tr.hl td:first-child { color: var(--honey); }
 .cpy-tb .tbd { color: var(--mute); font-weight: 600; }
 .cpy-biz { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8em; }
@@ -764,26 +769,28 @@ small { font-size: .8em; }
 .cpy-biz li:nth-child(1) .pill { background: linear-gradient(135deg, #B8763A 0%, #A0622A 100%); }
 .cpy-biz li:nth-child(2) .pill { background: linear-gradient(135deg, #93531F 0%, #7A4318 100%); }
 .cpy-biz li:nth-child(3) .pill { background: linear-gradient(135deg, #5C3820 0%, #432716 100%); }
-.cpy-biz p { font-size: .86em; font-weight: 600; line-height: 1.4; color: var(--cream-2); }
+.cpy-biz p { font-size: .95em; font-weight: 600; line-height: 1.4; color: var(--cream-2); }
 .cpy-hist { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 1.1em 1.4em 1.15em; }
 .cpy-hh { display: flex; align-items: center; gap: .4em; font-size: 1em; font-weight: 800; color: var(--honey); }
 .cpy-hh .ico { width: 1.15em; height: 1.15em; stroke-width: 2; }
 .cpy-tl { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); padding: 0 3.4em; }
 .cpy-tl::before { content: ""; position: absolute; left: 1em; right: 1em; top: 50%; height: 2px; margin-top: -1px; background: linear-gradient(90deg, rgba(234, 217, 195, 0), #EAD9C3 6%, #EAD9C3 94%, rgba(234, 217, 195, 0)); }
-.cpy-tl li { position: relative; display: grid; grid-template-rows: 1fr 1fr; justify-items: center; }
-.cpy-tl li::before { content: ""; position: absolute; left: 50%; width: 1px; height: 2.2em; background: #E2CDB2; }
+.cpy-tl li { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr 1fr; justify-items: center; }
+.cpy-tl li::before { content: ""; position: absolute; left: 50%; width: 1px; height: 3.6em; background: #E2CDB2; }
 .cpy-tl li.up::before { bottom: 50%; }
 .cpy-tl li.dn::before { top: 50%; }
 .cpy-tl li::after { content: ""; position: absolute; left: 50%; top: 50%; width: .74em; height: .74em; transform: translate(-50%, -50%); border-radius: 50%; background: #FFFFFF; border: 2px solid var(--honey); }
-.cpy-tl li.now::after { background: var(--honey); box-shadow: 0 0 0 .3em rgba(173, 98, 41, .16); }
-.cpy-tl .c { width: 13.4em; display: flex; flex-direction: column; align-items: center; gap: .22em; text-align: center; }
-.cpy-tl .up .c { grid-row: 1; align-self: end; padding-bottom: 2.6em; }
-.cpy-tl .dn .c { grid-row: 2; align-self: start; padding-top: 2.6em; }
-.cpy-tl time { font-size: .98em; font-weight: 800; color: var(--honey); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
-.cpy-tl b { font-size: 1.06em; font-weight: 780; line-height: 1.32; }
-.cpy-tl span { font-size: .86em; font-weight: 600; line-height: 1.35; color: var(--mute); }
+.cpy-tl li.deal::after { background: var(--honey); }
+.cpy-tl li.now::after { box-shadow: 0 0 0 .3em rgba(173, 98, 41, .16); }
+.cpy-tl li.deal b { color: var(--honey); }
+.cpy-tl .c { width: 13.8em; display: flex; flex-direction: column; align-items: center; gap: .22em; text-align: center; }
+.cpy-tl .up .c { grid-row: 1; align-self: end; padding-bottom: 4em; }
+.cpy-tl .dn .c { grid-row: 2; align-self: start; padding-top: 4em; }
+.cpy-tl time { font-size: 1.08em; font-weight: 800; color: var(--honey); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.cpy-tl b { font-size: 1.14em; font-weight: 780; line-height: 1.32; }
+.cpy-tl span { font-size: .92em; font-weight: 600; line-height: 1.35; color: var(--mute); }
 .cpy-more { display: flex; flex-wrap: wrap; justify-content: center; gap: .45em; padding-top: .85em; border-top: 1px dashed var(--line); }
-.cpy-more li { font-size: .84em; font-weight: 700; padding: .32em .9em; border-radius: 99em; background: var(--panel-2); color: var(--cream-2); }
+.cpy-more li { font-size: .9em; font-weight: 650; padding: .38em 1em; border-radius: 99em; background: var(--panel); border: 1px solid var(--line); color: var(--cream-2); }
 
 /* ================= 12 CEO ================= */
 .ceo { flex: 1; min-height: 0; display: grid; grid-template-columns: 18.6em 1fr; gap: 1.1em; }
@@ -1035,6 +1042,7 @@ small { font-size: .8em; }
   <symbol id="i-brief" viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="1.8"/><path d="M9 7.5V5.5h6v2M3.5 12.5h17"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3 19.5c.9-3.2 3.3-5 6-5s5.1 1.8 6 5"/><path d="M15.5 5.6a3.2 3.2 0 0 1 0 6M17.5 14.8c1.7.6 2.9 2.2 3.5 4.7"/></symbol>
   <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.4 3.5 5.3 3.5 8.5s-1.1 6.1-3.5 8.5c-2.4-2.4-3.5-5.3-3.5-8.5S9.6 5.9 12 3.5z"/></symbol>
+  <symbol id="i-iv" viewBox="0 0 24 24"><path d="M8 3.5h8v8.5a4 4 0 0 1-8 0z"/><path d="M10.5 7.5h3M12 16v2.2M12 21v.01"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></symbol>
 </svg>
 
@@ -1627,7 +1635,7 @@ small { font-size: .8em; }
       <p class="next b"><b>다음 단계</b>제품 생산 · 인증을 마치면 수량 · 단가 · 납기를 정해 본계약으로 전환합니다<span class="more">전문 · 부록 A10 · A11</span></p>
     </div>
   </div>
-  <div class="note" hidden><p>판로는 문서로 확인했습니다. 전남대 수의과대학 구매의향서, ㈜씨엔 최소 300개 공급 약정, 그리고 유통사 SKM&amp;M과 5,000만 원 규모 MOU입니다.</p></div>
+  <div class="note" hidden><p>판로는 문서로 확인했습니다. 전남대 수의과대학 구매의향서, ㈜씨엔 MOQ 300개 기준 공급 약정, 그리고 유통사 SKM&amp;M과 5,000만 원 규모 MOU입니다.</p></div>
 </section>
 
 <!-- ================= 09 시장 진입 전략 ================= -->
@@ -1690,13 +1698,13 @@ small { font-size: .8em; }
 <section class="slide" id="company" data-sec="12" data-time="6" data-title="회사 소개 · 인퓨테크">
   <div class="frame">
     <p class="lab b">Company <span>회사 소개</span></p>
-    <h2 class="h b">센서 하나로 입원 동물의 수액을 <mark>24시간 지키는 회사</mark></h2>
+    <h2 class="h b">센서 하나로 입원 동물의 수액을 <mark>24시간 지켜보는 회사</mark></h2>
     <div class="bd">
       <div class="cpy">
         <div class="cpy-l">
           <div class="card cpy-ci b">
             <span class="cpy-mark"><svg class="ico"><use href="#i-drop"/></svg></span>
-            <p class="cpy-wm"><b>INFUTECH</b><span>인퓨테크 · 반려동물 투약 안전 AIoT</span></p>
+            <p class="cpy-wm"><b>INFUTECH</b><span>인퓨테크 · 팀 WON SHOT</span></p>
           </div>
           <div class="card cpy-tb b">
             <table>
@@ -1714,8 +1722,8 @@ small { font-size: .8em; }
         </div>
         <div class="cpy-r">
           <ul class="cpy-biz b">
-            <li><span class="pill"><svg class="ico"><use href="#i-scale"/></svg>수액 모니터링 IoT</span><p>링거폴대에 거는 무게센서 모듈<br>INFU RETRO · 대당 25만 원</p></li>
-            <li><span class="pill"><svg class="ico"><use href="#i-chip"/></svg>온디바이스 AI 판별</span><p>칼만필터 + 경량 CNN<br>판별 정확도 97.3%</p></li>
+            <li><span class="pill"><svg class="ico"><use href="#i-iv"/></svg>수액 모니터링 IoT</span><p>링거폴대에 거는 무게센서 모듈<br>INFU RETRO · 대당 25만 원</p></li>
+            <li><span class="pill"><svg class="ico"><use href="#i-chip"/></svg>온디바이스 AI 판별</span><p>칼만필터 + 경량 CNN<br>CNN 검증 정확도 97.3%</p></li>
             <li><span class="pill"><svg class="ico"><use href="#i-clip"/></svg>투약 기록 · 관제 구독</span><p>24시간 자동 기록 · 이상 알림<br>대당 월 12만 원</p></li>
           </ul>
           <div class="card cpy-hist b">
@@ -1724,12 +1732,12 @@ small { font-size: .8em; }
               <li class="up"><div class="c"><time>2025.11</time><b>WON+UP 캡스톤디자인 대상</b><span>총장상 · 인퓨테크팀</span></div></li>
               <li class="dn"><div class="c"><time>2026.01</time><b>국제 학술대회 AIT 2026 논문</b><span>로드셀 기반 실시간 수액 감시</span></div></li>
               <li class="up"><div class="c"><time>2026.07</time><b>국내 공동학술대회 논문</b><span>상태 패턴 CNN 이상 감지</span></div></li>
-              <li class="dn"><div class="c"><time>2026.08</time><b>호남권 글로벌 피우다 프로젝트 장려상</b><span>호남ICT이노베이션스퀘어</span></div></li>
-              <li class="up"><div class="c"><time>2026.08</time><b>㈜씨엔 물품공급 · 판매 약정</b><span>2년 · 공급가 17만 원 × MOQ 300개</span></div></li>
-              <li class="dn now"><div class="c"><time>2026.10</time><b>㈜에스케이엠엔엠 MOU</b><span>5,000만 원 규모 구매의향</span></div></li>
+              <li class="dn"><div class="c"><time>2026.08</time><b>피우다 프로젝트 장려상</b><span>호남ICT이노베이션스퀘어</span></div></li>
+              <li class="up deal"><div class="c"><time>2026.08</time><b>㈜씨엔 물품공급 · 판매 약정</b><span>2년 · 공급가 17만 원 × MOQ 300개</span></div></li>
+              <li class="dn deal now"><div class="c"><time>2026.10</time><b>㈜에스케이엠엔엠 MOU</b><span>5,000만 원 규모 구매의향</span></div></li>
             </ol>
             <ul class="cpy-more">
-              <li>특허 3건 출원 · 심사 중</li>
+              <li>특허 3건 심사 중</li>
               <li>전남대학교 수의과대학 LOI</li>
               <li>원광대 간호학과 모의 병실 실험 협력</li>
               <li>모두의창업 1기 2라운드 진출</li>
@@ -1739,7 +1747,7 @@ small { font-size: .8em; }
       </div>
     </div>
   </div>
-  <div class="note" hidden><p>인퓨테크는 입원 동물 수액을 지키는 회사로, 1억 500만 원 계약을 맺었습니다.</p></div>
+  <div class="note" hidden><p>인퓨테크는 입원 동물 수액을 지켜보는 회사로, 1억 500만 원 계약을 맺었습니다.</p></div>
 </section>
 
 <section class="slide" id="team" data-sec="12" data-time="4" data-title="팀 WON SHOT">
@@ -1776,12 +1784,6 @@ small { font-size: .8em; }
           </ul>
         </div>
       </div>
-      <ul class="creds b">
-        <li>원광대 간호학과 실험 협력</li>
-        <li>전남대학교 수의과대학 LOI</li>
-        <li>수액 10종 보정 테스트</li>
-        <li>특허 3건 심사 중</li>
-      </ul>
     </div>
   </div>
   <div class="note" hidden><p>개발팀 넷, 의료실증팀 셋, 팀 WON SHOT입니다.</p></div>
