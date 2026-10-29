@@ -1253,10 +1253,10 @@ small { font-size: .8em; }
 </section>
 
 <!-- ================= 02 기존 시스템의 한계 ================= -->
-<section class="slide" id="limits" data-sec="2" data-time="19" data-title="지금 방식으로는 두 공백을 메울 수 없습니다">
+<section class="slide" id="limits" data-sec="2" data-time="19" data-title="법은 기록을 요구하지만, 지금 방식으로는 지킬 수 없습니다">
   <div class="frame">
     <p class="lab b">Pain Point <span>기존 시스템의 한계</span></p>
-    <h2 class="h b">지금 방식으로는 두 공백을 <mark>메울 수 없습니다</mark></h2>
+    <h2 class="h b">법은 기록을 요구하지만, <mark>지금 방식</mark>으로는 지킬 수 없습니다</h2>
     <div class="bd">
       <div class="lim-grp b"><p>사람이 메우는 방식</p><p>장비로 메우는 방식</p></div>
       <div class="lims">
@@ -1272,7 +1272,7 @@ small { font-size: .8em; }
             </div>
           </figure>
           <p class="x"><b>19.5%</b><span>기록이 없을 때 분쟁 해결률</span></p>
-          <p class="why"><svg class="ico"><use href="#i-x"/></svg>빈칸 · 사후 기록은 분쟁 근거가 못 됨</p>
+          <p class="why"><svg class="ico"><use href="#i-x"/></svg>빈칸 기록은 법정 기록도 분쟁 근거도 못 됨</p>
         </div>
         <div class="card lim b">
           <p class="tag">사람 · 확인</p>
@@ -1309,7 +1309,7 @@ small { font-size: .8em; }
       <div class="needs b">
         <p class="needs-l">그래서 필요한 것</p>
         <ul>
-          <li><svg class="ico"><use href="#i-check"/></svg>자동으로 남는 기록</li>
+          <li><svg class="ico"><use href="#i-check"/></svg>자동으로 남는 진료 기록</li>
           <li><svg class="ico"><use href="#i-check"/></svg>24시간 이상 감지</li>
           <li><svg class="ico"><use href="#i-check"/></svg>부담 없는 도입가</li>
           <li><svg class="ico"><use href="#i-check"/></svg>기존 폴대 그대로 · 센서 1개</li>
@@ -1318,7 +1318,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 한국소비자원(2026.9) · 수의미래연구소 집계(농식품부 자료, 2025.6 — 전국 동물병원 5,312곳 중 1인 병원 3,815곳) · SW Medi 동물용 인퓨전펌프 판매가(2025) · 스마트 폴대 제작비는 INFUTECH 시장조사 · 펌프 · 스마트 폴대는 실제 장비 사진 · 기록지 · 순회 표시는 이해를 돕는 예시</p></div>
   </div>
-  <div class="note" hidden><p>손 기록엔 빈칸이 생기고, 병원 열 곳 중 일곱 곳은 수의사 한 명이라 순회 사이를 못 봅니다.</p><p>장비는 110만 원 펌프, 100만 원이 넘는 다중 센서 폴대라 비쌉니다. 그래서 필요한 건, 자동으로 남고 24시간 지키는, 기존 폴대에 붙는 센서 하나입니다.</p></div>
+  <div class="note" hidden><p>법은 기록을 요구하지만, 손 기록엔 빈칸이 생기고, 병원 열 곳 중 일곱 곳은 수의사 한 명이라 순회 사이를 못 봅니다.</p><p>펌프와 다중 센서 폴대는 100만 원이 넘습니다. 그래서 필요한 건, 자동으로 남고 24시간 지키는, 기존 폴대에 붙는 센서 하나입니다.</p></div>
 </section>
 
 <!-- ================= 03 아이디어 소개 ================= -->
@@ -1504,7 +1504,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 한우진 외, 「상태 패턴 분석 기반 수액 이상 감지 알고리즘」, 한국혁신산업학회 · 한국디지털정책학회 공동학술대회(2026.07), 원광대학교 지원 · AIT 2026(2026.01)</p></div>
   </div>
-  <div class="note" hidden><p>알고리즘은 논문으로 검증했습니다. 유속을 느림, 정상, 빠름 세 상태로 바꾸고, 16개를 4×4 패턴으로 만들어 CNN이 봅니다. 순간 흔들림과 진짜 이상을 구분합니다.</p><p>경량 모델이라 기기 안에서 바로 판정합니다.</p></div>
+  <div class="note" hidden><p>알고리즘은 논문으로 검증했습니다. 유속을 세 상태로 바꿔 4×4 패턴으로 만들고, 경량 CNN이 기기 안에서 순간 흔들림과 진짜 이상을 구분합니다.</p></div>
 </section>
 
 <section class="slide" id="results" data-sec="4" data-time="17" data-title="검증 성과 — 숫자로 증명">
@@ -2582,6 +2582,38 @@ small { font-size: .8em; }
     </div>
   </div>
   <div class="note" hidden><p>질의응답용: 회사 소개입니다. 인퓨테크는 센서 하나로 입원 동물의 수액을 24시간 지켜보는 학생 창업기업이고, 공급 약정과 MOU로 1억 100만 원 규모 계약을 맺었습니다.</p></div>
+</section>
+
+<section class="slide appx" id="a-record" data-sec="14" data-title="부록 · 기록과 분쟁 해결률">
+  <div class="frame">
+    <p class="lab b">Appendix <span>기록과 분쟁 해결률</span></p>
+    <h2 class="h b">기록이 없으면, <mark>아무도</mark> 지킬 수 없습니다</h2>
+    <div class="bd">
+      <div class="g" style="--c: .52fr 1.05fr 1fr">
+        <figure class="ph b"><img src="media/nurse-record.webp" alt="입원실에서 클립보드에 손으로 투약을 기록하는 모습" decoding="async"><figcaption class="cap">지금의 투약 기록</figcaption></figure>
+        <div class="card chart b">
+          <h3>동물병원 피해구제 접수 <small style="color: var(--mute)">(건)</small></h3>
+          <p class="cs">4년 새 3배 · 올해는 6월까지 45건<br>128건 중 반려견 68.8% · 반려묘 28.0%</p>
+          <img class="pyc" src="charts/dispute.svg" alt="동물병원 피해구제 접수 — 2021년 9건, 2022년 20건, 2023년 11건, 2024년 16건, 2025년 27건, 2026년 1~6월 45건">
+        </div>
+        <div class="card hi chart b" style="display: flex; flex-direction: column">
+          <h3>진료기록 확보 여부별 분쟁 해결률</h3>
+          <img class="pyc-res" src="charts/resolve.svg" alt="분쟁 해결률 — 진료기록 있음 30%(80건 중 24건 해결), 기록 없음 19.5%(41건 중 8건 해결)">
+          <p class="verdict">기록이 없으면 <em>5건 중 4건</em>은 해결되지 못합니다</p>
+          <div class="cause">
+            <p class="cause-h"><b>신청 사유</b>진료상 과실이 75% — 1위는 <em>처치 미흡</em></p>
+            <img class="pyc-w" src="charts/causes.svg" alt="동물병원 피해구제 신청 사유(128건 기준) — 처치 미흡 32.0%, 수술 부작용 26.6%, 진단 과실 10.2%, 안전사고 6.2%">
+          </div>
+          <p class="quote">“의사소통이 어려운 반려동물을 대상으로… 소비자가 진료 과실을 명확히 입증하기 어렵다”<cite>한국소비자원 · 2021~2026.6 접수 128건 분석</cite></p>
+        </div>
+      </div>
+    </div>
+    <div class="ft">
+      <p class="take b">손으로 쓰는 투약 기록 → <em>자동으로 남는 기록</em>이 필요합니다</p>
+      <p class="src b">출처: 한국소비자원 동물병원 피해구제 분석(2026.9, 2021~2026.6 접수 128건) · 데일리벳 2026.09.09 · 처리 결과 · 사유 상세는 부록 A15</p>
+    </div>
+  </div>
+  <div class="note" hidden><p>질의응답용: 동물병원 피해구제 신청은 4년 새 세 배로 늘었고, 진료기록이 있으면 30%, 없으면 19.5%만 해결됐습니다. 처리 결과와 사유 상세는 부록 A15에 있습니다.</p></div>
 </section>
 
 </main>
