@@ -86,7 +86,7 @@ L 463.5 144.75
    </g>
    <g id="text_1">
     <!-- -40 -->
-    <g style="fill: #76665a" transform="translate(66.22307 289.5) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(65.589159 289.5) scale(0.1125 -0.1125)">
      <defs>
       <path id="Pretendard-Medium-33c4" d="M 2406 2550 
 L 400 2550 
@@ -137,7 +137,7 @@ z
    </g>
    <g id="text_2">
     <!-- -20 -->
-    <g style="fill: #76665a" transform="translate(156.759362 289.5) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(156.140466 289.5) scale(0.1125 -0.1125)">
      <defs>
       <path id="Pretendard-Medium-32cb" d="M 400 0 
 L 3444 0 
@@ -164,13 +164,13 @@ z
    </g>
    <g id="text_3">
     <!-- 0 -->
-    <g style="fill: #76665a" transform="translate(252.509766 289.5) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(252.27832 289.5) scale(0.1125 -0.1125)">
      <use xlink:href="#Pretendard-Medium-32c9"/>
     </g>
    </g>
    <g id="text_4">
     <!-- +20 -->
-    <g style="fill: #76665a" transform="translate(336.375892 289.5) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(335.683021 289.5) scale(0.1125 -0.1125)">
      <defs>
       <path id="Pretendard-Medium-362b" d="M 1731 763 
 L 2331 763 
@@ -195,7 +195,7 @@ z
    </g>
    <g id="text_5">
     <!-- +40 -->
-    <g style="fill: #76665a" transform="translate(426.491774 289.5) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(425.783888 289.5) scale(0.1125 -0.1125)">
      <use xlink:href="#Pretendard-Medium-362b"/>
      <use xlink:href="#Pretendard-Medium-32cd" transform="translate(63.578125 0)"/>
      <use xlink:href="#Pretendard-Medium-32c9" transform="translate(127.0625 0)"/>
@@ -203,7 +203,7 @@ z
    </g>
    <g id="text_6">
     <!-- -10 -->
-    <g style="fill: #76665a" transform="translate(24.708984 263.727273) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(23.581055 263.727273) scale(0.1125 -0.1125)">
      <defs>
       <path id="Pretendard-Medium-32ca" d="M 2119 4525 
 L 1444 4525 
@@ -224,7 +224,7 @@ z
    </g>
    <g id="text_7">
     <!-- -5 -->
-    <g style="fill: #76665a" transform="translate(29.52832 206.113636) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(28.744629 206.113636) scale(0.1125 -0.1125)">
      <defs>
       <path id="Pretendard-Medium-32ce" d="M 1938 -63 
 C 2881 -63 3550 575 3550 1469 
@@ -252,20 +252,20 @@ z
    </g>
    <g id="text_8">
     <!-- 0 -->
-    <g style="fill: #76665a" transform="translate(34.019531 148.5) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(33.556641 148.5) scale(0.1125 -0.1125)">
      <use xlink:href="#Pretendard-Medium-32c9"/>
     </g>
    </g>
    <g id="text_9">
     <!-- +5 -->
-    <g style="fill: #76665a" transform="translate(27.457031 90.886364) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(26.525391 90.886364) scale(0.1125 -0.1125)">
      <use xlink:href="#Pretendard-Medium-362b"/>
      <use xlink:href="#Pretendard-Medium-32ce" transform="translate(63.578125 0)"/>
     </g>
    </g>
    <g id="text_10">
     <!-- +10 -->
-    <g style="fill: #76665a" transform="translate(22.637695 33.272727) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(21.361816 33.272727) scale(0.1125 -0.1125)">
      <use xlink:href="#Pretendard-Medium-362b"/>
      <use xlink:href="#Pretendard-Medium-32ca" transform="translate(63.578125 0)"/>
      <use xlink:href="#Pretendard-Medium-32c9" transform="translate(108.40625 0)"/>
@@ -674,7 +674,7 @@ z
    </g>
    <g id="text_19">
     <!-- 샘플 236개 · 12초 · 20 Hz -->
-    <g style="fill: #76665a" transform="translate(58.5 64.5) scale(0.105 -0.105)">
+    <g style="fill: #76665a" transform="translate(58.5 64.5) scale(0.1125 -0.1125)">
      <defs>
       <path id="Pretendard-Medium-1ad8" d="M 4981 5063 
 L 4419 5063 
@@ -910,7 +910,7 @@ z
    </g>
    <g id="text_20">
     <!-- 자이로 각속도 (°/s) -->
-    <g style="fill: #5b4b3f" transform="translate(213.731506 310.5) scale(0.10875 -0.10875)">
+    <g style="fill: #5b4b3f" transform="translate(212.282593 310.5) scale(0.1125 -0.1125)">
      <defs>
       <path id="Pretendard-SemiBold-2190" d="M 2213 3488 
 L 2213 3963 
@@ -1132,7 +1132,7 @@ z
    </g>
    <g id="text_21">
     <!-- 무게 편차 (g) -->
-    <g style="fill: #5b4b3f" transform="translate(14.363068 173.450654) rotate(-90) scale(0.10875 -0.10875)">
+    <g style="fill: #5b4b3f" transform="translate(14.496277 174.440332) rotate(-90) scale(0.1125 -0.1125)">
      <defs>
       <path id="Pretendard-SemiBold-1534" d="M 5344 1894 
 L 181 1894 

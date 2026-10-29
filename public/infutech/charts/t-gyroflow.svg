@@ -1059,7 +1059,7 @@ L 268.374375 106.626418
    </g>
    <g id="text_3">
     <!-- 자이로 -->
-    <g style="fill: #4c8744" transform="translate(200.592334 132) scale(0.0975 -0.0975)">
+    <g style="fill: #4c8744" transform="translate(192.627026 132) scale(0.10875 -0.10875)">
      <defs>
       <path id="Pretendard-Bold-2190" d="M 2269 3563 
 L 2269 3913 
@@ -1137,7 +1137,7 @@ z
    </g>
    <g id="text_4">
     <!-- 무게 편차 -->
-    <g style="fill: #ad6229" transform="translate(233.671875 132) scale(0.0975 -0.0975)">
+    <g style="fill: #ad6229" transform="translate(229.523438 132) scale(0.10875 -0.10875)">
      <defs>
       <path id="Pretendard-Bold-1534" d="M 5369 1931 
 L 163 1931 

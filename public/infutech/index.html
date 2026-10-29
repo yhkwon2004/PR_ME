@@ -757,7 +757,7 @@ small { font-size: .8em; }
 .creds li { font-size: .84em; font-weight: 650; padding: .45em 1.05em; border-radius: 99em; background: var(--panel); border: 1px solid var(--line); color: var(--cream-2); }
 
 /* ================= 01 record: legal basis ================= */
-.lw { flex: 1; min-height: 0; display: grid; grid-template-columns: .62fr 1.25fr 1fr; gap: 1.1em; }
+.lw { flex: 1; min-height: 0; display: grid; grid-template-columns: .55fr 1.05fr 1.15fr; gap: 1.1em; }
 .lw-ph { margin: 0; min-height: 0; }
 .lw-col { display: flex; flex-direction: column; gap: .8em; min-height: 0; }
 .card.lw-col { padding: 1.2em 1.4em; }
@@ -777,14 +777,14 @@ small { font-size: .8em; }
 .lw-safe li { display: grid; gap: .1em; padding-left: .9em; border-left: 2px solid #CFE0C7; }
 .lw-safe b, .lw-gap b { font-size: 1.02em; font-weight: 780; line-height: 1.38; }
 .lw-safe span { font-size: .9em; font-weight: 600; color: var(--cream-2); }
-.lw-gap li { display: grid; gap: .1em; padding-left: .9em; border-left: 2px solid #F0B9A6; }
-.lw-gap span { font-size: .82em; font-weight: 800; color: var(--alert); letter-spacing: .02em; }
+.lw-gap li { display: grid; gap: .1em; padding-left: .9em; border-left: 2px solid #EAD9C3; }
+.lw-gap span { font-size: .82em; font-weight: 800; color: var(--honey); letter-spacing: .02em; }
 .lw-cmp { width: 100%; border-collapse: separate; border-spacing: 0 .3em; margin: -.15em 0 -.1em; }
 .lw-cmp th, .lw-cmp td { padding: .4em .7em; text-align: center; vertical-align: middle; }
 .lw-cmp thead th { padding: 0 .7em; font-size: .86em; font-weight: 800; color: var(--cocoa); }
 .lw-cmp thead th small { margin-left: .35em; font-size: .9em; font-weight: 600; color: var(--ink-mute); }
 .lw-cmp tbody th { text-align: left; font-size: .94em; font-weight: 750; color: var(--cocoa); background: rgba(255, 255, 255, .78); border-radius: .55em 0 0 .55em; }
-.lw-cmp tbody td { font-size: 1.12em; font-weight: 850; letter-spacing: -.02em; color: var(--ink); background: rgba(255, 255, 255, .78); }
+.lw-cmp tbody td { font-size: 1.5em; font-weight: 850; letter-spacing: -.02em; color: var(--ink); background: rgba(255, 255, 255, .78); }
 .lw-cmp tbody td:last-child { color: var(--alert); border-radius: 0 .55em .55em 0; }
 #record .take em { font-style: normal; color: var(--honey); }
 
@@ -873,7 +873,7 @@ small { font-size: .8em; }
 .ve-mk p { margin-top: .3em; font-size: 1em; font-weight: 700; line-height: 1.38; color: var(--cocoa); }
 .ve-flow { display: flex; align-items: center; justify-content: center; gap: .6em; font-size: 1.04em; font-weight: 750; color: var(--cocoa); }
 .ve-flow .ico { width: 1.2em; height: 1.2em; color: var(--honey); stroke-width: 2.2; }
-.ve-flow span { padding: .35em .95em; border-radius: 99em; background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); }
+.ve-flow span { padding: .35em .95em; border-radius: 99em; background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--line); white-space: nowrap; }
 .ve-flow span.hi { background: var(--honey); color: #FFFFFF; box-shadow: none; }
 
 /* ================= 12 company ================= */
@@ -1005,6 +1005,11 @@ small { font-size: .8em; }
 .rtl time { font-weight: 800; color: var(--honey); font-variant-numeric: tabular-nums; }
 .rtl p { display: grid; gap: .2em; font-size: .9em; color: var(--mute); line-height: 1.45; }
 .rtl p b { font-size: 1.1em; color: var(--cream); }
+#a-reg .cs b { margin-left: .2em; font-size: 1.45em; font-weight: 800; color: var(--honey); }
+#a-reg .rtl li { padding: 1.05em 0 1.05em 1.4em; }
+#a-reg .rtl li::before { top: 1.35em; }
+#a-reg .rtl p { font-size: 1em; }
+#limits .src { letter-spacing: -.015em; }
 .news .press { font-size: .8em; color: var(--mute); }
 .news .press b { color: var(--honey); }
 .news h4 { margin-top: .45em; font-size: 1.02em; font-weight: 700; line-height: 1.5; }
@@ -1190,7 +1195,7 @@ small { font-size: .8em; }
 <main class="deck" id="deck">
 
 <!-- ================= 표지 ================= -->
-<section class="slide light s-cover" id="cover" data-sec="0" data-time="10" data-title="AI 자이로 센서 기반 반려동물 약물 투약 이상감지 솔루션">
+<section class="slide light s-cover" id="cover" data-sec="0" data-time="11" data-title="AI 자이로 센서 기반 반려동물 약물 투약 이상감지 솔루션">
   <div class="frame">
     <div class="cover-photo"><img src="media/cover-night.webp" alt="불 꺼진 입원실, 링거폴대 옆 케이지에서 잠든 강아지" decoding="async"></div>
     <p class="topline b"><span>2026 NEXT WAVE-UP 아이디어 리그 · 일반·기술 트랙</span></p>
@@ -1209,7 +1214,7 @@ small { font-size: .8em; }
       <figcaption>INFU RETRO · AI 자이로 센서 탑재</figcaption>
     </figure>
   </div>
-  <div class="note" hidden><p>안녕하십니까, 팀 WON SHOT입니다. AI로 구현한 자이로 센서로, 반려동물의 약물 투약 이상을 감지하는 솔루션을 소개합니다.</p></div>
+  <div class="note" hidden><p>안녕하십니까, 팀 WON SHOT입니다. AI로 구현한 자이로 센서로, 반려동물의 약물 투약 이상을 감지하는 INFU RETRO를 소개합니다.</p></div>
 </section>
 
 <!-- ================= 01 문제 배경 ================= -->
@@ -1282,7 +1287,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft">
       <p class="take b">손으로 쓰는 투약 기록 → <em>자동으로 남는 기록</em>이 필요합니다</p>
-      <p class="src b">출처: 한국소비자원 동물병원 피해구제 분석(2026.9, 2021~2026.6 접수 128건) · 데일리벳 2026.09.09 · 처리 결과 · 사유 상세는 부록 A15</p>
+      <p class="src b">출처: 한국소비자원 동물병원 피해구제 분석(2026.9, 2021~2026.6 접수 128건) · 데일리벳 2026.09.09 · 처리 결과 · 사유 상세는 부록 A15 · 법적 의무 · 보호장치는 부록 A21</p>
     </div>
   </div>
   <div class="note" hidden><p>둘째, 기록 공백입니다. 피해구제 신청은 4년 만에 세 배로 늘었습니다.</p><p>진료기록이 있으면 30%가 해결되지만, 없으면 19.5%에 그칩니다. 기록이 자동으로 남아야 하는 이유입니다.</p></div>
@@ -1383,7 +1388,7 @@ small { font-size: .8em; }
   <div class="note" hidden><p>저희는 동물병원과 수의과대학에서 먼저 문제를 확인했습니다. 현장 요구에 맞춰 제품을 고쳐 가며 발전시켰고, 그 결과 판매 계약까지 이어졌습니다.</p></div>
 </section>
 
-<section class="slide" id="solution" data-sec="3" data-time="17" data-title="AI 자이로 센서를 품은 하중센서 모듈, INFU RETRO">
+<section class="slide" id="solution" data-sec="3" data-time="19" data-title="AI 자이로 센서를 품은 하중센서 모듈, INFU RETRO">
   <div class="frame">
     <p class="lab b">Solution <span>아이디어 소개</span></p>
     <h2 class="h b"><mark>AI 자이로 센서</mark>를 품은 하중센서 모듈, INFU RETRO</h2>
@@ -1429,7 +1434,7 @@ small { font-size: .8em; }
       </ul>
     </div>
   </div>
-  <div class="note" hidden><p>체중계 위에서 몸을 흔들면 숫자가 튀죠. 자이로를 달면 보정되지만 비쌉니다.</p><p>그래서 학습할 때만 자이로를 함께 달아 AI를 학습시키고, 제품에서는 자이로를 빼 AI 자이로 센서가 그 역할을 합니다.</p></div>
+  <div class="note" hidden><p>체중계 위에서 몸을 흔들면 숫자가 튀죠. 폴대에 걸린 수액도 똑같습니다. 자이로를 달면 보정되지만 비쌉니다.</p><p>그래서 학습할 때만 자이로를 함께 달아 AI를 학습시키고, 제품에서는 자이로를 빼 AI 자이로 센서가 그 역할을 합니다.</p></div>
 </section>
 
 <section class="slide" id="sensor" data-sec="3" data-time="4" data-title="센서는 줄이고, 학습으로 채웠습니다">
@@ -1476,7 +1481,7 @@ small { font-size: .8em; }
 </section>
 
 <!-- ================= 04 시연 ================= -->
-<section class="slide" id="demo" data-sec="4" data-time="13" data-title="시연 영상">
+<section class="slide" id="demo" data-sec="4" data-time="12" data-title="시연 영상">
   <div class="frame">
     <p class="lab b">Demo <span>시연</span></p>
     <h2 class="h b">유속이 바뀌는 순간, <mark>바로</mark> 알립니다</h2>
@@ -1568,10 +1573,10 @@ small { font-size: .8em; }
 </section>
 
 <!-- ================= 05 시장분석 ================= -->
-<section class="slide" id="market" data-sec="5" data-time="15" data-title="시장 — 수요와 기록 공개 의무화">
+<section class="slide" id="market" data-sec="5" data-time="15" data-title="시장 — 수요와 기록 발급 의무화">
   <div class="frame">
     <p class="lab b">Market <span>시장분석</span></p>
-    <h2 class="h b">수요는 이미 일상, <mark>기록 공개 의무화</mark>까지 다가옵니다</h2>
+    <h2 class="h b">수요는 이미 일상, <mark>기록 발급 의무화</mark>까지 다가옵니다</h2>
     <div class="bd">
       <div class="g" style="--c: 1.05fr .85fr 1.1fr">
         <div class="kpis">
@@ -1594,7 +1599,7 @@ small { font-size: .8em; }
             <li><time>2025.12</time><span>진료비 공개 항목 11종 → 20종 확대</span></li>
             <li><time>2026.04</time><span>마약류 투약 시 소유자 정보 기록 추진</span></li>
             <li><time>2026.08</time><span>합동점검 46곳 중 28곳 위반 적발</span></li>
-            <li><time>2026.09</time><span>분쟁용 진료기록 열람 · 발급 의무화 상임위 의결</span></li>
+            <li><time>2026.09</time><span>분쟁용 진료기록 열람 · 사본 발급 의무화 농해수위 의결</span></li>
           </ol>
           <div class="rx2">
             <p class="k">동물병원 의료용 마약류 처방량 (개)<b>+37%</b></p>
@@ -1605,7 +1610,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 농림축산식품부 2025 반려동물 양육현황 조사(2026.2) · 수의미래연구소 집계(농식품부 자료, 2025.6) · 농식품부 연관산업 육성 대책 · Data Bridge / Grand View / GM Insights / MRF · 농식품부 진료항목 표준화(2025.4) · 농식품부 보도자료(2025.12) · 농식품부 · 식약처 보도자료(2026.4) · 데일리벳 2026.08.05 · 연합뉴스 2026.05.31 · 한국경제 2026.09.02</p></div>
   </div>
-  <div class="note" hidden><p>반려가구는 29.2%로 역대 최대, 동물병원은 5,312곳입니다.</p><p>마약류 처방은 3년 새 37% 늘었고, 진료기록 공개 의무화도 다가옵니다. 지금이 진입 시점입니다.</p></div>
+  <div class="note" hidden><p>반려가구는 29.2%로 역대 최대, 동물병원은 5,312곳입니다.</p><p>마약류 처방은 3년 새 37% 늘었고, 진료기록 발급 의무화도 다가옵니다. 지금이 진입 시점입니다.</p></div>
 </section>
 
 <!-- ================= 06 차별점 ================= -->
@@ -1822,7 +1827,7 @@ small { font-size: .8em; }
 </section>
 
 <!-- ================= 10 비즈니스 모델 ================= -->
-<section class="slide" id="bm" data-sec="10" data-time="15" data-title="모듈은 한 번, 관제는 매달">
+<section class="slide" id="bm" data-sec="10" data-time="13" data-title="모듈은 한 번, 관제는 매달">
   <div class="frame">
     <p class="lab b">Business Model <span>비즈니스 모델</span></p>
     <h2 class="h b">모듈은 한 번 팔고, <mark>관제는 매달</mark> 받습니다</h2>
@@ -1831,7 +1836,7 @@ small { font-size: .8em; }
     </div>
     <div class="ft"><p class="src b">출처: 아이디어 제안서(원가 · 판매가 · 구독료, 관리비 포함) · ㈜씨엔 물품공급 약정(공급가 17만 원 · MOQ 300개) · 수의미래연구소 집계(2025.6) · 보건복지부 제5기 상급종합병원(2024~2026) · WHO 「State of the World’s Nursing 2025」(2023년 기준)</p></div>
   </div>
-  <div class="note" hidden><p>모듈은 대당 25만 원에 팔고, 관제 구독으로 대당 월 12만 원을 받습니다. 직접 판매와 유통 파트너로 동물병원, 수의대, 동물원에 팔고, 인증을 거쳐 사람 대형병원과 해외로 넓힙니다.</p></div>
+  <div class="note" hidden><p>모듈은 대당 25만 원에 팔고, 관제 구독으로 대당 월 12만 원을 받습니다. 동물병원, 수의대, 동물원에 팔고, 인증을 거쳐 사람 대형병원과 해외로 넓힙니다.</p></div>
 </section>
 
 <!-- ================= 11 기대효과 ================= -->
@@ -1846,9 +1851,9 @@ small { font-size: .8em; }
         <div class="card b"><p class="num">2.12<small>분</small></p><p>이상 알림 후 평균 대응<small>IoT 수액 모니터링 · 중국 대학병원 2개 병동 · 도입 전후 1년 · 알림 74%가 막힘 · 유속 이상 · 합병증 감소</small></p></div>
       </div>
       <ul class="who3 b">
-        <li class="card"><svg class="ico"><use href="#i-hosp"/></svg><div><b>동물병원</b><p>순회 · 수기 기록 부담 ↓</p></div><p class="m"><strong>−77%</strong><small>도입비 (펌프 대비)</small></p></li>
-        <li class="card"><svg class="ico"><use href="#i-user"/></svg><div><b>보호자</b><p>시간별 투약 기록 → 신뢰</p></div><p class="m"><strong>24시간</strong><small>자동 기록</small></p></li>
-        <li class="card"><svg class="ico"><use href="#i-paw"/></svg><div><b>반려동물</b><p>소진 · 중단 · 유속 이상 조기 발견</p></div><p class="m"><strong>5초</strong><small>이내 감지</small></p></li>
+        <li class="card"><svg class="ico"><use href="#i-hosp"/></svg><div><b>동물병원</b><p>순회 · 수기 기록 부담 ↓</p></div></li>
+        <li class="card"><svg class="ico"><use href="#i-user"/></svg><div><b>보호자</b><p>시간별 투약 기록 → 신뢰</p></div></li>
+        <li class="card"><svg class="ico"><use href="#i-paw"/></svg><div><b>반려동물</b><p>소진 · 중단 · 유속 이상 조기 발견</p></div></li>
       </ul>
     </div>
     <div class="ft"><p class="src b">출처: Puolitaival et al., Advances in Therapy(2022) — 근무조당 5.05분 확보 · 간호사 56.3% 시간 절약 응답(자기보고 설문) · Tong et al., Frontiers in Medicine(2025) — 수액 합병증 감소 · 정시 완료율 향상</p></div>
@@ -1862,33 +1867,33 @@ small { font-size: .8em; }
     <p class="lab b">Impact <span>기대효과</span></p>
     <h2 class="h b">제품으로 부담을 덜고, <mark>데이터로 확장</mark>합니다</h2>
     <p class="vs-pill b">EXPECTED EFFECTS</p>
-    <p class="vs-sub b">반려동물 시장에서 시작해, 흔들림 보정이 필요한 측정 산업으로</p>
+    <p class="vs-sub b">반려동물 시장에서 시작해, 체중계처럼 흔들림 보정이 필요한 측정 산업으로</p>
     <div class="bd">
       <div class="ve">
         <div class="card ve-p b">
           <p class="ve-h"><i>제품</i>제품 기대효과</p>
           <ul class="ve-list">
-            <li><svg class="ico"><use href="#i-note"/></svg><p><b>수기 작성 부담 감소</b><span>투약 · 잔량 · 이상을 자동 저장해 손 기록이 줄어듭니다</span></p><strong>자동<small> 기록</small></strong></li>
-            <li><svg class="ico"><use href="#i-tag"/></svg><p><b>금전적 손실 감소</b><span>입원장 5대 장비비 550만 → 125만 원 · 분쟁 입증 기록</span></p><strong>−77<small>% 장비비</small></strong></li>
+            <li><svg class="ico"><use href="#i-note"/></svg><p><b>수기 작성 부담 감소</b><span>수액 투여량 · 잔량 · 이상을 자동 저장해 손 기록이 줄어듭니다</span></p><strong>자동<small> 기록</small></strong></li>
+            <li><svg class="ico"><use href="#i-tag"/></svg><p><b>금전적 손실 감소</b><span>5대 장비비 550만 → 125만 원(구독 별도) · 분쟁 입증 기록</span></p><strong>−77<small>% 장비비</small></strong></li>
             <li><svg class="ico"><use href="#i-clock"/></svg><p><b>이상 조기 발견</b><span>소진 · 막힘 · 유속 이상을 바로 알립니다</span></p><strong>5<small>초 이내</small></strong></li>
             <li><svg class="ico"><use href="#i-shield"/></svg><p><b>법정 기록 작성 지원</b><span>진료부에 옮길 수액 투여 · 잔량 기록을 자동으로 남김</span></p><strong>24<small>시간</small></strong></li>
           </ul>
         </div>
         <div class="card ve-p ex b">
           <p class="ve-h"><i>확장</i>확장 가능 기대효과</p>
-          <div class="ve-data"><svg class="ico"><use href="#i-db"/></svg><p><b>구하기 어려운 의료 데이터 확보</b><span>사람 환자 데이터는 민감정보(건강)라 수집 · 활용 절차가 까다롭지만,<br>동물병원 입원장에 설치하면 수액 투여 · 흔들림 데이터가 매일 쌓입니다</span></p></div>
+          <div class="ve-data"><svg class="ico"><use href="#i-db"/></svg><p><b>구하기 어려운 의료 데이터, 진료 중에 확보</b><span>사람 환자 데이터는 민감정보(건강)라 수집 · 활용 절차가 까다롭지만,<br>동물병원 입원장에 설치하면 수액 투여 · 흔들림 데이터가 매일 쌓입니다</span></p></div>
           <ul class="ve-mk">
-            <li><svg class="ico"><use href="#i-robot"/></svg><b>휴머노이드</b><strong>380<small>억 달러</small></strong><em>2035년 세계 · 10년 25배</em><p>발바닥 하중으로<br>자세 · 균형 추정</p></li>
+            <li><svg class="ico"><use href="#i-robot"/></svg><b>휴머노이드</b><strong>380<small>억 달러</small></strong><em>2035년 세계 · 10년 25배</em><p>걸을 때 흔들리는<br>발바닥 하중 보정</p></li>
             <li><svg class="ico"><use href="#i-body"/></svg><b>인바디 · 체성분계</b><strong>13.9<small>억 달러</small></strong><em>2031년 세계 · 연 7.1%</em><p>측정 중<br>흔들림 보정</p></li>
             <li><svg class="ico"><use href="#i-scale"/></svg><b>산업용 체크웨이어</b><strong>3.6<small>억 달러</small></strong><em>2033년 세계 · 연 3.3%</em><p>컨베이어 진동 속<br>무게 보정</p></li>
           </ul>
-          <p class="ve-flow"><span>반려동물 시장</span><svg class="ico"><use href="#i-arrow"/></svg><span>초기 데이터 · 수익</span><svg class="ico"><use href="#i-arrow"/></svg><span>정확도 향상</span><svg class="ico"><use href="#i-arrow"/></svg><span class="hi">산업 확장</span></p>
+          <p class="ve-flow"><span>반려동물 시장</span><svg class="ico"><use href="#i-arrow"/></svg><span>초기 데이터 · 수익</span><svg class="ico"><use href="#i-arrow"/></svg><span>보정 AI 정확도 향상</span><svg class="ico"><use href="#i-arrow"/></svg><span class="hi">산업 확장</span></p>
         </div>
       </div>
     </div>
-    <div class="ft"><p class="src b">출처: 산업통상자원부 보도자료(2025.4.10 — 휴머노이드 2025년 15억 → 2035년 380억 달러) · MarketsandMarkets(2026 — 체성분 분석기 2026년 9.9억 → 2031년 13.9억 달러) · IMARC(2025 — 자동 체크웨이어 2024년 2.68억 → 2033년 3.58억 달러) · 장비비는 입원장 5대 기준(동물용 인퓨전펌프 대당 110만 원 — SW Medi 판매가 2025, INFU RETRO 25만 원, 관제 구독 대당 월 12만 원 별도) · 5초는 모의 병실 1,000회 시험의 최대 검측 시간(11장) · 민감정보: 개인정보 보호법 제23조</p></div>
+    <div class="ft"><p class="src b">출처: 산업통상자원부 보도자료(2025.4.10 — 휴머노이드 2025년 15억 → 2035년 380억 달러) · MarketsandMarkets(2026 — 체성분 분석기 2026년 9.9억 → 2031년 13.9억 달러) · IMARC(2025 — 자동 체크웨이어 2024년 2.68억 → 2033년 3.58억 달러) · 장비비는 입원장&nbsp;5대 기준(동물용 인퓨전펌프 대당 110만 원 — SW Medi 판매가 2025, INFU RETRO 25만 원, 관제 구독 대당 월 12만 원 별도) · 5초는 모의 병실 1,000회 시험의 최대 검측 시간(11장) · 민감정보: 개인정보 보호법 제23조</p></div>
   </div>
-  <div class="note" hidden><p>제품은 손 기록과 장비 도입비를 줄입니다. 사람에겐 모으기 까다로운 수액 · 흔들림 데이터를 입원장에서 쌓아, 휴머노이드 · 체성분계 · 체크웨이어로 넓힙니다.</p></div>
+  <div class="note" hidden><p>제품은 손 기록과 장비비를 줄입니다. 사람에겐 모으기 어려운 수액 데이터를 진료 중에 쌓아, 체중계처럼 보정이 필요한 체성분계, 체크웨이어, 휴머노이드로 넓힙니다.</p></div>
 </section>
 
 <!-- ================= 12 팀 소개 ================= -->
@@ -2322,7 +2327,7 @@ small { font-size: .8em; }
       <div class="g" style="--c: 1.1fr 1fr">
         <div class="card chart b">
           <h3>동물병원 의료용 마약류 처방량 <small style="color: var(--mute)">(만 개)</small></h3>
-          <p class="cs">3년 새 +37%</p>
+          <p class="cs">3년 새 <b>+37%</b></p>
           <img class="pyc" src="charts/rx-large.svg" alt="동물병원 의료용 마약류 처방량(만 개) 2022년 257.6, 2023년 299.2, 2024년 323.6, 2025년 353">
         </div>
         <div class="card b">
@@ -2413,7 +2418,7 @@ small { font-size: .8em; }
           <ul class="facts">
             <li><span>보호자</span><b>진료부 등 객관적 입증 자료 확보 · 진료 전후 상태를 사진 · 영상으로 기록</b></li>
             <li><span>병원</span><b>중대 진료 전 설명 · 서면 동의, 동의서 사본 제공, 예상 진료비 안내 권고</b></li>
-            <li><span>제도</span><b>현행 수의사법엔 진료부 열람 · 사본 발급 의무가 없음 — 공개 의무화 개정안 국회 상임위 통과</b></li>
+            <li><span>제도</span><b>현행 수의사법엔 진료부 열람 · 사본 발급 의무가 없음 — 열람 · 사본 발급 의무화 개정안 상임위 통과(법사위 · 본회의 대기)</b></li>
           </ul>
           <p class="lead2">소비자원은 객관적 입증 자료 확보를 당부했고, INFU RETRO는 시간별 잔량 · 유속 · 알림을 자동으로 남깁니다</p>
           <p class="cs">한계: 소비자원에 접수된 피해구제만 집계 — 병원과 직접 합의한 분쟁은 빠져 있음</p>
@@ -2597,7 +2602,7 @@ small { font-size: .8em; }
           <div class="card cpy-hist b">
             <p class="cpy-hh"><svg class="ico"><use href="#i-clock"/></svg>회사 주요 연혁</p>
             <ol class="cpy-tl">
-              <li class="up"><div class="c"><time>2025.11</time><b>WON+UP 캡스톤디자인 대상</b><span>총장상 · 인퓨테크팀</span></div></li>
+              <li class="up"><div class="c"><time>2025.11</time><b>WON+UP 캡스톤디자인 대상</b><span>총장상</span></div></li>
               <li class="dn"><div class="c"><time>2026.01</time><b>국제 학술대회 AIT 2026 논문</b><span>로드셀 기반 실시간 수액 감시</span></div></li>
               <li class="up"><div class="c"><time>2026.07</time><b>국내 공동학술대회 논문</b><span>상태 패턴 CNN 이상 감지</span></div></li>
               <li class="dn"><div class="c"><time>2026.08</time><b>피우다 프로젝트 장려상</b><span>호남ICT이노베이션스퀘어</span></div></li>
@@ -2662,7 +2667,7 @@ small { font-size: .8em; }
       </div>
     </div>
     <div class="ft">
-      <p class="take b">기록은 이미 의무이고 공개도 다가옵니다 — 수액 처치 기록은 <em>자동으로</em> 남아야 합니다</p>
+      <p class="take b">기록은 이미 의무이고 발급 의무화도 다가옵니다 — 수액 처치 기록은 <em>자동으로</em> 남아야 합니다</p>
       <p class="src b">출처: 수의사법 제13조 · 제13조의2 · 제20조 · 제41조와 시행규칙 제13조, 마약류관리법 제11조 · 제12조 · 제15조 · 제32조, 의료법 제21조 · 시행규칙 제15조 · 농식품부(2024.10.14) · 한국경제(2026.3.5 · 9.2) · 데일리벳 · 한국소비자원(2026.9)</p>
     </div>
   </div>

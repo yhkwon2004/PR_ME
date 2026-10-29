@@ -188,18 +188,18 @@ def chart_gyro():
             (res, INK, '자이로로 보정한 뒤 (g)', f'편차 RMS {rms0:.1f} g → {rms1:.1f} g', INK)]
     for ax, (y, col, left, right, rc) in zip(axs, rows):
         ax.plot(t, y, color=col, lw=1.3, solid_joinstyle='round')
-        ax.set_title(left, loc='left', fontsize=9.5, fontweight='semibold', color=INK2, pad=5)
-        ax.set_title(right, loc='right', fontsize=9.5, fontweight='bold', color=rc, pad=5)
+        ax.set_title(left, loc='left', fontsize=10.5, fontweight='semibold', color=INK2, pad=5)
+        ax.set_title(right, loc='right', fontsize=10.5, fontweight='bold', color=rc, pad=5)
         ax.grid(axis='y', color=GRID, lw=.8)
         ax.set_axisbelow(True)
         for side in ('top', 'right'):
             ax.spines[side].set_visible(False)
-        ax.tick_params(labelsize=8)
+        ax.tick_params(labelsize=10.5)
     axs[0].set_ylim(-46, 46); axs[0].set_yticks([-40, 0, 40])
     for ax in axs[1:]:
         ax.set_ylim(-lim, lim); ax.set_yticks([-5, 0, 5])
     axs[2].set_xlim(0, 12); axs[2].set_xticks(range(0, 13, 2))
-    axs[2].set_xlabel('시간 (s) · 20 Hz 샘플링', fontsize=8.5, color=INK2, labelpad=4)
+    axs[2].set_xlabel('시간 (s) · 20 Hz 샘플링', fontsize=10.5, color=INK2, labelpad=4)
     fig.subplots_adjust(left=.075, right=.985, top=.93, bottom=.11)
     return fig, (r, rms0, rms1)
 
@@ -215,12 +215,12 @@ def chart_gyro_mini():
     lim = float(max(abs(dev).max(), abs(res).max()) * 1.15)
     ax.set_ylim(-lim, lim * 1.6); ax.set_yticks([-5, 0, 5])  # headroom above the traces for the legend
     ax.set_xlim(0, 12); ax.set_xticks(range(0, 13, 2))
-    ax.set_xlabel('시간 (s) · 학습 장비 20 Hz', fontsize=10, color=INK2, labelpad=3)
+    ax.set_xlabel('시간 (s) · 학습 장비 20 Hz', fontsize=11, color=INK2, labelpad=3)
     ax.grid(axis='y', color=GRID, lw=.8); ax.set_axisbelow(True)
     for side in ('top', 'right'):
         ax.spines[side].set_visible(False)
-    ax.tick_params(labelsize=9.5)
-    leg = ax.legend(loc='upper right', ncol=2, fontsize=10, frameon=False, handlelength=1.4, columnspacing=1.2, borderaxespad=.1)
+    ax.tick_params(labelsize=11)
+    leg = ax.legend(loc='upper right', ncol=2, fontsize=11, frameon=False, handlelength=1.4, columnspacing=1.2, borderaxespad=.1)
     for txt, col in zip(leg.get_texts(), (HONEY, INK)):
         txt.set_color(col)
     fig.subplots_adjust(left=.075, right=.985, top=.86, bottom=.22)
@@ -621,12 +621,12 @@ def chart_epoch():
     fig, ax = plt.subplots(figsize=px(339, 104))
     x = np.arange(6)
     ax.plot([-.4, 5.3], [mean, mean], color=HONEY, lw=1.1, ls=(0, (3, 2.5)), zorder=1)
-    ax.text(5.45, mean, f'평균 {mean:.1f}', ha='left', va='center', fontsize=10, fontweight='bold', color=HONEY)
+    ax.text(5.45, mean, f'평균 {mean:.1f}', ha='left', va='center', fontsize=11, fontweight='bold', color=HONEY)
     ax.plot(x, acc, color=BAR_DIM, lw=1.4, zorder=2)
     ax.scatter(x, acc, s=34, color=HONEY, zorder=3, linewidths=0)
     ax.set_xticks(x, [f'E{e}' for e in range(62, 68)])
     ax.set_yticks([95, 99]); ax.set_ylim(94, 100.2); ax.set_xlim(-.4, 6.6)
-    ax.tick_params(axis='both', labelsize=9.5, labelcolor=MUTE, length=0, pad=3)
+    ax.tick_params(axis='both', labelsize=11, labelcolor=MUTE, length=0, pad=3)
     for side in ('top', 'right', 'left', 'bottom'):
         ax.spines[side].set_visible(False)
     ax.grid(axis='y', color=GRID, lw=.8); ax.set_axisbelow(True)
@@ -1215,7 +1215,7 @@ def chart_t_gyroflow():
             for y_, col, lw in ((gyro / 46, SAGE, 1.6), (dev / 9, HONEY, 1.8)):
                 ii = np.arange(sl.start, sl.stop)
                 ax.plot([sx(i) for i in ii], [140 - 22 * y_[i] for i in ii], color=col, lw=lw * PT, zorder=3)
-            say(ax, x + cw - 26, 176, [('자이로', 13, 700, SAGE), ('무게 편차', 13, 700, HONEY, 0, .8)], ha='right')
+            say(ax, x + cw - 26, 176, [('자이로', 14.5, 700, SAGE), ('무게 편차', 14.5, 700, HONEY, 0, .8)], ha='right')
         if k < 3:
             arrow(ax, x + cw + 8, x + cw + gap - 8, 84, LINE, lw=2.4, head=12)
     return fig
@@ -1232,19 +1232,19 @@ def chart_t_gyroscatter():
     gy = lambda v: y1 - (y1 - y0) * (v + 11) / 22
     for v in (-40, -20, 0, 20, 40):
         ax.plot([gx(v), gx(v)], [y0, y1], color=GRID, lw=PT, zorder=1)
-        say(ax, gx(v), y1 + 24, [(f'{v:+d}' if v else '0', 14, 500, MUTE)], ha='center')
+        say(ax, gx(v), y1 + 24, [(f'{v:+d}' if v else '0', 15, 500, MUTE)], ha='center')
     for v in (-10, -5, 0, 5, 10):
         ax.plot([x0, x1], [gy(v), gy(v)], color=GRID, lw=PT, zorder=1)
-        say(ax, x0 - 10, gy(v) + 5, [(f'{v:+d}' if v else '0', 14, 500, MUTE)], ha='right')
+        say(ax, x0 - 10, gy(v) + 5, [(f'{v:+d}' if v else '0', 15, 500, MUTE)], ha='right')
     ax.plot([gx(0), gx(0)], [y0, y1], color=LINE, lw=PT, zorder=1.5)
     ax.plot([x0, x1], [gy(0), gy(0)], color=LINE, lw=PT, zorder=1.5)
     ax.scatter([gx(v) for v in x], [gy(v) for v in y], s=26, color=HONEY, alpha=.45, linewidths=0, zorder=3)
     k, b = np.polyfit(x, y, 1)
     ax.plot([gx(-44), gx(44)], [gy(k * -44 + b), gy(k * 44 + b)], color=INK, lw=2 * PT, zorder=4)
     say(ax, x0 + 14, y0 + 36, [(f'r = {r:.2f}', 30, 800, HONEY, -.01)])
-    say(ax, x0 + 14, y0 + 62, [(f'샘플 {x.size}개 · 12초 · 20 Hz', 14, 500, MUTE)])
-    say(ax, (x0 + x1) / 2, H - 6, [('자이로 각속도 (°/s)', 14.5, 600, INK2)], ha='center')
-    ax.text(14, (y0 + y1) / 2, '무게 편차 (g)', rotation=90, fontsize=14.5 * PT, fontweight=WEIGHT[600], color=INK2, ha='center', va='center')
+    say(ax, x0 + 14, y0 + 62, [(f'샘플 {x.size}개 · 12초 · 20 Hz', 15, 500, MUTE)])
+    say(ax, (x0 + x1) / 2, H - 6, [('자이로 각속도 (°/s)', 15, 600, INK2)], ha='center')
+    ax.text(14, (y0 + y1) / 2, '무게 편차 (g)', rotation=90, fontsize=15 * PT, fontweight=WEIGHT[600], color=INK2, ha='center', va='center')
     return fig
 
 
