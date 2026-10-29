@@ -110,7 +110,7 @@ async function autoplay(file, media) {
 
   const pres = new PptxGenJS();
   pres.layout = 'LAYOUT_WIDE';
-  pres.title = 'INFU RETRO — 반려동물 주사약물 투약 관리 AIoT 솔루션';
+  pres.title = 'INFU RETRO — 가상 자이로 기반 약물 투약 관리 · 이상감지 솔루션';
   pres.subject = '2026 NEXT WAVE-UP 아이디어 리그 · 일반·기술 트랙';
   pres.author = 'WON SHOT';
   pres.company = 'WON SHOT';

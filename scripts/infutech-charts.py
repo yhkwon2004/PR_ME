@@ -748,7 +748,7 @@ def chart_bm():
     say(ax, L[0], CY + 47, [('배터리 · 조립', 15.5, 500, INK2)], ha='center')
     say(ax, C[0], CY - 52, [('INFU RETRO', 15, 700, '#F6E3CF', .14)], ha='center')
     say(ax, C[0], CY - 4, [('WON SHOT', 40, 800, '#FFFFFF', -.01)], ha='center')
-    say(ax, C[0], CY + 32, [('무게센서 모듈', 17, 600, '#FFFFFF')], ha='center')
+    say(ax, C[0], CY + 32, [('하중센서 모듈', 17, 600, '#FFFFFF')], ha='center')
     say(ax, C[0], CY + 56, [('24시간 관제 플랫폼', 17, 600, '#FFFFFF')], ha='center')
     say(ax, R[0], CY - 4, [('병원 고객', 23, 800, INK)], ha='center')
     say(ax, R[0], CY + 26, [('입원장마다 1대', 15.5, 500, INK2)], ha='center')
@@ -1192,14 +1192,15 @@ def chart_t_chain():
 
 def chart_t_gyroflow():
     # 부록 · 센서 절감 학습 (1680 × 200 px): 동시 수집 → 상관 분석 → 보정 튜닝 → 제품 적용 (수치는 학습 장비 모의 신호 기준)
-    t, gyro, dev, res, r, rms0, rms1 = gyro_signals()
+    t, gyro, dev, _, r, rms0, rms1 = gyro_signals()
     W, H, gap = 1680, 200, 46
     fig, ax = canvas(W, H)
     cw = (W - 3 * gap) / 4
+    # ③ is the gyro-input correction (simulated); ④ is the product, which learns to reproduce it from the load signal alone
     steps = [('동시 수집', '학습 장비: 로드셀 + 자이로 · 20 Hz', None),
              ('상관 분석', '자이로 각속도 ↔ 무게 편차', f'r = {r:.2f}'),
-             ('보정 튜닝', '흔들림이 무게에 남기는 편차를 학습', None),
-             ('제품 적용', '자이로 없이 무게센서 1개', f'{rms0:.1f} g → {rms1:.1f} g')]
+             ('보정 튜닝', '자이로 입력으로 편차 보정 · 모의 신호', f'{rms0:.1f} g → {rms1:.1f} g'),
+             ('제품 적용', '자이로 없이 하중센서 1개 · 실측 검증 중', '하중 신호만으로 보정')]
     for k, (t1, t2, big) in enumerate(steps):
         x = k * (cw + gap)
         card(ax, x, 6, cw, H - 22, gid=f'gsh{k}', hi=k == 3)
@@ -1208,20 +1209,13 @@ def chart_t_gyroflow():
         say(ax, x + 26, 104, [(t2, 15.5, 500, INK2)])
         if big:
             say(ax, x + 26, 150, [(big, 26, 800, HONEY, -.01)])
-        else:  # a small trace instead of a number: both sensors (1), deviation before → after the learned correction (3)
+        else:  # a small trace instead of a number: both sensors (1)
             sl = slice(20, 220)
             sx = lambda i: x + 26 + (cw - 52) * (i - sl.start) / (sl.stop - sl.start)
-            if k == 0:
-                pairs = ((gyro / 46, SAGE, 1.6), (dev / 9, HONEY, 1.8))
-            else:
-                pairs = ((dev / 9, '#D9C3A8', 1.6), (res / 9, INK, 1.8))
-            for y_, col, lw in pairs:
+            for y_, col, lw in ((gyro / 46, SAGE, 1.6), (dev / 9, HONEY, 1.8)):
                 ii = np.arange(sl.start, sl.stop)
                 ax.plot([sx(i) for i in ii], [140 - 22 * y_[i] for i in ii], color=col, lw=lw * PT, zorder=3)
-            if k == 0:
-                say(ax, x + cw - 26, 176, [('자이로', 13, 700, SAGE), ('무게 편차', 13, 700, HONEY, 0, .8)], ha='right')
-            else:
-                say(ax, x + cw - 26, 176, [('보정 전', 13, 700, '#B8A797'), ('보정 후', 13, 700, INK, 0, .8)], ha='right')
+            say(ax, x + cw - 26, 176, [('자이로', 13, 700, SAGE), ('무게 편차', 13, 700, HONEY, 0, .8)], ha='right')
         if k < 3:
             arrow(ax, x + cw + 8, x + cw + gap - 8, 84, LINE, lw=2.4, head=12)
     return fig
