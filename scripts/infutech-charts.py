@@ -710,19 +710,67 @@ def pill_c(ax, cx, cy, text, size, col, bg, z=4, weight=800):
     say(ax, cx, cy + size * .37, [(text, size, weight, col)], ha='center', z=z + .1)
 
 
-def chart_bm():
-    # 18장 비즈니스 모델 (덱 본문 1680 × 763 px): 위 — 생산 파트너 · WON SHOT · 병원 고객 사이의 제품(회색)과 돈(꿀색) 흐름,
-    # 가운데 아래 — 제공 서비스, 맨 아래 — 지금 판매하는 곳과 다음 확대 목표
-    W, H = 1680, 763
+def thumb_sensors(media):
+    # 7장 1단계 썸네일 (1200 × 840 px webp, 화면 약 300 × 210 — 글자 ≥ 14 px): 실제 사진 두 장 —
+    # 기존 다중 센서 폴대 → INFU RETRO 하중센서 모듈
+    from PIL import Image, ImageDraw, ImageFont
+    W, H = 1200, 840
+    im = Image.new('RGB', (W, H), '#FFFFFF')
+    d = ImageDraw.Draw(im)
+    pole = Image.open(os.path.join(media, 'pole-multi.webp')).convert('RGB')
+    pole = pole.resize((int(pole.width * 610 / pole.height), 610), Image.LANCZOS)
+    im.paste(pole, (270 - pole.width // 2, 30))
+    mod = Image.open(os.path.join(media, 'module.webp')).convert('RGBA').crop((20, 40, 360, 800))
+    mod = mod.resize((int(mod.width * 600 / mod.height), 600), Image.LANCZOS)
+    im.paste(mod, (930 - mod.width // 2, 34), mod)
+    otf = {os.path.basename(e.fname): e.fname for e in font_manager.fontManager.ttflist if e.fname.endswith('.otf')}
+    f = ImageFont.truetype(otf['Pretendard-ExtraBold.otf'], 64)
+    def pill(cx, cy, text, fg, bg):
+        tw = d.textlength(text, font=f)
+        h = 64 * 1.6
+        d.rounded_rectangle((cx - tw / 2 - 48, cy - h / 2, cx + tw / 2 + 48, cy + h / 2), radius=h / 2, fill=bg)
+        d.text((cx, cy), text, font=f, fill=fg, anchor='mm')
+    pill(270, 740, '센서 여러 개', '#5B4B3F', '#EFE8DE')
+    pill(930, 740, '하중센서 1개', '#FFFFFF', '#AD6229')
+    ax0, ay = 545, 330
+    d.line((ax0, ay, ax0 + 80, ay), fill='#AD6229', width=14)
+    d.polygon([(ax0 + 120, ay), (ax0 + 74, ay - 32), (ax0 + 74, ay + 32)], fill='#AD6229')
+    im.save(os.path.join(media, 'sv-sensors.webp'), quality=86, method=6)
+    print('  media/sv-sensors.webp', im.size)
+
+
+def chart_sv_ai():
+    # 7장 3단계 썸네일 (300 × 210 px, 화면과 같은 크기 — 글자 ≥ 14 px): 흔들린 무게 신호 → 가상 자이로 AI → 보정된 무게, 개념 예시
+    W, H = 300, 210
     fig, ax = canvas(W, H)
-    CY = 186
-    L, C, R = (118, 108), (700, 142), (1562, 114)        # (cx, r)
-    def edge(node, y, side):                             # x where a lane at y meets the circle's left/right side
+    rng = np.random.default_rng(7)
+    x = np.linspace(18, 282, 160)
+    t = np.linspace(0, 1, 160)
+    sway = 15 * np.sin(2 * np.pi * 3.2 * t) * np.exp(-((t - .45) / .32) ** 2) + 5 * np.sin(2 * np.pi * 7.5 * t) * (t > .62) * (t < .9)
+    say(ax, 18, 26, [('흔들린 무게', 15, 700, INK2)])
+    pill_c(ax, 262, 21, '예시', 14, '#FFFFFF', INK2)
+    ax.plot(x, 56 + sway + rng.normal(0, 1.4, x.size), color=HONEY, lw=2.2 * PT, zorder=2)
+    rbox(ax, 62, 86, 176, 40, 20, z=3, color=HONEY, lw=0)
+    say(ax, 150, 106 + .36 * 18, [('가상 자이로 AI', 18, 800, '#FFFFFF')], ha='center', z=4)
+    for y0, y1 in ((76, 86), (126, 138)):
+        ax.annotate('', xy=(150, y1), xytext=(150, y0), arrowprops=dict(arrowstyle='-|>', color=HONEY, lw=2 * PT, mutation_scale=12), zorder=3)
+    ax.plot(x, 160 + rng.normal(0, .8, x.size), color=INK, lw=2.2 * PT, zorder=2)
+    say(ax, 18, 196, [('보정된 무게', 15, 700, INK)])
+    return fig
+
+
+def chart_bm():
+    # 18장 비즈니스 모델 흐름도 (덱 왼쪽 칸 약 1050 × 400 px): 생산 파트너 · WON SHOT · 유통 파트너 · 병원 고객 사이의
+    # 제품(회색)과 돈(꿀색) 흐름만 — 가격 · 수익 숫자와 판매 대상은 슬라이드의 카드가 맡습니다
+    W, H = 1050, 400
+    fig, ax = canvas(W, H)
+    CY = 215
+    L, C, R = (92, 86), (440, 124), (958, 90)            # (cx, r)
+    def edge(node, y, side):
         cx, r = node
         return cx + side * math.sqrt(r * r - (y - CY) ** 2)
-    RIM = '#E6DBCD'   # the deck's card border; nodes and cards sit on white like .card, with its soft shadow
+    RIM = '#E6DBCD'
 
-    # legend
     lx = W - 4
     for lab, col in (('돈', HONEY), ('제품 · 서비스', INK2)):
         lx -= advance(lab, 15, 600)
@@ -730,101 +778,44 @@ def chart_bm():
         arrow(ax, lx - 46, lx - 10, 15, col, lw=2.4, head=9)
         lx -= 70
 
-    # nodes
     for k, (cx, r) in enumerate((L, R)):
-        ax.add_patch(plt.Circle((cx, CY + 11), r, color='#5C3E24', alpha=.08, lw=0, zorder=1, gid=f'nsh{k}'))
+        ax.add_patch(plt.Circle((cx, CY + 10), r, color='#5C3E24', alpha=.08, lw=0, zorder=1, gid=f'nsh{k}'))
         ax.add_patch(plt.Circle((cx, CY), r, facecolor='#FFFFFF', edgecolor=RIM, lw=PT, zorder=2))
-    ax.add_patch(plt.Circle((C[0], CY + 14), C[1], color='#5C3E24', alpha=.2, lw=0, zorder=1, gid='cnsh'))
+    ax.add_patch(plt.Circle((C[0], CY + 13), C[1], color='#5C3E24', alpha=.2, lw=0, zorder=1, gid='cnsh'))
     ax.add_patch(plt.Circle((C[0], CY), C[1], color=HONEY, lw=0, zorder=2, gid='cnode'))
-    say(ax, L[0], CY - 4, [('생산 파트너', 23, 800, INK)], ha='center')
-    say(ax, L[0], CY + 26, [('PCB · 로드셀', 15.5, 500, INK2)], ha='center')
-    say(ax, L[0], CY + 47, [('배터리 · 조립', 15.5, 500, INK2)], ha='center')
-    say(ax, C[0], CY - 52, [('INFU RETRO', 15, 700, '#F6E3CF', .14)], ha='center')
-    say(ax, C[0], CY - 4, [('WON SHOT', 40, 800, '#FFFFFF', -.01)], ha='center')
-    say(ax, C[0], CY + 32, [('하중센서 모듈', 17, 600, '#FFFFFF')], ha='center')
-    say(ax, C[0], CY + 56, [('24시간 관제 플랫폼', 17, 600, '#FFFFFF')], ha='center')
-    say(ax, R[0], CY - 4, [('병원 고객', 23, 800, INK)], ha='center')
+    say(ax, L[0], CY - 2, [('생산 파트너', 21, 800, INK)], ha='center')
+    say(ax, L[0], CY + 26, [('PCB · 로드셀 · 조립', 15.5, 500, INK2)], ha='center')
+    say(ax, C[0], CY - 44, [('INFU RETRO', 15, 700, '#F6E3CF', .14)], ha='center')
+    say(ax, C[0], CY + 2, [('WON SHOT', 36, 800, '#FFFFFF', -.01)], ha='center')
+    say(ax, C[0], CY + 34, [('모듈 + 24시간 관제', 17, 600, '#FFFFFF')], ha='center')
+    say(ax, R[0], CY - 2, [('병원 고객', 21, 800, INK)], ha='center')
     say(ax, R[0], CY + 26, [('입원장마다 1대', 15.5, 500, INK2)], ha='center')
-    say(ax, R[0], CY + 47, [('병원당 평균 5대', 15.5, 500, INK2)], ha='center')
 
     # 생산 파트너 ⇄ WON SHOT
-    y1, y2 = CY - 34, CY + 32
+    y1, y2 = CY - 30, CY + 30
     a, b = edge(L, y1, 1) + 10, edge(C, y1, -1) - 10
     arrow(ax, a, b, y1, INK2)
-    say(ax, (a + b) / 2, y1 - 14, [('부품 · 생산', 18, 600, INK2)], ha='center')
+    say(ax, (a + b) / 2, y1 - 14, [('부품 · 생산', 17, 600, INK2)], ha='center')
     a, b = edge(L, y2, 1) + 10, edge(C, y2, -1) - 10
     arrow(ax, b, a, y2, HONEY)
-    pill_c(ax, (a + b) / 2, y2 + 27, '제조비 3.5만 원 / 대', 16.5, HONEY, '#F6E7D6')
+    say(ax, (a + b) / 2, y2 + 28, [('제조비', 17, 700, HONEY)], ha='center')
 
-    # WON SHOT ⇄ 병원 고객: 직접 판매 · 유통 파트너 경유 · 돈
-    y1, y2, y3 = CY - 76, CY - 6, CY + 64
+    # WON SHOT → 병원: 직접 판매(위) · 유통 파트너 경유(가운데) · 돈(아래)
+    y1, y2, y3 = CY - 78, CY, CY + 74
     a, b = edge(C, y1, 1) + 10, edge(R, y1, -1) - 10
     arrow(ax, a, b, y1, INK2)
-    say(ax, (a + b) / 2, y1 - 14, [('직접 판매', 18, 700, INK), ('  모듈 + 24시간 관제', 18, 500, INK2)], ha='center')
-    bx, bw, bh = 1150, 238, 64
+    say(ax, (a + b) / 2, y1 - 14, [('직접 판매', 18, 800, INK)], ha='center')
+    bx, bw, bh = 712, 226, 66
     rbox(ax, bx - bw / 2, y2 - bh / 2, bw, bh, 14, z=3, facecolor='#FFFFFF', edgecolor=LINE, lw=1.2 * PT)
-    say(ax, bx, y2 - 5, [('유통 파트너', 18, 800, INK)], ha='center', z=4)
-    say(ax, bx, y2 + 19, [('㈜씨엔 · ㈜에스케이엠엔엠', 14, 500, MUTE)], ha='center', z=4)
+    say(ax, bx, y2 - 4, [('유통 파트너', 18, 800, INK)], ha='center', z=4)
+    say(ax, bx, y2 + 20, [('㈜씨엔 · ㈜에스케이엠엔엠', 15, 500, MUTE)], ha='center', z=4)
     a = edge(C, y2, 1) + 10
     arrow(ax, a, bx - bw / 2 - 6, y2, INK2)
-    pill_c(ax, (a + bx - bw / 2) / 2, y2 - 30, '공급가 17만 원', 15, HONEY, '#F6E7D6')
     b = edge(R, y2, -1) - 10
     arrow(ax, bx + bw / 2 + 6, b, y2, INK2)
-    say(ax, (bx + bw / 2 + b) / 2, y2 - 14, [('회원사 · 유통망', 15, 500, MUTE)], ha='center')
     a, b = edge(C, y3, 1) + 10, edge(R, y3, -1) - 10
     arrow(ax, b, a, y3, HONEY)
-    mid = (a + b) / 2
-    pill_c(ax, mid - 128, y3 + 31, '장비 25만 원 / 대 · 1회', 17, '#FFFFFF', HONEY)
-    pill_c(ax, mid + 136, y3 + 31, '관제 구독 월 12만 원 / 대', 17, '#FFFFFF', HONEY)
-
-    # captions under the outer nodes
-    say(ax, L[0], 344, [('대당 원가 8만 원', 15.5, 600, INK2)], ha='center')
-    say(ax, L[0], 367, [('공헌이익 17만 원 · 68%', 15.5, 500, MUTE)], ha='center')
-    say(ax, R[0], 344, [('병원 1곳 · 5대 기준', 15.5, 600, INK2)], ha='center')
-    say(ax, R[0], 367, [('첫해 845만 원', 15.5, 500, MUTE)], ha='center')
-    say(ax, R[0], 390, [('2년차부터 매년 720만 원', 15.5, 500, MUTE)], ha='center')
-
-    # services under WON SHOT, hung from one bracket
-    svc = ['설치 · 교육', '24시간 관제 · 알림', '투약 기록 자동 저장', '유지관리 · 교체']
-    sw, sg, sy = 168, 10, 368
-    x0 = C[0] - (len(svc) * sw + (len(svc) - 1) * sg) / 2
-    cxs = [x0 + k * (sw + sg) + sw / 2 for k in range(len(svc))]
-    ax.plot([C[0], C[0]], [CY + C[1], sy - 16], color=LINE, lw=1.5 * PT, zorder=1)
-    ax.plot([cxs[0], cxs[-1]], [sy - 16, sy - 16], color=LINE, lw=1.5 * PT, zorder=1, solid_capstyle='round')
-    for cx, lab in zip(cxs, svc):
-        ax.plot([cx, cx], [sy - 16, sy], color=LINE, lw=1.5 * PT, zorder=1)
-        rbox(ax, cx - sw / 2, sy, sw, 44, 10, z=2, color='#EFE5D8', lw=0)
-        say(ax, cx, sy + 22 + .36 * 16, [(lab, 16, 700, INK2)], ha='center')
-
-    # 판매 대상 → 확대 목표
-    cards = [  # title, two lines, tag, goal?
-        ('반려동물 동물병원', '전국 5,312곳', '호남권 300곳부터', '직접 판매 · ㈜씨엔', False),
-        ('수의과대학 동물병원', '전국 수의과대학 10곳', '교육 · 연구 입원장', '전남대 수의대 LOI', False),
-        ('동물원 동물병원', '사육 동물 입원 치료', '같은 모듈 · 같은 관제', '동물용 기기 그대로', False),
-        ('사람 대형병원', '상급종합병원 47곳', '병동 수액 순회 · 기록', '식약처 인증 후', True),
-        ('간호인력 부족 국외 시설', '세계 간호인력 580만 명 부족', '원격 관제로 순회 부담 ↓', '현지 인증 후', True)]
-    GAP, top, ch = 16, 520, 216
-    cw = (W - GAP * 4) / 5
-    band_y = 474
-    for k0, k1, lab, col, dash in ((0, 2, '지금 판매 · 동물 의료', HONEY, False), (3, 4, '확대 목표 · 사람 의료 · 해외', INK2, True)):
-        xa, xb = k0 * (cw + GAP), k1 * (cw + GAP) + cw
-        tw = say(ax, xa, band_y + .36 * 18, [(lab, 18, 800, col)])
-        arrow(ax, xa + tw + 14, xb - 2, band_y, col, lw=2, head=10, dash=dash)
-    for k, (title, l1, l2, tag, goal) in enumerate(cards):
-        x = k * (cw + GAP)
-        if goal:
-            rbox(ax, x + 1, top + 1, cw - 2, ch - 2, 16, z=1, facecolor='#FFFFFF', edgecolor='#BFAF9E', lw=1.4 * PT, ls=(0, (5, 4)))
-        else:  # .card.hi: linear-gradient(160deg, #FFF6EA, #FBE8D2), border #EED1AE, soft shadow
-            rbox(ax, x, top + 11, cw, ch, 16, z=.5, gid=f'csh{k}', color='#5C3E24', alpha=.08, lw=0)
-            rbox(ax, x, top, cw, ch, 16, z=1, gid=f'card{k}', facecolor='#FFF6EA', edgecolor='#EED1AE', lw=PT)
-        badge = HONEY if not goal else '#FFFFFF'
-        ax.add_patch(plt.Circle((x + 40, top + 42), 17, facecolor=badge, edgecolor=HONEY if not goal else '#BFAF9E', lw=1.4 * PT, zorder=2))
-        say(ax, x + 40, top + 42 + .36 * 17, [(str(k + 1), 17, 800, '#FFFFFF' if not goal else INK2)], ha='center')
-        say(ax, x + 24, top + 104, [(title, 22, 800, INK)])
-        say(ax, x + 24, top + 136, [(l1, 16, 600, HONEY if not goal else INK2)])
-        say(ax, x + 24, top + 160, [(l2, 16, 500, MUTE)])
-        pill(ax, x + 24 + advance(tag, 14.5, 800) + 14.5 * 1.5, top + ch - 30, tag, 14.5, HONEY if not goal else INK2,
-             '#EDDCC8' if not goal else '#F1EBE3', 2)
+    say(ax, (a + b) / 2, y3 + 30, [('장비 대금 + 월 관제 구독료', 18, 800, HONEY)], ha='center')
     return fig
 
 
@@ -1421,7 +1412,8 @@ if __name__ == '__main__':
     save(chart_t_gyroscatter(), 't-gyroscatter.svg')
     save(chart_v_kaha(), 'v-kaha.svg')
     save(chart_v_rank(), 'v-rank.svg')
-    save(chart_bm(), 'bm.svg', fills={'cnode': (.25, .067, .75, .933, [(0, '#C97F40', 1), (1, '#A35A22', 1)]),
-                                      **{f'card{k}': hi for k in range(3)}},
-         blurs={'cnsh': 18, 'nsh0': 16, 'nsh1': 16, **{f'csh{k}': 16 for k in range(3)}})
+    save(chart_sv_ai(), 'sv-ai.svg')
+    thumb_sensors(os.path.join(os.path.dirname(OUT), 'media'))
+    save(chart_bm(), 'bm.svg', fills={'cnode': (.25, .067, .75, .933, [(0, '#C97F40', 1), (1, '#A35A22', 1)])},
+         blurs={'cnsh': 18, 'nsh0': 16, 'nsh1': 16})
     print(f'  자이로-편차 r={r:.2f}, RMS {a:.2f} → {b:.2f} g')
