@@ -1,7 +1,7 @@
 {
   "name": "INFU RETRO 피치덱",
   "short_name": "INFU RETRO",
-  "description": "INFUTECH — 가상 자이로 기반 약물 투약 관리 · 이상감지 솔루션 발표",
+  "description": "INFUTECH — AI 자이로 센서 기반 반려동물 약물 투약 이상감지 솔루션 발표",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
