@@ -589,29 +589,22 @@ def chart_market():
 
 def chart_visit():
     # only the two years the source gives: 2021 73.0% and 2025 95.1%
-    fig = plt.figure(figsize=px(331, 64))
-    ax = fig.add_axes([.02, .02, .96, .96])
-    ax.plot([0, 1], [73.0, 95.1], color=HONEY, lw=2.4, solid_capstyle='round', zorder=2)
-    ax.scatter([0, 1], [73.0, 95.1], s=[36, 64], color=[BAR_DIM, HONEY], zorder=3, linewidths=0)
-    ax.text(.04, 73.0 - 1.5, '2021  73.0%', ha='left', va='top', fontsize=11, color=MUTE)
-    ax.text(.96, 95.1 + 1.5, '2025  95.1%', ha='right', va='bottom', fontsize=11, fontweight='bold', color=HONEY)
-    ax.set_xlim(-.03, 1.03); ax.set_ylim(58, 112); ax.axis('off')
-    return fig
+    return columns([73.0, 95.1], ['2021', '2025'], (460, 320), {1}, lambda v: f'{v:.1f}%', value_px=22, label_px=17, bar_px=84)
 
 
 def chart_cagr():
-    # four firms' forecasts in one colour — the point is that all of them grow, not the highest one
-    vals = [12.3, 7.4, 7.2, 6.55]
-    labs = ['Data\nBridge', 'Grand\nView', 'GM\nInsights', 'MRF']
-    return columns(vals, labs, (402, 603), set(), lambda v: f'{v:g}%', value_px=19, label_px=16, fill='#E9BE8C')
+    # four firms' forecasts as horizontal bars in one colour — firms are not a time axis, so no left-to-right "trend"
+    rows = [(n, v, f'{v:g}%', '#E9BE8C', INK2, None) for n, v in
+            [('Data Bridge', 12.3), ('Grand View', 7.4), ('GM Insights', 7.2), ('MRF', 6.55)]]
+    return hbars(rows, (460, 300), label_w=118, value_px=20, label_px=17, bar_px=34)
 
 
 RX = [257.6, 299.2, 323.6, 353.0]
 def chart_rx(size, large=False):
     labs = ['2022', '2023', '2024', '2025']
     fmt = (lambda v: f'{v:g}') if large else (lambda v: f'{v:g}만')
-    return columns(RX, labs, size, {3}, fmt, value_px=20 if large else 16.5, label_px=16.5 if large else 15.5,
-                   bar_px=84 if large else 60)
+    return columns(RX, labs, size, {3}, fmt, value_px=20 if large else 18, label_px=16.5 if large else 16,
+                   bar_px=84 if large else 56)
 
 
 def chart_epoch():
@@ -1409,7 +1402,7 @@ if __name__ == '__main__':
          blurs={'sh1': 16, 'sh2': 16})                                                  # CSS: 1.6em blur → σ 16 px
     save(chart_visit(), 'visit.svg')
     save(chart_cagr(), 'cagr.svg')
-    save(chart_rx((538, 318)), 'rx.svg')
+    save(chart_rx((460, 320)), 'rx.svg')
     save(chart_rx((806, 560), large=True), 'rx-large.svg')
     save(chart_epoch(), 'epoch.svg')
     save(chart_cost_vs(), 'cost-vs.svg')
