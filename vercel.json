@@ -33,21 +33,15 @@
       ]
     }
   ],
+  "redirects": [
+    { "source": "/present", "destination": "/", "permanent": false },
+    { "source": "/growth", "destination": "/", "permanent": false },
+    { "source": "/growth/:path*", "destination": "/", "permanent": false },
+    { "source": "/history", "destination": "/", "permanent": false }
+  ],
   "rewrites": [
     {
       "source": "/about",
-      "destination": "/"
-    },
-    {
-      "source": "/growth",
-      "destination": "/"
-    },
-    {
-      "source": "/growth/:path*",
-      "destination": "/"
-    },
-    {
-      "source": "/history",
       "destination": "/"
     },
     {

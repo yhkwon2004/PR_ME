@@ -83,7 +83,7 @@ export const scenes = [
     label: 'About Me',
     chapter: ['01', '소개'],
     // 이력서처럼 두 화면(소개 → 학력 · 기록) — 스크롤 없이 한 화면씩(src/ui/beats.js).
-    // 성장 과정 · 보유 역량 · 미래 계획은 필름에 두지 않는다(발표 자료 /present에서만) — 필름은 프로젝트에 집중
+    // 성장 과정 · 보유 역량 · 미래 계획은 필름에 두지 않는다(따로 떨어진 발표 자료 yhkwon2004/wku_portfolio에서) — 필름은 프로젝트에 집중
     layout: 'beats',
     beats: 'profile',
     hold: 11,

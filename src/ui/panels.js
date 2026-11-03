@@ -259,7 +259,6 @@ function render(scene, i) {
           )
           .join('')}</ul>
         <nav class="endcard-links" data-r aria-label="더 보기">${[
-          ['/present', '발표 자료'],
           ['/works', `프로젝트 ${ALL_PROJECTS.length}`],
           ['/awards', `수상 ${AWARDS.length} · 상장`],
           ['/skills', '보유 스킬'],

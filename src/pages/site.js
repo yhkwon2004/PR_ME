@@ -6,8 +6,6 @@ import { AWARDS, awardsOf, bestOf, TIER_KEY } from '../data/awards.js';
 import { HISTORY, HISTORY_YEARS } from '../data/history.js';
 import { PRESS, pressOf } from '../data/press.js';
 import { DOMAIN_SKILLS, SKILLS, CERTS, SKILL_COUNT } from '../data/skills.js';
-import { createPager } from '../deck/pager.js';
-import { presentDeck, PR_SECS } from '../deck/present.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
@@ -351,7 +349,6 @@ export function awardCard(a) {
 
 const tabs = (on) => `<nav class="pg-tabs" aria-label="보기 전환">
     <a href="/about" data-link class="${on === 'about' ? 'is-on' : ''}"${on === 'about' ? ' aria-current="page"' : ''}>프로필</a>
-    <a href="/present" data-link class="${on === 'journey' ? 'is-on' : ''}"${on === 'journey' ? ' aria-current="page"' : ''}>발표 자료</a>
     <a href="/works" data-link class="${on === 'works' ? 'is-on' : ''}"${on === 'works' ? ' aria-current="page"' : ''}>프로젝트<sup>${projects.length}</sup></a>
     <a href="/awards" data-link class="${on === 'awards' ? 'is-on' : ''}"${on === 'awards' ? ' aria-current="page"' : ''}>수상<sup>${AWARDS.length}</sup></a>
     <a href="/skills" data-link class="${on === 'skills' ? 'is-on' : ''}"${on === 'skills' ? ' aria-current="page"' : ''}>스킬<sup>${SKILL_COUNT}</sup></a>
@@ -503,7 +500,7 @@ function aboutPage() {
         : ''
     }
 
-    <section class="ab-sec reveal">${h('02', '걸어온 길', 0, { href: '/present#years', label: '연도별 이력 자세히' })}<ol class="ab-time">${HISTORY.map((y) => {
+    <section class="ab-sec reveal">${h('02', '걸어온 길')}<ol class="ab-time">${HISTORY.map((y) => {
       const n = inYear(y.year);
       const count = [n.p && `프로젝트 ${n.p}`, n.a && `수상 ${n.a}`].filter(Boolean).join(' · ');
       return `<li><time>${esc(y.year)}</time><ul class="ab-tl">${y.items.map((it) => `<li>${esc(it.title)}</li>`).join('')}</ul>${count ? `<small>${count}</small>` : ''}</li>`;
@@ -630,33 +627,10 @@ function skillsPage() {
   </div>`;
 }
 
-// ── 발표 자료(/present · 예전 /growth/detail): 스크롤 없이 한 화면씩 넘기는 덱 — 포트폴리오와 따로 산다(src/deck/: 내용 present.js · 넘기기 pager.js · 모양 deck.css) ──
-// 사진은 덱이 지금 화면 가까이에서만 받는다(src → data-src)
-const jrLazy = (html) => html.replace(/<img\b([^>]*)>/g, (m, a) => `<img${a.replace(/\sloading="lazy"/, '').replace(/\ssrcset=/, ' data-srcset=').replace(/\ssrc=/, ' data-src=')}>`);
-
-function journeyPage() {
-  const deck = presentDeck({ esc, pad, img, certSheet, certCaption });
-  const html = `<div class="pg pg-journey" data-owner="${esc(profile.name)} · ${esc(profile.role)}">
-    ${bar({ href: '/', label: '3D 필름' }, { full: true })}
-    <nav class="jr-tabs" aria-label="발표 순서">${PR_SECS.map(([id, ko, en, short]) => `<button type="button" data-go="${id}" aria-current="false" aria-label="${en} ${ko}"><small>${en}</small><span class="jr-tab-l">${ko}</span><span class="jr-tab-s" aria-hidden="true">${short}</span></button>`).join('')}</nav>
-    <div class="jr-view" tabindex="-1" aria-roledescription="화면 넘김" aria-label="발표 자료 — 옆으로 끌거나 ← → 로 넘기기"><div class="jr-track"></div></div>
-    <footer class="jr-pager">
-      <button type="button" class="jr-nav" data-dir="-1" aria-label="이전 화면"><span aria-hidden="true">←</span></button>
-      <ol class="jr-prog" aria-label="쪽"></ol>
-      <p class="jr-count" aria-hidden="true"><b>01</b>/<span>01</span></p>
-      <button type="button" class="jr-nav" data-dir="1" aria-label="다음 화면"><span aria-hidden="true">→</span></button>
-    </footer>
-    <p class="sr-only jr-live" aria-live="polite"></p>
-    <div class="jr-src" hidden>${jrLazy(deck.html)}</div>
-  </div>`;
-  return { html, media: deck.media };
-}
-
-function bar(back, { full = false } = {}) {
+function bar(back) {
   return `<header class="pg-bar">
     <a class="pg-back" href="${back.href}" data-link>← ${esc(back.label)}</a>
     <a class="pg-brand" href="/" data-link aria-label="메인 화면으로">KWON</a>
-    ${full ? '<button type="button" class="pg-full pg-pdf" data-deck-print aria-label="PDF로 저장 — 화면 한 장이 한 쪽"><b aria-hidden="true">PDF</b><span>저장</span></button><button type="button" class="pg-full" data-full aria-label="전체 화면 (F)" aria-pressed="false"><i aria-hidden="true"></i><span>전체 화면</span></button>' : ''}
     <button type="button" class="pg-close" data-close aria-label="닫기"><i></i><i></i></button>
     <i class="pg-progress" aria-hidden="true"></i>
   </header>`;
@@ -891,7 +865,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   let backPending = false; // history.back()을 보냈고 popstate를 기다리는 중
   let pendingPop = false; // 커튼이 도는 동안 들어온 popstate
   let filmOpener = null; // 필름에서 페이지를 연 요소(닫으면 포커스를 돌려준다)
-  let deck = null; // 성장 · 이력 상세의 화면 넘김 덱
 
   // 히어로 글 높이만큼 위쪽 사진의 자리를 비운다(제목이 두 줄이 되어도 겹치지 않게)
   const fitHero = () => {
@@ -907,31 +880,22 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (cols !== gridCols) gridCols = layoutGrid(grid);
   });
 
-  // 성장 · 이력(/growth · /history)과 예전 필름 장면(성장 · 보유 역량 · 미래 계획)은 이제 발표 자료 안에만 있다 — 그 화면으로:
-  // /growth#gr-<학년> → 걸어온 길 · #gr-values → 일하는 방식 · /history#y2025 · #h-<항목> → 학년별 비교과 · 경력
-  const FILM_GONE = { '#growth': 'overview', '#history': 'years', '#competency': 'swot', '#future': 'goals' };
-  const deckOf = (path, hash) => {
-    const y = hash.match(/^#y(\d{4})$/);
-    if (y) return `y${y[1]}`;
-    if (/^#h-[\w-]+$/.test(hash)) return 'years';
-    const g = hash.match(/^#gr-([\w-]+?)(-more)?$/);
-    if (g) return g[1] === 'values' ? 'values' : `s-${g[1]}`;
-    return path === '/history' ? 'years' : 'overview';
-  };
-  const toDeck = (anchor) => {
-    history.replaceState(history.state, '', `/present#${anchor}`);
-    return { name: 'journey' };
+  // 발표 자료는 따로 떨어져 나갔다(yhkwon2004/wku_portfolio) — 예전 주소(/present · /growth · /history · /growth/detail)와
+  // 예전 필름 장면 주소(#growth · #history · #competency · #future)는 필름 처음으로
+  const GONE = new Set(['/present', '/growth', '/growth/detail', '/history']);
+  const FILM_GONE = new Set(['#growth', '#history', '#competency', '#future']);
+  const toFilm = () => {
+    history.replaceState(history.state, '', '/');
+    return { name: 'film' };
   };
   const parse = () => {
     const path = location.pathname.replace(/\/+$/, '') || '/';
     if (path.toLowerCase() === '/awards') return { name: 'awards' };
     if (path.toLowerCase() === '/skills') return { name: 'skills' };
-    // 발표 자료(화면 넘김 덱) — #about-me · #swot · #projects · #p-<프로젝트> · #goals …(예전 주소 /growth/detail도)
-    if (path.toLowerCase() === '/present' || path.toLowerCase() === '/growth/detail') return { name: 'journey' };
-    // 프로필은 필름의 소개 장면(한 화면씩), 성장 · 이력은 발표 자료의 그 화면
+    if (GONE.has(path.toLowerCase())) return toFilm();
+    // 프로필은 필름의 소개 장면(한 화면씩)
     if (path.toLowerCase() === '/about') return { name: 'film', scene: 'prologue' };
-    if (path.toLowerCase() === '/growth' || path.toLowerCase() === '/history') return toDeck(deckOf(path.toLowerCase(), location.hash));
-    if (path === '/' && FILM_GONE[location.hash]) return toDeck(FILM_GONE[location.hash]);
+    if (path === '/' && FILM_GONE.has(location.hash)) return toFilm();
     if (path.toLowerCase() === '/resume') return { name: 'resume' };
     const m = path.match(/^\/works(?:\/([\w-]+))?$/);
     if (!m) return { name: 'film' };
@@ -985,11 +949,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (route.name === 'works') page.innerHTML = worksPage(route.cat);
     else if (route.name === 'skills') page.innerHTML = skillsPage();
     else if (route.name === 'resume') page.innerHTML = aboutPage();
-    else if (route.name === 'journey') {
-      const j = journeyPage();
-      pageMedia = j.media;
-      page.innerHTML = j.html;
-    }
     else if (route.name === 'awards') {
       const a = awardsPage();
       pageMedia = a.media;
@@ -1000,31 +959,23 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     document.body.classList.add('page-open');
     bind(route);
     const p = route.name === 'detail' ? byId(route.id) : null;
-    const name = { awards: 'Awards', skills: 'Skills', resume: 'Résumé', journey: 'Presentation' }[route.name] || 'Works';
+    const name = { awards: 'Awards', skills: 'Skills', resume: 'Résumé' }[route.name] || 'Works';
     document.title = p ? `${p.title} — 권용현 Physical AI Portfolio` : `${name} — 권용현 Physical AI Portfolio`;
     page.focus({ preventScroll: true });
     // 주소에 자리가 있으면(필름의 이력 항목에서 들어온 경우 등) 그 자리로 — 그림이 자리 잡은 뒤에
     // (브라우저가 스스로 #자리로 옮기는 스크롤 · 글꼴이 늦게 와 줄이 바뀌는 것까지 지나간 뒤 한 번 더 맞춘다)
-    if (location.hash && route.name !== 'journey') {
+    if (location.hash) {
       requestAnimationFrame(() => requestAnimationFrame(() => jumpHash(false)));
       setTimeout(() => current === route && jumpHash(false), 420);
     }
   }
 
   function unmount() {
-    deck?.destroy();
-    deck = null;
     page.hidden = true;
     page.innerHTML = '';
     observer?.disconnect();
     document.body.classList.remove('page-open');
     document.title = '권용현 — Physical AI Portfolio';
-  }
-
-  // 발표 자료: 스크롤 없는 화면 넘김 덱(deck/pager.js) — 주소의 #(#years · #swot · #y2025 · #s-<학년> …)로 그 화면부터
-  function bindJourney() {
-    deck?.destroy();
-    deck = createPager(page.querySelector('.pg-journey'), { reducedMotion, start: hashOf(location.hash) });
   }
 
   // 보유 스킬: 기술 펼치기 · 기술 ↔ 근거 프로젝트 강조 · 분야로 건너뛰기
@@ -1096,8 +1047,8 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
 
 
   function bind(route) {
-    // 이미지 로드 페이드(성장 · 이력 상세는 덱이 화면 가까이에서 받으며 처리)
-    if (route.name !== 'journey') page.querySelectorAll('img').forEach((im) => {
+    // 이미지 로드 페이드
+    page.querySelectorAll('img').forEach((im) => {
       if (im.complete) im.classList.add('is-loaded');
       else im.addEventListener('load', () => im.classList.add('is-loaded'), { once: true });
     });
@@ -1115,7 +1066,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     );
     page.querySelectorAll('.reveal, .w-item, .aw-cell, .sk-dcard').forEach((el) => observer.observe(el));
     // 상장 크게 보기(수상 아카이브 · 상세의 수상 칸)
-    const certs = route.name === 'awards' || route.name === 'journey' ? pageMedia : JSON.parse(page.querySelector('.d-awards')?.dataset.media || '[]');
+    const certs = route.name === 'awards' ? pageMedia : JSON.parse(page.querySelector('.d-awards')?.dataset.media || '[]');
     // 수상 아카이브: 라이트박스도 화면에 보이는 순서(해마다 높은 등급부터)대로, 걸러 보는 중이면 보이는 수상만 넘긴다
     const showCert = (b) => {
       if (route.name !== 'awards') return lightbox.show({ media: certs }, +b.dataset.cert, b);
@@ -1127,8 +1078,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       });
       lightbox.show({ media }, at, b);
     };
-    // 성장 · 이력 상세의 상장은 아래 위임 리스너가 연다(덱이 화면 크기가 바뀔 때 블록을 새로 만든다)
-    if (route.name !== 'journey') page.querySelectorAll('[data-cert]').forEach((b) => b.addEventListener('click', () => showCert(b)));
+    page.querySelectorAll('[data-cert]').forEach((b) => b.addEventListener('click', () => showCert(b)));
 
     if (route.name === 'awards') {
       const sum = page.querySelector('.aw-sum');
@@ -1182,8 +1132,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       );
       if (!reducedMotion)
         gsap.fromTo(page.querySelectorAll('.works-title, .pg-tabs a, .ab-who > *, .ab-act > *, .ab-nums > div'), { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.035, ease: 'expo.out', delay: 0.2, clearProps: 'opacity,visibility,transform' });
-    } else if (route.name === 'journey') {
-      bindJourney();
     } else if (route.name === 'skills') {
       bindSkills();
       if (!reducedMotion)
@@ -1251,7 +1199,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       else back();
       return;
     }
-    const label = route.name === 'detail' ? byId(route.id).title : route.name === 'resume' ? 'RÉSUMÉ' : route.name === 'journey' ? 'PRESENTATION' : route.name.toUpperCase();
+    const label = route.name === 'detail' ? byId(route.id).title : route.name === 'resume' ? 'RÉSUMÉ' : route.name.toUpperCase();
     const doMount = () => {
       onOpen?.(route);
       mount(route);
@@ -1266,7 +1214,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (url.pathname + url.search === location.pathname + location.search) {
       // 같은 페이지 안의 다른 자리(#)
       if (url.hash && current) {
-        if (deck) return void deck.goAnchor(hashOf(url.hash));
         history.replaceState(history.state, '', url.pathname + url.search + url.hash);
         jumpHash(true);
       }
@@ -1320,12 +1267,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     { passive: true }
   );
 
-  // 성장 · 이력 상세: 상장 크게 보기(덱 안의 블록은 다시 만들어질 수 있어 위임)
-  page.addEventListener('click', (e) => {
-    const b = current?.name === 'journey' && e.target.closest('[data-cert]');
-    if (b) lightbox.show({ media: pageMedia }, +b.dataset.cert, b);
-  });
-
   // 내부 링크 가로채기
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[data-link]');
@@ -1334,10 +1275,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (!href || isExternal(href)) return;
     e.preventDefault();
     navigate(href);
-  });
-  // 성장 · 이력 상세 안에서 주소의 #만 바뀌면(뒤로 · 앞으로, 직접 고친 주소) 덱의 그 화면으로
-  addEventListener('hashchange', () => {
-    if (current?.name === 'journey' && deck && !busy) deck.goAnchor(hashOf(location.hash));
   });
   addEventListener('popstate', () => {
     backPending = false;
@@ -1374,8 +1311,6 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     },
     key(e) {
       if (!current) return busy; // 닫히는 커튼 동안에는 필름 단축키를 막는다
-      // 발표 자료: 넘기기 · F 전체 화면 · B 화면 가리기(가린 동안의 Esc는 다시 보이기 — 페이지를 닫지 않는다)
-      if (current.name === 'journey' && deck && !lightbox.open && deck.key(e)) return true;
       if (e.key === 'Escape') {
         close();
         return true;

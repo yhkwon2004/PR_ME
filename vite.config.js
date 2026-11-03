@@ -78,30 +78,6 @@ function pageMeta() {
           image: og('about'),
         },
         {
-          path: '/growth',
-          title: `걸어온 길 — ${NAME}`,
-          desc: '1학년 전공 탐색(2023) → 2학년 도전(2024) → 3학년 인턴십 · Physical AI 집중(2025 — 2026) — 발표 자료의 걸어온 길 화면으로 열립니다.',
-          image: og('growth'),
-        },
-        {
-          path: '/present',
-          title: `발표 자료 — 자기이해 · 직업탐색 · 진로계획 · 미래설계 — ${NAME}`,
-          desc: `4분 포트폴리오 발표(본편 17장 + 질문 대비 부록 10장) — 목표 ADD 무인 감시정찰 연구원: 나를 소개합니다 → STEP 1 자기이해(SWOT · 대응 전략) → STEP 2 직업탐색(희망 직무 · 요구 역량) → STEP 3 진로계획 및 비교과(대표 프로젝트 · 공식 보도 · 수상 ${awards.length} · 봉사 · 자격) → STEP 4 미래설계(로보틱스 대학원 → ADD).`,
-          image: og('growth'),
-        },
-        {
-          path: '/growth/detail',
-          title: `발표 자료 — 자기이해 · 직업탐색 · 진로계획 · 미래설계 — ${NAME}`,
-          desc: '한 화면씩 넘기는 포트폴리오 발표 자료 — 걸어온 길 · SWOT 분석 · 학년별 비교과 · 미래설계를 포함합니다.',
-          image: og('growth'),
-        },
-        {
-          path: '/history',
-          title: `학년별 비교과 · 경력 — ${NAME}`,
-          desc: '2023 — 2026, 학년마다 한 일 — 연구실 · 인턴십 · 동아리 · 전공 · 창업 · 수상 — 발표 자료의 학년별 비교과 · 경력 화면으로 열립니다.',
-          image: og('history'),
-        },
-        {
           path: '/works',
           title: `프로젝트 ${projects.length} — ${NAME}`,
           desc: `드론 · 모빌리티 · 로봇 · AI · 임베디드 · 창업 — 권용현이 만든 프로젝트 ${projects.length}개를 분야별로 모아 봅니다.`,

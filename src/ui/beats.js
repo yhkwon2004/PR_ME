@@ -1,6 +1,6 @@
 // 한 장면 안의 여러 화면(비트): 스크롤 없이 영화처럼 한 화면씩 바뀐다 — 휠 · 스와이프 · 방향키 · 아래 칸 · 자동 재생.
 // 필름은 프로젝트에 집중한다: 01 소개(이 두 화면) → 02 프로젝트(드론 · 모빌리티 / 로봇 · AI / 창업 · 제품개발) → 03 보도 · 수상.
-// 성장 과정 · 보유 역량 · 미래 계획은 발표 자료(/present)에서만 다룬다.
+// 성장 과정 · 보유 역량 · 미래 계획은 따로 떨어진 발표 자료(yhkwon2004/wku_portfolio)에서 다룬다.
 import gsap from 'gsap';
 import { profile } from '../content.js';
 import { projects, byId, FEATURED } from '../data/projects.js';

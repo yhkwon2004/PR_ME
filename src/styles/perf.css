@@ -28,8 +28,7 @@ html.q-lite .deck-btn {
   background-color: rgba(5, 7, 12, 0.72);
 }
 /* 첫 화면 버튼: 뒤 흐림이 빠진 만큼 조금 더 짙게 */
-html.q-lite .btn-enter,
-html.q-lite .btn-present {
+html.q-lite .btn-enter {
   background-color: rgba(5, 7, 12, 0.86);
 }
 

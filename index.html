@@ -55,7 +55,7 @@
     <div class="scrim" aria-hidden="true"><i class="s-left"></i><i class="s-right"></i><i class="s-top"></i><i class="s-bottom"></i><i class="s-center"></i></div>
     <div class="letterbox" aria-hidden="true"><i class="lb-top"></i><i class="lb-bottom"></i></div>
 
-    <!-- 첫 화면: 이름 · 역할 · 두 갈래(3D 포트폴리오 / 발표 자료) — 뒤에서는 3D 격납고의 드론이 로딩만큼 떠오른다.
+    <!-- 첫 화면: 이름 · 역할 · 시작 버튼 — 뒤에서는 3D 격납고의 드론이 로딩만큼 떠오른다.
          시작하면 화면 전체가 위로 걷히며(스플래시 업) 첫 장면으로. 순서 · 바로 보기 줄은 main.js가 데이터에서 채운다 -->
     <section id="boot" aria-label="포트폴리오 시작">
       <header class="boot-top">
@@ -75,10 +75,6 @@
             <span class="btn-enter-text"><b>포트폴리오 보기</b><small id="boot-state">불러오는 중 0%</small></span>
             <i class="btn-enter-bar" aria-hidden="true"></i>
           </button>
-          <a class="btn-present" href="/present" data-link>
-            <span class="btn-enter-text"><b>발표 자료</b><small>한 화면씩 넘기는 슬라이드</small></span>
-            <i aria-hidden="true">→</i>
-          </a>
         </div>
         <ol class="boot-agenda" id="boot-agenda" aria-label="포트폴리오 순서"></ol>
       </div>
@@ -130,7 +126,7 @@
       <button class="index-close" type="button" aria-label="장면 목록 닫기">×</button>
       <div class="index-inner">
         <p class="index-kicker">목차 — 보고 싶은 장면을 누르세요</p>
-        <nav class="index-archive" aria-label="아카이브 페이지"><span>모아 보기</span><a href="/present" data-link>발표 자료</a><a href="/resume" data-link>이력서</a><a href="/works" data-link>프로젝트</a><a href="/awards" data-link>수상</a><a href="/skills" data-link>스킬</a></nav>
+        <nav class="index-archive" aria-label="아카이브 페이지"><span>모아 보기</span><a href="/resume" data-link>이력서</a><a href="/works" data-link>프로젝트</a><a href="/awards" data-link>수상</a><a href="/skills" data-link>스킬</a></nav>
         <ol id="index-list"></ol>
       </div>
     </nav>
