@@ -11,6 +11,14 @@ import { presentDeck, PR_SECS } from '../deck/present.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
+// 주소의 # — 잘못 인코딩된 #(%ZZ 같은)는 그대로 쓴다(덱 · 페이지가 멈추지 않게)
+const hashOf = (h) => {
+  try {
+    return decodeURIComponent(h.slice(1));
+  } catch {
+    return h.slice(1);
+  }
+};
 const isExternal = (url) => /^https?:\/\//.test(url) || url.startsWith('mailto:');
 
 // 한 줄 알림(복사 · 공유 결과) — 화면 아래 가운데에 잠깐
@@ -1016,7 +1024,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   // 발표 자료: 스크롤 없는 화면 넘김 덱(deck/pager.js) — 주소의 #(#years · #swot · #y2025 · #s-<학년> …)로 그 화면부터
   function bindJourney() {
     deck?.destroy();
-    deck = createPager(page.querySelector('.pg-journey'), { reducedMotion, start: decodeURIComponent(location.hash.slice(1)) });
+    deck = createPager(page.querySelector('.pg-journey'), { reducedMotion, start: hashOf(location.hash) });
   }
 
   // 보유 스킬: 기술 펼치기 · 기술 ↔ 근거 프로젝트 강조 · 분야로 건너뛰기
@@ -1081,7 +1089,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   }
   // 주소의 #자리(/awards#y2025 · /skills#… )로
   const jumpHash = (smooth) => {
-    const id = decodeURIComponent(location.hash.slice(1));
+    const id = hashOf(location.hash);
     if (id) jumpTo(page.querySelector(`#${CSS.escape(id)}`), smooth);
   };
 
@@ -1258,7 +1266,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (url.pathname + url.search === location.pathname + location.search) {
       // 같은 페이지 안의 다른 자리(#)
       if (url.hash && current) {
-        if (deck) return void deck.goAnchor(decodeURIComponent(url.hash.slice(1)));
+        if (deck) return void deck.goAnchor(hashOf(url.hash));
         history.replaceState(history.state, '', url.pathname + url.search + url.hash);
         jumpHash(true);
       }
@@ -1329,7 +1337,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   });
   // 성장 · 이력 상세 안에서 주소의 #만 바뀌면(뒤로 · 앞으로, 직접 고친 주소) 덱의 그 화면으로
   addEventListener('hashchange', () => {
-    if (current?.name === 'journey' && deck && !busy) deck.goAnchor(decodeURIComponent(location.hash.slice(1)));
+    if (current?.name === 'journey' && deck && !busy) deck.goAnchor(hashOf(location.hash));
   });
   addEventListener('popstate', () => {
     backPending = false;

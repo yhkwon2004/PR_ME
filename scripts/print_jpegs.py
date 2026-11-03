@@ -10,6 +10,8 @@
       { id: '<프로젝트>', shots: ['<번호>', …], … }) — 큰 것과 작은 것(.thumb) 모두
     - 증명사진 · 장학증서(content.js의 profile)
     - 공식 보도 기사 사진 작은 것(media/press/*.thumb.webp — 덱의 공식 보도 슬라이드)
+    - 세로 · 작은 대표 사진은 큰 것도(작은 것의 폭이 720px보다 좁으면 무대 타일에서 큰 것이 골라진다)
+    - CarHub 캡처(media/carhub/*.webp — deck/carhub.js에 적은 그림)
 덱은 인쇄할 때 사진 이름의 .webp를 .print.jpg로 바꿔 받고, 없으면 원래 WebP로 인쇄한다 — 기록이 바뀌면 다시 돌린다.
 """
 import glob
@@ -35,7 +37,11 @@ def targets():
             continue
         cover = p['cover']['file'] if isinstance(p['cover'], dict) else p['cover']
         thumb = cover.replace('.webp', '.thumb.webp')
-        out.add(thumb if os.path.exists(media(thumb)) else cover)
+        has_thumb = os.path.exists(media(thumb))
+        out.add(thumb if has_thumb else cover)
+        # 세로 · 작은 사진은 작은 것의 폭이 720px보다 좁아 무대 타일에서 큰 것이 골라진다 — 그것도
+        if not has_thumb or Image.open(media(thumb)).width < 720:
+            out.add(cover)
     out.update(os.path.relpath(f, PUBLIC) for f in glob.glob(os.path.join(PUBLIC, 'media', 'awards', '*.sm.webp')))
     deck = open(os.path.join(ROOT, 'src', 'deck', 'present.js'), encoding='utf-8').read()
     pairs = re.findall(r"(?:shotOf|picOf)\('([\w-]+)', '(\d+)'\)", deck) + re.findall(r"\['([a-z][\w-]+)', '(\d+)'\]", deck)
@@ -51,6 +57,7 @@ def targets():
         out.add(f'media/{photo.group(1)}')
     out.update(os.path.relpath(f, PUBLIC) for f in glob.glob(os.path.join(PUBLIC, 'media', 'profile', 'scholarship*.webp')))
     out.update(os.path.relpath(f, PUBLIC) for f in glob.glob(os.path.join(PUBLIC, 'media', 'press', '*.thumb.webp')))
+    out.update(os.path.relpath(f, PUBLIC) for f in glob.glob(os.path.join(PUBLIC, 'media', 'carhub', '*.webp')))
     return sorted(out)
 
 

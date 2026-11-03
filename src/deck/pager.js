@@ -526,7 +526,9 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
   function loadAll() {
     track.querySelectorAll('img').forEach((im) => {
       const set = im.dataset.srcset || im.getAttribute('srcset');
-      if (!im.dataset.src && !set) return;
+      // 이미 받아 둔 사진 목록 없는 WebP(증명사진 등)도 인쇄용 JPEG로
+      const plain = !set && !im.dataset.src && /\.webp$/.test(im.getAttribute('src') || '');
+      if (!im.dataset.src && !set && !plain) return;
       if (set) {
         im.dataset.later = set;
         im.removeAttribute('srcset');
@@ -540,18 +542,28 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
       im.removeAttribute('data-srcset');
       im.classList.add('is-loaded');
     });
+    // .print.jpg가 없어 WebP로 다시 받는 중이면 그것이 끝날 때까지 기다린다(인쇄 창이 빈 사진으로 열리지 않게)
     const wait = (im) =>
       im.complete
         ? null
         : new Promise((r) => {
-            im.addEventListener('load', r, { once: true });
-            im.addEventListener('error', r, { once: true });
+            const done = () => {
+              if (!im.complete) return;
+              im.removeEventListener('load', done);
+              im.removeEventListener('error', done);
+              r();
+            };
+            im.addEventListener('load', done);
+            im.addEventListener('error', done);
           });
     return Promise.race([Promise.all([...track.querySelectorAll('img')].map(wait)), new Promise((r) => setTimeout(r, 6000))]);
   }
+  // 인쇄하는 동안에는 화면 크기가 바뀌어도(인쇄 미리보기 · 인쇄 매체) 무대 그대로 — 휴대폰에서 누르면 무대로 바꿔 뽑고 끝나면 되돌린다
+  let flipped = false;
   function forPrint() {
-    if (stage) return;
     forced = true;
+    if (stage) return;
+    flipped = true;
     relayout(false, true);
   }
   const afterPrint = () => {
@@ -562,7 +574,10 @@ export function createPager(root, { reducedMotion = false, start = '' } = {}) {
     track.querySelectorAll('img[src$=".print.jpg"]').forEach((im) => (im.src = im.src.replace(/\.print\.jpg$/, '.webp')));
     if (forced) {
       forced = false;
-      relayout(false, true);
+      if (flipped) {
+        flipped = false;
+        relayout(false, true);
+      }
     }
   };
   const beforePrint = () => {

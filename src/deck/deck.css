@@ -3638,8 +3638,8 @@ kbd {
     font-size: 12px;
   }
 }
-/* 휴대폰: 막대 · 탭 · 아래 줄을 낮게 */
-@media (max-width: 820px) {
+/* 휴대폰: 막대 · 탭 · 아래 줄을 낮게 — 화면에만(인쇄할 때 종이 폭이 820px보다 좁게 잡혀 '나' 화면의 숫자 줄이 두 줄로 넘치지 않게) */
+@media screen and (max-width: 820px) {
   .pg-journey .pg-bar {
     height: 54px;
   }
