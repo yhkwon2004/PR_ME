@@ -142,6 +142,14 @@ body.no-webgl #gl {
 body[data-scene='record'] .amb-type {
   opacity: 0;
 }
+/* 장면 사이를 지나는 동안 큰 연도 글자는 잠시 물러난다 — 가운데 타이틀 카드가 홀로 읽히고, 다음 장면의 연도가 미리 보이지 않게
+   (지나가면 .ambient의 1.2초 전환으로 덱 뒤에 다시 나타난다) */
+body.is-moving .amb-type {
+  opacity: 0;
+  transition:
+    opacity 0.35s var(--ease),
+    --amb 1.2s var(--ease);
+}
 /* 배경에 천천히 흘러가는 프로젝트 사진들 — 아주 옅게, 양 끝은 사라지게 */
 .amb-flow {
   position: absolute;

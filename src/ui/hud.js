@@ -90,15 +90,19 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
     document.body.dataset.scene = scenes[i].id;
     if (i > 0) hint.classList.add('is-gone');
 
-    // 장면 사이 타이틀 카드
-    if (prev >= 0 && duration > 0.5 && !reducedMotion) {
+    // 장면 사이 타이틀 카드 — 엔딩은 첫 크레딧이 곧 제목(END CREDITS)이라 카드를 띄우지 않는다(가운데에서 둘이 겹쳐 읽히지 않게).
+    // 카드는 새 장면의 덱이 들어오기 시작할 때(0.45·d + 0.3초) 다 걷힌다 — 가운데 카드와 겹치지 않게
+    if (scenes[i].layout === 'finale') {
+      gsap.killTweensOf(card);
+      gsap.to(card, { autoAlpha: 0, duration: 0.2, overwrite: true });
+    } else if (prev >= 0 && duration > 0.5 && !reducedMotion) {
       card.querySelector('.tc-no').textContent = `${pad(i)} · ${scenes[i].label}`;
       card.querySelector('.tc-name').textContent = scenes[i].ko;
       gsap.killTweensOf(card);
       gsap
         .timeline()
-        .fromTo(card, { autoAlpha: 0, letterSpacing: '0.6em' }, { autoAlpha: 1, letterSpacing: '0.32em', duration: duration * 0.35, ease: 'power2.out' }, duration * 0.12)
-        .to(card, { autoAlpha: 0, duration: duration * 0.25, ease: 'power2.in' }, duration * 0.55);
+        .fromTo(card, { autoAlpha: 0, letterSpacing: '0.6em' }, { autoAlpha: 1, letterSpacing: '0.32em', duration: duration * 0.18, ease: 'power2.out' }, duration * 0.06)
+        .to(card, { autoAlpha: 0, duration: duration * 0.2, ease: 'power2.in' }, duration * 0.36);
     }
     document.body.classList.add('is-moving');
     clearTimeout(setScene.t);

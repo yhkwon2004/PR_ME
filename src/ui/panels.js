@@ -685,6 +685,13 @@ function deckReel(el, reducedMotion) {
   // 움직이던 덱에 손가락이 닿으면 그 자리에서 붙잡는다 — 연달아 튕겨 넘길 때 앞의 움직임에서 이어서
   let tx = null;
   const tv = velocity();
+  // 장면 넘김(위아래로 밀기)이 이 손가락을 가져가면 덱은 놓고 처음 카드로 — 비스듬히 한 번 밀어 카드와 장면이 같이 넘어가지 않게
+  const yieldDrag = (k0) => {
+    held = false;
+    stage.classList.remove('is-dragging');
+    if (focus !== k0) set(k0);
+    else wake();
+  };
   stage.addEventListener(
     'touchstart',
     (e) => {
@@ -694,7 +701,7 @@ function deckReel(el, reducedMotion) {
         held = true;
         vel = 0;
       }
-      tx = { x: t.clientX, y: t.clientY, f0: pos, k0: focus, axis: '' };
+      tx = { x: t.clientX, y: t.clientY, sx: t.clientX, f0: pos, k0: focus, axis: '' };
       tv.reset(t.clientX, performance.now());
     },
     { passive: true }
@@ -721,6 +728,10 @@ function deckReel(el, reducedMotion) {
         }
       }
       if (tx.axis !== 'x' || reducedMotion) return;
+      if (document.documentElement.classList.contains('is-pulling')) {
+        tx.axis = 'y';
+        return yieldDrag(tx.k0);
+      }
       pos = dragPos(t.clientX - tx.x, tx.f0);
       follow(true);
       wake();
@@ -734,9 +745,11 @@ function deckReel(el, reducedMotion) {
       const t = e.changedTouches[0];
       const dx = t.clientX - tx.x;
       const dy = t.clientY - tx.y;
-      const { axis, k0 } = tx;
+      const { axis, k0, sx } = tx;
       const v = tv.get(performance.now());
       tx = null;
+      // 처음 자리에서 세로로 더 많이 움직였으면 장면 넘김(input.js와 같은 기준) — 덱은 넘기지 않는다(동작 줄이기에서도)
+      if (axis === 'x' && Math.abs(dy) >= Math.abs(t.clientX - sx)) return yieldDrag(k0);
       if (axis !== 'x' && !(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy))) {
         if (held) release(0, focus, 0);
         return;
@@ -860,7 +873,8 @@ function deckReel(el, reducedMotion) {
     },
     // 끌어 넘길 수 있다는 걸 보여 준다: 덱이 다음 카드 쪽으로 살짝 끌려갔다 제자리로 돌아온다
     peek(amount = 0.34) {
-      if (reducedMotion || tx || md || held || n < 2 || !width) return 0;
+      // 날아드는 중(등장)에는 끌어 보이지 않는다
+      if (reducedMotion || tx || md || held || n < 2 || !width || intro.t >= 0) return 0;
       stopPeek();
       const dir = focus >= n - 1 ? -1 : 1;
       const p = { v: 0 };
@@ -906,9 +920,11 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
     probes.forEach((p) => p.remove());
     info.style.minHeight = `${h}px`;
   };
-  // 창 크기 · 글꼴이 바뀌면 다시 잰다(보이는 덱만 — 숨은 장면은 들어설 때)
-  addEventListener('resize', () => ((fitW = -1), el.hidden || fit()));
-  document.fonts?.ready.then(() => ((fitW = -1), el.hidden || fit()));
+  // 창 크기가 바뀌거나 글꼴 조각이 새로 도착하면 다시 잰다(보이는 덱만 — 숨은 장면은 들어설 때).
+  // 한글 글꼴은 조각으로 나뉘어 늦게 오는 조각이 있어(fonts.ready는 한 번만 끝난다) 도착할 때마다
+  const refit = () => ((fitW = -1), el.hidden || fit());
+  addEventListener('resize', refit);
+  document.fonts?.addEventListener?.('loadingdone', refit);
   // 덱 아래 설명: 나가는 줄은 위로 사라지고, 새 줄이 아래에서 한 줄씩 올라온다
   const showInfo = (dir) => {
     const tpl = tpls[reel.focus];
@@ -1059,8 +1075,15 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     const own = (sel) => [...el.querySelectorAll(sel)].filter((n) => !n.closest('.endcard'));
     const titleSpans = own('.title .line > span, .hero-title .line > span');
     const heroChars = own('.hero-title i');
-    const reveal = own('[data-r]');
+    // 덱 덩어리(.reel.deck)는 통째로 흐리게 들이지 않는다 — 카드가 날아드는 동안 덱 전체가 아직 투명해서 날아오는 모습이 거의 보이지 않았다
+    // (날아온 거리의 80%를 지난 뒤에야 반쯤 보였다). 덱 바닥 빛 · 기록 장면의 그늘만 짧게 들이고, 설명 줄 · 막대는 원래 차례대로
+    const deckEl = el.reel ? el.querySelector('.reel.deck') : null;
+    const reveal = own('[data-r]').flatMap((n) => (n === deckEl ? [...n.querySelectorAll(':scope > .deck-info, :scope > .deck-bar')] : [n]));
     set(reveal, { autoAlpha: 0, y: back ? -22 : 22 });
+    if (deckEl) {
+      gsap.set(deckEl, { autoAlpha: 0, y: 0 });
+      tl.to(deckEl, { autoAlpha: 1, duration: 0.3 * D, ease: 'power2.out' }, 0.15);
+    }
     if (heroChars.length) {
       set(heroChars, { yPercent: 115, rotate: 6 });
       tl.to(heroChars, { yPercent: 0, rotate: 0, duration: 1.3 * D, ease: 'expo.out', stagger: 0.045 * D }, 0.1);
@@ -1115,10 +1138,16 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     const hint = el.querySelector('.credits-hint');
     const beats = [...roll.querySelectorAll('.cb')];
     gsap.set(card, { autoAlpha: 0 });
-    gsap.set([credits, skip, el.querySelector('.credits-rail')].filter(Boolean), { autoAlpha: 1 });
+    gsap.set(credits, { autoAlpha: 1 });
+    // SKIP · 진행 막대 · 넘기는 법은 앞 장면이 빠진 뒤 크레딧과 함께 들어온다(누르는 순간 앞 장면 글 위에 겹쳐 뜨지 않게)
+    const chrome = [skip, el.querySelector('.credits-rail'), hint].filter(Boolean);
+    gsap.killTweensOf(chrome); // 지난번에 들어오다 만 움직임
+    gsap.set(chrome, { autoAlpha: 0 });
+    // 엔딩은 장면 사이 타이틀 카드를 띄우지 않으므로 그 몫(0.35초)만큼 일찍 — 앞 장면이 빠진 뒤 빈 화면이 길지 않게
+    const lead = Math.max(0.6, delay - 0.35);
+    gsap.to(chrome, { autoAlpha: 1, duration: 0.5 * D, ease: 'power2.out', delay: lead * D });
     gsap.set(card.querySelectorAll('.title .line > span'), { yPercent: 112 });
     gsap.set(card.querySelectorAll('[data-r]'), { autoAlpha: 0, y: 22 });
-    if (hint) gsap.set(hint, { autoAlpha: 1 });
     beats.forEach((b) => b.classList.remove('is-on'));
     const st = { p: 0 }; // 0: 첫 비트가 아래에서 막 들어올 때 · 1: 마지막 비트가 위로 다 지나갔을 때
     let shown = false;
@@ -1152,6 +1181,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       creditsTl.kill();
       creditsTl = gsap.timeline();
       const rail = el.querySelector('.credits-rail');
+      gsap.killTweensOf([skip, rail, hint].filter(Boolean)); // 들어오는 중에 SKIP을 눌러도 다시 나타나지 않게
       creditsTl
         .to([credits, skip, rail, hint].filter(Boolean), { autoAlpha: 0, duration: 0.5 })
         .set(card, { autoAlpha: 1 })
@@ -1175,7 +1205,10 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       creditsTl = gsap.timeline();
       clearTimeout(resumeT);
       resumeT = setTimeout(() => !shown && flow(), 2200);
-      if (hint) gsap.to(hint, { autoAlpha: 0, duration: 0.4 });
+      if (hint) {
+        gsap.killTweensOf(hint);
+        gsap.to(hint, { autoAlpha: 0, duration: 0.4 });
+      }
     };
     const seek = (p, smooth = false) => {
       hold();
@@ -1230,7 +1263,7 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     apply();
     creditsTl = gsap.timeline({ delay: delay * D });
     if (reducedMotion) creditsTl.add(showCard, 0.5);
-    else flow(delay * D);
+    else flow(lead * D);
   }
   addEventListener('resize', () => creditsCtl?.fit());
 
@@ -1330,14 +1363,20 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       current = i;
       // 다음 장면의 릴 썸네일을 미리 받아 카드가 빈 상자로 날아들지 않게
       panels[i + 1]?.querySelectorAll('.deck-stage img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
-      const delay = prev < 0 ? 0.9 : quick ? Math.max(0.35, duration * 0.4) : Math.max(0.5, duration * 0.62);
+      // 새 장면의 글 · 덱이 들어오는 때 — 장면 사이 타이틀 카드만 떠 있는 빈 시간이 1~1.85초씩 길지 않게(0.62·d → 0.45·d)
+      const delay = prev < 0 ? 0.9 : quick ? Math.max(0.35, duration * 0.4) : Math.max(0.5, duration * 0.45);
       // 들어올 장면의 준비(보이기 · 첫 자리 잡기)는 무거워서(데스크톱 50ms · 휴대폰 200ms 안팎) 같은 순간에 하면
-      // 나가는 장면이 한 프레임도 움직이지 못한 채 멈춰 있다 — 나가는 움직임이 먼저 화면에 그려진 뒤(두 프레임) 준비한다
+      // 나가는 장면이 한 프레임도 움직이지 못한 채 멈춰 있다 — 나가는 움직임이 한 프레임 그려진 바로 뒤에 준비하고,
+      // 기다린 만큼 등장 지연에서 뺀다(느린 기기에서 프레임이 길어도 새 장면이 늦게 들어오지 않게)
       if (prev < 0) show(i, delay, false, first, beat);
-      else
+      else {
+        const t0 = performance.now();
         requestAnimationFrame(() =>
-          requestAnimationFrame(() => current === i && show(i, Math.max(0, delay - 0.035), prev === i + 1, first, beat))
+          setTimeout(() => current === i && show(i, Math.max(0, delay - (performance.now() - t0) / 1000), prev === i + 1, first, beat), 0)
         );
+      }
+      // 덱이 날아와 가운데 카드가 자리에 서기까지(초) — 끌기 안내가 이걸 기다린다
+      return panels[i].reel && !reducedMotion ? delay + 0.3 + INTRO : 0;
     },
     get current() {
       return panels[current];

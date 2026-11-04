@@ -43,7 +43,7 @@ function profileBeats(scene, i) {
           ${kicker(i, `PROFILE — 대학 시절 포트폴리오 ${profile.span}`)}
         </div>
         <div class="bt-body panel-content">
-          <article class="rs-card">
+          <article class="rs-card b-a">
             ${profile.photo ? `<figure class="rs-photo b-a"><img src="${esc(profile.photo.src)}" width="${profile.photo.w}" height="${profile.photo.h}" alt="${esc(profile.name)} 증명사진" decoding="async" /></figure>` : ''}
             <div class="rs-id">
               <p class="rs-role b-a">${esc(profile.role)}</p>
@@ -204,7 +204,8 @@ export function bindBeats(el, reducedMotion, onBeat) {
     intro(tl, at) {
       if (reducedMotion) return;
       const p = parts(list[index]);
-      gsap.set(p, { autoAlpha: 0, y: 26 });
+      // 소개 카드의 판(.rs-card)도 같이 숨겼다가 들인다(장면에 들어서는 순간 빈 판만 먼저 보이지 않게) — 안의 줄도 따로 올라오므로 판은 조금만
+      gsap.set(p, { autoAlpha: 0, y: (k, t) => (t.classList.contains('rs-card') ? 12 : 26) });
       tl.to(p, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.06 }, at);
       openPano(list[index], at, tl);
     },

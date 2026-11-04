@@ -69,7 +69,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
     document.body.classList.remove('has-toast');
     toastT = setTimeout(() => (toast.hidden = true), 400);
   }
-  // 휴대폰: 알림을 옆이나 아래로 밀어 닫는다
+  // 휴대폰: 알림을 옆이나 위아래로 밀어 닫는다(덱 장면에서는 위쪽에 떠서 위로 튕겨 닫는다)
   {
     let t0 = null;
     toast.addEventListener('touchstart', (e) => (t0 = { x: e.touches[0].clientX, y: e.touches[0].clientY }), { passive: true });
@@ -78,7 +78,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       (e) => {
         if (!t0) return;
         const dx = e.touches[0].clientX - t0.x;
-        const dy = Math.max(0, e.touches[0].clientY - t0.y);
+        const dy = e.touches[0].clientY - t0.y;
         toast.style.translate = `${dx}px ${dy}px`;
         toast.style.opacity = String(Math.max(0.2, 1 - Math.hypot(dx, dy) / 160));
       },
@@ -95,7 +95,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
         toast.style.opacity = '';
         // 알림을 민 손가락이 장면까지 넘기지 않게
         e.stopPropagation();
-        if (Math.abs(dx) > 60 || dy > 36) hide();
+        if (Math.abs(dx) > 60 || Math.abs(dy) > 36) hide();
       },
       { passive: true }
     );
@@ -220,6 +220,8 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
   // ── 처음 방문: 첫 장면 아래의 짧은 안내를 세 가지 사용법으로 ──
   const hint = document.getElementById('hint');
   const firstVisit = !store.get(KEY_SEEN);
+  // 지난 방문에서 멈춘 장면 — 이번 방문의 장면이 덮어쓰기 전에 한 번 읽어 둔다
+  const savedLast = store.get(KEY_LAST);
   if (hint && firstVisit) {
     const items = touch
       ? [
@@ -286,7 +288,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
   let takeoverTold = false;
   return {
     // 장면이 바뀔 때
-    setScene(i, hasDeck) {
+    setScene(i, hasDeck, land = 0) {
       current = i;
       // 좁은 화면은 첫 장면 아래에 자리가 없어, 처음 방문 사용법을 위쪽 알림으로 한 번
       if (i === 0 && firstVisit && !coachTold && matchMedia('(max-width: 820px), (orientation: portrait) and (max-width: 1100px), (max-height: 500px)').matches) {
@@ -308,6 +310,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       // 처음 만나는 카드 덱: 넘기는 법을 한 번 알려 준다
       if (hasDeck && !deckTold) {
         deckTold = true;
+        // 덱이 날아와 자리에 선 뒤에(land: 장면이 바뀐 때부터 가운데 카드가 닿을 때까지의 초) — 날아드는 도중에 끌어 보이면 카드가 멈추지 못한다
         setTimeout(() => {
           if (current !== i) return;
           document.body.classList.add('deck-cue');
@@ -316,7 +319,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
           const rect = onPeek?.();
           if (rect) showGhost('x', rect);
           say(touch ? '카드는 옆으로 넘기고 탭하면 자세히 · 위로 밀면 다음 장면' : '카드를 옆으로 넘기거나(← → · 휠) 눌러서 프로젝트를 볼 수 있어요', { ms: 4800 });
-        }, reducedMotion ? 400 : 2200);
+        }, reducedMotion ? 400 : Math.max(2200, land * 1000 + 300));
       }
     },
     // 자동 재생 남은 시간(0~1) — 끄면 고리를 비운다
@@ -332,10 +335,12 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       say('직접 넘기는 중이라 자동 재생을 멈췄어요', { action: touch ? '다시 자동 재생' : '다시 자동 재생 (P)', onAction: onAuto, ms: 5600 });
     },
     // 지난번에 멈춘 장면에서 이어 보기(2주 안 · 처음과 끝 장면 제외)
+    // 표지에 아직 머물러 있을 때만 — 이미 장면을 골랐으면(표지 목차 · 키 · 목차) 이번 방문을 '지난번'이라 하지 않는다
     offerResume() {
+      if (current !== 0) return;
       let saved = null;
       try {
-        saved = JSON.parse(store.get(KEY_LAST) || 'null');
+        saved = JSON.parse(savedLast || 'null');
       } catch {
         saved = null;
       }

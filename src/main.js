@@ -287,9 +287,9 @@ function onTransition(i, prev, duration) {
   // 끌어서 넘겼으면 끌려 올라가 있던 패널을 그 자리에서 이어 내보내고, 다음 장면을 더 빨리 들인다
   const nav = pendingNav;
   pendingNav = null;
-  panels.go(i, prev, duration, nav || {}); // 뒤로 돌아와 마지막 카드에서 시작하는 릴이면 onReelFocus가 시계를 맞춘다
+  const land = panels.go(i, prev, duration, nav || {}); // 뒤로 돌아와 마지막 카드에서 시작하는 릴이면 onReelFocus가 시계를 맞춘다
   hud.setScene(i, prev, duration);
-  guide.setScene(i, !!panels.panels[i]?.reel);
+  guide.setScene(i, !!panels.panels[i]?.reel, land);
   // 덱이 없는 장면(소개): 조금 머물면 아래로 넘기는 법을 보여 준다.
   // 휴대폰은 위로 밀면 덱이 있어도 바로 다음 장면이라, 덱 장면에서도 카드 안내 뒤에 한 번
   if (started && i > 0 && i < scenes.length - 1) {
