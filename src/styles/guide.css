@@ -119,10 +119,23 @@ body.index-open .next-cue {
 .guide-toast[hidden] {
   display: none;
 }
-/* 덱이 있는 장면(데스크톱): 덱 아래 막대(장 수 · 분야 이름)와 같은 줄이라 그 위로 올린다 */
+/* 덱이 있는 장면(데스크톱 · 가로 태블릿): 알림은 덱 아래 막대 줄에서 ← → 넘김 버튼 앞까지만 차지하고, 그동안 막대 왼쪽의 장 수 · 분야 이름은 비켜 준다.
+   넓은 화면(1400 이상)은 막대 위로 올려도 설명 줄 글과 겹치지 않아 위로 올린다 */
 @media (min-width: 821px) and (min-height: 501px) and (orientation: landscape), (min-width: 1101px) and (min-height: 501px) {
   body.has-deck .guide-toast {
+    max-width: min(470px, calc(50vw - 150px - var(--pad)));
+  }
+  body.has-deck.has-toast .deck-label {
+    opacity: 0;
+  }
+}
+@media (min-width: 1400px) and (min-height: 501px) {
+  body.has-deck .guide-toast {
     bottom: calc(var(--bottom) + 64px);
+    max-width: min(calc(92 * var(--vw)), 470px);
+  }
+  body.has-deck.has-toast .deck-label {
+    opacity: 1;
   }
 }
 .gt-text {
@@ -685,6 +698,18 @@ body.deck-cue .panel:not([hidden]) .deck-count {
   }
   body.has-deck .guide-toast.is-on {
     transform: none;
+  }
+}
+/* 세로 태블릿: 위쪽 알림은 가운데 좁게(화면 폭 띠로 제목을 다 가리지 않게) */
+@media (orientation: portrait) and (min-width: 600px) and (max-width: 1100px) {
+  body.has-deck .guide-toast {
+    left: 50%;
+    right: auto;
+    width: min(470px, calc(100% - 24px));
+    transform: translate(-50%, -8px);
+  }
+  body.has-deck .guide-toast.is-on {
+    transform: translate(-50%, 0);
   }
 }
 @media (max-width: 380px) {

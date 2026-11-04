@@ -315,9 +315,14 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
           if (current !== i) return;
           document.body.classList.add('deck-cue');
           setTimeout(() => document.body.classList.remove('deck-cue'), 4200);
-          // 덱이 살짝 끌려갔다 돌아오는 동안 반투명한 손끝이 같은 방향으로 민다
-          const rect = onPeek?.();
-          if (rect) showGhost('x', rect);
+          // 덱이 살짝 끌려갔다 돌아오는 동안 반투명한 손끝이 같은 방향으로 민다 — 덱이 아직 날아드는 중이라 거절하면(느린 기기) 조금 뒤 다시
+          const tryPeek = (left) => {
+            if (current !== i) return;
+            const rect = onPeek?.();
+            if (rect) showGhost('x', rect);
+            else if (left > 0) setTimeout(() => tryPeek(left - 1), 250);
+          };
+          tryPeek(6);
           say(touch ? '카드는 옆으로 넘기고 탭하면 자세히 · 위로 밀면 다음 장면' : '카드를 옆으로 넘기거나(← → · 휠) 눌러서 프로젝트를 볼 수 있어요', { ms: 4800 });
         }, reducedMotion ? 400 : Math.max(2200, land * 1000 + 300));
       }

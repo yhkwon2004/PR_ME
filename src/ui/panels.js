@@ -608,6 +608,8 @@ function deckReel(el, reducedMotion) {
     const v = -vPx * (1000 / span()); // 초당 카드 수
     let k = Math.round(pos + Math.max(-reach, Math.min(reach, v * 0.14)));
     if (k === k0 && Math.abs(dx) > 40) k = k0 - Math.sign(dx);
+    // 짧게 민 손가락(1.5장 안쪽)은 아주 세게 튕긴 게 아니면 한 장만 — 작은 휴대폰에서 한 번 밀어 두 장이 넘어가지 않게
+    if (Math.abs(dx) < 1.5 * span() && Math.abs(v) < 8) k = Math.max(k0 - 1, Math.min(k0 + 1, k));
     k = Math.max(0, Math.min(n - 1, k));
     // 스프링이 목표를 지나쳐 되돌아오지 않을 만큼만 속도를 넘긴다
     const room = k - pos;
@@ -701,7 +703,7 @@ function deckReel(el, reducedMotion) {
         held = true;
         vel = 0;
       }
-      tx = { x: t.clientX, y: t.clientY, sx: t.clientX, f0: pos, k0: focus, axis: '' };
+      tx = { x: t.clientX, y: t.clientY, sx: t.clientX, t0: performance.now(), f0: pos, k0: focus, axis: '', yielded: false };
       tv.reset(t.clientX, performance.now());
     },
     { passive: true }
@@ -728,9 +730,23 @@ function deckReel(el, reducedMotion) {
         }
       }
       if (tx.axis !== 'x' || reducedMotion) return;
+      // 장면 넘김이 위아래 끌기를 잡고 있는 동안은 덱을 놓아 두고, 다시 옆으로 끌면(끌기 표시가 꺼지고 옆이 더 길면) 그 자리에서 다시 잡는다
       if (document.documentElement.classList.contains('is-pulling')) {
-        tx.axis = 'y';
-        return yieldDrag(tx.k0);
+        if (!tx.yielded) {
+          tx.yielded = true;
+          yieldDrag(tx.k0);
+        }
+        return;
+      }
+      if (tx.yielded) {
+        if (Math.abs(t.clientX - tx.sx) <= Math.abs(dy)) return;
+        tx.yielded = false;
+        held = true;
+        vel = 0;
+        stage.classList.add('is-dragging');
+        tx.x = t.clientX;
+        tx.f0 = grab();
+        tx.k0 = focus;
       }
       pos = dragPos(t.clientX - tx.x, tx.f0);
       follow(true);
@@ -745,11 +761,15 @@ function deckReel(el, reducedMotion) {
       const t = e.changedTouches[0];
       const dx = t.clientX - tx.x;
       const dy = t.clientY - tx.y;
-      const { axis, k0, sx } = tx;
+      const { axis, k0, sx, t0, yielded } = tx;
       const v = tv.get(performance.now());
       tx = null;
-      // 처음 자리에서 세로로 더 많이 움직였으면 장면 넘김(input.js와 같은 기준) — 덱은 넘기지 않는다(동작 줄이기에서도)
-      if (axis === 'x' && Math.abs(dy) >= Math.abs(t.clientX - sx)) return yieldDrag(k0);
+      // 장면 넘김이 이 손가락을 가져갈 때만 덱은 넘기지 않는다(동작 줄이기에서도) — 위아래로 끄는 표시가 켜져 있거나,
+      // 처음 자리에서 세로가 더 길고 빠르게(0.7초 안 46px · 0.25초 안 22px) 밀었을 때(input.js와 같은 기준). 느린 비스듬한 끌기는 가까운 카드로
+      const dxs = Math.abs(t.clientX - sx);
+      const ms = performance.now() - t0;
+      const vertical = Math.abs(dy) >= dxs && ((ms <= 700 && Math.abs(dy) >= 46) || (ms <= 250 && Math.abs(dy) >= 22));
+      if (axis === 'x' && (yielded || document.documentElement.classList.contains('is-pulling') || vertical)) return yieldDrag(k0);
       if (axis !== 'x' && !(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy))) {
         if (held) release(0, focus, 0);
         return;
@@ -767,13 +787,26 @@ function deckReel(el, reducedMotion) {
     tx = null;
     if (held) release(0, focus, 0);
   });
+  // 카드에 키보드 초점이 있을 때도 화면 전체의 방향키와 같은 규칙(input.js): 누를 때마다 한 장 · 누르고 있으면 0.17초마다,
+  // 덱 끝에서 연달아 누른 키(0.56초 안)와 누르고 있는 키는 다음 장면으로 새지 않는다
+  let keyAt = -1e9;
   stage.addEventListener('keydown', (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     const dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (!dir) return;
+    const now = performance.now();
     const k = focus + dir;
-    if (!dir || k < 0 || k >= n) return;
+    if (k < 0 || k >= n) {
+      if (e.repeat || now - keyAt < 560) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
     e.preventDefault();
     e.stopPropagation();
+    if (e.repeat && now - keyAt < 170) return;
+    keyAt = now;
     set(k);
   });
   // 마우스로 끌기: 터치처럼 덱이 포인터를 따라 움직인다
@@ -1375,8 +1408,9 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
           setTimeout(() => current === i && show(i, Math.max(0, delay - (performance.now() - t0) / 1000), prev === i + 1, first, beat), 0)
         );
       }
-      // 덱이 날아와 가운데 카드가 자리에 서기까지(초) — 끌기 안내가 이걸 기다린다
-      return panels[i].reel && !reducedMotion ? delay + 0.3 + INTRO : 0;
+      // 덱이 다 날아와 자리에 서기까지(초 — 카드마다 0.09초씩 늦게 출발한다) — 끌기 안내가 이걸 기다린다(덱은 날아드는 동안 끌어 보이지 않는다)
+      const reel = panels[i].reel;
+      return reel && !reducedMotion ? delay + 0.3 + (reel.count - 1) * 0.09 + 0.05 + INTRO : 0;
     },
     get current() {
       return panels[current];
