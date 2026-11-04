@@ -117,13 +117,23 @@ function awardBadge(p) {
 // 프로젝트 타일 — 사진 위에 글을 얹은 시네마 플레이트(필름 릴 · 아카이브 공통)
 // 릴 카드 폭(premium.css의 --card-h × 0.78, 가로 휴대폰 × 1.5)에 맞춘 sizes
 const REEL_SIZES = '(max-height: 500px) and (orientation: landscape) 190px, (max-width: 820px) 210px, 290px';
+// 덱 카드는 세로(폭:높이 0.78)라 가로 사진을 꽉 채우면(cover) 카드 폭보다 그만큼 넓게 그려진다 — sizes도 그만큼 키워
+// 고해상도 화면(레티나 · 휴대폰)에서 작은 사진(720px)을 늘려 흐려지지 않게. box: 사진 칸의 폭:높이 · part: 사진 칸 폭 / 카드 폭
+const coverSizes = (im, box = 0.78, part = 1) => {
+  const k = part * (im?.w && im?.h ? Math.max(1, im.w / im.h / box) : 1);
+  // 크기 값만(조건 안의 500px · 820px는 그대로)
+  return REEL_SIZES.replace(/(^|\) |, )(\d+)px/g, (m, pre, n) => `${pre}${Math.round(n * k)}px`);
+};
+// 덱에서 통째로 보이는(contain) 도면 · 렌더 · 문서는 카드 폭 그대로
+const DECK_WHOLE = new Set(['diagram', 'render', 'document']);
+const reelSizes = (im) => (im && !fitsCover(im) && DECK_WHOLE.has(im.kind) ? REEL_SIZES : coverSizes(im));
 const GRID_SIZES = '(max-width: 599px) 50vw, (max-width: 1180px) 33vw, (min-width: 1600px) 20vw, 25vw';
 export function projectCard(p, i, { cls = 'card' } = {}) {
   const c = categoryOf(p.category);
   const label = `${p.title}${p.awards.length ? ` — 수상 ${p.awards.length}건` : ''}`;
   return `<a class="${cls}" href="${p.path}" data-link data-cat="${esc(p.category)}" aria-label="${esc(label)}">
     <figure class="card-media">
-      ${p.cover ? media(p.cover, { sizes: cls === 'r-card' ? REEL_SIZES : p.wide ? GRID_SIZES.replace(/(\d+)vw/g, (m, n) => `${n * 2}vw`) : GRID_SIZES, allowSmall: true }) : typeCover(p)}
+      ${p.cover ? media(p.cover, { sizes: cls === 'r-card' ? reelSizes(p.cover) : p.wide ? GRID_SIZES.replace(/(\d+)vw/g, (m, n) => `${n * 2}vw`) : GRID_SIZES, allowSmall: true }) : typeCover(p)}
       <span class="card-shade" aria-hidden="true"></span>
       <span class="card-glare" aria-hidden="true"></span>
       <span class="card-top"><span class="card-no">${pad(i + 1)}</span><span class="card-cat">${esc(c.label)}</span></span>
@@ -298,7 +308,7 @@ export function pressCard(a, k) {
         qa ? `<span class="pc-iv-q">Q. ${esc(qa.q)}</span>` : `<small>INTERVIEW</small><b>${esc(profile.name)}</b><span>${esc(profile.en)}</span>`
       }</span>`
     : a.image
-      ? `<span class="pc-photo"><img src="${esc(a.image.thumb)}" srcset="${esc(a.image.thumb)} 720w, ${esc(a.image.src)} ${a.image.w}w" sizes="${REEL_SIZES}" alt="${esc(a.image.alt)}" loading="lazy" decoding="async" /></span>`
+      ? `<span class="pc-photo"><img src="${esc(a.image.thumb)}" srcset="${esc(a.image.thumb)} 720w, ${esc(a.image.src)} ${a.image.w}w" sizes="${coverSizes(a.image, 1.34, 0.86)}" alt="${esc(a.image.alt)}" loading="lazy" decoding="async" /></span>`
       : // 기사 사진을 받아 두지 못한 보도: 사진 칸에 기사 제목을 활자로
         `<span class="pc-iv is-text"><small>NEWS${a.date ? ` · ${esc(a.date.replace(/-/g, '.'))}` : ''}</small><b>${esc(a.title)}</b></span>`;
   const label = a.interview ? `${a.publisher} 인터뷰 — ${a.title} (새 창)` : `${a.publisher} 보도 — ${a.title} (새 창)`;
@@ -333,9 +343,9 @@ export function awardCard(a) {
   const bg = a.certs.length ? p.cover : a.photo || p.cover;
   return `<a class="r-card a-card" href="${p.path}" data-link data-cat="${esc(p.category)}" data-tier="${TIER_KEY[a.tier]}" aria-label="${esc(`${a.grade} — ${a.contest} · ${p.title}`)}">
     <figure class="card-media">
-      ${bg ? img(bg, { cls: 'a-bg', sizes: REEL_SIZES }) : typeCover(p)}
+      ${bg ? img(bg, { cls: 'a-bg', sizes: coverSizes(bg) }) : typeCover(p)}
       <span class="card-shade" aria-hidden="true"></span>
-      ${a.certs.length ? certSheet(a, { sizes: '90px' }) : ''}
+      ${a.certs.length ? certSheet(a, { sizes: '150px' }) : ''}
       <span class="card-glare" aria-hidden="true"></span>
       <span class="card-award" data-tier="${TIER_KEY[a.tier]}">${LAUREL}<b>${esc(a.grade)}</b></span>
       <figcaption class="card-cap">

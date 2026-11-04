@@ -139,7 +139,11 @@ export function createHud(scenes, { onGo, onToggleAuto, onToggleSound, reducedMo
     const m = Math.floor(sec / 60) % 60;
     const h = Math.floor(sec / 3600);
     const tc = `TC ${pad(h)}:${pad(m)}:${pad(s)}:${pad(f)}`;
-    if (tc !== lastTc) tcLbl.textContent = lastTc = tc;
+    // 글자 노드의 값만 바꾼다(노드를 갈아 끼우면 위 막대 전체를 매 프레임 다시 배치 · 칠한다)
+    if (tc === lastTc) return;
+    lastTc = tc;
+    if (tcLbl.firstChild) tcLbl.firstChild.nodeValue = tc;
+    else tcLbl.textContent = tc;
   }
 
   return {

@@ -432,6 +432,13 @@ function deckReel(el, reducedMotion) {
   // 초점이 바뀔 때 카드 표면을 훑는 빛 · 물러난 카드를 어둡게 하는 막(불투명도만 바꿔 다시 칠하지 않는다)
   cards.forEach((c) => c.querySelector('.card-media')?.insertAdjacentHTML('beforeend', '<i class="card-dim" aria-hidden="true"></i><i class="card-sweep" aria-hidden="true"></i>'));
   const dims = cards.map((c) => c.querySelector('.card-dim'));
+  // 카드의 분야 색은 바뀌지 않으므로 처음에 한 번만 읽는다(넘길 때마다 읽으면 방금 바꾼 카드들의 스타일을 다시 계산하게 된다)
+  const cc = cards.map((c) => {
+    const cs = getComputedStyle(c);
+    // 배경 분위기 색도 같이(수상 카드는 등급 색) — mood.set이 넘길 때마다 다시 읽지 않게
+    c._amb = ((c.classList.contains('a-card') && cs.getPropertyValue('--tc')) || cs.getPropertyValue('--cc')).trim();
+    return cs.getPropertyValue('--cc');
+  });
   const last = cards.map(() => ({ tf: '', o: -1, d: -1, z: 0, vis: '' }));
   const n = cards.length;
   let focus = 0;
@@ -484,9 +491,12 @@ function deckReel(el, reducedMotion) {
 
   // 프레임마다: 잡고 있지 않으면 스프링이 초점으로 데려간다
   let running = false;
+  let fresh = false; // 쉬다가 깨어난 첫 프레임
   const tick = (time, deltaMs) => {
-    // 느린 기기에서도 같은 빠르기로(스프링은 큰 걸음에도 안정적)
-    const dt = Math.min(0.12, deltaMs / 1000);
+    // 느린 기기에서도 같은 빠르기로(스프링은 큰 걸음에도 안정적).
+    // 쉬다가 깨어난 첫 프레임만은 쉰 시간만큼의 간격(최대 0.5초)이 한 번에 들어와 첫걸음에 거리의 30~40%를 건너뛰므로 한 프레임 길이로
+    const dt = fresh ? Math.min(1 / 60, deltaMs / 1000) : Math.min(0.12, deltaMs / 1000);
+    fresh = false;
     if (!held) [pos, vel] = damp(pos, focus, vel, dt);
     const settled = !held && Math.abs(pos - focus) < 0.0005 && Math.abs(vel) < 0.002;
     if (settled) {
@@ -502,6 +512,7 @@ function deckReel(el, reducedMotion) {
   const wake = () => {
     if (running || reducedMotion) return;
     running = true;
+    fresh = true;
     gsap.ticker.add(tick);
   };
   // 움직임 없이 바로 그 자리에(동작 줄이기 · 창 크기 변경)
@@ -519,11 +530,22 @@ function deckReel(el, reducedMotion) {
     peek = 0;
     stage.classList.remove('is-dragging');
   };
+  // 새 가운데 카드만 다시 착지시킨다 — 방금 착지하던 카드는 사진이 다가왔다 자리 잡는 움직임을 끝까지(끊으면 한 프레임에 튄다)
+  // 착지 표시는 움직임이 다 끝난 뒤(1.4초 + 여유) 걷는다 — 사진 없는 카드 · 보도 카드 · 가벼운 단계처럼 움직임이 없는 카드도 같게
+  // 다시 붙이는 건 두 프레임 뒤에 — 그 자리에서 배치를 다시 재게 하지 않고(넘기는 순간의 한 프레임을 길게 만들지 않게) 움직임을 처음부터
+  const landT = cards.map(() => 0);
   const land = () => {
-    const c = cards[focus];
-    cards.forEach((x) => x.classList.remove('is-landing'));
-    void c.offsetWidth;
-    c.classList.add('is-landing');
+    const j = focus;
+    const c = cards[j];
+    clearTimeout(landT[j]);
+    c.classList.remove('is-landing');
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        if (focus !== j) return;
+        c.classList.add('is-landing');
+        landT[j] = setTimeout(() => c.classList.remove('is-landing'), 1600);
+      })
+    );
   };
   // auto: 자동 재생이 옮긴 것 · animate: 움직임으로 옮길지 · v: 손을 놓은 속도(초당 카드 수)
   // entry: 장면에 들어설 때 — 이전 방문의 초점과 비교한 방향을 쓰지 않는다
@@ -541,7 +563,7 @@ function deckReel(el, reducedMotion) {
     });
     if (had && document.activeElement !== cards[focus]) cards[focus].focus({ preventScroll: true });
     // 바닥 빛은 초점 카드의 분야 색
-    stage.style.setProperty('--fc', getComputedStyle(cards[focus]).getPropertyValue('--cc') || '');
+    stage.style.setProperty('--fc', cc[focus] || '');
     if (v !== undefined) vel = v;
     if (!animate || reducedMotion) snap();
     else wake();
@@ -862,10 +884,36 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
   const ticks = [...el.querySelectorAll('.deck-ticks i')];
   const info = el.querySelector('.deck-info');
   const tpls = [...el.querySelectorAll('template.deck-tpl')];
+  // 설명 줄의 높이는 이 덱에서 가장 긴 설명에 맞춰 둔다 — 덱 덩어리(카드 · 설명 · 막대)가 화면 아래에 붙어 있어
+  // 카드마다 제목 줄 수 · 기관 로고 줄이 달라 설명 높이가 바뀌면 덱 전체가 위아래로 튀었다(넘길 때마다 7~11px)
+  let fitW = -1;
+  const fit = () => {
+    if (!info || !tpls.length) return;
+    const w = info.clientWidth;
+    if (!w || w === fitW) return;
+    fitW = w;
+    info.style.minHeight = '';
+    const probes = tpls.map((t) => {
+      const p = t.content.firstElementChild.cloneNode(true);
+      p.inert = true;
+      p.setAttribute('aria-hidden', 'true');
+      p.style.visibility = 'hidden';
+      info.appendChild(p);
+      return p;
+    });
+    // 배치 px로(세로 태블릿은 필름 층을 키워 화면 px와 다르다)
+    const h = info.offsetHeight;
+    probes.forEach((p) => p.remove());
+    info.style.minHeight = `${h}px`;
+  };
+  // 창 크기 · 글꼴이 바뀌면 다시 잰다(보이는 덱만 — 숨은 장면은 들어설 때)
+  addEventListener('resize', () => ((fitW = -1), el.hidden || fit()));
+  document.fonts?.ready.then(() => ((fitW = -1), el.hidden || fit()));
   // 덱 아래 설명: 나가는 줄은 위로 사라지고, 새 줄이 아래에서 한 줄씩 올라온다
   const showInfo = (dir) => {
     const tpl = tpls[reel.focus];
     if (!info || !tpl) return;
+    if (fitW < 0) fit();
     const node = tpl.content.firstElementChild.cloneNode(true);
     const old = [...info.children];
     // 나가는 설명 안의 버튼에 키보드 초점이 있었다면 새 설명의 같은 자리로 옮긴다
@@ -873,11 +921,20 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
     old.forEach((o) => (o.inert = true));
     info.appendChild(node);
     if (had) (node.querySelector('.di-open') || node.querySelector('a'))?.focus({ preventScroll: true });
+    // 앞 설명이 다 빠진 뒤에 새 설명이 들어온다(두 글이 겹쳐 읽히지 않게). 빠르게 연달아 넘기면
+    // 이미 빠지는 중인 설명은 그대로 두고(다시 처음부터 흐리지 않게), 들어오던 중에 밀려난 설명은 그 자리에서 멈춘 채 빠진다.
+    // Web Animations로 — 시작 · 끝 값을 직접 주어 계산된 스타일을 읽지 않고(넘기는 순간의 프레임이 길어지지 않게) 합성만으로 그린다
     old.forEach((o) => {
       if (reducedMotion || !dir) return o.remove();
-      gsap.to(o, { autoAlpha: 0, y: dir > 0 ? -12 : 12, duration: 0.26, ease: 'power2.in', onComplete: () => o.remove() });
+      if (o._out) return;
+      o._in?.forEach((a) => a.pause());
+      o._out = o.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateY(${dir > 0 ? -10 : 10}px)` }], { duration: 160, easing: 'cubic-bezier(0.55, 0.085, 0.68, 0.53)', fill: 'forwards' });
+      o._out.onfinish = () => o.remove();
     });
-    if (!reducedMotion && dir) gsap.fromTo(node.children, { autoAlpha: 0, y: dir > 0 ? 16 : -16 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.05, delay: 0.12 });
+    if (!reducedMotion && dir)
+      node._in = [...node.children].map((c, k) =>
+        c.animate([{ opacity: 0, transform: `translateY(${dir > 0 ? 16 : -16}px)` }, { opacity: 1, transform: 'none' }], { duration: 500, delay: 160 + k * 50, easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)', fill: 'backwards' })
+      );
   };
   el.querySelectorAll('[data-reel]').forEach((b) => b.addEventListener('click', () => reel.step(+b.dataset.reel)));
   // 번호 · 눈금 · 버튼 상태를 초점에 맞춘다
@@ -885,7 +942,7 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
     const f = reel.focus;
     if (now) {
       now.textContent = reel.card?.classList.contains('deck-all') ? 'ALL' : pad(f + 1);
-      if (dir && !reducedMotion) gsap.fromTo(now, { yPercent: dir * 70, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.45, ease: 'power3.out' });
+      if (dir && !reducedMotion) now.animate([{ opacity: 0, transform: `translateY(${dir * 70}%)` }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)' });
     }
     ticks.forEach((t, j) => {
       t.classList.toggle('is-on', j === f);
@@ -904,6 +961,7 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
   };
   el.addEventListener('reelfocus', (e) => {
     const dir = e.detail.entry ? 0 : Math.sign(e.detail.focus - e.detail.prev);
+    if (e.detail.entry) fit();
     sync(dir);
     if (e.detail.focus !== e.detail.prev || !info.children.length) showInfo(dir);
     if (!e.detail.auto) onReelFocus?.(el, e.detail);
@@ -1273,7 +1331,13 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
       // 다음 장면의 릴 썸네일을 미리 받아 카드가 빈 상자로 날아들지 않게
       panels[i + 1]?.querySelectorAll('.deck-stage img[loading="lazy"]').forEach((im) => (im.loading = 'eager'));
       const delay = prev < 0 ? 0.9 : quick ? Math.max(0.35, duration * 0.4) : Math.max(0.5, duration * 0.62);
-      show(i, delay, prev === i + 1, first, beat);
+      // 들어올 장면의 준비(보이기 · 첫 자리 잡기)는 무거워서(데스크톱 50ms · 휴대폰 200ms 안팎) 같은 순간에 하면
+      // 나가는 장면이 한 프레임도 움직이지 못한 채 멈춰 있다 — 나가는 움직임이 먼저 화면에 그려진 뒤(두 프레임) 준비한다
+      if (prev < 0) show(i, delay, false, first, beat);
+      else
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => current === i && show(i, Math.max(0, delay - 0.035), prev === i + 1, first, beat))
+        );
     },
     get current() {
       return panels[current];

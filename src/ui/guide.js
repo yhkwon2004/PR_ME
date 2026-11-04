@@ -115,7 +115,8 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
     ghost.hidden = false;
     ghost.className = `drag-ghost is-${kind}`;
     ghost.style.left = `${rect.left + rect.width / 2}px`;
-    ghost.style.top = `${rect.top + rect.height / 2}px`;
+    // 카드 위에서는 아래쪽 그늘에(사진의 주인공 · '전체 보기' 글과 겹치지 않게) — 높이가 없는 자리(소개 화면)는 그 자리에
+    ghost.style.top = `${rect.top + rect.height * (rect.height ? 0.84 : 0.5)}px`;
     ghost.querySelector('.dg-t').textContent = text || (kind === 'x' ? (touch ? '옆으로 밀어 넘기기' : '끌어서 넘기기') : touch ? '위로 밀어 다음 장면' : '스크롤 · 끌어 올려 다음 장면');
     void ghost.offsetWidth;
     ghost.classList.add('is-on');

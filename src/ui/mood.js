@@ -47,12 +47,15 @@ export function createMood({ getStage, reducedMotion }) {
   let current = null;
 
   // 연도 · 색 번짐의 높이: 덱의 레이아웃 위치(등장 트윈의 y 이동은 빼고)로 재고, 창 크기가 바뀌면 다시 잰다
+  // 다 읽은 뒤에 쓴다(쓰고 다시 읽으면 배치를 한 번 더 잰다)
   function placeY() {
     const s = current?.closest('.deck-stage');
-    if (!s || !s.offsetHeight) return;
+    const h = s?.offsetHeight;
+    if (!h) return;
     let y = 0;
     for (let n = s; n; n = n.offsetParent) y += n.offsetTop;
-    roots.forEach((x) => x.style.setProperty('--ay', `${Math.round(y + s.offsetHeight * 0.3)}px`));
+    const v = `${Math.round(y + h * 0.3)}px`;
+    roots.forEach((x) => x.style.setProperty('--ay', v));
   }
   let resizeT = 0;
   addEventListener('resize', () => {
@@ -90,20 +93,28 @@ export function createMood({ getStage, reducedMotion }) {
   }
 
   // 큰 연도 글자: 바뀔 때만 아래에서 올라오며 겹쳐 바뀐다
+  let yearSeq = 0;
   function showYear(text, dir) {
     if (text === year) return;
     year = text;
     const next = years[1 - yearFront];
     const prev = years[yearFront];
     next.textContent = text;
-    // 들어오는 글자는 시작 자리로 순간 이동한 뒤(앞으로 넘기면 아래에서) 가운데로 올라온다
+    // 들어오는 글자는 시작 자리로 순간 이동한 뒤(앞으로 넘기면 아래에서) 가운데로 올라온다 —
+    // 이동은 두 프레임 뒤에 이어 붙인다(그 자리에서 배치를 다시 재게 하지 않게)
     next.style.transition = 'none';
     next.style.setProperty('--to', dir < 0 ? '-18%' : '18%');
     next.classList.remove('is-on');
-    void next.offsetWidth;
-    next.style.transition = '';
-    next.classList.add('is-on');
-    // 나가는 글자는 반대쪽으로
+    const t = ++yearSeq;
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        if (t !== yearSeq) return;
+        next.style.transition = '';
+        next.classList.add('is-on');
+      })
+    );
+    // 나가는 글자는 반대쪽으로(아주 빠르게 연달아 바뀌어 들어오다 만 글자도 움직임을 되살려서)
+    prev.style.transition = '';
     prev.style.setProperty('--to', dir < 0 ? '18%' : '-18%');
     prev.classList.remove('is-on');
     yearFront = 1 - yearFront;
@@ -113,9 +124,12 @@ export function createMood({ getStage, reducedMotion }) {
     // card: 덱의 가운데 카드 · dir: 넘긴 방향(1 · -1 · 0)
     set(card, dir = 0) {
       if (!card) return this.clear();
-      const cs = getComputedStyle(card);
-      // 수상 카드는 등급 색(대상은 금빛), 프로젝트 카드는 분야 색
-      const color = ((card.classList.contains('a-card') && cs.getPropertyValue('--tc')) || cs.getPropertyValue('--cc') || DEFAULT).trim();
+      // 수상 카드는 등급 색(대상은 금빛), 프로젝트 카드는 분야 색 — 덱이 처음에 읽어 둔 값(없으면 여기서 한 번 읽어 둔다)
+      if (card._amb == null) {
+        const cs = getComputedStyle(card);
+        card._amb = ((card.classList.contains('a-card') && cs.getPropertyValue('--tc')) || cs.getPropertyValue('--cc')).trim();
+      }
+      const color = card._amb || DEFAULT;
       target.set(color);
       amtTarget = 1;
       if (dir) pulse = 1;
@@ -130,9 +144,10 @@ export function createMood({ getStage, reducedMotion }) {
       const im = card.querySelector('.card-media img:not(.blur-fill)');
       showPhoto(!lite() && im ? im.currentSrc || im.src : '');
       showYear((card.querySelector('.card-meta')?.textContent.match(/\d{4}/) || [''])[0], dir);
-      // 덱 높이에 맞춰 연도 글자를 덱 뒤에 둔다
+      // 덱 높이에 맞춰 연도 글자를 덱 뒤에 둔다 — 같은 덱 안에서 카드만 바뀌면 덱 자리는 그대로라 다시 재지 않는다
+      const moved = card.closest('.deck-stage') !== current?.closest('.deck-stage');
       current = card;
-      placeY();
+      if (moved) placeY();
     },
     clear() {
       current = null;

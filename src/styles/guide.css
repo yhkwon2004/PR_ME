@@ -119,6 +119,12 @@ body.index-open .next-cue {
 .guide-toast[hidden] {
   display: none;
 }
+/* 덱이 있는 장면(데스크톱): 덱 아래 막대(장 수 · 분야 이름)와 같은 줄이라 그 위로 올린다 */
+@media (min-width: 821px) and (min-height: 501px) and (orientation: landscape), (min-width: 1101px) and (min-height: 501px) {
+  body.has-deck .guide-toast {
+    bottom: calc(var(--bottom) + 64px);
+  }
+}
 .gt-text {
   word-break: keep-all;
 }

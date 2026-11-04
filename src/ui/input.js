@@ -35,18 +35,22 @@ const html = document.documentElement;
 export function createInput({ next, prev, first, last, isBlocked, onKey, onPull, pullLabel }) {
   let acc = 0;
   let lockUntil = 0;
+  let sceneUntil = 0; // 카드를 넘긴 뒤 이때까지는 카드만(덱 끝에서 연달아 누른 키 · 휠이 다음 장면으로 새지 않게)
   let idleTimer = 0;
   let stepped = false;
 
   // how: 'swipe'(손가락으로 위아래 — 카드는 건너뛰고 장면) · 'drag'(마우스로 끌기) · 없으면 휠 · 키
-  const fire = (dir, lockMs = 1100, how) => {
+  // stepMs: 덱 카드 한 장을 넘긴 뒤의 잠금 — 키는 누를 때마다 한 장(빠르게 여러 번 누르면 그만큼, 누르고 있으면 0.17초마다)
+  // held: 키를 누르고 있는 자동 반복 — 카드는 넘기되 장면은 넘기지 않는다
+  const fire = (dir, lockMs = 1100, how, stepMs = 560, held = false) => {
     const now = performance.now();
     if (now < lockUntil) return;
-    const moved = dir > 0 ? next(how) : prev(how);
+    const moved = dir > 0 ? next(how, held || now < sceneUntil) : prev(how, held || now < sceneUntil);
     if (moved === false) return;
-    // 릴 카드 한 장은 장면 전환보다 짧게 잠근다
-    stepped = moved === 'step';
-    lockUntil = now + (stepped ? Math.min(lockMs, 560) : lockMs);
+    // 릴 카드 한 장 · 소개 화면 하나는 장면 전환보다 짧게 잠근다(덱 카드는 stepMs만큼 — 덱이 그 사이를 이어서 지나간다)
+    stepped = moved === 'step' || moved === 'card';
+    lockUntil = now + (stepped ? Math.min(lockMs, moved === 'card' ? stepMs : 560) : lockMs);
+    if (stepped) sceneUntil = now + Math.min(lockMs, 560);
   };
 
   addEventListener(
@@ -233,10 +237,10 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
     const k = e.key;
     if (['ArrowDown', 'ArrowRight', 'PageDown'].includes(k) || (k === ' ' && !e.target.closest('button, a'))) {
       e.preventDefault();
-      fire(1, 600);
+      fire(1, 600, undefined, e.repeat ? 170 : 0, e.repeat);
     } else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(k)) {
       e.preventDefault();
-      fire(-1, 600);
+      fire(-1, 600, undefined, e.repeat ? 170 : 0, e.repeat);
     } else if (k === 'Home') {
       e.preventDefault();
       first();

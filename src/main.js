@@ -347,9 +347,13 @@ function goScene(id, beat) {
 // 스크롤 · 화살표 · 마우스로 끌기: 프로젝트 릴이 있으면 카드를 한 장씩 넘긴 뒤 다음 장면으로.
 // 휴대폰에서 위아래로 밀면(swipe) 카드는 건너뛰고 바로 다음 · 이전 장면 — 카드는 옆으로 넘긴다
 let pendingNav = null;
-function stepOrGo(dir, how) {
+// cardOnly: 카드를 막 넘긴 직후 — 카드(화면)만 넘기고 장면은 넘기지 않는다
+function stepOrGo(dir, how, cardOnly = false) {
   if (!started) return false;
-  if (!(how === 'swipe' && panels.current?.reel) && panels.step(dir)) return 'step'; // 시계는 onReelFocus가 맞춘다
+  // 덱 카드를 넘겼으면 'card', 소개 화면 · 크레딧을 넘겼으면 'step' — 시계는 onReelFocus가 맞춘다
+  const st = !(how === 'swipe' && panels.current?.reel) && panels.step(dir);
+  if (st) return st.focus != null ? 'card' : 'step';
+  if (cardOnly) return false;
   const j = director.index + dir;
   if (j < 0 || j >= scenes.length || director.index < 0) return false;
   if (!how) return goTo(j);
@@ -380,13 +384,13 @@ createInput({
     return j >= 0 && j < scenes.length ? `${dir > 0 ? '다음' : '이전'} 장면 · ${scenes[j].ko}` : null;
   },
   onPull: (st) => guide.pull(st),
-  next: (how) => {
-    const r = stepOrGo(1, how);
+  next: (how, cardOnly) => {
+    const r = stepOrGo(1, how, cardOnly);
     if (r) takeOver();
     return r;
   },
-  prev: (how) => {
-    const r = stepOrGo(-1, how);
+  prev: (how, cardOnly) => {
+    const r = stepOrGo(-1, how, cardOnly);
     if (r) takeOver();
     return r;
   },
@@ -560,7 +564,16 @@ async function boot() {
   fillBoot();
 
   const tasks = [
-    () => Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]),
+    () => {
+      // 필름 전체(장면 글 · 덱 설명)에 쓰이는 한글 글꼴 조각을 부팅 화면 동안 미리 받아 둔다(기다리지는 않는다) —
+      // 장면에 처음 들어설 때 조각이 늦게 와 글꼴이 바뀌며 화면 전체를 다시 배치하는(카드가 날아드는 도중 멈칫) 일이 없게
+      const root = $('stage');
+      if (root && document.fonts?.load) {
+        const text = root.textContent + [...root.querySelectorAll('template')].map((t) => t.content.textContent).join('');
+        document.fonts.load('16px "Pretendard Variable"', text).catch(() => {}); // 가변 글꼴이라 굵기마다 따로 받지 않는다
+      }
+      return Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2500))]);
+    },
     () => {
       // 상세 페이지로 바로 들어왔다면 페이지가 먼저 — 예열은 필름을 열 때
       if (stage && !pageCovered) {

@@ -193,6 +193,14 @@ body[data-scene='record'] .amb-type {
   opacity: 0.07;
   transform: scale(1.04);
 }
+/* 사라진 쪽 사진은 사라지는 움직임(1.6초)이 끝나면 그리지도 않는다(크게 흐린 층을 계속 합성하지 않게) */
+.amb-photo:not(.is-on) {
+  visibility: hidden;
+  transition:
+    opacity 1.6s var(--ease),
+    transform 9s cubic-bezier(0.2, 0.6, 0.2, 1),
+    visibility 0s linear 1.6s;
+}
 /* 카드 색 번짐: 덱 뒤에서 위로 퍼지는 빛 */
 .amb-wash {
   position: absolute;
@@ -245,6 +253,11 @@ body[data-scene='record'] .amb-type {
   .amb-photo,
   .amb-year {
     transition: opacity 0.4s;
+  }
+  .amb-photo:not(.is-on) {
+    transition:
+      opacity 0.4s,
+      visibility 0s linear 0.4s;
   }
   .amb-row {
     animation: none;
@@ -878,6 +891,10 @@ body.is-started .hud-bottom {
   color: var(--muted);
   pointer-events: none;
   font-variant-numeric: tabular-nums;
+}
+/* 타임코드는 매 프레임 글자만 바뀐다 — 다시 배치 · 칠하는 범위를 이 칸 안에 가둔다(고정폭 글꼴이라 폭은 그대로) */
+#hud-tc {
+  contain: content;
 }
 .rec {
   color: var(--fg);
