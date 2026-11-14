@@ -84,12 +84,12 @@
     gap: 6px;
     padding-left: 4px;
   }
-  /* 덱 넘김 화살표를 휴대폰에서도 — 스와이프를 몰라도 누를 수 있게 */
+  /* 덱 넘김 화살표를 휴대폰에서도 — 스와이프를 몰라도 누를 수 있게(엄지로 누르기 쉬운 40px) */
   .deck-nav .deck-btn {
     display: grid;
-    width: 32px;
-    height: 32px;
-    font-size: 13px;
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
   }
   .deck-nav {
     gap: 8px;

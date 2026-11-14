@@ -1226,6 +1226,12 @@ body.is-started[data-scene='intro'] .hint {
   border: 1px solid rgba(94, 242, 255, 0.5);
   color: var(--fg);
 }
+/* 휴대폰: 장면 줄은 큰 제목과 같은 영문을 접고 한글 이름만(두 줄로 꺾이지 않게) */
+@media (max-width: 820px) {
+  .kicker .k-en {
+    display: none;
+  }
+}
 /* 장(발표 순서): 장면 번호 옆의 밝은 칩 — 지금 발표의 어디쯤인지 */
 .kicker-ch {
   flex: none;

@@ -19,7 +19,10 @@ const lines = (arr, cls = '') => arr.map((l) => `<span class="line ${cls}"><span
 // 장면 표시: 장면 번호 · 장(01 소개 · 02 프로젝트 · 03 성과) · 장면 이름
 function kicker(scene, i) {
   const ch = scene.chapter ? `<span class="kicker-ch">CH ${esc(scene.chapter[0])}<span class="kicker-chn"> · ${esc(scene.chapter[1])}</span></span>` : '';
-  return `<p class="kicker" data-r><span class="kicker-no">SC ${pad(i)}</span>${ch}<span class="kicker-txt">${esc(scene.kicker)}</span></p>`;
+  // 'ROBOTICS & AI — 로봇 · AI': 휴대폰에서는 큰 제목과 같은 영문을 접고 한글 이름만(한 줄에 들어가게)
+  const [en, ko] = scene.kicker.split(' — ');
+  const txt = ko && /[가-힣]/.test(ko) ? `<span class="k-en">${esc(en)}<span class="k-sep"> — </span></span><span class="k-ko">${esc(ko)}</span>` : esc(scene.kicker);
+  return `<p class="kicker" data-r><span class="kicker-no">SC ${pad(i)}</span>${ch}<span class="kicker-txt">${txt}</span></p>`;
 }
 // 발표 순서(장마다 첫 장면) — 표지 아래, 누르면 그 장의 첫 장면으로
 const agendaOf = () => {
@@ -46,9 +49,9 @@ function deck(cards, { count, label, noun, all, allLabel, stats = '', infos = []
         <div class="deck-bar">
           <span class="deck-label"><b>${pad(count)}</b> ${esc(label)}${stats ? `<span class="reel-stats">${stats}</span>` : ''}</span>
           <span class="deck-nav"${n < 2 ? ' hidden' : ''}>
-            <button type="button" class="deck-btn" data-reel="-1" aria-label="이전 ${noun}">←</button>
+            <button type="button" class="deck-btn" data-reel="-1" aria-label="이전 ${noun}" data-label="이전 ${noun}">←</button>
             <span class="deck-count" aria-hidden="true"><b class="deck-now">01</b><span class="deck-ticks">${'<i></i>'.repeat(count)}${end ? '<i class="is-all"></i>' : ''}</span><span class="deck-total">${pad(count)}</span></span>
-            <button type="button" class="deck-btn" data-reel="1" aria-label="다음 ${noun}">→</button>
+            <button type="button" class="deck-btn" data-reel="1" aria-label="다음 ${noun}" data-label="다음 ${noun}">→</button>
           </span>
           ${all ? `<a class="reel-all" href="${esc(all)}" data-link>${allLabel} <span aria-hidden="true">↗</span></a>` : ''}
         </div>`;
@@ -425,7 +428,8 @@ const INTRO = 1.25; // 등장 한 장의 길이(초)
 // 덱 전체가 하나의 위치(pos, 소수)로 움직인다 — 넘김 · 끌기 · 자동 재생 · 등장 · 끌기 안내가 모두 같은 길로 그려져
 // 여러 장을 건너뛰어도 자리 사이를 이어서 지나가고, 손을 놓은 속도 그대로 이어서 붙는다.
 // 그리기는 한 프레임에 한 번, 바뀐 값만 쓴다(움직임이 멈추면 쉰다)
-function deckReel(el, reducedMotion) {
+// edge: 덱 끝에서 한 번 더 밀면 이어지는 장면 — { has(dir): 그쪽 장면이 있는지, cue(st|null): 끄는 동안의 표시, go(dir): 넘기기 }
+function deckReel(el, reducedMotion, edge) {
   const stage = el.querySelector('.deck-stage');
   const cards = [...stage.querySelectorAll('.r-card')];
   if (!cards.length) return null;
@@ -593,6 +597,35 @@ function deckReel(el, reducedMotion) {
   };
   // 지금 보이는 위치를 끌기의 기준으로(끝에서 고무줄로 끌려 나가 있던 덱을 잡아도 튀지 않게)
   const grab = () => (pos < 0 ? unrubber(pos) : pos > n - 1 ? n - 1 + unrubber(pos - (n - 1)) : pos);
+  // 덱 끝에서 더 밀기: 마지막 카드에서 시작해 왼쪽으로(다음) · 첫 카드에서 시작해 오른쪽으로(이전) 끝을 지나 민 손가락 거리(px).
+  // EDGE만큼 밀고 놓으면(또는 짧아도 빠르게 튕기면) 그쪽 장면으로 — 끄는 동안 '다음 장면 · 이름' 표시가 차오른다
+  const EDGE = 70;
+  const edgeOf = (f0, dx, k0) => {
+    const raw = f0 - dx / span();
+    if (k0 === n - 1 && raw > n - 1 && edge?.has(1)) return { dir: 1, px: (raw - (n - 1)) * span() };
+    if (k0 === 0 && raw < 0 && edge?.has(-1)) return { dir: -1, px: -raw * span() };
+    return null;
+  };
+  let edgeOn = false;
+  const showEdge = (e) => {
+    if (!e || e.px < 12) {
+      if (edgeOn) edge?.cue(null);
+      edgeOn = false;
+      return;
+    }
+    edgeOn = true;
+    edge?.cue({ dir: e.dir, p: Math.min(1, (e.px - 12) / (EDGE - 12)), armed: e.px >= EDGE });
+  };
+  // 놓을 때: 끝을 지나 충분히 밀었거나(EDGE) · 30px 넘게 그쪽으로 빠르게(0.45px/ms) 튕겼으면 장면을 넘기고 true
+  const edgeRelease = (e, vPx) => {
+    showEdge(null);
+    if (!e || !(e.px >= EDGE || (e.px >= 30 && -Math.sign(vPx) === e.dir && Math.abs(vPx) >= 0.45))) return false;
+    held = false;
+    stage.classList.remove('is-dragging');
+    wake(); // 덱은 끝 카드로 돌아가고, 장면이 넘어간다
+    edge.go(e.dir);
+    return true;
+  };
   // 끄는 동안: 가운데에 가장 가까운 카드가 바로 초점이 된다(번호 · 설명 · 분위기 · 소리가 손가락을 따라) — 반을 조금 넘어가면 바뀐다
   const follow = (tick) => {
     const k = Math.max(0, Math.min(n - 1, Math.round(pos)));
@@ -750,6 +783,7 @@ function deckReel(el, reducedMotion) {
       }
       pos = dragPos(t.clientX - tx.x, tx.f0);
       follow(true);
+      showEdge(edgeOf(tx.f0, t.clientX - tx.x, tx.k0));
       wake();
     },
     { passive: true }
@@ -761,7 +795,7 @@ function deckReel(el, reducedMotion) {
       const t = e.changedTouches[0];
       const dx = t.clientX - tx.x;
       const dy = t.clientY - tx.y;
-      const { axis, k0, sx, t0, yielded } = tx;
+      const { axis, k0, sx, t0, yielded, f0 } = tx;
       const v = tv.get(performance.now());
       tx = null;
       // 장면 넘김이 이 손가락을 가져갈 때만 덱은 넘기지 않는다(동작 줄이기에서도) — 위아래로 끄는 표시가 켜져 있거나,
@@ -769,22 +803,30 @@ function deckReel(el, reducedMotion) {
       const dxs = Math.abs(t.clientX - sx);
       const ms = performance.now() - t0;
       const vertical = Math.abs(dy) >= dxs && ((ms <= 700 && Math.abs(dy) >= 46) || (ms <= 250 && Math.abs(dy) >= 22));
-      if (axis === 'x' && (yielded || document.documentElement.classList.contains('is-pulling') || vertical)) return yieldDrag(k0);
+      if (axis === 'x' && (yielded || document.documentElement.classList.contains('is-pulling') || vertical)) {
+        showEdge(null);
+        return yieldDrag(k0);
+      }
       if (axis !== 'x' && !(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy))) {
         if (held) release(0, focus, 0);
         return;
       }
       if (reducedMotion) {
         held = false;
-        set(focus - Math.sign(dx));
+        const k = focus - Math.sign(dx);
+        // 끝 카드에서 그쪽으로 한 번 더 밀면 장면을 넘긴다
+        if ((k < 0 || k >= n) && edge?.has(k < 0 ? -1 : 1)) edge.go(k < 0 ? -1 : 1);
+        else set(k);
         return;
       }
+      if (edgeRelease(edgeOf(f0, dx, k0), v)) return;
       release(dx, k0, v);
     },
     { passive: true }
   );
   stage.addEventListener('touchcancel', () => {
     tx = null;
+    showEdge(null);
     if (held) release(0, focus, 0);
   });
   // 카드에 키보드 초점이 있을 때도 화면 전체의 방향키와 같은 규칙(input.js): 누를 때마다 한 장 · 누르고 있으면 0.17초마다,
@@ -845,26 +887,32 @@ function deckReel(el, reducedMotion) {
     if (!reducedMotion) {
       pos = dragPos(e.clientX - md.x, md.f0);
       follow(false);
+      showEdge(edgeOf(md.f0, e.clientX - md.x, md.k0));
       wake();
     }
   });
   addEventListener('pointercancel', () => {
     if (!md) return;
     md = null;
+    showEdge(null);
     if (held) release(0, focus, 0);
   });
   addEventListener('pointerup', (e) => {
     if (!md) return;
-    const { x, on, k0 } = md;
+    const { x, on, k0, f0 } = md;
     md = null;
     if (!on) return;
     const dx = e.clientX - x;
-    if (Math.abs(dx) < 30 && focus === k0) return release(0, focus, 0);
+    const v = mv.get(performance.now());
+    const e2 = reducedMotion ? null : edgeOf(f0, dx, k0);
+    if (Math.abs(dx) < 30 && focus === k0 && !e2) return release(0, focus, 0);
     dragged = true;
     if (reducedMotion) {
       held = false;
-      set(focus - Math.sign(dx));
-    } else release(dx, k0, mv.get(performance.now()));
+      const k = focus - Math.sign(dx);
+      if ((k < 0 || k >= n) && edge?.has(k < 0 ? -1 : 1)) edge.go(k < 0 ? -1 : 1);
+      else set(k);
+    } else if (!edgeRelease(e2, v)) release(dx, k0, v);
     setTimeout(() => (dragged = false), 0);
   });
   addEventListener('resize', layout);
@@ -922,8 +970,8 @@ function deckReel(el, reducedMotion) {
   };
 }
 
-function bindReel(el, reducedMotion, onReelFocus, onCard) {
-  const reel = el.querySelector('.deck') ? deckReel(el, reducedMotion) : null;
+function bindReel(el, reducedMotion, onReelFocus, onCard, edge) {
+  const reel = el.querySelector('.deck') ? deckReel(el, reducedMotion, edge) : null;
   el.reel = reel;
   if (!reel) return;
   const nav = el.querySelector('.deck-nav');
@@ -985,7 +1033,13 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
         c.animate([{ opacity: 0, transform: `translateY(${dir > 0 ? 16 : -16}px)` }, { opacity: 1, transform: 'none' }], { duration: 500, delay: 160 + k * 50, easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)', fill: 'backwards' })
       );
   };
-  el.querySelectorAll('[data-reel]').forEach((b) => b.addEventListener('click', () => reel.step(+b.dataset.reel)));
+  // 덱 끝의 넘김 버튼은 그쪽 장면으로(마지막 카드의 → 는 다음 장면, 첫 카드의 ← 는 이전 장면)
+  el.querySelectorAll('[data-reel]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const d = +b.dataset.reel;
+      if (!reel.step(d) && edge?.has(d)) edge.go(d);
+    })
+  );
   // 번호 · 눈금 · 버튼 상태를 초점에 맞춘다
   const sync = (dir = 0) => {
     const f = reel.focus;
@@ -1002,8 +1056,15 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
       const next = nav.querySelector('[data-reel="1"]');
       // 누르던 버튼이 끝에서 꺼지면 초점을 반대쪽 버튼으로 넘겨 잃지 않게
       const active = document.activeElement;
-      prev.disabled = f <= 0;
-      next.disabled = f >= reel.count - 1;
+      // 끝 카드에서는 이어지는 장면이 있으면 버튼이 그 장면으로 — 없을 때만 끈다
+      const pe = f <= 0;
+      const ne = f >= reel.count - 1;
+      prev.disabled = pe && !edge?.has(-1);
+      next.disabled = ne && !edge?.has(1);
+      prev.classList.toggle('is-scene', pe && !prev.disabled);
+      next.classList.toggle('is-scene', ne && !next.disabled);
+      prev.setAttribute('aria-label', pe && !prev.disabled ? edge.label(-1) : prev.dataset.label);
+      next.setAttribute('aria-label', ne && !next.disabled ? edge.label(1) : next.dataset.label);
       if (active === prev && prev.disabled) next.focus({ preventScroll: true });
       if (active === next && next.disabled) prev.focus({ preventScroll: true });
     }
@@ -1020,7 +1081,8 @@ function bindReel(el, reducedMotion, onReelFocus, onCard) {
   showInfo(0);
 }
 
-export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus, onCard, onBeat }) {
+// onEdge: 덱 끝에서 이어지는 장면 — { label(i, dir): '다음 장면 · 이름'(없으면 ''), cue(st|null), go(dir) }
+export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocus, onCard, onBeat, onEdge }) {
   const panels = scenes.map((scene, i) => {
     const el = document.createElement('section');
     el.className = `panel layout-${scene.layout}`;
@@ -1031,11 +1093,19 @@ export function createPanels(root, scenes, { onReplay, reducedMotion, onReelFocu
     el.inert = true;
     root.appendChild(el);
     // 지금 장면의 릴에서 손으로 옮긴 초점만 자동 재생 시계에 알린다
+    // 덱 끝에서 이어지는 장면(지금 장면의 덱에서만)
+    const edge = onEdge && {
+      label: (dir) => onEdge.label(i, dir),
+      has: (dir) => !!onEdge.label(i, dir),
+      cue: (st) => el === panels[current] && onEdge.cue(st && { ...st, label: onEdge.label(i, st.dir) }),
+      go: (dir) => el === panels[current] && onEdge.go(dir),
+    };
     bindReel(
       el,
       reducedMotion,
       (from, r) => from === panels[current] && onReelFocus?.(r),
-      (from, card, dir, focus) => from === panels[current] && onCard?.(card, dir, focus)
+      (from, card, dir, focus) => from === panels[current] && onCard?.(card, dir, focus),
+      edge
     );
     // 소개 · 이력: 한 장면 안의 화면(비트) — 손으로 옮긴 화면만 자동 재생 시계에 알린다
     el.beats = el.querySelector('.beats') ? bindBeats(el, reducedMotion, (d) => el === panels[current] && onBeat?.(d)) : null;
