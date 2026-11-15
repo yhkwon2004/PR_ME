@@ -3105,6 +3105,15 @@ body.is-started.has-pointer .cursor {
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
+.lightbox figcaption .lb-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.lightbox.is-zoom figcaption .lb-hint {
+  visibility: hidden;
+}
 .lightbox figcaption span {
   font-family: var(--mono);
   font-size: 11px;
@@ -3420,6 +3429,28 @@ body.is-started.has-pointer .cursor {
   .lb-media video {
     max-width: calc(calc(100 * var(--vw)) - 20px);
     max-height: calc(68 * var(--vh));
+  }
+  /* 그림을 누르면 크게 — 이 칸 안에서만 손가락으로 밀어 읽는다(몸 전체는 touch-action: none) */
+  .lb-media img {
+    cursor: zoom-in;
+  }
+  .lightbox.is-zoom .lb-figure {
+    padding-inline: 0;
+  }
+  .lightbox.is-zoom .lb-media {
+    max-width: calc(100 * var(--vw));
+    max-height: calc(74 * var(--vh));
+    overflow: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+    scrollbar-width: none;
+  }
+  .lightbox.is-zoom .lb-media img {
+    max-width: none;
+    max-height: none;
+    width: calc(240 * var(--vw));
+    height: auto;
+    cursor: zoom-out;
   }
 }
 @media (prefers-reduced-motion: reduce) {

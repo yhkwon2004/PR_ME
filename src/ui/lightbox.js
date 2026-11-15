@@ -11,10 +11,12 @@ export function createLightbox() {
   let i = 0;
   let opener = null;
   let open = false;
+  const PHONE = '(max-width: 820px), (orientation: portrait) and (max-width: 1100px)';
 
   function render() {
     const m = list[i];
     media.innerHTML = '';
+    box.classList.remove('is-zoom');
     if (m.type === 'video') {
       const v = document.createElement('video');
       v.src = m.src;
@@ -35,6 +37,12 @@ export function createLightbox() {
     const no = document.createElement('span');
     no.textContent = `${String(i + 1).padStart(2, '0')} / ${String(list.length).padStart(2, '0')}`;
     cap.replaceChildren(no, document.createTextNode(m.caption));
+    if (m.type !== 'video' && matchMedia(PHONE).matches) {
+      const hint = document.createElement('small');
+      hint.className = 'lb-hint';
+      hint.textContent = '그림을 누르면 크게 보입니다';
+      cap.append(hint);
+    }
     btnPrev.hidden = btnNext.hidden = list.length < 2;
     gsap.fromTo(media, { autoAlpha: 0, scale: 0.97 }, { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'power3.out' });
   }
@@ -56,6 +64,7 @@ export function createLightbox() {
     if (!open) return;
     open = false;
     document.body.classList.remove('lightbox-open');
+    box.classList.remove('is-zoom');
     gsap.to(box, {
       autoAlpha: 0,
       duration: 0.25,
@@ -76,6 +85,20 @@ export function createLightbox() {
   box.addEventListener('click', (e) => {
     if (e.target === box) close();
   });
+  // 휴대폰: 그림을 누르면 크게(2.4배) — 발표 자료 · 도면 글자를 손가락으로 밀며 읽는다. 다시 누르면 원래대로.
+  // 누른 자리가 손가락 아래에 그대로 남도록 스크롤을 맞춘다
+  media.addEventListener('click', (e) => {
+    const im = e.target;
+    if (im.tagName !== 'IMG' || !matchMedia(PHONE).matches) return;
+    const r = im.getBoundingClientRect();
+    const fx = (e.clientX - r.left) / r.width;
+    const fy = (e.clientY - r.top) / r.height;
+    const on = box.classList.toggle('is-zoom');
+    if (!on) return;
+    const mr = media.getBoundingClientRect();
+    media.scrollLeft = fx * im.offsetWidth - (e.clientX - mr.left);
+    media.scrollTop = fy * im.offsetHeight - (e.clientY - mr.top);
+  });
   // 터치: 좌우로 밀어서 이전/다음
   let sx = 0;
   let sy = 0;
@@ -90,6 +113,7 @@ export function createLightbox() {
   box.addEventListener(
     'touchend',
     (e) => {
+      if (box.classList.contains('is-zoom')) return; // 크게 본 동안의 밀기는 넘기기가 아니라 읽기
       const dx = e.changedTouches[0].clientX - sx;
       const dy = e.changedTouches[0].clientY - sy;
       if (list.length > 1 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) step(dx < 0 ? 1 : -1);

@@ -619,6 +619,11 @@ body.deck-cue .panel:not([hidden]) .deck-count {
   transform: none;
   pointer-events: auto;
 }
+/* 크게 보기(라이트박스)가 열려 있으면 비켜 준다(같은 층이라 위에 그려져 뒤 페이지를 올려 버렸다) */
+body.lightbox-open .to-top {
+  opacity: 0;
+  pointer-events: none;
+}
 .to-top:hover,
 .to-top:focus-visible {
   border-color: var(--cyan);

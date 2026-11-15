@@ -376,9 +376,10 @@ body.page-open .title-card {
   padding: 0 var(--pad);
   background: linear-gradient(180deg, rgba(5, 7, 12, 0.92), rgba(5, 7, 12, 0));
 }
-/* 아카이브 · 수상 페이지는 카드와 상장이 막대 밑으로 지나가므로 반투명 막 + 흐림 */
+/* 아카이브 · 수상 · 이력서 페이지는 카드와 글이 막대 밑으로 지나가므로 반투명 막 + 흐림(글이 '메인' · 닫기 뒤로 비치지 않게) */
 .pg-works .pg-bar,
-.pg-awards .pg-bar {
+.pg-awards .pg-bar,
+.pg-about .pg-bar {
   background: rgba(5, 7, 12, 0.8);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
@@ -387,6 +388,28 @@ body.page-open .title-card {
   position: fixed;
   left: 0;
   right: 0;
+  border-bottom: 1px solid transparent;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
+}
+/* 상세: 사진 위(맨 위)에서는 그라데이션, 내려 읽기 시작하면 다른 페이지처럼 막 — 본문이 '← 프로젝트 목록' · 닫기와 겹치지 않게 */
+#page.is-scrolled .pg-detail .pg-bar {
+  background: rgba(5, 7, 12, 0.84);
+  backdrop-filter: blur(12px);
+  border-bottom-color: var(--line);
+}
+#page.is-scrolled .pg-detail .d-scroll {
+  opacity: 0;
+}
+/* 휴대폰은 흐림이 꺼지므로 막을 더 짙게(스킬 페이지와 같게) */
+@media (max-width: 820px), (pointer: coarse) {
+  .pg-works .pg-bar,
+  .pg-awards .pg-bar,
+  .pg-about .pg-bar,
+  #page.is-scrolled .pg-detail .pg-bar {
+    background: rgba(5, 7, 12, 0.97);
+  }
 }
 .pg-back {
   font-family: var(--mono);
@@ -1138,6 +1161,12 @@ body.page-open .title-card {
   align-items: center;
   text-align: center;
 }
+/* 휴대폰: 맨 위로 버튼(아래 18px + 42px)이 바닥 글(Blog 링크)을 덮지 않게 */
+@media (max-width: 820px) {
+  .pg-foot {
+    padding-bottom: 84px;
+  }
+}
 .pg-foot ul {
   justify-content: center;
 }
@@ -1749,3 +1778,316 @@ body.page-open .title-card {
   }
 }
 
+
+/* ── 상세 다듬기(2차 페이지 리뷰) ─────────────────────────────── */
+/* 글 줄바꿈: 마지막 줄에 한 낱말만 남지 않게(지원하지 않는 브라우저는 그대로) */
+.d-title,
+.d-metrics dt,
+.pg-detail .st-text h3,
+.pg-detail .aw-contest {
+  text-wrap: balance;
+}
+.pg-detail .d-summary,
+.pg-detail .st-text p,
+.pg-detail .vid figcaption,
+.d-facts dd {
+  text-wrap: pretty;
+}
+.pg-detail .d-summary {
+  max-width: 34em;
+  margin-inline: auto;
+}
+/* 긴 팀 · 도구 줄도 칸 밖으로 넘치지 않게 */
+.d-facts dd {
+  overflow-wrap: anywhere;
+}
+
+/* 히어로: 사진 위 영어 제목 · 분야 칩이 밝은 곳에서도 읽히게 */
+.pg-detail .d-en {
+  color: rgba(238, 242, 247, 0.74);
+}
+.pg-detail .d-hero:not(.is-type) .d-cat span:first-child {
+  background: rgba(5, 7, 12, 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+/* 넓은 화면: 화면 · 도표 표지(contain)는 제목을 한 단계 줄여 그림 자리를 넓힌다 */
+@media (min-width: 821px) and (min-height: 501px) {
+  .pg-detail .d-hero:has(img.is-contain) .d-title {
+    font-size: clamp(40px, 5vw, 84px);
+  }
+}
+/* 낮은 노트북: SCROLL 자리까지 그림에 */
+@media (min-width: 821px) and (min-height: 501px) and (max-height: 820px) {
+  .pg-detail .d-hero {
+    --hb: 5vh;
+  }
+  .pg-detail .d-scroll {
+    display: none;
+  }
+}
+/* 세로 표지(휴대폰 화면 · 세로 사진): 넓은 화면에서는 글 왼쪽 · 그림 오른쪽 */
+@media (min-width: 1024px) and (min-height: 501px) {
+  .pg-detail .d-hero:not(.is-land):has(img.is-contain)::after {
+    background:
+      linear-gradient(90deg, rgba(5, 7, 12, 0.7), transparent 55%),
+      linear-gradient(180deg, rgba(5, 7, 12, 0.55), transparent 22%);
+  }
+  .pg-detail .d-hero:not(.is-land) .d-hero-media img.is-contain {
+    padding: calc(var(--top) + 10px) 8vw max(6vh, 48px) 52%;
+  }
+  .pg-detail .d-hero:not(.is-land):has(img.is-contain) .d-hero-text {
+    top: calc(50% + 24px);
+    right: 54%;
+    bottom: auto;
+    left: max(var(--pad), 6vw);
+    margin: 0;
+    transform: translateY(-50%);
+    text-align: left;
+  }
+  .pg-detail .d-hero:not(.is-land):has(img.is-contain) .d-cat {
+    justify-content: flex-start;
+  }
+  .pg-detail .d-hero:not(.is-land):has(img.is-contain) .d-one {
+    margin-inline: 0;
+  }
+  .pg-detail .d-hero:not(.is-land):has(img.is-contain) .d-scroll {
+    display: none;
+  }
+}
+/* 글자 표지(사진 없는 프로젝트): 겉선 영어 제목은 바탕 무늬로 — 한글 제목과 다투지 않게 */
+.type-cover.is-hero b {
+  font-size: clamp(36px, 5.2vw, 96px);
+  opacity: 0.6;
+}
+.d-hero.is-type {
+  height: 66svh;
+}
+
+/* 정보 표: '이름 | 값' 한 줄씩, 760px 표를 가운데에 */
+.pg-detail .d-facts {
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  border-top: 1px solid var(--line-2);
+  text-align: left;
+}
+.pg-detail .d-facts > div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 16px;
+  padding: 13px 2px;
+  border-top: 0;
+  border-bottom: 1px solid var(--line);
+}
+.pg-detail .d-facts dt {
+  padding-top: 4px;
+}
+@media (max-width: 599px) {
+  .pg-detail .d-facts > div {
+    grid-template-columns: 66px minmax(0, 1fr);
+    gap: 12px;
+  }
+}
+
+/* 스토리 — 세로 사진: 넓은 화면에서는 사진 옆에 글(가운데 한 장에 빈 자리가 크지 않게) */
+@media (min-width: 1024px) {
+  .pg-detail .st-row.is-tall,
+  .pg-detail .st-row.is-tall:nth-child(even) {
+    grid-template-columns: auto minmax(0, 420px);
+    justify-content: center;
+    align-items: center;
+    column-gap: clamp(40px, 5vw, 80px);
+    text-align: left;
+  }
+  .pg-detail .st-row.is-tall:nth-child(even) {
+    grid-template-columns: minmax(0, 420px) auto;
+  }
+  .pg-detail .st-row.is-tall:nth-child(even) .st-media {
+    order: 2;
+  }
+  .pg-detail .st-row.is-tall .st-media img {
+    max-height: min(72vh, 720px);
+  }
+  .pg-detail .st-row.is-tall .st-text,
+  .pg-detail .st-row.is-tall .st-text p {
+    margin-inline: 0;
+  }
+  .pg-detail .st-row.is-tall .st-cap {
+    text-align: left;
+  }
+}
+/* 스토리 — 사진이 하나도 없으면 단계를 두 줄 카드로 묶는다 */
+.pg-detail .d-story:not(:has(.st-media)) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  max-width: calc(1120px + 2 * var(--pad));
+  margin: 0 auto;
+  padding: 2vh var(--pad) 8vh;
+}
+.pg-detail .d-story:not(:has(.st-media)) .st-row {
+  display: block;
+  padding: 34px 30px 36px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.pg-detail .d-story:not(:has(.st-media)) .st-text {
+  max-width: none;
+}
+.pg-detail .d-story:not(:has(.st-media)) .st-text h3 {
+  margin-top: 12px;
+  font-size: clamp(22px, 1.9vw, 30px);
+}
+.pg-detail .d-story:not(:has(.st-media)) .st-text p {
+  max-width: 40ch;
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.75;
+}
+@media (max-width: 820px) {
+  .pg-detail .d-story:not(:has(.st-media)) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .pg-detail .d-story:not(:has(.st-media)) .st-row {
+    padding: 26px 22px 28px;
+  }
+}
+
+/* 영상: 세로(Shorts) 영상은 세로 틀로, 같은 영상의 다른 주소는 링크 한 줄로 */
+.vid.is-short .yt,
+.vid.is-short .yt-frame {
+  aspect-ratio: 9 / 16;
+  width: auto;
+  max-width: 100%;
+  height: min(76vh, 720px);
+  margin-inline: auto;
+}
+.vid-alt {
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--pad);
+}
+.vid-alt a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  font-size: 13.5px;
+  transition:
+    border-color 0.3s,
+    background 0.3s;
+}
+.vid-alt a:hover {
+  border-color: var(--cc, var(--cyan));
+  background: rgba(255, 255, 255, 0.04);
+}
+.vid-alt span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.vid-alt i {
+  font-style: normal;
+  color: var(--cc, var(--cyan));
+}
+
+/* 갤러리: 16:9 두 장이 한 줄에(2 × 541 + 12 ≤ 1120) */
+.pg-detail .gal {
+  --row: 304px;
+}
+
+/* 보도: 카드 묶음을 가운데로, 네 장이면 2 × 2 */
+.d-press ul {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 340px));
+  justify-content: center;
+}
+@media (min-width: 900px) {
+  .d-press ul:has(> li:nth-child(4):last-child) {
+    grid-template-columns: repeat(2, minmax(300px, 400px));
+  }
+}
+.dp-t small {
+  letter-spacing: 0.02em;
+}
+
+/* 한글이 섞인 단추 · 안내는 본문 글꼴로(고정폭 · 넓은 자간이면 글자가 낱낱이 흩어져 보인다) */
+.pg-back,
+.d-share,
+.d-prev-link,
+.d-next-k {
+  font-family: var(--sans);
+  letter-spacing: 0.01em;
+}
+.pg-back {
+  font-size: 12.5px;
+}
+.d-share {
+  font-size: 13px;
+}
+.d-next-k {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.d-prev-link {
+  display: inline-block;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+@media (pointer: coarse) {
+  .pg-back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* 휴대폰 갤러리 */
+@media (max-width: 820px) {
+  /* 사진 하나뿐이면 반쪽이 아니라 열 폭으로 — 세로 사진은 화면 높이 60%까지 */
+  .pg-detail .gal[data-n='1'] .gal-item {
+    width: min(100%, calc(var(--ar) * 60svh));
+  }
+  /* 사진 없는 갤러리(발표 자료 · 도면 · 화면): 4:5 칸 대신 그림 비율 그대로 — 위아래 빈 띠 없이 */
+  .pg-detail .gal:not(:has(img[data-kind='photo'])) {
+    align-items: center;
+  }
+  .pg-detail .gal:not(:has(img[data-kind='photo'])) .gal-item {
+    aspect-ratio: var(--ar);
+  }
+}
+/* 휴대폰: 긴 요약은 왼쪽 맞춤 · 한 단계 가볍게, 히어로와 요약 사이는 좁게 */
+@media (max-width: 599px) {
+  .pg-detail .d-summary {
+    font-size: 18px;
+    font-weight: 550;
+    line-height: 1.65;
+    text-align: left;
+  }
+  .d-hero.is-land .d-hero-text {
+    padding-bottom: 3vh;
+  }
+  .pg-detail .d-intro {
+    padding-top: 5vh;
+  }
+}
+
+/* 하이픈으로 이은 낱말(End-to-End 등)은 하이픈에서 줄을 바꾸지 않는다 */
+.nw {
+  white-space: nowrap;
+}
+/* 분야 필터 이름도 본문 글꼴로 — 바로 위 탭과 같은 결(숫자만 고정폭) */
+.chips button {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.chips button sup {
+  font-family: var(--mono);
+  font-weight: 400;
+}

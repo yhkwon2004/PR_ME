@@ -637,6 +637,9 @@ async function boot() {
   if (queued && !pageCovered) return start(true);
   bootEl.classList.add('is-ready');
   state.textContent = '소리와 함께 시작합니다';
+  // 주소가 한 장면(/about → 소개 등)을 가리키면 버튼이 어디로 가는지 이름을 댄다
+  const deep = sceneOfHash(location.hash);
+  if (deep > 0) $('enter-sound').querySelector('.btn-enter-text b').textContent = `${scenes[deep].ko} 보기`;
   // 버튼에 초점을 준다(그 사이 다른 곳을 눌렀다면 그대로 둔다)
   if (!document.activeElement || document.activeElement === document.body) $('enter-sound').focus({ preventScroll: true });
 }

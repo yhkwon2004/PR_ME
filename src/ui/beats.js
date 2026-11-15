@@ -58,7 +58,7 @@ function profileBeats(scene, i) {
             <section class="rs-feat b-a" aria-label="대표 프로젝트 ${feat.length}">
               <h3 class="rs-h">대표 프로젝트 <span>${feat.length}</span></h3>
               <ul>${feat
-                .map((p) => `<li><a href="${p.path}" data-link>${p.cover ? `<img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async" />` : ''}<b>${esc(p.title)}</b></a></li>`)
+                .map((p) => `<li><a href="${p.path}" data-link aria-label="${esc(p.title)}" title="${esc(p.title)}">${p.cover ? `<img src="${esc(p.cover.thumb)}" alt="" loading="lazy" decoding="async" />` : ''}<b>${esc(p.title)}</b></a></li>`)
                 .join('')}</ul>
             </section>
             <section class="rs-aw b-a" aria-label="수상 ${AWARDS.length}건">

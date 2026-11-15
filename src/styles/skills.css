@@ -969,7 +969,7 @@
 /* 휴대폰: 흐림 효과가 꺼지므로 위 막대를 더 짙게 */
 @media (max-width: 820px), (pointer: coarse) {
   .pg-skills .pg-bar {
-    background: rgba(5, 7, 12, 0.94);
+    background: rgba(5, 7, 12, 0.97);
   }
 }
 @media (pointer: coarse) {

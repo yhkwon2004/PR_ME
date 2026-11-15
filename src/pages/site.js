@@ -161,12 +161,15 @@ export function orgMark(o, { decorative = false } = {}) {
 }
 
 // 기관 × 프로젝트: 기관마다 로고 아래에 함께한 프로젝트와 받은 상 수를 붙인다
-function withWall() {
+// compact: 아카이브 · 스킬에서는 로고 · 이름 · 수상 수만(프로젝트 칩은 수상 페이지에) — 같은 벽이 페이지마다 길게 반복되지 않게
+function withWall({ compact = false } = {}) {
   const tile = (k) => {
     const o = ORGS[k];
     const { projects: list, awards } = ORG_INDEX[k];
     const seen = new Set();
-    const chips = list
+    const chips = compact
+      ? ''
+      : list
       .filter(({ id }) => byId(id) && !seen.has(id) && seen.add(id))
       .map(({ id, rel }) => {
         const p = byId(id);
@@ -180,10 +183,10 @@ function withWall() {
       ${chips ? `<ul class="ow-proj" aria-label="${esc(o.name)}와 함께한 프로젝트">${chips}</ul>` : ''}
     </li>`;
   };
-  return `<section class="with-wall reveal" aria-label="함께한 기관과 프로젝트">
-    <p class="pg-kicker">WITH — 학교 · 협업 기관 · 상을 준 곳 × 프로젝트</p>
+  return `<section class="with-wall reveal" aria-label="${compact ? '함께한 기관' : '함께한 기관과 프로젝트'}">
+    <p class="pg-kicker">WITH — 학교 · 협업 기관 · 상을 준 곳${compact ? '' : ' × 프로젝트'}</p>
     <h2 class="ww-title">함께한 기관<sup>${pad(WALL.length)}</sup></h2>
-    <ul class="wall">${WALL.map(tile).join('')}</ul>
+    <ul class="wall${compact ? ' is-compact' : ''}">${WALL.map(tile).join('')}</ul>
     <p class="wall-note">로고는 기관 원본 파일 또는 상장에 인쇄된 로고를 흰색 단색으로만 바꾼 것입니다. 학업 · 수상 · 협업 이력을 밝히는 표기이며 후원이나 보증을 뜻하지 않습니다.</p>
   </section>`;
 }
@@ -359,6 +362,7 @@ export function awardCard(a) {
 
 const tabs = (on) => `<nav class="pg-tabs" aria-label="보기 전환">
     <a href="/about" data-link class="${on === 'about' ? 'is-on' : ''}"${on === 'about' ? ' aria-current="page"' : ''}>프로필</a>
+    <a href="/resume" data-link class="${on === 'resume' ? 'is-on' : ''}"${on === 'resume' ? ' aria-current="page"' : ''}>이력서</a>
     <a href="/works" data-link class="${on === 'works' ? 'is-on' : ''}"${on === 'works' ? ' aria-current="page"' : ''}>프로젝트<sup>${projects.length}</sup></a>
     <a href="/awards" data-link class="${on === 'awards' ? 'is-on' : ''}"${on === 'awards' ? ' aria-current="page"' : ''}>수상<sup>${AWARDS.length}</sup></a>
     <a href="/skills" data-link class="${on === 'skills' ? 'is-on' : ''}"${on === 'skills' ? ' aria-current="page"' : ''}>스킬<sup>${SKILL_COUNT}</sup></a>
@@ -480,9 +484,16 @@ function aboutPage() {
       <div class="ab-who">
         ${profile.photo ? `<figure class="ab-photo"><img src="${esc(profile.photo.src)}" width="${profile.photo.w}" height="${profile.photo.h}" alt="${esc(profile.name)} 증명사진" decoding="async" /></figure>` : ''}
         <p class="ab-name"><b>${esc(profile.name)}</b><span>${esc(profile.en)}${profile.born ? ` · ${esc(profile.born)}년생` : ''}</span></p>
-        <p class="ab-role"><b>${esc(profile.role)}</b> — ${esc(profile.roleKo)}</p>
+        <p class="ab-role"><b>${esc(profile.role)}</b></p>
         ${profile.summary ? `<p class="ab-lead">${esc(profile.summary)}</p>` : ''}
         <p class="ab-motto">“${esc(profile.motto)}”</p>
+        ${
+          profile.scholarship
+            ? `<p class="ab-honor"><b>${esc(profile.scholarship.title)}</b>${esc(profile.scholarship.date.slice(0, 4))} · 과학기술정보통신부${
+                profile.volunteer ? `<span>봉사 ${profile.volunteer.hours}시간 · ${profile.volunteer.count}건</span>` : ''
+              }</p>`
+            : ''
+        }
         ${profile.education?.length ? `<ul class="ab-edu" aria-label="학력">${profile.education.map((e) => `<li><b>${esc(e.school)}</b> ${esc(e.major)} <span>${esc(e.note)}</span><small>${esc(e.period)}</small></li>`).join('')}</ul>` : ''}
         <p class="ab-print-url">${esc(location.origin.replace(/^https?:\/\//, ''))}${email ? ` · ${esc(email.value)}` : ''}</p>
       </div>
@@ -632,7 +643,7 @@ function skillsPage() {
         .join('')}</ol>
       <p class="wall-note">근거는 프로젝트 기록(도구 · 역할 · 요약 · 스토리)에 그 기술이 적힌 경우만 셉니다. NOTION 줄과 자격증은 2026 Notion 포트폴리오의 본인 기록이며, 취득 연도가 적혀 있지 않은 자격은 비워 두었습니다.</p>
     </section>
-    ${withWall()}
+    ${withWall({ compact: true })}
     ${footer()}
   </div>`;
 }
@@ -658,12 +669,12 @@ function worksPage(cat) {
       <p class="pg-kicker">PROJECT ARCHIVE — 권용현이 만든 것들</p>
       <h1 class="works-title">Works<sup>${pad(projects.length)}</sup></h1>
       ${tabs('works')}
-      <nav class="chips" aria-label="분야">
-        <button type="button" data-cat="all" class="${cat === 'all' ? 'is-on' : ''}">전체<sup>${projects.length}</sup></button>
+      <div class="chips" role="group" aria-label="분야로 보기">
+        <button type="button" data-cat="all" class="${cat === 'all' ? 'is-on' : ''}" aria-pressed="${cat === 'all'}">전체<sup>${projects.length}</sup></button>
         ${CATEGORIES.filter((c) => counts[c.id])
-          .map((c) => `<button type="button" data-cat="${c.id}" class="${on?.includes(c.id) ? 'is-on' : ''}">${esc(c.ko)}<sup>${counts[c.id]}</sup></button>`)
+          .map((c) => `<button type="button" data-cat="${c.id}" class="${on?.includes(c.id) ? 'is-on' : ''}" aria-pressed="${!!on?.includes(c.id)}">${esc(c.ko)}<sup>${counts[c.id]}</sup></button>`)
           .join('')}
-      </nav>
+      </div>
     </section>
     <ul class="works-grid">
       ${projects
@@ -674,7 +685,7 @@ function worksPage(cat) {
         )
         .join('')}
     </ul>
-    ${withWall()}
+    ${withWall({ compact: true })}
     ${footer()}
   </div>`;
 }
@@ -751,7 +762,7 @@ function detailPage(p) {
         <p class="d-cat"><span>${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}<span>${pad(i + 1)} / ${pad(projects.length)}</span></p>
         <h1 class="d-title">${esc(p.title)}</h1>
         ${p.titleEn && p.cover ? `<p class="d-en">${esc(p.titleEn)}</p>` : ''}
-        ${p.cover ? `<p class="d-one">${esc(p.oneLiner)}</p>` : ''}
+        ${p.cover ? `<p class="d-one">${esc(p.oneLiner).replace(/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g, '<span class="nw">$&</span>')}</p>` : ''}
       </div>
       <span class="d-scroll" aria-hidden="true">SCROLL</span>
     </section>
@@ -796,7 +807,7 @@ function detailPage(p) {
       story.length
         ? `<section class="d-story">${story
             .map(
-              (s, k) => `<div class="st-row${s.img ? '' : ' no-img'} reveal">
+              (s, k) => `<div class="st-row${s.img ? (s.img.ratio < 0.85 ? ' is-tall' : '') : ' no-img'} reveal">
                 ${s.img ? `<button type="button" class="st-media" data-gallery="${gallery.indexOf(s.img)}" aria-label="${esc(s.img.caption)} 크게 보기">${img(s.img, { sizes: `(max-width: 820px) 100vw, ${Math.min(1120, s.img.w || 1120)}px` })}<span class="st-cap">${esc(s.img.caption)}</span></button>` : ''}
                 <div class="st-text"><span class="st-label">${pad(k + 1)} — ${esc(s.label)}</span><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>
               </div>`
@@ -805,25 +816,37 @@ function detailPage(p) {
         : ''
     }
 
-    ${
-      p.videos.length
-        ? `<section class="d-videos reveal"><h2 class="d-h">FILM<sup>${p.videos.length}</sup></h2>${p.videos
+    ${(() => {
+      // 같은 영상의 다른 주소(예: 파일 + YouTube 원본)는 플레이어를 두 번 두지 않고 링크로만
+      const same = (v) => /같은 영상/.test(v.caption || '');
+      const films = p.videos.filter((v) => !same(v));
+      const alts = p.videos.filter(same);
+      return films.length
+        ? `<section class="d-videos reveal"><h2 class="d-h">FILM<sup>${films.length}</sup></h2>${films
             .map((v) => {
               const yt = youtubeId(v.url);
-              if (yt)
-                return `<figure class="vid"><button type="button" class="yt" data-yt="${yt}" aria-label="${esc(v.caption || '영상')} 재생"><img src="https://i.ytimg.com/vi/${yt}/hqdefault.jpg" alt="" loading="lazy" /><span class="yt-play" aria-hidden="true">▶</span></button><figcaption>${esc(v.caption)}</figcaption></figure>`;
+              if (yt) {
+                const short = /\/shorts\//.test(v.url);
+                return `<figure class="vid${short ? ' is-short' : ''}"><button type="button" class="yt" data-yt="${yt}" aria-label="${esc(v.caption || '영상')} 재생"><img src="https://i.ytimg.com/vi/${yt}/maxresdefault.jpg" srcset="https://i.ytimg.com/vi/${yt}/hqdefault.jpg 480w, https://i.ytimg.com/vi/${yt}/maxresdefault.jpg 1280w" sizes="${short ? '(max-width: 820px) 100vw, 420px' : '(max-width: 1240px) 92vw, 1114px'}" alt="" loading="lazy" /><span class="yt-play" aria-hidden="true">▶</span></button><figcaption>${esc(v.caption)}</figcaption></figure>`;
+              }
               return `<figure class="vid"><video src="${esc(v.url)}" ${p.cover ? `poster="${esc(p.cover.src)}"` : ''} controls muted playsinline preload="metadata"></video><figcaption>${esc(v.caption)}</figcaption></figure>`;
             })
+            .join('')}${alts
+            .map((v) => `<p class="vid-alt"><a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(v.caption.replace(/\s*\(같은 영상\)/, ''))} <span>같은 영상</span> <i aria-hidden="true">↗</i></a></p>`)
             .join('')}</section>`
-        : ''
-    }
+        : '';
+    })()}
 
     ${
       showGallery
         ? `<section class="d-gallery reveal"><h2 class="d-h">GALLERY<sup>${rest.length}</sup></h2>
           <div class="gal" data-n="${Math.min(rest.length, 3)}">${rest
             .map(
-              ({ im, k }) => `<button type="button" class="gal-item" data-gallery="${k}" style="--ar:${Math.min(1.8, Math.max(0.6, im.ratio)).toFixed(3)}" aria-label="${esc(im.caption)} 크게 보기">${img(im, { sizes: '(max-width: 820px) 50vw, 25vw' })}<span class="gal-cap">${esc(im.caption)}</span></button>`
+              ({ im, k }) => {
+                const gar = Math.min(1.8, Math.max(0.6, im.ratio));
+                const sizes = rest.length === 1 ? '(max-width: 820px) 100vw, min(1120px, 92vw)' : `(max-width: 820px) 50vw, ${Math.round(gar * 304)}px`;
+                return `<button type="button" class="gal-item" data-gallery="${k}" style="--ar:${gar.toFixed(3)}" aria-label="${esc(im.caption)} 크게 보기">${img(im, { sizes })}<span class="gal-cap">${esc(im.caption)}</span></button>`;
+              }
             )
             .join('')}</div></section>`
         : ''
@@ -833,7 +856,7 @@ function detailPage(p) {
       // 이 프로젝트를 다룬 공식 보도: 기사 사진 · 매체 · 날짜 · 제목
       const list = pressOf(p.id);
       return list.length
-        ? `<section class="d-press reveal"><h2 class="d-h">IN THE PRESS<sup>${pad(list.length)}</sup></h2><ul>${list
+        ? `<section class="d-press reveal"><h2 class="d-h">IN THE PRESS<sup>${list.length}</sup></h2><ul>${list
             .map(
               (a) => `<li><a href="${esc(a.url)}" target="_blank" rel="noopener"><span class="dp-img${a.image ? '' : ' is-text'}">${a.image ? `<img src="${esc(a.image.thumb)}" alt="" loading="lazy" decoding="async" />` : `<b>${esc(a.publisher)}</b>`}</span><span class="dp-t"><small>${esc(a.publisher)} · ${esc(a.date.replace(/-/g, '.'))} · ${esc(a.relation)}</small><b>${esc(a.title)}</b></span><i aria-hidden="true">↗</i></a></li>`
             )
@@ -966,6 +989,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     } else page.innerHTML = detailPage(byId(route.id));
     page.hidden = false;
     page.scrollTop = 0;
+    page.classList.remove('is-scrolled'); // 새 페이지는 맨 위 — 위 막대도 투명한 처음 모습으로
     document.body.classList.add('page-open');
     bind(route);
     const p = route.name === 'detail' ? byId(route.id) : null;
@@ -1108,6 +1132,13 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
           sec.querySelector('.aw-y sup').textContent = pad(vis.length);
           shown.push(...vis);
         });
+        // 안내 줄도 지금 보이는 것을 말한다 — 다시 누르면 전체로 돌아간다는 것까지
+        const guide = page.querySelector('.aw-guide');
+        if (guide) {
+          guide.dataset.all ??= guide.innerHTML;
+          const label = sum.querySelector(`button[data-g="${g}"] span`)?.textContent || '';
+          guide.innerHTML = g === 'all' ? guide.dataset.all : `<b>${esc(label)} ${shown.length}건</b>만 보는 중 — 같은 칸을 한 번 더 누르면 전체로`;
+        }
         // 남은 카드는 CSS 등장 전환을 처음부터 다시 — 앞쪽 몇 장은 차례로
         shown.forEach((li, k) => {
           li.classList.remove('is-in');
@@ -1127,7 +1158,10 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
         const b = e.target.closest('button[data-cat]');
         if (!b) return;
         const cat = b.dataset.cat;
-        page.querySelectorAll('.chips button').forEach((x) => x.classList.toggle('is-on', x === b));
+        page.querySelectorAll('.chips button').forEach((x) => {
+          x.classList.toggle('is-on', x === b);
+          x.setAttribute('aria-pressed', String(x === b));
+        });
         const items = [...page.querySelectorAll('.w-item')];
         items.forEach((li) => li.classList.toggle('is-out', cat !== 'all' && li.dataset.cat !== cat));
         gridCols = layoutGrid(grid);
@@ -1157,6 +1191,8 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
         const img = b.querySelector('img');
         const drop = () => img.remove();
         if (img) img.complete && !img.naturalWidth ? drop() : img.addEventListener('error', drop, { once: true });
+        // 큰 썸네일이 없는 영상은 YouTube가 120px 빈 그림을 준다 — 그때는 보통 크기로
+        img?.addEventListener('load', () => img.naturalWidth <= 120 && img.src.includes('maxres') && (img.removeAttribute('srcset'), (img.src = img.src.replace('maxresdefault', 'hqdefault'))), { once: true });
         b.addEventListener('click', () => {
           b.outerHTML = `<iframe class="yt-frame" src="https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
         });
@@ -1190,7 +1226,10 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   async function apply(route, { animate = true } = {}) {
     if (lightbox.open) lightbox.close();
     // 없는 프로젝트 주소는 아카이브 주소로 바로잡는다
-    if (route.missing) history.replaceState(history.state, '', '/works');
+    if (route.missing) {
+      history.replaceState(history.state, '', '/works');
+      flash('찾는 프로젝트가 없어 전체 목록을 보여 드려요');
+    }
     if (current && route.name === current.name && route.id === current.id && route.cat === current.cat) return;
     const prev = current;
     current = route.name === 'film' ? null : route;
@@ -1271,6 +1310,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       const max = page.scrollHeight - page.clientHeight;
       page.querySelector('.pg-progress')?.style.setProperty('--sp', max > 0 ? (y / max).toFixed(4) : '0');
       toTop.classList.toggle('is-on', !!current && y > innerHeight * 1.2);
+      page.classList.toggle('is-scrolled', y > 40);
       const stacked = innerWidth <= 820 && media0?.parentElement.classList.contains('is-land');
       if (media0 && !reducedMotion && !stacked && y < innerHeight * 1.2) media0.style.transform = `translate3d(0, ${y * 0.35}px, 0)`;
     },
