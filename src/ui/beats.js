@@ -15,9 +15,10 @@ function kicker(i, text) {
   return `<p class="kicker b-a"><span class="kicker-no">SC ${pad(i)}</span>${chapter ? `<span class="kicker-ch">CH ${esc(chapter[0])}<span class="kicker-chn"> · ${esc(chapter[1])}</span></span>` : ''}<span class="kicker-txt">${esc(text)}</span></p>`;
 }
 
-// ── 소개: 실제 이력서처럼 두 화면 — 다음 장면부터 프로젝트 ──
+// ── 소개: 실제 이력서처럼 세 화면 — 다음 장면부터 프로젝트 ──
 // ① 소개: 작은 증명사진 · 이름 · 한 줄 · 장학 · 연락처 + 아래에 대표 프로젝트 여덟(작게) · 수상(대상 상장 작게)
 // ② 학력 · 기록: 학력 줄 · 숫자 넷 · 다루는 언어 · 스킬(분야마다 한 줄)
+// ③ 지금 · INFUTECH: 요즘 맡은 일(대표자 · F/W · PCB)과 성과 넷 — 자세한 기록은 프로젝트 페이지
 function profileBeats(scene, i) {
   const email = profile.links.find((l) => l.url.startsWith('mailto:'));
   const grand = AWARDS.filter((a) => a.tier === 1);
@@ -32,7 +33,10 @@ function profileBeats(scene, i) {
   const tiers = [1, 2, 3, 4, 5].map((t) => [TIER_LABEL[t], AWARDS.filter((a) => a.tier === t).length]).filter(([, n]) => n);
   const feat = FEATURED.map(byId).filter(Boolean);
   const edu = profile.education || [];
-  const now = edu.filter((e) => e.note !== '입학');
+  // 임시: '지금' 화면은 디자인을 마칠 때까지 공개 주소(운영)에서는 숨긴다 — 디자인을 붙이며 이 조건을 지운다
+  const now = location.hostname === 'kwon-physical-ai.vercel.app' ? null : profile.now;
+  const nowP = now && byId(now.project);
+  const cur = edu.filter((e) => e.note !== '입학');
   const link = (l) => `<li><a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}><span>${esc(l.label)}</span>${esc(l.value)}</a></li>`;
   return [
     {
@@ -51,7 +55,7 @@ function profileBeats(scene, i) {
               <p class="rs-motto b-a">${esc(profile.motto)}</p>
               <p class="rs-sch b-a"><b>${esc(sch.title)}</b><span>${esc(sch.date.slice(0, 4))} · 과학기술정보통신부</span></p>
               <dl class="rs-facts b-a">
-                ${now.map((e) => `<div><dt>${esc(e.note.includes('복수') ? '복수전공' : '소속')}</dt><dd>${esc(e.school)} ${esc(e.major)}</dd></div>`).join('')}
+                ${cur.map((e) => `<div><dt>${esc(e.note.includes('복수') ? '복수전공' : '소속')}</dt><dd>${esc(e.school)} ${esc(e.major)}</dd></div>`).join('')}
               </dl>
               <ul class="rs-links b-a">${[email, ...profile.links.filter((l) => l !== email && /GitHub|Notion/.test(l.label))].filter(Boolean).map(link).join('')}</ul>
             </div>
@@ -102,6 +106,36 @@ function profileBeats(scene, i) {
         </div>`,
       email: email?.value,
     },
+    // ③ 지금: INFUTECH — 최근 맡은 일과 성과(profile.now). 자세한 기록은 프로젝트 페이지로
+    ...(now
+      ? [
+          {
+            key: 'now',
+            label: '지금 · INFUTECH',
+            cls: 'bt-now',
+            html: `<div class="bt-top panel-content">
+          ${kicker(i, `NOW — 지금 만드는 것 · ${now.product}`)}
+          <h2 class="bt-h b-a">${esc(now.title)}</h2>
+        </div>
+        <div class="bt-body panel-content">
+          <article class="rs-now">
+            ${now.photo ? `<a class="rs-now-photo b-a" href="${nowP ? nowP.path : '/works'}" data-link aria-label="${esc(`${now.product} 프로젝트 보기`)}"><img src="${esc(now.photo.src)}" width="${now.photo.w}" height="${now.photo.h}" alt="${esc(now.photo.alt)}" loading="lazy" decoding="async" /></a>` : ''}
+            <div class="rs-now-id">
+              <p class="rs-now-org b-a">${esc(now.org)}</p>
+              <p class="rs-now-role b-a">${esc(now.role)}</p>
+              <p class="rs-now-lead b-a">${esc(now.lead)}</p>
+            </div>
+            <dl class="rs-now-facts b-a">${now.facts
+              .map((f) => `<div><dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd>${f.sub ? `<dd class="rs-now-sub">${esc(f.sub)}</dd>` : ''}</div>`)
+              .join('')}</dl>
+            <ul class="rs-now-more b-a">${now.more.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>
+            <p class="rs-now-team b-a">${esc(now.team)}</p>
+            ${nowP ? `<a class="rs-now-go b-a" href="${nowP.path}" data-link>프로젝트 기록 보기 <span aria-hidden="true">→</span></a>` : ''}
+          </article>
+        </div>`,
+          },
+        ]
+      : []),
   ];
 }
 
