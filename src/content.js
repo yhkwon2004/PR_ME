@@ -50,6 +50,25 @@ export const profile = {
       { name: '사회복지 자원봉사인증관리', hours: 8, minutes: 0 },
     ],
   },
+  // 지금 하는 일 — INFUTECH(2026 공학페스티벌 발표 자료 · 유통사 협약서 · 논문 상장, 본인 제공) 그대로.
+  // AIT 2026 Best Paper는 팀원 논문(정익상 · 한우진 · 이완범) — 본인 수상으로 쓰지 않는다. 우수논문상은 공저(권용현 포함).
+  now: {
+    org: 'INFUTECH · 학생창업기업 인퓨테크',
+    role: '대표자 · F/W · PCB 개발 총괄',
+    product: 'INFU RETRO',
+    title: '링거폴대를 바꾸지 않고 붙이는 스마트 수액 모니터링',
+    lead: '간호사 1명이 43.6명을 돌보는 병동에서, 순회 사이의 수액 이상을 무게센서 하나와 경량 AI로 잡아 스테이션에 알립니다.',
+    project: 'iot-iv-pole',
+    photo: { src: M('projects/iot-iv-pole/07.webp'), thumb: M('projects/iot-iv-pole/07.thumb.webp'), w: 1280, h: 720, alt: 'INFU RETRO 시연 — 폴대 위 모듈 · 스테이션 대시보드 · 환자 앱' },
+    facts: [
+      { value: '60×35mm', label: '직접 설계한 PCB', sub: 'ESP32 · ADS1232 · 무게센서 하나' },
+      { value: '97.3%', label: '경량 CNN 이상 판별', sub: '파라미터 659개 · 모의 데이터' },
+      { value: '우수논문상', label: '2026 공동학술발표회', sub: '공저 · 2026.07' },
+      { value: '5,000만 원', label: '유통사 구매의향 협약', sub: '㈜에스케이엠엔엠 · 2026.10' },
+    ],
+    more: ['캡스톤디자인 대상 2025.11', '팀 논문 AIT 2026 Best Paper', '특허 출원 진행 중'],
+    team: '팀장 정익상 · 권용현 · 한우진 · 최이지 · 한별 — 지도교수 이완범',
+  },
   email: 'yhkwon2004@gmail.com',
   links: [
     { label: 'Email', value: 'yhkwon2004@gmail.com', url: 'mailto:yhkwon2004@gmail.com' },

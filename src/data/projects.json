@@ -1873,21 +1873,24 @@
  {
   "id": "iot-iv-pole",
   "title": "스마트 IoT 링거폴대",
-  "titleEn": "Smart IoT IV Pole",
+  "titleEn": "Smart IoT IV Pole — INFU RETRO",
   "year": "2025–2026",
   "period": "",
   "category": "iot",
-  "oneLiner": "기존 링거폴대에 붙여 수액 상태를 확인하는 IoT 장치",
-  "summary": "환자 임의 조작과 모니터링 누락을 줄이려 기존 링거폴대에 탈부착하는 IoT 장치를 개발했습니다. 회로·PCB와 3D 설계를 맡았고, 팀은 WON+UP 캡스톤디자인 대상을 받은 뒤 경관급식 모니터링 IoT 장비로 글로벌 피우다 프로젝트 장려상을 받았습니다.",
+  "oneLiner": "링거폴대를 바꾸지 않고 붙여 쓰는 스마트 수액 모니터링 모듈(INFU RETRO)",
+  "summary": "간호사 1명이 수십 명을 돌보는 병동에서 순회와 순회 사이의 수액 이상을 놓치지 않도록, 기존 링거폴대에 붙여 쓰는 스마트 수액 모니터링 모듈 INFU RETRO를 만들었습니다. 펌웨어와 PCB 개발을 총괄해 ESP32 · ADS1232 기판 한 장과 무게센서 하나로 수액을 감지하고, 칼만 필터와 4×4 상태 패턴 경량 CNN이 이상을 판별해 스테이션 대시보드와 앱에 알립니다. WON+UP 캡스톤디자인 대상, 공동학술발표회 우수논문상(공저), 의료기기 유통사와의 5,000만 원 규모 구매의향 협약으로 이어졌고, 특허 출원을 진행하고 있습니다.",
   "role": [
-   "PCB / 회로 설계",
+   "학생창업기업 인퓨테크 대표자",
+   "F/W · PCB 개발 총괄",
+   "회로 설계 (ESP32 · ADS1232)",
    "3D 설계",
    "회계 관리"
   ],
-  "team": "인퓨테크(InfuTech) · 권용현, 정익상, 최이지, 한우진",
+  "team": "INFUTECH(인퓨테크) · 팀장 정익상, 권용현, 한우진, 최이지, 한별(간호 협력) · 지도교수 이완범 · 원광대학교 간호학과 협력",
   "tools": [
    "ESP32-WROOM-32E",
    "ADS1232 ADC",
+   "Load Cell",
    "Altium Designer",
    "Fusion 360",
    "Inventor",
@@ -1899,28 +1902,70 @@
   ],
   "metrics": [
    {
-    "value": "60×35mm",
-    "label": "자체 설계 PCB 크기"
+    "value": "97.3%",
+    "label": "이상 판별 정확도 (모의 데이터)"
+   },
+   {
+    "value": "5초",
+    "label": "이상 상황 감지 (모의 임상)"
+   },
+   {
+    "value": "659개",
+    "label": "ESP32 안 경량 CNN 파라미터"
+   },
+   {
+    "value": "5,000만 원",
+    "label": "유통사 구매의향 협약"
    }
   ],
   "story": [
    {
+    "label": "PROBLEM",
+    "title": "순회와 순회 사이의 공백",
+    "text": "병원급 의료기관에서 간호사 1명이 맡는 환자는 43.6명(미국 5.7명)입니다. 약 10~30분 순회 사이에 생기는 막힘 · 줄꺾임 · 역류 같은 수액 이상은, 의사소통이 어려운 고령 환자일수록 스스로 알리기 어렵습니다.",
+    "image": ""
+   },
+   {
+    "label": "FIELD",
+    "title": "간호사 75명에게 물었습니다",
+    "text": "원광대학교병원 등 임상 현장을 찾아 간호사 75명을 인터뷰 · 설문했습니다. 70%가 “수액 투여 이상 상황을 스테이션 컴퓨터로 자동 전송하는 기능이 필요하다”고 답했고, “투여 속도를 감시만 해도 실용적”이라는 의견이 나왔습니다.",
+    "image": "media/projects/iot-iv-pole/08.webp"
+   },
+   {
     "label": "IDEA",
-    "title": "기존 폴대에 붙이는 장치",
-    "text": "간호 업무 부담과 임의 조작 위험을 줄이려, 링거폴대를 바꾸지 않고 바로 부착하는 장치로 설계하고 하우징을 여러 버전 다듬었습니다.",
-    "image": "media/projects/iot-iv-pole/02.webp"
+    "title": "폴대는 그대로, 모듈만 바꿔 끼운다",
+    "text": "대당 100만 원이 넘는 인퓨전 펌프와 폴대 일체형 스마트 폴대는 모든 병상에 들이기 어렵습니다. 그래서 기존 폴대에 스크류 · 마그네틱으로 조립하는 레트로핏 모듈 INFU RETRO로 설계하고, 탈부착형 하우징을 여러 버전(V1.0~V2.1) 다듬었습니다 — 체결부 · 로드셀 · 걸이부가 일직선으로 하중을 받습니다.",
+    "image": "media/projects/iot-iv-pole/09.webp"
    },
    {
     "label": "BUILD",
-    "title": "잡음 줄인 단일 PCB",
-    "text": "이후 수작업 배선의 센서 잡음을 줄이려 ESP32와 ADS1232 ADC를 60×35mm PCB 한 장에 통합했습니다.",
-    "image": "media/projects/iot-iv-pole/04.webp"
+    "title": "무게센서 하나, 자체 설계 PCB",
+    "text": "펌웨어와 PCB 개발을 총괄했습니다. ESP32와 24비트 로드셀 전용 ADC ADS1232를 60×35mm 기판 한 장에 담고(전원 분리 · RC 필터, USB-C · 로드셀 4핀 단자), 자이로 · 적외선 같은 추가 센서 없이 무게 신호 하나로 수액을 감지합니다.",
+    "image": "media/projects/iot-iv-pole/11.webp"
    },
    {
     "label": "TEST",
-    "title": "실물 PCB 검수·디버깅",
-    "text": "전압·USB 인식과 펌웨어 실행을 확인했고, ADC 데이터가 안 들어오던 문제는 3번 핀을 GND에 연결해 해결했습니다.",
-    "image": "media/projects/iot-iv-pole/05.webp"
+    "title": "실물 PCB 검수 · 디버깅",
+    "text": "전압 · USB 인식과 펌웨어 실행을 확인했고, ADC 데이터가 들어오지 않던 문제는 3번 핀을 GND에 연결해 해결했습니다. 수작업 배선 시절의 센서 잡음도 한 기판으로 합치며 줄었습니다.",
+    "image": "media/projects/iot-iv-pole/12.webp"
+   },
+   {
+    "label": "AI",
+    "title": "무게 신호를 4×4 그림으로 읽는다",
+    "text": "칼만 필터로 거른 무게 신호를 느림 · 정상 · 빠름 상태로 부호화하고, 연속 16개 상태를 4×4 패턴 이미지로 접어 파라미터 659개(약 10KB) 경량 CNN이 ESP32 안에서 정상 · 급속 · 폐색을 판별합니다. 순간 흔들림은 고립된 한 칸, 지속 이상은 뭉친 덩어리로 보여 오알람이 줄어듭니다.",
+    "image": "media/projects/iot-iv-pole/13.webp"
+   },
+   {
+    "label": "VERIFY",
+    "title": "옮기고, 흔들고, 넘어뜨리며",
+    "text": "원광대 간호학과와 함께 실제 병동처럼 폴대를 옮기고 흔들고 넘어뜨리는 모의 임상 테스트를 반복했습니다. 투여 완료 시점 예측 오차 ±5분 이내, 이상 상황 감지 5초 이내, 수액 10종 이상의 점도별 무게 자동 보정을 확인했습니다.",
+    "image": "media/projects/iot-iv-pole/14.webp"
+   },
+   {
+    "label": "SYSTEM",
+    "title": "스테이션 대시보드 · 환자 앱",
+    "text": "병상마다 남은 수액 · 투여 속도 · 예상 종료 시각을 스테이션의 병동 현황 화면과 환자 앱에 실시간으로 보여 주고, 이상이 생기면 어느 병상인지 바로 알립니다.",
+    "image": "media/projects/iot-iv-pole/17.webp"
    },
    {
     "label": "RESULT",
@@ -1929,10 +1974,22 @@
     "image": "media/projects/iot-iv-pole/01.webp"
    },
    {
+    "label": "PAPER",
+    "title": "논문 두 편 · 특허 출원",
+    "text": "공저한 「CNN 상태 패턴 분석 기반 정맥 수액 이상 감지 알고리즘」(한우진 · 정익상 · 권용현 · 최이지 · 이완범)이 2026년 7월 공동학술발표회에서 우수논문상을 받았고, 팀원 논문 ‘Design of a Dual-Track Algorithm for Real-Time IV Monitoring Based on Load Cell’(정익상 · 한우진 · 이완범)은 2026년 1월 AIT 2026 국제학술대회(베트남 다낭)에서 Best Paper Award를 받았습니다. 이중 트랙 신호처리와 탈부착 구조는 변리사를 통해 특허 출원을 진행하고 있습니다.",
+    "image": "media/projects/iot-iv-pole/15.webp"
+   },
+   {
     "label": "NEXT",
     "title": "경관급식 모니터링으로",
     "text": "2026년 8월 같은 인퓨테크(INFUTECH) 팀이 경관급식 모니터링 IoT 장비개발로 호남권 글로벌 피우다 프로젝트 최종평가에서 장려상을 받았습니다.",
     "image": ""
+   },
+   {
+    "label": "MARKET",
+    "title": "유통사 구매의향 5,000만 원",
+    "text": "2026년 10월 의료기기 유통업체 ㈜에스케이엠엔엠과 5,000만 원 규모의 구매의향 및 사업협력 업무협약을 맺었습니다(본계약 전 의향 협약, 공급자 인퓨테크 대표자 권용현). 대당 25만 원 모듈에 관제 SaaS · 유지보수 월 관리 구독을 더해, 펌프가 닿지 않는 일반 병상을 채우는 모델입니다.",
+    "image": "media/projects/iot-iv-pole/16.webp"
    }
   ],
   "images": [
@@ -1977,10 +2034,100 @@
     "kind": "document",
     "w": 703,
     "h": 956
+   },
+   {
+    "file": "media/projects/iot-iv-pole/07.webp",
+    "caption": "INFU RETRO 시연 — 폴대 위 모듈 · 스테이션 대시보드 · 환자 앱",
+    "kind": "photo",
+    "w": 1280,
+    "h": 720
+   },
+   {
+    "file": "media/projects/iot-iv-pole/08.webp",
+    "caption": "병원 현장 방문 · 간호사 인터뷰",
+    "kind": "photo",
+    "w": 800,
+    "h": 476
+   },
+   {
+    "file": "media/projects/iot-iv-pole/09.webp",
+    "caption": "기존 링거폴대에 조립한 INFU RETRO 모듈",
+    "kind": "photo",
+    "w": 891,
+    "h": 378
+   },
+   {
+    "file": "media/projects/iot-iv-pole/10.webp",
+    "caption": "모듈 내부 — 로드셀 · 회로기판 · 배터리",
+    "kind": "photo",
+    "w": 1100,
+    "h": 466
+   },
+   {
+    "file": "media/projects/iot-iv-pole/11.webp",
+    "caption": "자체 설계 PCB 60×35mm — ESP32 · ADS1232 배선",
+    "kind": "diagram",
+    "w": 1024,
+    "h": 675
+   },
+   {
+    "file": "media/projects/iot-iv-pole/12.webp",
+    "caption": "실물 PCB 앞면 · 뒷면",
+    "kind": "photo",
+    "w": 678,
+    "h": 439
+   },
+   {
+    "file": "media/projects/iot-iv-pole/13.webp",
+    "caption": "경량 CNN 학습 곡선 — 손실 · 정확도",
+    "kind": "diagram",
+    "w": 1024,
+    "h": 237
+   },
+   {
+    "file": "media/projects/iot-iv-pole/14.webp",
+    "caption": "원광대 간호학과와 함께한 모의 임상 · 피드백",
+    "kind": "photo",
+    "w": 931,
+    "h": 667
+   },
+   {
+    "file": "media/projects/iot-iv-pole/15.webp",
+    "caption": "우수논문상 논문 1쪽 — CNN 상태 패턴 분석 기반 정맥 수액 이상 감지",
+    "kind": "document",
+    "w": 873,
+    "h": 1147
+   },
+   {
+    "file": "media/projects/iot-iv-pole/16.webp",
+    "caption": "㈜에스케이엠엔엠 구매의향 및 사업협력 업무협약서 1쪽",
+    "kind": "document",
+    "w": 978,
+    "h": 1246
+   },
+   {
+    "file": "media/projects/iot-iv-pole/17.webp",
+    "caption": "병동 현황 대시보드 · 환자 앱 화면",
+    "kind": "screenshot",
+    "w": 1600,
+    "h": 783
+   },
+   {
+    "file": "media/projects/iot-iv-pole/18.webp",
+    "caption": "INFUTECH 팀과 지도교수, INFU RETRO 모듈",
+    "kind": "photo",
+    "w": 1280,
+    "h": 960
    }
   ],
-  "cover": "media/projects/iot-iv-pole/01.webp",
-  "videos": [],
+  "cover": "media/projects/iot-iv-pole/07.webp",
+  "videos": [
+   {
+    "url": "/infutech/media/demo.mp4",
+    "caption": "INFU RETRO 시연 — 모듈 결합 · 앱 · 유속 이상 알림 (24초)",
+    "poster": "/infutech/media/demo-poster.webp"
+   }
+  ],
   "links": [
    {
     "label": "Notion 원문",
@@ -1995,7 +2142,7 @@
     "url": "https://www.wku.ac.kr/wonpbl-교과-캡스톤디자인-경진대회서-성과-입증원광대.html"
    },
    {
-    "label": "INFU RETRO 피치덱 (웹 발표)",
+    "label": "INFU RETRO 웹 발표 (동물병원 편)",
     "url": "/infutech/"
    }
   ]

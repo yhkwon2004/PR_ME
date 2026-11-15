@@ -1164,7 +1164,7 @@ html:not(.q-lite) .deck .r-card .card-media:has(> img.is-contain:is([data-kind='
 }
 .pg-tabs a {
   flex: none;
-  padding: 9px 18px;
+  padding: 10.5px 18px;
   white-space: nowrap;
   border-radius: 999px;
   font-family: var(--sans); /* 한글 탭 이름은 본문 글꼴로(고정폭 · 넓은 자간이면 글자가 흩어져 보인다) */
@@ -1179,6 +1179,7 @@ html:not(.q-lite) .deck .r-card .card-media:has(> img.is-contain:is([data-kind='
   font-family: var(--mono);
   font-size: 10px;
   font-weight: 400;
+  line-height: 0; /* 개수가 줄 높이를 밀어 올리지 않게 — 모든 탭 글자가 같은 높이에 */
   color: var(--muted);
 }
 .pg-tabs a:hover {

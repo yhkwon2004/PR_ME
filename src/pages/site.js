@@ -829,7 +829,8 @@ function detailPage(p) {
                 const short = /\/shorts\//.test(v.url);
                 return `<figure class="vid${short ? ' is-short' : ''}"><button type="button" class="yt" data-yt="${yt}" aria-label="${esc(v.caption || '영상')} 재생"><img src="https://i.ytimg.com/vi/${yt}/maxresdefault.jpg" srcset="https://i.ytimg.com/vi/${yt}/hqdefault.jpg 480w, https://i.ytimg.com/vi/${yt}/maxresdefault.jpg 1280w" sizes="${short ? '(max-width: 820px) 100vw, 420px' : '(max-width: 1240px) 92vw, 1114px'}" alt="" loading="lazy" /><span class="yt-play" aria-hidden="true">▶</span></button><figcaption>${esc(v.caption)}</figcaption></figure>`;
               }
-              return `<figure class="vid"><video src="${esc(v.url)}" ${p.cover ? `poster="${esc(p.cover.src)}"` : ''} controls muted playsinline preload="metadata"></video><figcaption>${esc(v.caption)}</figcaption></figure>`;
+              const poster = v.poster || p.cover?.src;
+              return `<figure class="vid"><video src="${esc(v.url)}" ${poster ? `poster="${esc(poster)}"` : ''} controls muted playsinline preload="metadata"></video><figcaption>${esc(v.caption)}</figcaption></figure>`;
             })
             .join('')}${alts
             .map((v) => `<p class="vid-alt"><a href="${esc(v.url)}" target="_blank" rel="noopener">${esc(v.caption.replace(/\s*\(같은 영상\)/, ''))} <span>같은 영상</span> <i aria-hidden="true">↗</i></a></p>`)

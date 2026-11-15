@@ -117,7 +117,8 @@ const RAW = [
   { d: 'software', name: 'Git · GitHub 협업', en: 'Git', re: /GitHub/ },
 
   // ── 기획 · 창업 ──
-  { d: 'product', name: '현장 조사 · 인터뷰', en: 'User Research', re: /인터뷰|현장 조사|설문/ },
+  // 링거폴대의 간호사 인터뷰 · 설문은 팀 활동(본인 역할은 F/W · PCB) — 근거로 세지 않는다
+  { d: 'product', name: '현장 조사 · 인터뷰', en: 'User Research', re: /인터뷰|현장 조사|설문/, not: ['iot-iv-pole'] },
   { d: 'product', name: '시제품 제작', en: 'Prototyping', re: /시제품/ },
   { d: 'product', name: '업사이클 사업화', en: 'Upcycling', re: /업사이클|폐키보드|폐플라스틱/ },
   { d: 'product', name: '팀 리드 · 협업 조율', en: 'Team Lead', re: /팀장|모임을 직접 주선/ },
