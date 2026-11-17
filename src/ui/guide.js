@@ -47,9 +47,12 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
   toast.hidden = true;
   document.body.appendChild(toast);
   let toastT = 0;
+  // 가운뎃점 · 줄표 · 화살표가 줄 맨 앞에 서지 않게 앞 낱말과 NBSP로 묶는다(site.js의 sep()와 같게) — 알림 글은 고르게 줄을 나누므로
+  // ('이메일 주소를 복사했어요 — 주소'가 '— 주소'로 시작하는 줄이 됐다)
+  const bindSep = (s) => esc(s).replace(/ ([·—–→]) /g, '&nbsp;$1 ');
   function say(text, { action, onAction, ms = 5200 } = {}) {
     clearTimeout(toastT);
-    toast.innerHTML = `<span class="gt-text">${esc(text)}</span>${action ? `<button type="button" class="gt-act">${esc(action)}</button>` : ''}<button type="button" class="gt-x" aria-label="알림 닫기">×</button>`;
+    toast.innerHTML = `<span class="gt-text">${bindSep(text)}</span>${action ? `<button type="button" class="gt-act">${esc(action)}</button>` : ''}<button type="button" class="gt-x" aria-label="알림 닫기">×</button>`;
     toast.hidden = false;
     toast.classList.remove('is-on');
     void toast.offsetWidth;
@@ -175,9 +178,12 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
     if (st.armed && !armed) navigator.vibrate?.(8);
     armed = !!st.armed;
     // 화면 전체가 손가락을 따라 끌려온다 — 처음엔 손가락만큼, 더 끌수록 덜(고무줄처럼) · 옆으로 미는 덱 끝은 덱만 고무줄
+    // 시연(st.demo)은 st.room(무대를 끌어 올려도 되는 만큼 — 소개 화면의 머리줄 위 빈자리)까지만. 손가락으로 끄는 진짜 끌기는 그대로
     if (stageEl && !reducedMotion && !x) {
+      let lift = 32 * Math.tanh(Math.max(0, st.p) * 0.9);
+      if (st.demo && st.room != null) lift = Math.min(lift, st.room);
       stageEl.classList.add('is-pulling');
-      stageEl.style.translate = `0 ${(-st.dir * 32 * Math.tanh(Math.max(0, st.p) * 0.9)).toFixed(1)}px`;
+      stageEl.style.translate = `0 ${(-st.dir * lift).toFixed(1)}px`;
     }
   }
   // 끌어서 넘어가는 순간: 끌려 와 있던 거리를 돌려주고 화면은 제자리로(움직임 없이) — 나가는 패널이 그 자리에서 이어 빠진다
@@ -195,10 +201,12 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
   // ── 장면 넘김 안내: 카드 안내처럼 반투명한 손끝이 아래에서 위로 밀어 올리고(두 번),
   //    그 손끝을 따라 화면 전체가 살짝 끌려 올라갔다 돌아온다 — 아래 표시에 다음 장면 이름이 비친다 ──
   let demoRaf = 0;
-  function sceneHint(label, rect) {
+  // room: 시연이 무대를 끌어 올려도 되는 만큼(px) — 없으면 제한 없이
+  function sceneHint(label, rect, room) {
     if (reducedMotion || !label) return false;
     cancelAnimationFrame(demoRaf);
-    showGhost('y', rect || { left: innerWidth / 2, top: innerHeight * 0.6, width: 0, height: 0 });
+    // rect가 false면 손끝을 둘 빈자리가 없다(글이 아래 칸 가까이까지 찬 화면) — 시연(끌어 올림 · 아래 표시)만
+    if (rect !== false) showGhost('y', rect || { left: innerWidth / 2, top: innerHeight * 0.6, width: 0, height: 0 });
     const t0 = performance.now();
     const CYCLE = 1500; // 손끝 애니메이션(ghost-y) 한 번과 같은 길이
     const ease = (x) => x * x * (3 - 2 * x);
@@ -211,7 +219,7 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
       const u = t % 1;
       // 누르고(0~18%) → 끌어 올리고(18~62%) → 놓으면 제자리로(62~90%)
       const p = u < 0.18 ? 0 : u < 0.62 ? ease((u - 0.18) / 0.44) * 0.8 : u < 0.9 ? 0.8 * (1 - ease((u - 0.62) / 0.28)) : 0;
-      setPull({ dir: 1, p, armed: false, label, demo: true });
+      setPull({ dir: 1, p, armed: false, label, demo: true, room });
       demoRaf = requestAnimationFrame(step);
     };
     demoRaf = requestAnimationFrame(step);
@@ -260,16 +268,59 @@ export function createGuide(scenes, { profile, onNext, onGo, onAuto, onPeek, red
     row.setAttribute('aria-label', '연락처');
     row.innerHTML = `<span>연락처</span>${profile.links
       .map((l) => `<a href="${esc(l.url)}"${l.url.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"'}>${esc(l.label.toUpperCase())}</a>`)
-      .join('')}${email ? `<button type="button" class="ic-copy" data-copy="${esc(email.value)}">이메일 복사</button>` : ''}`;
+      .join('')}${email ? `<button type="button" class="ic-copy" data-copy="${esc(email.value)}" aria-live="polite">이메일 복사</button>` : ''}`;
     archive.after(row);
-    row.querySelector('.ic-copy')?.addEventListener('click', async (e) => {
-      const v = e.currentTarget.dataset.copy;
+    // 복사했다는 알림은 단추 자리에서 — 아래 알림(.guide-toast)은 열린 목차 밑에 깔려 흐리게 비치며 목차 글과 겹쳤다.
+    // 단추 글이 잠깐 '복사했어요 ✓'로 바뀐다(aria-live로 읽기 프로그램에도). 클립보드 API가 막힌 브라우저는 숨은 글 칸을 골라
+    // 복사 명령으로 한 번 더 — 그것도 막혔을 때만 단추가 주소를 보여 준다(누르면 주소가 통째로 골라진다). 주소는 단추보다 넓어 휴대폰에서는 연락처 줄이
+    // 한 줄 늘어나므로, 몇 초 뒤 저절로 되돌아가 목록이 다시 튀어 오르지 않게 다른 곳을 누를 때까지 그대로 둔다
+    const copyBtn = row.querySelector('.ic-copy');
+    let copyT = 0;
+    const away = (e) => !copyBtn.contains(e.target) && reset();
+    const reset = () => {
+      clearTimeout(copyT);
+      removeEventListener('pointerdown', away, true);
+      copyBtn.textContent = '이메일 복사';
+      copyBtn.classList.remove('is-done', 'is-addr');
+    };
+    const legacyCopy = (v) => {
+      const ta = document.createElement('textarea');
+      ta.value = v;
+      ta.readOnly = true;
+      ta.setAttribute('aria-hidden', 'true');
+      ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none';
+      row.append(ta);
+      ta.select();
+      ta.setSelectionRange(0, v.length);
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {}
+      ta.remove();
+      copyBtn.focus({ preventScroll: true });
+      return ok;
+    };
+    copyBtn?.addEventListener('click', async () => {
+      // 주소를 보여 주는 중이면 다시 복사하지 않고 주소를 고른다(다시 복사하면 글을 바꿔 쓰며 고른 것이 풀렸다) — Ctrl+C · ⌘C로 복사
+      if (copyBtn.classList.contains('is-addr')) return void getSelection()?.selectAllChildren(copyBtn);
+      const v = copyBtn.dataset.copy;
+      reset();
+      let ok = false;
       try {
         await navigator.clipboard.writeText(v);
-        say(`이메일 주소를 복사했어요 — ${v}`, { ms: 3200 });
+        ok = true;
       } catch {
-        say(v, { ms: 6000 });
+        ok = legacyCopy(v);
       }
+      if (ok) {
+        copyBtn.textContent = '복사했어요 ✓';
+        copyBtn.classList.add('is-done');
+        copyT = setTimeout(reset, 2400);
+        return;
+      }
+      copyBtn.textContent = v;
+      copyBtn.classList.add('is-done', 'is-addr');
+      addEventListener('pointerdown', away, true);
     });
     if (!touch) {
       const keys = document.createElement('p');

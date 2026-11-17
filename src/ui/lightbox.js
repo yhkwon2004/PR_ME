@@ -33,10 +33,16 @@ export function createLightbox() {
       img.alt = m.caption;
       media.appendChild(img);
     }
-    // 설명은 글자로만 넣는다(마크업으로 해석하지 않음)
+    // 설명은 글자로만 넣는다(마크업으로 해석하지 않음). '(재)광주정보문화산업진흥원장' · '㈜에스케이엠엔엠'처럼 앞에 붙은 법인 표시와
+    // 하이픈으로 이은 영문 낱말(IDEA-GO-ROUND)은 떨어지지 않게(WORD JOINER), 줄은 '·' · '—' · '→'로 시작하지 않게(앞 칸을 NBSP로 —
+    // site.js sep()과 같게)
     const no = document.createElement('span');
     no.textContent = `${String(i + 1).padStart(2, '0')} / ${String(list.length).padStart(2, '0')}`;
-    cap.replaceChildren(no, document.createTextNode(m.caption));
+    const text = m.caption
+      .replace(/(\([재주사]\)|㈜)(?=\S)/g, '$1⁠')
+      .replace(/([A-Za-z0-9])-(?=[A-Za-z0-9])/g, '$1-⁠')
+      .replace(/ ([·—–→]) /g, ' $1 ');
+    cap.replaceChildren(no, document.createTextNode(text));
     if (m.type !== 'video' && matchMedia(PHONE).matches) {
       const hint = document.createElement('small');
       hint.className = 'lb-hint';

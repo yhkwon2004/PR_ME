@@ -129,6 +129,35 @@ body.index-open .next-cue {
     opacity: 0;
   }
 }
+/* 좁은 가로 창(폭 1000 미만): 덱 장면 · 소개 장면의 알림 칸이 225 — 290px 남짓이라 '다시 자동 재생 (P)' · '이어 보기' 단추 옆에 남는
+   글 폭이 60 — 120px 남짓 — '직접 넘기는 / 중이라 자동 / 재생을 / 멈췄어요'처럼 한두 낱말씩 네 — 여섯 줄로 꺾였다. 단추는 글 아래 줄로
+   내리고 글은 칸 폭을 다 쓴다(두 줄) */
+@media (min-width: 821px) and (max-width: 999px) and (min-height: 501px) and (orientation: landscape) {
+  :is(body.has-deck, body[data-scene='prologue']) .guide-toast {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    border-radius: 18px;
+  }
+  :is(body.has-deck, body[data-scene='prologue']) .gt-text {
+    flex: 1 1 calc(100% - 38px);
+  }
+  :is(body.has-deck, body[data-scene='prologue']) .gt-act {
+    order: 1;
+  }
+}
+/* 소개 장면(데스크톱 · 가로 태블릿): 알림은 아래 가운데 화면 칸(01 소개 · 02 · 03) 왼쪽 끝 12px 앞까지만 — 칸을 덮어 누르지 못하게 하던 것.
+   칸 폭은 beats.css의 --u(화면 크기로 자라는 단위)를 따른다: 22px + 342 × u 남짓 */
+@media (min-width: 821px) and (min-height: 501px) and (orientation: landscape), (min-width: 1101px) and (min-height: 501px) {
+  body[data-scene='prologue'] .guide-toast {
+    --u: clamp(0.8px, min(calc(0.0694 * var(--vw)), calc(0.112 * var(--vh))), 1.5px);
+    max-width: min(470px, calc(50 * var(--vw) - var(--pad) - 24px - 171 * var(--u)));
+  }
+}
+/* 알림이 두 줄이 되면(좁힌 가로 태블릿 · 휴대폰) 고르게 — '직접 넘기는 중이라 / 자동 재생을 멈췄어요'
+   ('자동 / 재생'으로 끊기거나 '멈췄어요' · 덱 장면의 '… 다음 / 장면'처럼 한 낱말만 남지 않게) */
+.gt-text {
+  text-wrap: balance;
+}
 @media (min-width: 1400px) and (min-height: 501px) {
   body.has-deck .guide-toast {
     bottom: calc(var(--bottom) + 64px);
@@ -553,9 +582,18 @@ body.deck-cue .panel:not([hidden]) .deck-count {
     color 0.3s;
 }
 .ic-copy:hover,
-.ic-copy:focus-visible {
+.ic-copy:focus-visible,
+.ic-copy.is-done {
   border-color: var(--cyan);
   color: var(--cyan);
+}
+.ic-copy.is-done {
+  border-style: solid;
+}
+/* 복사가 막힌 브라우저: 단추가 주소를 보여 준다 — 한 번에 골라 직접 복사하게 */
+.ic-copy.is-addr {
+  user-select: all;
+  -webkit-user-select: all;
 }
 .index-keys {
   display: flex;
@@ -713,29 +751,33 @@ body.lightbox-open .to-top {
     height: 42px;
   }
 }
-/* 덱 장면(세로 휴대폰 · 태블릿): 알림이 덱 막대(← 번호 → · 전체 보기)를 덮어 카드를 넘기지 못하게 하던 것 — 위쪽으로.
-   가로 휴대폰(높이 500 이하)은 이미 막대를 비켜 있어 그대로 */
+/* 덱 장면 · 소개 장면(세로 휴대폰 · 태블릿): 알림이 덱 막대(← 번호 → · 전체 보기) · 화면 칸(01 · 02 · 03)을 덮어
+   카드 · 화면을 넘기지 못하게 하던 것 — 위쪽으로. 가로 휴대폰(높이 500 이하)은 이미 막대를 비켜 있어 그대로 */
 @media (max-width: 820px) and (min-height: 501px), (orientation: portrait) and (max-width: 1100px) {
   body.has-deck .guide-toast,
-  body[data-scene='intro'] .guide-toast {
+  body[data-scene='intro'] .guide-toast,
+  body[data-scene='prologue'] .guide-toast {
     top: calc(var(--top) + 8px);
     bottom: auto;
     transform: translateY(-8px);
   }
   body.has-deck .guide-toast.is-on,
-  body[data-scene='intro'] .guide-toast.is-on {
+  body[data-scene='intro'] .guide-toast.is-on,
+  body[data-scene='prologue'] .guide-toast.is-on {
     transform: none;
   }
 }
 /* 세로 태블릿: 위쪽 알림은 가운데 좁게(화면 폭 띠로 제목을 다 가리지 않게) */
 @media (orientation: portrait) and (min-width: 600px) and (max-width: 1100px) {
-  body.has-deck .guide-toast {
+  body.has-deck .guide-toast,
+  body[data-scene='prologue'] .guide-toast {
     left: 50%;
     right: auto;
     width: min(470px, calc(100% - 24px));
     transform: translate(-50%, -8px);
   }
-  body.has-deck .guide-toast.is-on {
+  body.has-deck .guide-toast.is-on,
+  body[data-scene='prologue'] .guide-toast.is-on {
     transform: translate(-50%, 0);
   }
 }
@@ -788,4 +830,43 @@ body.lightbox-open .to-top {
 }
 .reel-all {
   transition: opacity 0.3s;
+}
+
+/* 손가락 화면: 필름의 작은 단추도 누르는 자리 40px 넘게 — 보이는 크기 · 배치는 그대로 두고 둘레의 빈 자리(이웃과의 틈)까지 넓힌다.
+   알림 닫기(×) 28px · 덱 설명의 '프로젝트 보기 →' · '인터뷰 원문 보기 ↗' 34px · 장학증서 26×37px · 표지의 '다음 장면' 알약 38px.
+   표지의 장 단추(01 소개 · 02 프로젝트 · 03 보도 · 수상)와 엔딩의 더 보기 알약은 줄 사이가 좁아 높이 자체를 40px로 */
+@media (pointer: coarse) {
+  .gt-x,
+  .di-open,
+  .di-ghost,
+  .rec-honor button {
+    position: relative;
+  }
+  .gt-x::after,
+  .di-open::after,
+  .di-ghost::after,
+  .rec-honor button::after,
+  .next-cue::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+  }
+  /* .next-cue는 제자리가 absolute(장면 막대 위) — 테두리 안쪽에서 재므로 위아래 2px */
+  .next-cue::after {
+    inset: -2px 0;
+  }
+  .di-open::after {
+    inset: -3px 0;
+  }
+  /* 테두리(1px) 안쪽에서 재므로 1px 더 — '상장 전체 보기' · '모든 프로젝트' 38px이던 것 */
+  .di-ghost::after {
+    inset: -4px 0;
+  }
+  .rec-honor button::after {
+    inset: -2px -7px;
+  }
+  .hero-agenda button,
+  .endcard-links a {
+    min-height: 40px;
+  }
 }

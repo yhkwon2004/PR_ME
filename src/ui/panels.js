@@ -3,7 +3,7 @@ import { profile, scenes } from '../content.js';
 import { byId, projects as ALL_PROJECTS, categoryOf, FEATURED } from '../data/projects.js';
 import { AWARDS, AWARD_REEL, bestOf } from '../data/awards.js';
 import { ORGS, WALL } from '../data/orgs.js';
-import { projectCard, awardCard, pressCard, orgMark, deckInfo, deckAwardInfo, deckPressInfo, deckAllCard, deckAllInfo } from '../pages/site.js';
+import { projectCard, awardCard, pressCard, orgMark, deckInfo, deckAwardInfo, deckPressInfo, deckAllCard, deckAllInfo, sep } from '../pages/site.js';
 import { PRESS } from '../data/press.js';
 import { renderBeats, bindBeats } from './beats.js';
 
@@ -38,6 +38,10 @@ function stats(list = []) {
     .map((s) => `<div class="stat"><dt>${esc(s.label)}</dt><dd><b data-count="${esc(s.value)}">${esc(s.value)}</b>${s.unit ? `<small>${esc(s.unit)}</small>` : ''}</dd></div>`)
     .join('')}</dl>`;
 }
+
+// 덱 막대의 한 줄 수치(낮은 데스크톱): 수치마다 한 덩어리 — 막대에 다 들어가지 않으면 뒤 수치를 통째로 뺀다(premium.css), 주장이 '…'로 잘리지 않게.
+// 구분점 앞뒤는 같은 빈칸(NBSP — 덩어리 맨 앞의 빈칸도 접히지 않는다)이라 점이 가운데 서고, 복사 · 읽기 프로그램에도 '1종 · 2024'로 읽힌다
+const reelStats = (list) => (list ? list.map((s, k) => `<span>${k ? '&nbsp;·&nbsp;' : ''}${esc(s.value)} ${esc(s.label)}</span>`).join('') : '');
 
 // 카드 덱: 가운데 무대에 카드가 겹쳐 서고, 아래 막대에 번호 · 진행 눈금 · 넘김 버튼
 // cards · infos: 같은 순서의 카드와 설명 — 맨 끝에는 아카이브로 이어지는 '전체 보기' 카드와 설명
@@ -115,7 +119,7 @@ function creditBeat(c, kicker) {
       <p ${a(0)}><span class="cb-role">${esc(c.role)}</span></p>
       <p class="cb-line" ${a(1)}>${esc(c.line)}</p>
       <p class="cb-big" ${a(2)}>${esc(c.big)}</p>
-      <p class="cb-copy" ${a(3)}>© 2026 ${esc(profile.name)} · ${esc(profile.en)} — Three.js · GSAP · Web Audio</p>
+      <p class="cb-copy" ${a(3)}>© 2026 <span class="is-ko">${esc(profile.name)}</span> · ${esc(profile.en)} — Three.js · GSAP · Web Audio</p>
     </section>`;
 }
 
@@ -150,7 +154,7 @@ function render(scene, i) {
       <div class="reel-head panel-content">
         ${kicker(scene, i)}
         <h2 class="title">${lines(scene.title)}</h2>
-        ${scene.subtitle ? `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>` : ''}
+        ${scene.subtitle ? `<p class="subtitle" data-r>${sep(scene.subtitle)}</p>` : ''}
         ${scene.stats ? `<ul class="mini-stats" data-r>${scene.stats.map((s) => `<li><b>${esc(s.value)}</b><span>${esc(s.label)}</span></li>`).join('')}</ul>` : ''}
       </div>
       <div class="reel deck press-reel panel-content" data-r>
@@ -158,7 +162,7 @@ function render(scene, i) {
           count: PRESS.length,
           label: '보도 · 인터뷰',
           noun: '기사',
-          stats: scene.stats ? scene.stats.map((s) => `${esc(s.value)} ${esc(s.label)}`).join(' · ') : '',
+          stats: reelStats(scene.stats),
           infos: PRESS.map(deckPressInfo),
         })}
       </div>
@@ -170,7 +174,7 @@ function render(scene, i) {
       <div class="reel-head panel-content">
         ${kicker(scene, i)}
         <h2 class="title">${lines(scene.title)}</h2>
-        ${scene.subtitle ? `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>` : ''}
+        ${scene.subtitle ? `<p class="subtitle" data-r>${sep(scene.subtitle)}</p>` : ''}
         ${scene.stats ? `<ul class="mini-stats" data-r>${scene.stats.map((s) => `<li><b>${esc(s.value)}</b><span>${esc(s.label)}</span></li>`).join('')}</ul>` : ''}
       </div>
       <div class="reel deck panel-content" data-r>
@@ -186,7 +190,7 @@ function render(scene, i) {
               noun: '프로젝트',
               all: href,
               allLabel: '전체 보기',
-              stats: scene.stats ? scene.stats.map((s) => `${esc(s.value)} ${esc(s.label)}`).join(' · ') : '',
+              stats: reelStats(scene.stats),
               infos: list.map(deckInfo),
               end: {
                 card: deckAllCard({ href, label: `${field} 전체 보기`, total: ALL_PROJECTS.length, unit: 'PROJECTS', thumbs: moreThumbs(list) }),
@@ -253,7 +257,7 @@ function render(scene, i) {
       <p class="credits-hint" aria-hidden="true">스크롤 · 드래그로 넘겨 보기</p>
       <button type="button" class="skip" id="skip-credits">SKIP ▸</button>
       <div class="endcard panel-content">
-        <p class="endcard-kicker" data-r>THE END — 그리고 다음 장면</p>
+        <p class="endcard-kicker" data-r>THE END&nbsp;— <span class="is-ko">그리고 다음 장면</span></p>
         <h2 class="title title-end">${lines(scene.end)}</h2>
         <p class="endcard-en" data-r>${esc(scene.endEn)}</p>
         <ul class="contact" data-r>${profile.links
@@ -271,7 +275,7 @@ function render(scene, i) {
           .join('')}</nav>
         <div class="endcard-actions" data-r>
           <button type="button" class="btn-replay" id="btn-replay"><span aria-hidden="true">↺</span> 처음부터 다시 보기</button>
-          <span class="sig">${esc(profile.name)} · ${esc(profile.en)} — ${esc(profile.role)}</span>
+          <span class="sig"><span class="is-ko">${esc(profile.name)}</span> · ${esc(profile.en)} — ${esc(profile.role)}</span>
         </div>
       </div>
     </div>`;
@@ -279,7 +283,7 @@ function render(scene, i) {
   if (L === 'stage') {
     // 중앙 무대: 제목은 위 가운데, 카드는 아래 가운데 — 가운데 띠는 3D 피사체의 자리
     let head = '';
-    if (scene.subtitle) head += `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>`;
+    if (scene.subtitle) head += `<p class="subtitle" data-r>${sep(scene.subtitle)}</p>`;
     if (scene.lead) head += `<p class="lead" data-r>${esc(scene.lead)}</p>`;
     if (scene.counters)
       head += `<dl class="counters" data-r>${scene.counters
@@ -352,7 +356,7 @@ function render(scene, i) {
   }
   // split-left / split-right
   let body = '';
-  if (scene.subtitle) body += `<p class="subtitle" data-r>${esc(scene.subtitle)}</p>`;
+  if (scene.subtitle) body += `<p class="subtitle" data-r>${sep(scene.subtitle)}</p>`;
   if (scene.lead) body += `<p class="lead" data-r>${esc(scene.lead)}</p>`;
   if (scene.pillars)
     body += `<div class="pillars">${scene.pillars

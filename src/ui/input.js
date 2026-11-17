@@ -28,11 +28,11 @@ const MOUSE_PULL = 64;
 // 짧게 튕기기: 이만큼(px)만 움직였어도 빠르게(px/ms) 튕기고 놓았으면 넘긴다
 const FLICK = 22;
 const FLICK_V = 0.45;
-// 패널 글을 끝까지 스크롤한 손가락이 떼지 않고 더 밀면: 끝에 닿은 자리부터 이만큼 더 밀어야 넘어간다
-const HANDOFF = PULL + 18;
 const html = document.documentElement;
 
-export function createInput({ next, prev, first, last, isBlocked, onKey, onPull, pullLabel }) {
+// scroller: 키보드가 먼저 스크롤할 지금 화면(소개 화면 — 낮은 창 · 휴대폰에서는 화면 안에서 스크롤한다). 없으면 키는 바로 넘긴다
+// settled: 그 화면이 다 들어섰는지 — 들어서는 중에는 스크롤할 화면이어도 키를 버린다
+export function createInput({ next, prev, first, last, isBlocked, onKey, onPull, pullLabel, scroller, settled }) {
   let acc = 0;
   let lockUntil = 0;
   let sceneUntil = 0; // 카드를 넘긴 뒤 이때까지는 카드만(덱 끝에서 연달아 누른 키 · 휠이 다음 장면으로 새지 않게)
@@ -89,7 +89,6 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
   let ly = 0; // 손가락 속도 재기: 마지막 위치 · 시각 · 속도(px/ms)
   let lt = 0;
   let vy = 0;
-  let base = null; // 패널 글을 끝까지 스크롤한 뒤 이어서 미는 손가락: 끝에 닿은 자리
   let pull = null; // 지금 끄는 중인 당겨 넘기기 { dir, p, armed, label }
   // 손가락을 댄 곳이 알림 · 크레딧처럼 자기 몫의 끌기가 있는 곳이면 당겨 넘기기를 쓰지 않는다
   const ownsDrag = (el) => !!el?.closest?.('.guide-toast, .credits');
@@ -112,7 +111,6 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
       sy = ly = t.clientY;
       st = lt = performance.now();
       vy = 0;
-      base = null;
       startEl = e.target;
       // 손가락을 대는 순간 패널이 더 스크롤될 수 있었는지 기억한다
       couldScroll = { 1: !!scrollableAncestor(startEl, 1), '-1': !!scrollableAncestor(startEl, -1) };
@@ -135,19 +133,14 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
       const dy = t.clientY - sy;
       if (Math.abs(dy) < 12 || Math.abs(dy) < Math.abs(dx) * 1.2) return endPull();
       const dir = dy < 0 ? 1 : -1;
-      let dist = Math.abs(dy);
-      let need = PULL;
-      if (couldScroll[dir]) {
-        // 패널 글을 스크롤하던 손가락: 끝에 닿으면 떼지 않아도 그 자리부터 이어서 당겨 넘긴다
-        if (scrollableAncestor(startEl, dir)) return endPull();
-        if (base === null) base = t.clientY;
-        dist = (base - t.clientY) * dir;
-        need = HANDOFF;
-        if (dist < 12) return endPull();
-      } else if (scrollableAncestor(startEl, dir)) return endPull();
+      // 패널 글을 스크롤하던 손가락(손가락을 댈 때 그쪽으로 더 스크롤할 글이 있었다)은 끝에 닿아도 이 끌기로는 넘기지 않는다 —
+      // 넘친 글이 몇십 px뿐이면 한 번 민 손가락이 그 글을 스치듯 지나 바로 다음 화면으로 넘어가, 끝 줄이 멈춰 보이지 않았다.
+      // 글 끝에서 다시 민 손가락(다음 끌기)이 넘긴다
+      if (couldScroll[dir] || scrollableAncestor(startEl, dir)) return endPull();
+      const dist = Math.abs(dy);
       const label = pullLabel?.(dir, 'swipe');
       if (!label) return endPull();
-      setPull({ dir, p: (dist - 12) / (need - 12), armed: dist >= need, label });
+      setPull({ dir, p: (dist - 12) / (PULL - 12), armed: dist >= PULL, label });
     },
     { passive: true }
   );
@@ -212,9 +205,7 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
       };
       if (Math.abs(dy) >= Math.abs(dx)) {
         const dir = dy < 0 ? 1 : -1;
-        // 글을 끝까지 스크롤하고 이어 민 손가락: 끝에서부터 다 밀었을 때만
-        if (base !== null) return st0?.armed && st0.dir === dir ? go(dir, 650, 'swipe') : endPull();
-        // 세로 스와이프가 패널 스크롤이었다면 장면을 넘기지 않는다
+        // 세로 스와이프가 패널 스크롤이었다면(끝에 닿았어도) 장면을 넘기지 않는다 — 다음 스와이프가 넘긴다
         if (couldScroll[dir] || scrollableAncestor(startEl, dir)) return endPull();
         // 다 당겨 놓았거나(천천히 끌어도) · 빨리 밀었거나 · 짧아도 빠르게 튕겼으면
         const flick = Math.abs(dy) >= FLICK && performance.now() - lt < 90 && Math.abs(vy) >= FLICK_V && Math.sign(vy) === Math.sign(dy);
@@ -230,6 +221,53 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
     { passive: true }
   );
 
+  // 화면 안에서 스크롤하는 소개 화면('아래에 더 있어요 ↓'): ↓ · ↑ · PageDown · PageUp · Space는 휠처럼 가려진 글을 먼저 보여 주고
+  // (↓ · ↑는 몇 줄씩, PageDown · PageUp · Space는 아래 흐림 띠를 뺀 한 화면씩), 끝에 닿은 뒤에 새로 누른 키가 화면을 넘긴다.
+  // 스크롤로 시작한 누름은 누르고 있어도(자동 반복) 끝에서 멈춘다 — 손가락 스와이프와 같다. ← · →는 늘 바로 넘긴다.
+  // 화면을 넘긴 잠금(lockUntil) 동안의 누름은 넘길 때처럼 버린다 — 아직 들어오는 화면을 스크롤하면 그 화면이 끝까지 내려간 채
+  // 도착해 머리줄 · 제목이 HUD 밑에 가려졌다(빠르게 ↓ ↓)
+  let keyScrolled = false;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  // 부드럽게 스크롤: 그림마다 scrollTop을 직접 옮긴다(scrollBy의 smooth 스크롤은 가끔 움직이지 않고 끝나 키 한 번이 헛돌 때가
+  // 있었다 — 측정 중 열두 번에 두 번). 이어 누르면 이어서 더 가고, 그사이 손가락 · 휠이 움직이면 멈춘다
+  let tween = null;
+  const glide = (el, by) => {
+    const max = el.scrollHeight - el.clientHeight;
+    const from = el.scrollTop;
+    let to = Math.max(0, Math.min(max, (tween?.el === el ? tween.to : from) + by));
+    // 끝(위 · 아래)까지 몇 px만 남으면 끝까지 — 글 없는 몇 px 띠만 옮기는 누름은 아무것도 안 바뀐 것처럼 보여 키 한 번이 헛돈다
+    if (by > 0 && max - to < 24) to = max;
+    if (by < 0 && to < 24) to = 0;
+    if (tween) cancelAnimationFrame(tween.raf);
+    tween = null;
+    if (reduce.matches) return void (el.scrollTop = to);
+    const t0 = performance.now();
+    const tw = (tween = { el, to, last: from, raf: 0 });
+    const frame = (now) => {
+      if (tween !== tw || Math.abs(el.scrollTop - tw.last) > 2) return void (tween === tw && (tween = null));
+      const p = Math.min(1, (now - t0) / 260);
+      el.scrollTop = from + (to - from) * (1 - (1 - p) ** 3);
+      tw.last = el.scrollTop;
+      if (p < 1) tw.raf = requestAnimationFrame(frame);
+      else tween = null;
+    };
+    tw.raf = requestAnimationFrame(frame);
+  };
+  const keyScroll = (dir, k, repeat) => {
+    if (!repeat) keyScrolled = false;
+    if (k === 'ArrowRight' || k === 'ArrowLeft') return false;
+    const el = scrollableAncestor(scroller?.(), dir);
+    if (!el) return repeat && keyScrolled;
+    // 아직 들어서는 화면(장면이 바뀌는 중 · 화면 칸을 누른 직후): 누름을 버린다 — 잠금(lockUntil)이 끝난 뒤에도 줄이 다 나타나기 전이면
+    if (settled && !settled()) return true;
+    const cs = getComputedStyle(el);
+    const view = el.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    glide(el, dir * (k === 'ArrowDown' || k === 'ArrowUp' ? 80 : Math.max(80, view - 48)));
+    keyScrolled = true;
+    return true;
+  };
+  addEventListener('keyup', () => (keyScrolled = false));
+
   addEventListener('keydown', (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     if (onKey(e)) return;
@@ -237,9 +275,13 @@ export function createInput({ next, prev, first, last, isBlocked, onKey, onPull,
     const k = e.key;
     if (['ArrowDown', 'ArrowRight', 'PageDown'].includes(k) || (k === ' ' && !e.target.closest('button, a'))) {
       e.preventDefault();
+      if (performance.now() < lockUntil) return;
+      if (keyScroll(1, k, e.repeat)) return;
       fire(1, 600, undefined, e.repeat ? 170 : 0, e.repeat);
     } else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(k)) {
       e.preventDefault();
+      if (performance.now() < lockUntil) return;
+      if (keyScroll(-1, k, e.repeat)) return;
       fire(-1, 600, undefined, e.repeat ? 170 : 0, e.repeat);
     } else if (k === 'Home') {
       e.preventDefault();

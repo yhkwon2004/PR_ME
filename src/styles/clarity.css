@@ -26,8 +26,100 @@
   font-weight: 700;
   letter-spacing: 0;
 }
+.nc-t small {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+/* 필름 장면의 한국어 작은 이름표(장면 머리줄의 한국어 이름 · 덱 막대의 'n 프로젝트'와 한 줄 수치 · 전체 보기 ·
+   설명 줄의 매체 이름 · 수상 등급 · 보도 관계 · 수여 기관 · 카드의 수여 기관 · 제목 아래 수치 이름 · 연도별 수상 · 기사 원문 ·
+   덱 끝 카드의 '전체 보기' · 크레딧의 '대상을 받은 대회' · 출연작의 상 이름 · 넘김 안내 · 이름 · 목차의 안내 줄과 '모아 보기' 칸 ·
+   첫 안내 카드의 작은 줄 · 엔드 카드의 '그리고 다음 장면' · 서명의 이름)도 '다음 장면'처럼 본문 글꼴로 —
+   영문 꼬리표(DRONE & MOBILITY · AI · PROJECTS)와 숫자만 고정폭 */
+.kicker .k-ko,
+.deck-label,
+.deck-label .reel-stats,
+.deck-bar .reel-all,
+.di-award,
+.di-grade,
+.di-rel,
+.di-cat.is-ko,
+.di-issuer.is-ko,
+.card-meta.is-ko,
+.card-meta .is-ko,
+.mini-stats span,
+.rec-years > span:first-child,
+.pc-foot i,
+.all-copy small,
+.cb-grand-h,
+.credits-hint,
+.cb-copy .is-ko,
+.cb-cast-list em,
+.index-kicker,
+.index-archive span,
+.index-archive:not(.index-contact) a,
+.hc-t small,
+.endcard-kicker .is-ko,
+.sig .is-ko {
+  font-family: var(--sans);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.deck-label b {
+  font-family: var(--mono);
+  letter-spacing: 0.14em;
+}
 .ix-code {
   letter-spacing: 0.08em;
+}
+/* 페이지의 한국어 작은 이름표(머리줄의 한국어 · 수상 수 · 분류 · 더 보기 · 숫자 이름 · 자격 분야)도 본문 글꼴로 —
+   영문 꼬리표(RÉSUMÉ · WITH …)만 고정폭 넓은 자간 */
+.pg-kicker .pk-ko,
+.ow-aw,
+.ab-pk,
+.ab-more,
+.ab-nums dt,
+.sk-cert small,
+.sk-dnum span,
+.sk-cnt small,
+.sk-sec-n span,
+.sk-flags em,
+.sk-sum dt,
+.sk-legend,
+.aw-y-tiers,
+.ab-time small {
+  font-family: var(--sans);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.pg-kicker .pk-ko {
+  font-size: 12px;
+}
+/* 짧은 이름 · 설명: 마지막 줄에 낱말 하나만 남지 않게 줄을 고르게(줄은 낱말 사이에서만 — '앞·뒷면'의 점 앞에서 끊기지 않게) */
+.ow-name,
+.dp-t small,
+.aw-proj-t b,
+.gal-cap,
+.st-cap,
+.subtitle,
+.hero-lead,
+.ab-prole,
+.ab-pone,
+.d-next-t,
+.dp-t b,
+.ow-proj a,
+.sk-sec-lead,
+.d-with-t small {
+  text-wrap: balance;
+  word-break: keep-all;
+}
+.wall-note,
+.sk-lead,
+.ab-tl li,
+.ab-aw b,
+.ab-press b {
+  text-wrap: pretty;
 }
 
 /* 세로 휴대폰: 아이콘 아래에 짧은 이름 */

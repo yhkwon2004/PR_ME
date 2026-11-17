@@ -1508,6 +1508,23 @@ body.page-open .title-card {
     position: absolute;
     inset: -13px -7px;
   }
+  /* 이력서 '더 보기' · 연락처 칩 · 공유 · 기술 근거 링크도 40px 넘게(모양은 그대로) — 기관 벽의 프로젝트 칩은 premium.css */
+  .ab-more,
+  .ab-links a,
+  .d-share {
+    position: relative;
+  }
+  .ab-more::after,
+  .ab-links a::after,
+  .d-share::after,
+  .sk-evl a::after {
+    content: '';
+    position: absolute;
+    inset: -5px 0;
+  }
+  .ab-more::after {
+    inset: -14px -6px;
+  }
   .pg-brand::after {
     content: '';
     position: absolute;
@@ -1596,7 +1613,7 @@ body.page-open .title-card {
     display: none;
   }
   .reel-stats {
-    display: inline-block;
+    display: inline-flex;
   }
 }
 

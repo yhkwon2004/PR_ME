@@ -974,9 +974,15 @@
 }
 @media (pointer: coarse) {
   .sk-proj a {
+    min-height: 40px; /* 누르는 자리 40px 넘게 */
     padding: 9px 12px 9px 11px;
   }
-  .index-archive a {
+  /* 목차의 바로가기 · 연락처 알약과 '이메일 복사'도 누르는 자리 44px */
+  .index-archive a,
+  .index-archive .ic-copy {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     padding: 11px 16px;
   }
 }

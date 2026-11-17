@@ -139,6 +139,11 @@ let lastInput = performance.now();
 let lastHand = 0; // 마지막으로 손을 쓴 시각(멈춤 상태로 늘리지 않는 실제 입력)
 let hintsLeft = 4;
 const coarse = matchMedia('(pointer: coarse)').matches;
+// 휴대폰 · 세로 태블릿 · 가로 휴대폰(과 폭 820 이하의 창) · 높이 660 이하의 낮은 창(beats.css의 촘촘한 단계와 같은 높이)의 소개 화면:
+// 알림이 설 자리(위 머리줄 · 왼쪽 아래)가 막 고른 화면의 글(머리줄 · 제목 · 학력 줄 · 지금 화면의 사진 설명)과 겹치거나 12px 안으로 붙는다 —
+// 손으로 화면을 고른 것 자체가 직접 넘기는 중이라는 뜻이므로 알림 없이 멈춘다. 폭 1000 이하의 가로 창(반으로 나눈 화면 · 작은 창)도 —
+// 아래 화면 칸 왼쪽 자리가 좁아 알림이 낱말마다 꺾인 3 — 6줄 덩어리가 되어 학력 줄에 닿았다(821×720)
+const phoneBeats = matchMedia('(max-width: 1000px), (orientation: portrait) and (max-width: 1100px), (max-height: 660px)');
 ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach((t) =>
   addEventListener(
     t,
@@ -219,7 +224,7 @@ const panels = createPanels($('stage'), scenes, {
     const h = holdOf(director?.index);
     if (h > 0 && !byAuto) elapsed = (h * index) / count;
     if (entry) return;
-    if (!byAuto) takeOver();
+    if (!byAuto) takeOver(phoneBeats.matches);
     audio.pluck(index, index > prev ? 1 : -1);
     if (index === count - 1) hintNextScene(1600);
   },
@@ -260,11 +265,12 @@ const guide = createGuide(scenes, {
   },
 });
 // 손으로 넘기기 시작하면(휠 · 스와이프 · 방향키 · 카드) 자동 재생을 멈춘다 — 읽는 도중 장면이 넘어가지 않게
-function takeOver() {
+// quiet: 멈춘 까닭을 알리는 알림은 띄우지 않는다(자동 재생 상태는 위 HUD의 '자동' 단추가 보여 준다)
+function takeOver(quiet = false) {
   if (!auto || !started) return;
   auto = false;
   hud.setAuto(false);
-  guide.takeover();
+  if (!quiet) guide.takeover();
 }
 
 // ── 작품 아카이브 · 상세 페이지 ─────────────────────────────────
@@ -413,6 +419,9 @@ createInput({
   },
   first: () => goTo(0),
   last: () => goTo(scenes.length - 1),
+  // 키보드가 먼저 스크롤할 곳: 지금 장면의 지금 소개 화면(화면 안에서 스크롤하는 단계일 때만 스크롤할 여지가 있다)
+  scroller: () => (started ? panels.current?.beats?.el : null),
+  settled: () => panels.current?.beats?.settled ?? true,
   isBlocked: () => !started || lightbox.open || hud.indexOpen || site.open || site.busy,
   onKey: (e) => {
     if (lightbox.key(e)) return true;
@@ -767,16 +776,33 @@ function idleHint() {
     return true;
   }
   const label = nextLabel();
-  return label ? guide.sceneHint(label, hintRect()) : false;
+  return label ? guide.sceneHint(label, hintRect(), liftRoom()) : false;
 }
-// 넘김 안내(손끝)를 둘 자리: 카드가 있으면 카드 위, 화면(비트) 장면이면 글이 가운데를 차지하니 아래 화면 칸 바로 위
+// 넘김 안내(손끝)를 둘 자리: 카드가 있으면 카드 위, 화면(비트) 장면이면 아래 화면 칸 위의 빈자리 —
+// 손끝 · 글씨가 오르내리는 띠(칸 위 9 — 137px)가 글과 12px 넘게 떨어질 때만. 글이 칸 가까이까지 차 있으면(대부분의 소개 화면)
+// 손끝은 두지 않고(false) 화면을 끌어 올려 보이는 시연과 아래 표시(다음 화면 이름)만 — 글 위에 겹쳐 그리지 않게
 function hintRect() {
   const card = panels.current?.reel?.card;
   if (card) return card.getBoundingClientRect();
   const nav = panels.current?.beats && panels.current.querySelector('.beat-nav');
   if (!nav) return undefined;
   const r = nav.getBoundingClientRect();
+  const body = panels.current.querySelector('.beat:not([hidden]) .bt-body')?.getBoundingClientRect();
+  if (body && r.top - body.bottom < 150) return false;
   return { left: r.left, width: r.width, top: r.top - 70, height: 0 };
+}
+// 넘김 안내 시연이 화면(무대)을 끌어 올려도 되는 만큼(px, 무대 좌표): 소개 화면은 머리줄과 위 HUD 사이의 빈자리에서 12px을 남긴
+// 만큼까지 — 머리줄을 HUD 바로 아래에 둔 휴대폰 · 낮은 창에서 머리줄이 HUD 밑으로 들어가지 않게. 화면 안에서 스크롤해 내려간
+// 화면은 머리줄이 이미 위로 지나가 있으므로 0(흐려 지운 위 띠가 HUD 쪽으로 따라 올라오지 않게). 그 밖의 장면은 제한 없음
+function liftRoom() {
+  const top = panels.current?.beats && panels.current.querySelector('.beat:not([hidden]) .bt-top');
+  if (!top) return undefined;
+  const hud = [...document.querySelectorAll('.hud-top .brand, .hud-top .hud-nav > *')].reduce((b, e) => {
+    const r = e.getBoundingClientRect();
+    return r.height ? Math.max(b, r.bottom) : b;
+  }, 0);
+  const zoom = parseFloat(getComputedStyle($('stage')).zoom) || 1; // 세로 태블릿은 무대를 --tz배로 키운다
+  return Math.max(0, (top.getBoundingClientRect().top - hud - 12) / zoom);
 }
 // 아래로 넘기면 무엇이 오는지: 화면(비트)이 남았으면 다음 화면, 아니면 다음 장면
 function nextLabel() {
@@ -821,7 +847,7 @@ function hintNextScene(delay) {
     const reel = panels.current?.reel;
     if (!coarse && reel && reel.focus < reel.count - 1) return; // 넘길 카드가 남았으면 카드 안내가 먼저(휴대폰은 위로 밀면 바로 다음 장면)
     const label = nextLabel();
-    if (!label || !guide.sceneHint(label, hintRect())) return;
+    if (!label || !guide.sceneHint(label, hintRect(), liftRoom())) return;
     hintedScenes.add(key);
     lastInput = performance.now(); // 손을 쉬는 안내(idleHint)가 곧바로 또 뜨지 않게
   }, delay);

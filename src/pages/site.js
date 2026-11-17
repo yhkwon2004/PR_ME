@@ -9,6 +9,30 @@ import { DOMAIN_SKILLS, SKILLS, CERTS, SKILL_COUNT } from '../data/skills.js';
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const pad = (n) => String(n).padStart(2, '0');
+// 가운뎃점 · 줄표가 줄 맨 앞에 서지 않게: 앞 낱말과 붙는 공백(NBSP)으로 묶는다 — 줄은 점 · 줄표 뒤에서만 바뀐다.
+// 띄어 쓰지 않은 점('앞·뒷면')도 점 앞에서는 줄이 바뀌지 않게 이음표(WORD JOINER)를 둔다
+// 하이픈으로 이은 영문 낱말(End-to-End · IDEA-GO-ROUND)도 하이픈 뒤에서 줄이 바뀌지 않게 이음표를 둔다
+export const sep = (s = '') =>
+  esc(s)
+    .replace(/(\S)·/g, '$1&#8288;·')
+    .replace(/([A-Za-z0-9])-(?=[A-Za-z0-9])/g, '$1-&#8288;')
+    .replace(/ ([·—–→]) /g, '&nbsp;$1 ');
+// 하이픈으로 이은 영문 낱말(End-to-End · IDEA-GO-ROUND · Do-Dream)을 한 덩어리(.nw)로 — 이미 esc()한 본문 글에만(속성 값에는 쓰지 않는다)
+const hy = (h = '') => h.replace(/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g, '<span class="nw">$&</span>');
+// 한 줄 소개 끝의 '… 스마트팜 + 앱': '+ 앱'이 마지막 줄에 홀로 서지 않게 앞 낱말과 묶는다 — 짧은 끝 낱말('… 업사이클 상자')도 앞 낱말과
+const tieEnd = (s = '') =>
+  esc(s)
+    .replace(/ \+ (\S+)$/, '&nbsp;+&nbsp;$1')
+    .replace(/ (\S{1,6})$/, '&nbsp;$1');
+// 필름 덱의 작은 이름표(분류 · 매체 · 수여 기관): 한국어가 든 것만 .is-ko — 본문 글꼴로(clarity.css). 영문 꼬리표는 고정폭 그대로
+const koCls = (s = '') => (/[가-힣]/.test(s) ? ' is-ko' : '');
+// 대문자 낱말 둘로 된 이름(INFU RETRO)은 그 사이에서 줄이 바뀌지 않게
+const caps = (h = '') => h.replace(/\b([A-Z]{2,}) ([A-Z]{2,})\b/g, '$1&nbsp;$2');
+// 페이지 머리줄: 영문 꼬리표는 고정폭(넓은 자간), 한국어는 본문 글꼴로(clarity.css) — 넓은 자간 고정폭 한국어는 글자가 낱낱이 흩어져 보인다
+const kicker = (text) => {
+  const [en, ...ko] = String(text).split(' — ');
+  return `<p class="pg-kicker">${esc(en)}${ko.length ? `&nbsp;— <span class="pk-ko">${sep(ko.join(' — '))}</span>` : ''}</p>`;
+};
 // 주소의 # — 잘못 인코딩된 #(%ZZ 같은)는 그대로 쓴다(덱 · 페이지가 멈추지 않게)
 const hashOf = (h) => {
   try {
@@ -140,7 +164,7 @@ export function projectCard(p, i, { cls = 'card' } = {}) {
       ${awardBadge(p)}
       <figcaption class="card-cap">
         ${p.year ? `<span class="card-meta">${esc(p.year)}</span>` : ''}
-        <h3 class="card-title">${esc(p.title)}</h3>
+        <h3 class="card-title">${sep(p.title)}</h3>
         <span class="card-line">${esc(p.oneLiner)}</span>
       </figcaption>
       <span class="card-open" aria-hidden="true">↗</span>
@@ -157,7 +181,7 @@ export function orgMark(o, { decorative = false } = {}) {
     // 이름이 곁에 따로 적히는 자리(decorative)에서는 상징만
     return o.lockup && !decorative ? `<span class="org-lockup" role="img" aria-label="${esc(o.name)}">${im}<b>${esc(o.name)}</b></span>` : im;
   }
-  return `<span class="org-word"${decorative ? ' aria-hidden="true"' : ` role="img" aria-label="${esc(o.name)}"`}><b>${esc(o.mark)}</b><small>${esc(o.en)}</small></span>`;
+  return `<span class="org-word"${decorative ? ' aria-hidden="true"' : ` role="img" aria-label="${esc(o.name)}"`}><b>${esc(o.mark)}</b><small>${sep(o.en)}</small></span>`;
 }
 
 // 기관 × 프로젝트: 기관마다 로고 아래에 함께한 프로젝트와 받은 상 수를 붙인다
@@ -173,10 +197,14 @@ function withWall({ compact = false } = {}) {
       .filter(({ id }) => byId(id) && !seen.has(id) && seen.add(id))
       .map(({ id, rel }) => {
         const p = byId(id);
-        return `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}" title="${esc(rel)}">${esc(p.title)}</a></li>`;
+        return `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}" title="${esc(rel)}">${sep(p.title)}</a></li>`;
       })
       .join('');
-    const mark = o.url ? `<a class="ow-mark" href="${esc(o.url)}" target="_blank" rel="noopener">${orgMark(o)}</a>` : `<span class="ow-mark">${orgMark(o)}</span>`;
+    // 정부 상징(lockup)은 타일 아래에 이름이 바로 적히므로 상징만 — 이름을 곁에 또 적으면 좁은 타일을 넘어 잘렸다
+    const logo = orgMark(o, { decorative: !!o.lockup });
+    const mark = o.url
+      ? `<a class="ow-mark" href="${esc(o.url)}" target="_blank" rel="noopener"${o.lockup ? ` aria-label="${esc(o.name)}"` : ''}>${logo}</a>`
+      : `<span class="ow-mark">${logo}</span>`;
     return `<li class="ow${o.logo ? '' : ' is-text'}${chips ? '' : ' is-solo'}">
       ${mark}
       <p class="ow-name">${esc(o.name)}${awards ? `<span class="ow-aw">수상 ${awards}</span>` : ''}</p>
@@ -184,10 +212,10 @@ function withWall({ compact = false } = {}) {
     </li>`;
   };
   return `<section class="with-wall reveal" aria-label="${compact ? '함께한 기관' : '함께한 기관과 프로젝트'}">
-    <p class="pg-kicker">WITH — 학교 · 협업 기관 · 상을 준 곳${compact ? '' : ' × 프로젝트'}</p>
+    ${kicker(`WITH — 학교 · 협업 기관 · 상을 준 곳${compact ? '' : ' × 프로젝트'}`)}
     <h2 class="ww-title">함께한 기관<sup>${pad(WALL.length)}</sup></h2>
     <ul class="wall${compact ? ' is-compact' : ''}">${WALL.map(tile).join('')}</ul>
-    <p class="wall-note">로고는 기관 원본 파일 또는 상장에 인쇄된 로고를 흰색 단색으로만 바꾼 것입니다. 학업 · 수상 · 협업 이력을 밝히는 표기이며 후원이나 보증을 뜻하지 않습니다.</p>
+    <p class="wall-note">로고는 기관 원본 파일 또는 상장에 인쇄된 로고를 흰색 단색으로만 바꾼 것입니다. 학업 · 수상 · 협업 이력을 밝히는 표기이며 후원이나 보증을 뜻하지&nbsp;않습니다.</p>
   </section>`;
 }
 
@@ -199,7 +227,7 @@ const issuerLine = (a) => {
   const prize = (a.prize || '').split(' · ').filter((x) => x && !who.some((w) => norm(w).endsWith(norm(x).replace(/(상|표창)$/, ''))));
   const parts = [...who, ...prize];
   // 구분점은 앞 조각 끝에 붙여, 줄이 바뀌어도 새 줄이 '·'로 시작하지 않게
-  return parts.map((x, k) => `<span class="nw">${esc(x)}${k < parts.length - 1 ? ' ·' : ''}</span>`).join(' ');
+  return parts.map((x, k) => `<span class="nw">${esc(x)}${k < parts.length - 1 ? '&nbsp;·' : ''}</span>`).join(' ');
 };
 // 상장(없으면 시상 사진)을 라이트박스 목록으로
 function awardMedia(list) {
@@ -234,7 +262,7 @@ function awardTile(a) {
       ${a.certs.length || a.photo ? `<button type="button" class="aw-sheet" data-cert="${a.at}" data-n="${a.certs.length || 1}" aria-label="${esc(a.contest)} ${a.certs.length ? '상장' : '시상 사진'} 크게 보기">${certSheet(a, { sizes: '(max-width: 599px) 44vw, 240px' })}<span class="card-glare" aria-hidden="true"></span></button>` : `<div class="aw-sheet">${certSheet(a)}</div>`}
       <div class="aw-info">
         <p class="aw-top"><span class="aw-grade">${LAUREL}${esc(a.grade)}</span><time datetime="${esc(a.date)}">${esc(a.date.replace(/-/g, '.'))}</time></p>
-        <h3 class="aw-contest">${esc(a.contest)}</h3>
+        <h3 class="aw-contest">${hy(esc(a.contest))}</h3>
         ${a.issuer || a.prize ? `<p class="aw-issuer">${issuerLine(a)}</p>` : ''}
         ${awardOrgLogos(a)}
         ${
@@ -257,11 +285,11 @@ export function deckInfo(p) {
   const c = categoryOf(p.category);
   const b = bestOf(p);
   return `<div class="di">
-    <p class="di-meta"><span class="di-cat" data-cat="${esc(p.category)}">${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}${
+    <p class="di-meta"><span class="di-cat${koCls(c.label)}" data-cat="${esc(p.category)}">${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}${
       b ? `<span class="di-award" data-tier="${b.key}">${LAUREL}${esc(b.label)}${b.count > 1 ? ` 외 ${b.count - 1}건` : ''}</span>` : ''
     }${diOrgs(orgsOf(p.id))}</p>
-    <h3 class="di-title">${esc(p.title)}</h3>
-    ${p.oneLiner ? `<p class="di-line">${esc(p.oneLiner)}</p>` : ''}
+    <h3 class="di-title">${sep(p.title)}</h3>
+    ${p.oneLiner ? `<p class="di-line">${tieEnd(p.oneLiner)}</p>` : ''}
     <p class="di-actions"><a class="di-open" href="${p.path}" data-link data-cat="${esc(p.category)}">프로젝트 보기 <span aria-hidden="true">→</span></a></p>
   </div>`;
 }
@@ -269,9 +297,9 @@ export function deckAwardInfo(a) {
   const p = a.project;
   const who = (a.issuer || '').split(' · ')[0];
   return `<div class="di" data-tier="${TIER_KEY[a.tier]}">
-    <p class="di-meta"><span class="di-grade">${LAUREL}${esc(a.grade)}</span><span>${esc(a.date.replace(/-/g, '.'))}</span>${who ? `<span class="di-issuer">${esc(who)}</span>` : ''}${diOrgs(awardOrgs(a).map((k) => ORGS[k]))}</p>
-    <h3 class="di-title">${esc(a.contest)}</h3>
-    <p class="di-line">${esc(p.title)}${p.oneLiner ? ` — ${esc(p.oneLiner)}` : ''}</p>
+    <p class="di-meta"><span class="di-grade">${LAUREL}${esc(a.grade)}</span><span>${esc(a.date.replace(/-/g, '.'))}</span>${who ? `<span class="di-issuer${koCls(who)}">${esc(who)}</span>` : ''}${diOrgs(awardOrgs(a).map((k) => ORGS[k]))}</p>
+    <h3 class="di-title">${hy(esc(a.contest))}</h3>
+    <p class="di-line">${sep(p.title)}${p.oneLiner ? `&nbsp;— ${tieEnd(p.oneLiner)}` : ''}</p>
     <p class="di-actions"><a class="di-open" href="${p.path}" data-link data-cat="${esc(p.category)}">수상 프로젝트 보기 <span aria-hidden="true">→</span></a><a class="di-ghost" href="/awards" data-link>상장 전체 보기</a></p>
   </div>`;
 }
@@ -282,13 +310,13 @@ export function deckAllCard({ href, label, total, unit, thumbs }) {
       <span class="all-grid" aria-hidden="true">${thumbs.map((src) => `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" />`).join('')}</span>
       <span class="card-shade" aria-hidden="true"></span>
       <span class="all-copy"><small>전체 보기</small><b>${total}</b><span>${esc(unit)}</span><i aria-hidden="true">↗</i></span>
-      <figcaption class="card-cap"><span class="card-meta">모아 보기</span><h3 class="card-title">${esc(label)}</h3></figcaption>
+      <figcaption class="card-cap"><span class="card-meta is-ko">모아 보기</span><h3 class="card-title">${esc(label)}</h3></figcaption>
     </figure>
   </a>`;
 }
 export function deckAllInfo({ href, title, line, cta, ghost }) {
   return `<div class="di di-all">
-    <p class="di-meta"><span class="di-cat">모아 보기</span><span>${projects.length} PROJECTS · ${AWARDS.length} AWARDS</span></p>
+    <p class="di-meta"><span class="di-cat is-ko">모아 보기</span><span>${projects.length} PROJECTS · ${AWARDS.length} AWARDS</span></p>
     <h3 class="di-title">${esc(title)}</h3>
     <p class="di-line">${esc(line)}</p>
     <p class="di-actions"><a class="di-open" href="${esc(href)}" data-link>${esc(cta)} <span aria-hidden="true">→</span></a>${ghost ? `<a class="di-ghost" href="${esc(ghost.href)}" data-link>${esc(ghost.label)}</a>` : ''}</p>
@@ -312,8 +340,8 @@ export function pressCard(a, k) {
       }</span>`
     : a.image
       ? `<span class="pc-photo"><img src="${esc(a.image.thumb)}" srcset="${esc(a.image.thumb)} 720w, ${esc(a.image.src)} ${a.image.w}w" sizes="${coverSizes(a.image, 1.34, 0.86)}" alt="${esc(a.image.alt)}" loading="lazy" decoding="async" /></span>`
-      : // 기사 사진을 받아 두지 못한 보도: 사진 칸에 기사 제목을 활자로
-        `<span class="pc-iv is-text"><small>NEWS${a.date ? ` · ${esc(a.date.replace(/-/g, '.'))}` : ''}</small><b>${esc(a.title)}</b></span>`;
+      : // 기사 사진을 받아 두지 못한 보도: 사진 칸에 기사 제목을 활자로(끝 낱말 '수상'이 홀로 줄에 남지 않게 tieEnd)
+        `<span class="pc-iv is-text"><small>NEWS${a.date ? ` · ${esc(a.date.replace(/-/g, '.'))}` : ''}</small><b>${tieEnd(a.title)}</b></span>`;
   const label = a.interview ? `${a.publisher} 인터뷰 — ${a.title} (새 창)` : `${a.publisher} 보도 — ${a.title} (새 창)`;
   return `<a class="r-card p-card${a.interview ? ' is-interview' : ''}" href="${esc(a.url)}" target="_blank" rel="noopener" data-cat="${esc(cat)}" data-rel="${relKey(a)}" aria-label="${esc(label)}">
     <figure class="card-media">
@@ -321,7 +349,7 @@ export function pressCard(a, k) {
       <span class="pc-rule" aria-hidden="true"></span>
       ${visual}
       <figcaption class="pc-cap">
-        <span class="card-meta">${[pressDate(a) || (a.interview ? '학보 인터뷰' : ''), pad(k + 1)].filter(Boolean).join(' · ')}</span>
+        <span class="card-meta">${[pressDate(a) || (a.interview ? '<span class="is-ko">학보 인터뷰</span>' : ''), pad(k + 1)].filter(Boolean).join(' · ')}</span>
         <h3 class="pc-title">${esc(a.title)}</h3>
         <span class="pc-foot"><em>${esc(a.relation)}</em><i aria-hidden="true">${a.interview ? '인터뷰 원문 ↗' : '기사 원문 ↗'}</i></span>
       </figcaption>
@@ -333,10 +361,10 @@ export function deckPressInfo(a) {
   const p = a.project;
   const qa = firstQA(a);
   return `<div class="di di-press${a.interview ? ' di-interview' : ''}">
-    <p class="di-meta"><span class="di-cat">${esc(a.publisher)}</span>${pressDate(a) ? `<span>${esc(pressDate(a))}</span>` : ''}<span class="di-rel" data-rel="${relKey(a)}">${esc(a.relation)}</span></p>
+    <p class="di-meta"><span class="di-cat${koCls(a.publisher)}">${esc(a.publisher)}</span>${pressDate(a) ? `<span>${esc(pressDate(a))}</span>` : ''}<span class="di-rel" data-rel="${relKey(a)}">${esc(a.relation)}</span></p>
     <h3 class="di-title">${esc(a.title)}</h3>
     ${qa ? `<p class="di-line di-qa"><b>Q. ${esc(qa.q)}</b> ${esc(qa.a)}</p>` : `<p class="di-line">${esc(a.summary)}</p>`}
-    <p class="di-actions"><a class="di-open" href="${esc(a.url)}" target="_blank" rel="noopener">${a.interview ? '인터뷰 원문 보기' : '기사 원문 보기'} <span aria-hidden="true">↗</span></a>${p ? `<a class="di-ghost" href="${p.path}" data-link>${esc(p.title)} →</a>` : ''}</p>
+    <p class="di-actions"><a class="di-open" href="${esc(a.url)}" target="_blank" rel="noopener">${a.interview ? '인터뷰 원문 보기' : '기사 원문 보기'} <span aria-hidden="true">↗</span></a>${p ? `<a class="di-ghost" href="${p.path}" data-link>${sep(p.title)} →</a>` : ''}</p>
   </div>`;
 }
 
@@ -352,9 +380,9 @@ export function awardCard(a) {
       <span class="card-glare" aria-hidden="true"></span>
       <span class="card-award" data-tier="${TIER_KEY[a.tier]}">${LAUREL}<b>${esc(a.grade)}</b></span>
       <figcaption class="card-cap">
-        <span class="card-meta">${esc(a.date.slice(0, 4))}${a.issuer ? ` · ${esc(a.issuer)}` : ''}</span>
+        <span class="card-meta">${esc(a.date.slice(0, 4))}${a.issuer ? ` · ${koCls(a.issuer) ? `<span class="is-ko">${esc(a.issuer)}</span>` : esc(a.issuer)}` : ''}</span>
         <h3 class="card-title">${esc(a.contest)}</h3>
-        <span class="a-proj">${esc(p.title)} <i aria-hidden="true">→</i></span>
+        <span class="a-proj">${sep(p.title)} <i aria-hidden="true">→</i></span>
       </figcaption>
     </figure>
   </a>`;
@@ -381,7 +409,7 @@ function awardsPage() {
     html: `<div class="pg pg-awards">
     ${bar({ href: '/', label: '메인' })}
     <section class="works-head aw-head">
-      <p class="pg-kicker">AWARD ARCHIVE — 상장과 프로젝트</p>
+      ${kicker(`AWARD ARCHIVE — 상장과 프로젝트`)}
       <h1 class="works-title">Awards<sup>${pad(AWARDS.length)}</sup></h1>
       ${tabs('awards')}
       <div class="aw-sum" role="group" aria-label="등급별로 보기">
@@ -390,7 +418,7 @@ function awardsPage() {
         ${sum('project', AWARDS.filter((a) => a.project).length, '프로젝트와 연결')}
       </div>
     </section>
-    <p class="aw-guide">수상 <b>${AWARDS.length}건 전체</b>를 연도별로 보여 드립니다 — 해마다 <b class="g">대상</b>부터 · 상장을 누르면 크게, 프로젝트를 누르면 그 작업으로</p>
+    <p class="aw-guide">수상 <b>${AWARDS.length}건 전체</b>를 연도별로 보여 드립니다&nbsp;— 해마다 <b class="g">대상</b>부터&nbsp;· 상장을 누르면 크게, 프로젝트를 누르면 그 작업으로</p>
     <div class="aw-list" id="aw-list">${years
       .map((y) => {
         // 해마다 높은 등급부터, 같은 등급은 최근 것부터
@@ -424,7 +452,7 @@ function skillRow(s) {
     ...s.evidence.map(({ project: p, tools }) => {
       const aw = awardsOf(p.id).length;
       const meta = [p.year, categoryOf(p.category).label, ...tools].filter(Boolean).join(' · ');
-      return `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}"><span class="sk-ev-t"><b>${esc(p.title)}</b><small>${esc(meta)}</small></span>${aw ? `<span class="sk-ev-aw">${LAUREL}${aw}</span>` : ''}<i aria-hidden="true">↗</i></a></li>`;
+      return `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}"><span class="sk-ev-t"><b>${sep(p.title)}</b><small>${esc(meta)}</small></span>${aw ? `<span class="sk-ev-aw">${LAUREL}${aw}</span>` : ''}<i aria-hidden="true">↗</i></a></li>`;
     }),
     ...s.direct.map(
       (a) =>
@@ -475,7 +503,7 @@ function aboutPage() {
   return `<div class="pg pg-about">
     ${bar({ href: '/', label: '메인' })}
     <section class="works-head ab-head">
-      <p class="pg-kicker">RÉSUMÉ — 한 장으로 보는 이력서 · PDF로 저장</p>
+      ${kicker(`RÉSUMÉ — 한 장으로 보는 이력서 · PDF로 저장`)}
       <h1 class="works-title">Résumé<sup>${from}–${to}</sup></h1>
       ${tabs('resume')}
     </section>
@@ -516,7 +544,7 @@ function aboutPage() {
     ${
       intro.pillars?.length
         ? `<section class="ab-sec reveal">${h('01', '핵심 역량')}<ol class="ab-pillars">${intro.pillars
-            .map((p) => `<li><span class="ab-no">${esc(p.no)}</span><b>${esc(p.title)}</b><small>${esc(p.text)}</small></li>`)
+            .map((p) => `<li><span class="ab-no">${esc(p.no)}</span><b>${sep(p.title)}</b><small>${esc(p.text)}</small></li>`)
             .join('')}</ol></section>`
         : ''
     }
@@ -534,9 +562,9 @@ function aboutPage() {
           const best = bestOf(p);
           return `<li data-cat="${esc(p.category)}"><a href="${p.path}" data-link>
             <span class="ab-pk">${esc(categoryOf(p.category).ko)} · ${esc(p.year)}</span>
-            <b class="ab-pt">${esc(p.title)}</b>
-            <span class="ab-pone">${esc(p.oneLiner)}</span>
-            ${p.role.length ? `<span class="ab-prole">${esc(p.role.join(' · '))}</span>` : ''}
+            <b class="ab-pt">${sep(p.title)}</b>
+            <span class="ab-pone">${caps(hy(esc(p.oneLiner)))}</span>
+            ${p.role.length ? `<span class="ab-prole">${p.role.map((r, k, a) => `<span class="nw">${esc(r)}${k < a.length - 1 ? '&nbsp;·' : ''}</span>`).join(' ')}</span>` : ''}
             ${best ? `<span class="ab-paw" data-tier="${best.key}">${LAUREL}${esc(best.label)}${best.count > 1 ? ` 외 ${best.count - 1}` : ''}</span>` : ''}
           </a></li>`;
         })
@@ -546,7 +574,7 @@ function aboutPage() {
     <section class="ab-sec reveal">
       ${h('04', '수상', AWARDS.length, { href: '/awards', label: '상장 보기' })}
       <ul class="ab-aw">${AWARDS.map(
-        (a) => `<li data-tier="${TIER_KEY[a.tier]}"><time datetime="${esc(a.date)}">${esc(dot(a.date))}</time><b>${esc(a.contest)}</b><span class="ab-g">${esc(a.grade)}</span>${a.issuer ? `<small>${esc(a.issuer)}</small>` : ''}</li>`
+        (a) => `<li data-tier="${TIER_KEY[a.tier]}"><time datetime="${esc(a.date)}">${esc(dot(a.date))}</time><b>${hy(esc(a.contest))}</b><span class="ab-g">${esc(a.grade)}</span>${a.issuer ? `<small>${esc(a.issuer)}</small>` : ''}</li>`
       ).join('')}</ul>
     </section>
 
@@ -606,7 +634,7 @@ function skillsPage() {
         ${
           d.projects.length
             ? `<ul class="sk-proj" aria-label="${esc(d.ko)} 근거 프로젝트">${d.projects
-                .map((p) => `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}" data-p="${p.id}"><b>${esc(p.title)}</b><small>${esc(p.year)}</small></a></li>`)
+                .map((p) => `<li><a href="${p.path}" data-link data-cat="${esc(p.category)}" data-p="${p.id}"><b>${sep(p.title)}</b><small>${esc(p.year)}</small></a></li>`)
                 .join('')}</ul>`
             : ''
         }
@@ -616,7 +644,7 @@ function skillsPage() {
   return `<div class="pg pg-skills">
     ${bar({ href: '/', label: '메인' })}
     <section class="works-head sk-head">
-      <p class="pg-kicker">SKILL MAP — 프로젝트가 증명하는 기술</p>
+      ${kicker(`SKILL MAP — 프로젝트가 증명하는 기술`)}
       <h1 class="works-title">Skills<sup>${pad(SKILL_COUNT)}</sup></h1>
       ${tabs('skills')}
       <p class="sk-lead">숙련도 점수 대신 근거를 셉니다. 기술마다 그 기술을 쓴 프로젝트와 그 프로젝트가 받은 상을 잇고, 누르면 근거가 열립니다.</p>
@@ -633,7 +661,7 @@ function skillsPage() {
     </section>
     <div class="sk-matrix">${DOMAIN_SKILLS.map(section).join('')}</div>
     <section class="sk-certs reveal" id="sk-certs" aria-labelledby="sk-h-certs">
-      <p class="pg-kicker">CERTIFICATIONS — 자격증</p>
+      ${kicker(`CERTIFICATIONS — 자격증`)}
       <h2 class="ww-title" id="sk-h-certs" tabindex="-1">자격증<sup>${pad(CERTS.length)}</sup></h2>
       <ol class="sk-cgrid">${certs
         .map((c) => {
@@ -666,7 +694,7 @@ function worksPage(cat) {
   return `<div class="pg pg-works">
     ${bar({ href: '/', label: '메인' })}
     <section class="works-head">
-      <p class="pg-kicker">PROJECT ARCHIVE — 권용현이 만든 것들</p>
+      ${kicker(`PROJECT ARCHIVE — 권용현이 만든 것들`)}
       <h1 class="works-title">Works<sup>${pad(projects.length)}</sup></h1>
       ${tabs('works')}
       <div class="chips" role="group" aria-label="분야로 보기">
@@ -738,12 +766,17 @@ function detailPage(p) {
   const awards = awardsOf(p.id);
   const certMedia = awardMedia(awards);
   const orgs = orgsOf(p.id);
+  // 값은 HTML — 가운뎃점이 줄 맨 앞에 서지 않게(앞 낱말에 붙인다), 짧은 도구 이름은 한 덩어리로(Load Cell이 두 줄로 갈리지 않게)
+  const tool = (t, last) => {
+    const h = `${sep(t)}${last ? '' : '&nbsp;·'}`;
+    return t.length <= 20 ? `<span class="nw">${h}</span>` : h;
+  };
   const facts = [
-    ['ROLE', p.role.join(' · ')],
-    ['TEAM', p.team],
-    ['PERIOD', p.period || p.year],
-    ['TOOLS', p.tools.join(' · ')],
-    ['AWARD', awards.length ? '' : p.awards.join(' / ')],
+    ['ROLE', sep(p.role.join(' · '))],
+    ['TEAM', sep(p.team || '')],
+    ['PERIOD', esc(p.period || p.year || '')],
+    ['TOOLS', p.tools.map((t, k, a) => tool(t, k === a.length - 1)).join(' ')],
+    ['AWARD', awards.length ? '' : esc(p.awards.join(' / '))],
   ].filter(([, v]) => v);
   const gallery = detailImages(p);
   // 히어로 사진은 스토리에서 다시 쓰지 않고, 갤러리에는 스토리에 없던 사진만 — 같은 사진이 반복되지 않게
@@ -760,21 +793,21 @@ function detailPage(p) {
       <div class="d-hero-media">${p.cover ? media(p.cover, { eager: true, full: true }) : typeCover(p, 'is-hero')}</div>
       <div class="d-hero-text">
         <p class="d-cat"><span>${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}<span>${pad(i + 1)} / ${pad(projects.length)}</span></p>
-        <h1 class="d-title">${esc(p.title)}</h1>
+        <h1 class="d-title">${sep(p.title)}</h1>
         ${p.titleEn && p.cover ? `<p class="d-en">${esc(p.titleEn)}</p>` : ''}
-        ${p.cover ? `<p class="d-one">${esc(p.oneLiner).replace(/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g, '<span class="nw">$&</span>')}</p>` : ''}
+        ${p.cover ? `<p class="d-one">${caps(hy(esc(p.oneLiner)))}</p>` : ''}
       </div>
       <span class="d-scroll" aria-hidden="true">SCROLL</span>
     </section>
 
     <section class="d-intro reveal">
-      <p class="d-summary">${esc(p.summary)}</p>
-      ${p.metrics.length ? `<dl class="d-metrics">${p.metrics.map((m) => `<div><dd>${esc(m.value)}</dd><dt>${esc(m.label)}</dt></div>`).join('')}</dl>` : ''}
-      ${facts.length ? `<dl class="d-facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
+      <p class="d-summary">${caps(sep(p.summary))}</p>
+      ${p.metrics.length ? `<dl class="d-metrics">${p.metrics.map((m) => `<div><dd>${esc(m.value)}</dd><dt>${sep(m.label)}</dt></div>`).join('')}</dl>` : ''}
+      ${facts.length ? `<dl class="d-facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` : ''}
       ${
         orgs.length
           ? `<div class="d-with"><p class="d-with-k">WITH</p><ul>${orgs
-              .map((o) => `<li${o.logo ? '' : ' class="is-text"'}>${o.logo ? orgMark(o, { decorative: true }) : ''}<span class="d-with-t"><b>${esc(o.name)}</b><small>${esc(o.rel)}</small></span></li>`)
+              .map((o) => `<li${o.logo ? '' : ' class="is-text"'}>${o.logo ? orgMark(o, { decorative: true }) : ''}<span class="d-with-t"><b>${sep(o.name)}</b><small>${sep(o.rel)}</small></span></li>`)
               .join('')}</ul></div>`
           : ''
       }
@@ -795,7 +828,7 @@ function detailPage(p) {
                     : `<div class="aw-sheet">${certSheet(a)}</div>`
                 }
                 <p class="aw-top"><span class="aw-grade">${LAUREL}${esc(a.grade)}</span><time datetime="${esc(a.date)}">${esc(a.date.replace(/-/g, '.'))}</time></p>
-                <h3 class="aw-contest">${esc(a.contest)}</h3>
+                <h3 class="aw-contest">${hy(esc(a.contest))}</h3>
                 ${a.issuer || a.prize ? `<p class="aw-issuer">${issuerLine(a)}</p>` : ''}
               </li>`
             )
@@ -808,8 +841,8 @@ function detailPage(p) {
         ? `<section class="d-story">${story
             .map(
               (s, k) => `<div class="st-row${s.img ? (s.img.ratio < 0.85 ? ' is-tall' : '') : ' no-img'} reveal">
-                ${s.img ? `<button type="button" class="st-media" data-gallery="${gallery.indexOf(s.img)}" aria-label="${esc(s.img.caption)} 크게 보기">${img(s.img, { sizes: `(max-width: 820px) 100vw, ${Math.min(1120, s.img.w || 1120)}px` })}<span class="st-cap">${esc(s.img.caption)}</span></button>` : ''}
-                <div class="st-text"><span class="st-label">${pad(k + 1)} — ${esc(s.label)}</span><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>
+                ${s.img ? `<button type="button" class="st-media" data-gallery="${gallery.indexOf(s.img)}" aria-label="${esc(s.img.caption)} 크게 보기">${img(s.img, { sizes: `(max-width: 820px) 100vw, ${Math.min(1120, s.img.w || 1120)}px` })}<span class="st-cap">${sep(s.img.caption)}</span></button>` : ''}
+                <div class="st-text"><span class="st-label">${pad(k + 1)} — ${esc(s.label)}</span><h3>${sep(s.title)}</h3><p>${sep(s.text)}</p></div>
               </div>`
             )
             .join('')}</section>`
@@ -846,7 +879,7 @@ function detailPage(p) {
               ({ im, k }) => {
                 const gar = Math.min(1.8, Math.max(0.6, im.ratio));
                 const sizes = rest.length === 1 ? '(max-width: 820px) 100vw, min(1120px, 92vw)' : `(max-width: 820px) 50vw, ${Math.round(gar * 304)}px`;
-                return `<button type="button" class="gal-item" data-gallery="${k}" style="--ar:${gar.toFixed(3)}" aria-label="${esc(im.caption)} 크게 보기">${img(im, { sizes })}<span class="gal-cap">${esc(im.caption)}</span></button>`;
+                return `<button type="button" class="gal-item" data-gallery="${k}" style="--ar:${gar.toFixed(3)}" aria-label="${esc(im.caption)} 크게 보기">${img(im, { sizes })}<span class="gal-cap">${sep(im.caption)}</span></button>`;
               }
             )
             .join('')}</div></section>`
@@ -874,13 +907,13 @@ function detailPage(p) {
     }
 
     <nav class="d-next" aria-label="다른 프로젝트">
-      <a class="d-prev-link" href="${prev.path}" data-link>← 이전 프로젝트 · ${esc(prev.title)}</a>
+      <a class="d-prev-link" href="${prev.path}" data-link>← 이전 프로젝트&nbsp;· ${sep(prev.title)}</a>
       <a class="d-next-card" href="${next.path}" data-link>
         <div class="d-next-media">${next.cover ? media(next.cover, { sizes: '100vw' }) : typeCover(next)}</div>
-        <span class="d-next-k">다음 프로젝트 · ${esc(categoryOf(next.category).ko)} →</span>
-        <b class="d-next-t">${esc(next.title)}</b>
+        <span class="d-next-k">다음 프로젝트&nbsp;· ${esc(categoryOf(next.category).ko)}&nbsp;→</span>
+        <b class="d-next-t">${sep(next.title)}</b>
       </a>
-      <p class="d-next-how">카드를 누르거나 <kbd>←</kbd> <kbd>→</kbd> 키로 이전 · 다음 프로젝트</p>
+      <p class="d-next-how">카드를 누르거나 <kbd>←</kbd> <kbd>→</kbd> 키로 이전&nbsp;· 다음 프로젝트</p>
     </nav>
     ${footer()}
   </article>`;
@@ -1138,7 +1171,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
         if (guide) {
           guide.dataset.all ??= guide.innerHTML;
           const label = sum.querySelector(`button[data-g="${g}"] span`)?.textContent || '';
-          guide.innerHTML = g === 'all' ? guide.dataset.all : `<b>${esc(label)} ${shown.length}건</b>만 보는 중 — 같은 칸을 한 번 더 누르면 전체로`;
+          guide.innerHTML = g === 'all' ? guide.dataset.all : `<b>${esc(label)} ${shown.length}건</b>만 보는 중&nbsp;— 같은 칸을 한 번 더 누르면 전체로`;
         }
         // 남은 카드는 CSS 등장 전환을 처음부터 다시 — 앞쪽 몇 장은 차례로
         shown.forEach((li, k) => {

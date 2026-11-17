@@ -465,9 +465,7 @@
   padding: 11px 18px;
   border: 1px solid var(--line-2);
   border-radius: 999px;
-  font-family: var(--mono);
-  font-size: 11.5px;
-  letter-spacing: 0.06em;
+  /* 글꼴 · 크기는 pages.css(본문 글꼴 13px) — 한국어를 고정폭 넓은 자간으로 두지 않는다 */
   transition:
     border-color 0.3s,
     color 0.3s;
@@ -644,7 +642,8 @@
     font-size: clamp(56px, 8vw, 128px);
   }
 }
-/* 낮은 데스크톱(높이 920 이하): 제목 · 위 여백을 더 줄여 숫자 칸까지 첫 화면에 */
+/* 낮은 데스크톱(높이 920 이하): 제목 · 위 여백을 더 줄인다 — 높이 900 남짓(1440×900)이면 숫자 칸까지 첫 화면에 들어온다.
+   720 · 768 높이 노트북은 신원 칸(사진 · 학력 · 연락처)만으로 첫 화면이 차서 숫자 칸은 바로 아래에서 시작한다 */
 @media screen and (min-width: 821px) and (max-height: 920px) {
   .pg-about .works-title {
     font-size: clamp(56px, 6vw, 96px);
@@ -755,7 +754,7 @@
     grid-template-columns: 1fr;
     gap: 8px;
     margin: 0;
-    padding: 0 0 9px;
+    padding: 0 0 7px;
     border: 0;
     border-bottom: 2px solid #14171c;
   }
@@ -809,8 +808,9 @@
   .ab-nums dt {
     font-size: 7.5pt;
   }
+  /* 1쪽에 대표 프로젝트 셋째 줄(링거폴대 카드)까지 들어가게 조금씩 좁힌다 — 전에는 그 줄이 2쪽으로 넘어가 1쪽 아래 4분의 1이 비었다(3쪽은 그대로) */
   .ab-sec {
-    margin-top: 13px;
+    margin-top: 10px;
   }
   .ab-h {
     margin-bottom: 5px;
@@ -832,7 +832,7 @@
   .ab-pillars li,
   .ab-proj a {
     gap: 2px;
-    padding: 6px 9px;
+    padding: 5px 9px;
     border-radius: 6px;
     background: none;
   }
@@ -854,7 +854,7 @@
   }
   .ab-time > li {
     grid-template-columns: 48px minmax(0, 1fr) auto;
-    padding: 3px 0;
+    padding: 2px 0;
     gap: 10px;
   }
   .ab-time small {
