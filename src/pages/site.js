@@ -6,9 +6,12 @@ import { AWARDS, awardsOf, bestOf, TIER_KEY } from '../data/awards.js';
 import { HISTORY, HISTORY_YEARS } from '../data/history.js';
 import { PRESS, pressOf } from '../data/press.js';
 import { DOMAIN_SKILLS, SKILLS, CERTS, SKILL_COUNT } from '../data/skills.js';
+// 발표 슬라이드(slides.js + slides.css)는 그 주소에 들어설 때 받는다 — 필름 첫 화면의 짐을 늘리지 않게(apply가 기다린다)
+let slidesMod = null;
+const loadSlides = () => (slidesMod ? Promise.resolve(slidesMod) : import('./slides.js').then((m) => (slidesMod = m)));
 
-const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const pad = (n) => String(n).padStart(2, '0');
+export const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+export const pad = (n) => String(n).padStart(2, '0');
 // 가운뎃점 · 줄표가 줄 맨 앞에 서지 않게: 앞 낱말과 붙는 공백(NBSP)으로 묶는다 — 줄은 점 · 줄표 뒤에서만 바뀐다.
 // 띄어 쓰지 않은 점('앞·뒷면')도 점 앞에서는 줄이 바뀌지 않게 이음표(WORD JOINER)를 둔다
 // 하이픈으로 이은 영문 낱말(End-to-End · IDEA-GO-ROUND)도 하이픈 뒤에서 줄이 바뀌지 않게 이음표를 둔다
@@ -18,16 +21,25 @@ export const sep = (s = '') =>
     .replace(/([A-Za-z0-9])-(?=[A-Za-z0-9])/g, '$1-&#8288;')
     .replace(/ ([·—–→]) /g, '&nbsp;$1 ');
 // 하이픈으로 이은 영문 낱말(End-to-End · IDEA-GO-ROUND · Do-Dream)을 한 덩어리(.nw)로 — 이미 esc()한 본문 글에만(속성 값에는 쓰지 않는다)
-const hy = (h = '') => h.replace(/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g, '<span class="nw">$&</span>');
+export const hy = (h = '') => h.replace(/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g, '<span class="nw">$&</span>');
 // 한 줄 소개 끝의 '… 스마트팜 + 앱': '+ 앱'이 마지막 줄에 홀로 서지 않게 앞 낱말과 묶는다 — 짧은 끝 낱말('… 업사이클 상자')도 앞 낱말과
-const tieEnd = (s = '') =>
+export const tieEnd = (s = '') =>
   esc(s)
     .replace(/ \+ (\S+)$/, '&nbsp;+&nbsp;$1')
     .replace(/ (\S{1,6})$/, '&nbsp;$1');
+// 말로 하는 긴 글(기승전결의 막 한 줄 · 발표 노트 · 맺음말): 한 글자 낱말('네 다리로'의 '네', '학습 중 난')은 뒤 낱말과 묶어
+// 줄 끝에 홀로 남지 않게 — 끝 낱말은 tieEnd처럼 앞 낱말과
+const tieWords = (s = '') => tieEnd(s).replace(/(^|\s)([가-힣])\s(?=\S)/g, '$1$2&nbsp;').replace(/(&nbsp;[가-힣])\s(?=\S)/g, '$1&nbsp;');
+// 팀 구성 글(참여 인원): '개발 4(…)' · '한별 외 2명'은 한 덩어리로(줄이 그 사이에서 바뀌지 않게), 내 이름은 밝게(.me) — 누가 참여했는지 한눈에
+export const teamHtml = (t = '') =>
+  sep(t)
+    .replace(/([가-힣A-Za-z]+) (\d+)(?=\()/g, '$1&nbsp;$2')
+    .replace(/ 외 (\d+명)/g, '&nbsp;외&nbsp;$1')
+    .replace(new RegExp(profile.name, 'g'), `<b class="me">${profile.name}</b>`);
 // 필름 덱의 작은 이름표(분류 · 매체 · 수여 기관): 한국어가 든 것만 .is-ko — 본문 글꼴로(clarity.css). 영문 꼬리표는 고정폭 그대로
-const koCls = (s = '') => (/[가-힣]/.test(s) ? ' is-ko' : '');
+export const koCls = (s = '') => (/[가-힣]/.test(s) ? ' is-ko' : '');
 // 대문자 낱말 둘로 된 이름(INFU RETRO)은 그 사이에서 줄이 바뀌지 않게
-const caps = (h = '') => h.replace(/\b([A-Z]{2,}) ([A-Z]{2,})\b/g, '$1&nbsp;$2');
+export const caps = (h = '') => h.replace(/\b([A-Z]{2,}) ([A-Z]{2,})\b/g, '$1&nbsp;$2');
 // 페이지 머리줄: 영문 꼬리표는 고정폭(넓은 자간), 한국어는 본문 글꼴로(clarity.css) — 넓은 자간 고정폭 한국어는 글자가 낱낱이 흩어져 보인다
 const kicker = (text) => {
   const [en, ...ko] = String(text).split(' — ');
@@ -129,7 +141,7 @@ function img(im, { cls = '', eager = false, full = false, sizes = '' } = {}) {
   return `<img class="${cls}" data-kind="${esc(im.kind || 'photo')}" src="${esc(full ? im.src : im.thumb)}" ${full ? '' : `srcset="${set}" sizes="${sizes || '(max-width: 820px) 100vw, 50vw'}"`} alt="${esc(im.caption)}" width="${im.w || ''}" height="${im.h || ''}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />`;
 }
 
-const LAUREL = `<svg class="laurel" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5c-4.2-1.2-7-4.8-7-9 0-1.9.5-3.6 1.3-5.1M12 20.5c4.2-1.2 7-4.8 7-9 0-1.9-.5-3.6-1.3-5.1" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5.4 8.6c1.5 0 2.6.9 2.9 2.4-1.5 0-2.6-.9-2.9-2.4zm-.6 3.8c1.5-.3 2.8.4 3.4 1.8-1.5.3-2.8-.4-3.4-1.8zm1.4 3.5c1.4-.5 2.8-.1 3.7 1.1-1.4.5-2.8.1-3.7-1.1zM18.6 8.6c-1.5 0-2.6.9-2.9 2.4 1.5 0 2.6-.9 2.9-2.4zm.6 3.8c-1.5-.3-2.8.4-3.4 1.8 1.5.3 2.8-.4 3.4-1.8zm-1.4 3.5c-1.4-.5-2.8-.1-3.7 1.1 1.4.5 2.8.1 3.7-1.1z" fill="currentColor"/></svg>`;
+export const LAUREL = `<svg class="laurel" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5c-4.2-1.2-7-4.8-7-9 0-1.9.5-3.6 1.3-5.1M12 20.5c4.2-1.2 7-4.8 7-9 0-1.9-.5-3.6-1.3-5.1" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5.4 8.6c1.5 0 2.6.9 2.9 2.4-1.5 0-2.6-.9-2.9-2.4zm-.6 3.8c1.5-.3 2.8.4 3.4 1.8-1.5.3-2.8-.4-3.4-1.8zm1.4 3.5c1.4-.5 2.8-.1 3.7 1.1-1.4.5-2.8.1-3.7-1.1zM18.6 8.6c-1.5 0-2.6.9-2.9 2.4 1.5 0 2.6-.9 2.9-2.4zm.6 3.8c-1.5-.3-2.8.4-3.4 1.8 1.5.3 2.8-.4 3.4-1.8zm-1.4 3.5c-1.4-.5-2.8-.1-3.7 1.1 1.4.5 2.8.1 3.7-1.1z" fill="currentColor"/></svg>`;
 
 // 수상 배지: 가장 높은 등급(+ 나머지 수상 수)
 function awardBadge(p) {
@@ -281,16 +293,25 @@ const diOrgs = (list) => {
   const logos = list.filter((o) => o.logo).slice(0, 3);
   return logos.length ? `<span class="di-orgs">${logos.map((o) => `<img src="/media/orgs/${o.logo}.webp" alt="${esc(o.name)}" title="${esc(o.name)}" style="--r:${o.r}" loading="lazy" decoding="async" />`).join('')}</span>` : '';
 };
-export function deckInfo(p) {
+// arc: 기승전결이 있는 덱의 이 카드 — { act: '기', name: '몸과 목소리', j: 막 번호, first: 그 막의 첫 카드, line: 막의 한 줄, note: 발표 노트 }.
+// 막 칩은 분류 앞에, 막의 한 줄은 그 막의 첫 카드에만(넓은 화면은 칩 + 막의 한 줄이 분류 줄을 대신한다 — 연도는 뒤 배경의 큰 글자 · 노트에),
+// 발표 노트는 한 줄 소개 자리에(좁은 휴대폰은 한 줄 소개 · '노트' 단추 — clarity.css)
+// 모든 프로젝트 카드에 그 프로젝트의 발표 슬라이드(/works/<id>/slides)로 가는 작은 단추
+export function deckInfo(p, { arc = null } = {}) {
   const c = categoryOf(p.category);
   const b = bestOf(p);
-  return `<div class="di">
-    <p class="di-meta"><span class="di-cat${koCls(c.label)}" data-cat="${esc(p.category)}">${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}${
+  const act = arc ? `<span class="di-act" data-act-j="${arc.j}"><b>${esc(arc.act)}</b>&nbsp;· ${esc(arc.name)}</span>` : '';
+  return `<div class="di${arc ? ` di-arc${arc.first ? ' is-act-start' : ''}${arc.note ? ' has-note' : ''}` : ''}"${arc ? ` data-act="${arc.j}"` : ''}>
+    <p class="di-meta">${act}<span class="di-cat${koCls(c.label)}" data-cat="${esc(p.category)}">${esc(c.label)}</span>${p.year ? `<span>${esc(p.year)}</span>` : ''}${
       b ? `<span class="di-award" data-tier="${b.key}">${LAUREL}${esc(b.label)}${b.count > 1 ? ` 외 ${b.count - 1}건` : ''}</span>` : ''
     }${diOrgs(orgsOf(p.id))}</p>
+    ${arc?.first && arc.line ? `<p class="di-actline">${act.replace('class="di-act"', 'class="di-act" aria-hidden="true"')} ${tieWords(arc.line)}</p>` : ''}
     <h3 class="di-title">${sep(p.title)}</h3>
     ${p.oneLiner ? `<p class="di-line">${tieEnd(p.oneLiner)}</p>` : ''}
-    <p class="di-actions"><a class="di-open" href="${p.path}" data-link data-cat="${esc(p.category)}">프로젝트 보기 <span aria-hidden="true">→</span></a></p>
+    ${arc?.note ? `<p class="di-note">${tieWords(arc.note)}</p>` : ''}
+    <p class="di-actions"><a class="di-open" href="${p.path}" data-link data-cat="${esc(p.category)}">프로젝트 보기 <span aria-hidden="true">→</span></a>${p.slides ? `<a class="di-ghost di-slides" href="${p.path}/slides" data-link aria-label="${esc(p.title)} 발표 슬라이드">슬라이드 <span aria-hidden="true">▶</span></a>` : ''}${
+      arc?.note ? `<button type="button" class="di-ghost di-nb" data-notes aria-pressed="false">노트</button>` : ''
+    }</p>
   </div>`;
 }
 export function deckAwardInfo(a) {
@@ -314,11 +335,12 @@ export function deckAllCard({ href, label, total, unit, thumbs }) {
     </figure>
   </a>`;
 }
-export function deckAllInfo({ href, title, line, cta, ghost }) {
-  return `<div class="di di-all">
+// close: 기승전결의 맺음말 — 한 줄 소개를 감추는 화면(낮은 데스크톱 · 좁은 휴대폰)에서도 보인다
+export function deckAllInfo({ href, title, line, cta, ghost, close = false }) {
+  return `<div class="di di-all${close ? ' di-end' : ''}">
     <p class="di-meta"><span class="di-cat is-ko">모아 보기</span><span>${projects.length} PROJECTS · ${AWARDS.length} AWARDS</span></p>
     <h3 class="di-title">${esc(title)}</h3>
-    <p class="di-line">${esc(line)}</p>
+    <p class="di-line${close ? ' di-close' : ''}">${close ? tieWords(line) : esc(line)}</p>
     <p class="di-actions"><a class="di-open" href="${esc(href)}" data-link>${esc(cta)} <span aria-hidden="true">→</span></a>${ghost ? `<a class="di-ghost" href="${esc(ghost.href)}" data-link>${esc(ghost.label)}</a>` : ''}</p>
   </div>`;
 }
@@ -753,9 +775,79 @@ function footer() {
 }
 
 // 상세에서 쓰는 사진 목록 — 수상 칸에 상장이 있으면 프로젝트 사진 속 같은 상장 스캔은 뺀다(스토리 · 갤러리 · 라이트박스 공통)
-const isCertScan = (im) => im.kind === 'document' && /상장|증명서/.test(im.caption);
+export const isCertScan = (im) => im.kind === 'document' && /상장|증명서/.test(im.caption);
 function detailImages(p) {
   return awardsOf(p.id).some((a) => a.certs.length) ? p.images.filter((im) => !isCertScan(im)) : p.images;
+}
+
+// 포트폴리오 요약(briefs.json): 기간 · 참여 인원 · 내 역할 · 핵심 결과 한 줄과 01 문제 → 06 배운 점 — 있는 항목만, 번호는 보이는 것끼리
+// 요약이 없는 프로젝트도 기본 기록(기간 · 팀 · 역할 · 수상)으로 정보 줄은 둔다 — 위 정보 표(d-facts)에는 도구만 남는다
+function keyResult(p, awards) {
+  const best = [...awards].sort((a, b) => a.tier - b.tier || b.date.localeCompare(a.date))[0];
+  if (best)
+    return `<span class="db-grade" data-tier="${TIER_KEY[best.tier]}">${LAUREL}${esc(best.grade)}</span> ${hy(esc(best.contest))}${awards.length > 1 ? ` <small>외&nbsp;${awards.length - 1}건</small>` : ''}`;
+  if (p.awards.length) return p.awards.map((a) => `<span class="db-line">${sep(a)}</span>`).join('');
+  const m = p.metrics[0];
+  if (m) return `<b class="db-num">${esc(m.value)}</b> ${sep(m.label)}`;
+  return p.brief?.results[0] ? sep(p.brief.results[0]) : '';
+}
+// 요약 제목: 쉼표 뒤 마디는 한 덩어리(.db-hl-t)로 — 좁은 화면에서 '붙여 / 쓰는'처럼 마디 안에서 꺾이지 않게
+const headline = (h) => {
+  const i = h.indexOf(', ');
+  return i < 0 ? caps(sep(h)) : `${caps(sep(h.slice(0, i)))}, <span class="db-hl-t">${caps(sep(h.slice(i + 2)))}</span>`;
+};
+function briefSection(p, awards) {
+  const b = p.brief;
+  const facts = [
+    ['기간', p.period || p.year ? `<span class="db-num">${sep(p.period || p.year)}</span>` : ''],
+    // 인원 수가 없으면(팀 이름 · 소속만 — '인공지능학과 연구실 산학 프로젝트') 칸 이름은 '팀'
+    [p.teamSize ? '참여 인원' : '팀', p.teamSize || p.team ? `${p.teamSize ? `<span class="db-size"><b class="db-num">${p.teamSize}</b>명</span>` : ''}${p.team ? `<small class="db-team">${teamHtml(p.team)}</small>` : ''}` : ''],
+    ['내 역할', p.role.length ? `<ul class="db-roles">${p.role.map((r) => `<li>${sep(r)}</li>`).join('')}</ul>` : ''],
+    ['핵심 결과', keyResult(p, awards)],
+  ].filter(([, v]) => v);
+  const li = (t) => `<li>${caps(sep(t))}</li>`;
+  const blocks = b
+    ? [
+        ['problem', '문제', 'PROBLEM', b.problem && `<p class="db-p">${caps(sep(b.problem))}</p>`],
+        ['solution', '솔루션', 'SOLUTION', b.solution && `<p class="db-p">${caps(sep(b.solution))}</p>`],
+        ['contribution', '내 기여', 'CONTRIBUTION', b.contribution.length && `<ul class="db-list">${b.contribution.map(li).join('')}</ul>`],
+        [
+          'troubles',
+          '문제 해결 기록',
+          'TROUBLESHOOTING',
+          b.troubles.length &&
+            `<ol class="db-trbl">${b.troubles
+              .map(
+                (t, k) => `<li><span class="db-tno">${pad(k + 1)}</span><dl>${[
+                  ['문제', t.issue, ''],
+                  ['해결', t.fix, ''],
+                  ['결과', t.outcome, ' is-out'],
+                ]
+                  .filter(([, v]) => v)
+                  .map(([kk, v, c]) => `<div class="db-tc${c}"><dt>${kk}</dt><dd>${caps(sep(v))}</dd></div>`)
+                  .join('')}</dl></li>`
+              )
+              .join('')}</ol>`,
+        ],
+        ['results', '결과', 'RESULTS', b.results.length && `<ul class="db-list is-check">${b.results.map(li).join('')}</ul>`],
+        ['learned', '배운 점', 'LEARNED', b.learned && `<blockquote class="db-quote"><p>${caps(sep(b.learned))}</p></blockquote>`],
+        ['next', '다음', 'NEXT', b.next && `<p class="db-p">${caps(sep(b.next))}</p>`],
+      ].filter(([, , , v]) => v)
+    : [];
+  // 기간 한 칸뿐이면(위 히어로에 이미 연도가 있다) 구역을 두지 않는다
+  if (!blocks.length && (!facts.length || (facts.length === 1 && facts[0][0] === '기간'))) return '';
+  return `<section class="d-brief reveal" aria-labelledby="d-brief-h">
+    <h2 class="d-h" id="d-brief-h">PROJECT BRIEF</h2>
+    ${b?.headline ? `<p class="db-headline">${headline(b.headline)}</p>` : ''}
+    ${facts.length ? `<dl class="db-facts${p.team.length > 24 && facts.some(([k]) => k === '참여 인원' || k === '팀') ? ' has-long' : ''}" data-n="${facts.length}">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` : ''}
+    ${
+      blocks.length
+        ? `<ol class="db-blocks">${blocks
+            .map(([key, ko, en, v], k) => `<li class="db-b" data-k="${key}"><h3 class="db-k"><span class="db-no">${pad(k + 1)}</span><span class="db-ko">${ko}</span><span class="db-en">${en}</span></h3><div class="db-v">${v}</div></li>`)
+            .join('')}</ol>`
+        : ''
+    }
+  </section>`;
 }
 
 function detailPage(p) {
@@ -771,13 +863,8 @@ function detailPage(p) {
     const h = `${sep(t)}${last ? '' : '&nbsp;·'}`;
     return t.length <= 20 ? `<span class="nw">${h}</span>` : h;
   };
-  const facts = [
-    ['ROLE', sep(p.role.join(' · '))],
-    ['TEAM', sep(p.team || '')],
-    ['PERIOD', esc(p.period || p.year || '')],
-    ['TOOLS', p.tools.map((t, k, a) => tool(t, k === a.length - 1)).join(' ')],
-    ['AWARD', awards.length ? '' : esc(p.awards.join(' / '))],
-  ].filter(([, v]) => v);
+  // 역할 · 팀 · 기간 · 수상은 아래 요약(PROJECT BRIEF)의 정보 줄에 — 여기에는 도구만
+  const facts = [['TOOLS', p.tools.map((t, k, a) => tool(t, k === a.length - 1)).join(' ')]].filter(([, v]) => v);
   const gallery = detailImages(p);
   // 히어로 사진은 스토리에서 다시 쓰지 않고, 갤러리에는 스토리에 없던 사진만 — 같은 사진이 반복되지 않게
   const coverFile = p.cover?.file;
@@ -811,8 +898,10 @@ function detailPage(p) {
               .join('')}</ul></div>`
           : ''
       }
-      <div class="d-acts"><button type="button" class="d-share" data-share><span aria-hidden="true">↗</span> 이 프로젝트 링크 공유</button></div>
+      <div class="d-acts">${p.slides ? `<a class="d-slides" href="${p.path}/slides" data-link><span aria-hidden="true">▶</span> 발표 슬라이드로 보기</a>` : ''}<button type="button" class="d-share" data-share><span aria-hidden="true">↗</span> 이 프로젝트 링크 공유</button></div>
     </section>
+
+    ${briefSection(p, awards)}
 
     ${
       awards.length
@@ -964,6 +1053,16 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     if (path.toLowerCase() === '/about') return { name: 'film', scene: 'prologue' };
     if (path === '/' && FILM_GONE.has(location.hash)) return toFilm();
     if (path.toLowerCase() === '/resume') return { name: 'resume' };
+    // 발표 슬라이드: /works/<id>/slides(#3 — 세 번째 슬라이드)
+    const sl = path.match(/^\/works\/([\w-]+)\/slides$/i);
+    if (sl) {
+      let id = sl[1].toLowerCase();
+      if (ALIAS[id] && byId(ALIAS[id])) {
+        id = ALIAS[id];
+        history.replaceState(history.state, '', `/works/${id}/slides${location.hash}`);
+      }
+      return byId(id) ? { name: 'slides', id } : { name: 'works', cat: 'all', missing: true };
+    }
     const m = path.match(/^\/works(?:\/([\w-]+))?$/);
     if (!m) return { name: 'film' };
     if (m[1]) {
@@ -1011,9 +1110,14 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   }
 
   let pageMedia = [];
+  let deck = null; // 발표 슬라이드(열려 있을 때만)
   function mount(route) {
     pageMedia = [];
+    deck?.destroy();
+    deck = null;
+    page.classList.toggle('is-deck', route.name === 'slides');
     if (route.name === 'works') page.innerHTML = worksPage(route.cat);
+    else if (route.name === 'slides') page.innerHTML = slidesMod.slidesPage(byId(route.id));
     else if (route.name === 'skills') page.innerHTML = skillsPage();
     else if (route.name === 'resume') page.innerHTML = aboutPage();
     else if (route.name === 'awards') {
@@ -1026,10 +1130,11 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     page.classList.remove('is-scrolled'); // 새 페이지는 맨 위 — 위 막대도 투명한 처음 모습으로
     document.body.classList.add('page-open');
     bind(route);
-    const p = route.name === 'detail' ? byId(route.id) : null;
+    const p = route.name === 'detail' || route.name === 'slides' ? byId(route.id) : null;
     const name = { awards: 'Awards', skills: 'Skills', resume: 'Résumé' }[route.name] || 'Works';
-    document.title = p ? `${p.title} — 권용현 Physical AI Portfolio` : `${name} — 권용현 Physical AI Portfolio`;
+    document.title = p ? `${p.title}${route.name === 'slides' ? ' — 발표 슬라이드' : ''} — 권용현 Physical AI Portfolio` : `${name} — 권용현 Physical AI Portfolio`;
     page.focus({ preventScroll: true });
+    if (route.name === 'slides') return; // 슬라이드의 #3은 슬라이드 번호(덱이 읽는다)
     // 주소에 자리가 있으면(필름의 이력 항목에서 들어온 경우 등) 그 자리로 — 그림이 자리 잡은 뒤에
     // (브라우저가 스스로 #자리로 옮기는 스크롤 · 글꼴이 늦게 와 줄이 바뀌는 것까지 지나간 뒤 한 번 더 맞춘다)
     if (location.hash) {
@@ -1039,6 +1144,9 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   }
 
   function unmount() {
+    deck?.destroy();
+    deck = null;
+    page.classList.remove('is-deck');
     page.hidden = true;
     page.innerHTML = '';
     observer?.disconnect();
@@ -1120,6 +1228,10 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       if (im.complete) im.classList.add('is-loaded');
       else im.addEventListener('load', () => im.classList.add('is-loaded'), { once: true });
     });
+    if (route.name === 'slides') {
+      deck = slidesMod.createDeck(page.querySelector('.pg-slides'), { reducedMotion, onExit: exitDeck });
+      return;
+    }
     // 스크롤 등장
     observer?.disconnect();
     observer = new IntersectionObserver(
@@ -1258,6 +1370,19 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
   }
 
   async function apply(route, { animate = true } = {}) {
+    // 발표 슬라이드: 모듈을 받은 뒤에 — 받는 사이 주소가 바뀌었으면(뒤로 가기 등) 이 이동은 버린다
+    if (route.name === 'slides' && !slidesMod) {
+      const at = location.pathname;
+      try {
+        await loadSlides();
+      } catch {
+        // 받지 못하면(연결 끊김 · 새 배포로 조각 이름이 바뀜) 프로젝트 페이지로 — 같은 내용이 있다
+        if (location.pathname !== at) return;
+        history.replaceState(history.state, '', `/works/${route.id}`);
+        route = { name: 'detail', id: route.id };
+      }
+      if (location.pathname !== at && route.name === 'slides') return;
+    }
     if (lightbox.open) lightbox.close();
     // 없는 프로젝트 주소는 아카이브 주소로 바로잡는다
     if (route.missing) {
@@ -1282,7 +1407,7 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       else back();
       return;
     }
-    const label = route.name === 'detail' ? byId(route.id).title : route.name === 'resume' ? 'RÉSUMÉ' : route.name.toUpperCase();
+    const label = route.name === 'detail' || route.name === 'slides' ? byId(route.id).title : route.name === 'resume' ? 'RÉSUMÉ' : route.name.toUpperCase();
     const doMount = () => {
       onOpen?.(route);
       mount(route);
@@ -1302,12 +1427,15 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       }
       return;
     }
+    // 지금 기록을 바꿔 쓰면(replace) 그 기록이 어디서 왔는지는 그대로 — 필름 덱에서 연 슬라이드를 프로젝트 페이지로 바꿔도 닫으면 필름으로
+    const keep = replace && history.state?.app && url.pathname !== '/';
     // depth: 필름에서 몇 단계 들어왔는지(닫기 버튼이 필름으로 바로 돌아가도록)
-    const depth = url.pathname === '/' ? 0 : current ? (history.state?.app ? history.state.depth : 1) + 1 : 1;
+    const depth = keep ? history.state.depth : url.pathname === '/' ? 0 : current ? (history.state?.app ? history.state.depth : 1) + 1 : 1;
     // fromFilm: 바로 앞 기록이 필름일 때만 닫기에서 history.back()을 쓴다
-    const fromFilm = !current && url.pathname !== '/';
-    if (fromFilm) filmOpener = document.activeElement;
-    const state = { app: true, depth, fromFilm };
+    const fromFilm = keep ? !!history.state.fromFilm : !current && url.pathname !== '/';
+    if (fromFilm && !keep) filmOpener = document.activeElement;
+    // from: 바로 앞 주소 — 발표 슬라이드를 닫으면 그 프로젝트 페이지에서 열었을 때만 뒤로 가기
+    const state = { app: true, depth, fromFilm, from: keep ? history.state.from : current ? location.pathname : '/' };
     if (replace) history.replaceState(state, '', url.pathname + url.search + url.hash);
     else history.pushState(state, '', url.pathname + url.search + url.hash);
     apply(parse());
@@ -1321,6 +1449,19 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       setTimeout(() => (backPending = false), 1500);
       history.back();
     } else navigate('/');
+  }
+
+  // 발표 슬라이드 닫기 — how: 'page'(← 프로젝트 페이지 · 마지막 장의 프로젝트 페이지 링크) · 'esc'(Esc 키).
+  // 그 프로젝트 페이지에서 열었으면 둘 다 뒤로 가기. 필름 덱의 '슬라이드'에서 열었으면 Esc는 뒤로 가기(발표하던 장면 · 카드로),
+  // 단추 · 링크는 이름 그대로 프로젝트 페이지로 — 이 기록을 바꿔 써서, 그 페이지를 닫으면 필름으로 돌아간다
+  function exitDeck(how = 'esc') {
+    if (busy || backPending || current?.name !== 'slides') return;
+    const to = `/works/${current.id}`;
+    if (history.state?.from === to || (how === 'esc' && filmEntered && history.state?.fromFilm)) {
+      backPending = true;
+      setTimeout(() => (backPending = false), 1500);
+      history.back();
+    } else navigate(to, { replace: true });
   }
 
   // 맨 위로 버튼(페이지가 길어 한참 내려왔을 때만)
@@ -1351,6 +1492,10 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     { passive: true }
   );
 
+  // 슬라이드로 가는 단추에 손이 가면 모듈을 미리 받아 둔다(누르면 바로 열리게)
+  const warmSlides = (e) => e.target.closest?.('a[href$="/slides"]') && loadSlides().catch(() => {});
+  document.addEventListener('pointerover', warmSlides, { passive: true });
+  document.addEventListener('focusin', warmSlides);
   // 내부 링크 가로채기
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[data-link]');
@@ -1395,6 +1540,13 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
     },
     key(e) {
       if (!current) return busy; // 닫히는 커튼 동안에는 필름 단축키를 막는다
+      // 발표 슬라이드: Esc는 프로젝트 페이지로, 나머지 키는 덱이(← → PageUp PageDown Space Home End F)
+      if (current.name === 'slides') {
+        if (busy || lightbox.open) return true;
+        if (e.key === 'Escape') exitDeck('esc');
+        else deck?.key(e);
+        return true;
+      }
       if (e.key === 'Escape') {
         close();
         return true;

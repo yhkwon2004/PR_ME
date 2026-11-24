@@ -60,6 +60,7 @@ function pageMeta() {
       const projects = readJson('src/data/projects.json').filter((p) => !p.hidden); // 숨긴 기록은 주소 · 미리보기도 만들지 않는다
       const awards = readJson('src/data/awards.json');
       const press = readJson('src/data/press.json');
+      const briefs = existsSync(resolve(ROOT, 'src/data/briefs.json')) ? readJson('src/data/briefs.json') : {};
       const skills = (readFileSync(resolve(ROOT, 'src/data/skills.js'), 'utf8').match(/^\s*\{ d: '/gm) || []).length;
       const grand = awards.filter((a) => a.grade.includes('대상')).length;
       const og = (name) => (existsSync(resolve(ROOT, 'public/og', `${name}.jpg`)) ? `/og/${name}.jpg` : '/og.jpg');
@@ -103,8 +104,20 @@ function pageMeta() {
           type: 'article',
         })),
       ];
-      // /about → about.html · /works/<id> → works/<id>.html (vercel.json cleanUrls가 확장자 없는 주소로 내어 준다)
-      for (const pg of pages) {
+      // 프로젝트 발표 슬라이드(/works/<id>/slides) — 미리보기 카드만(sitemap에는 넣지 않는다: 같은 내용의 다른 보기)
+      const slides = projects.map((p) => {
+        const b = briefs[p.id] || {};
+        return {
+          path: `/works/${p.id}/slides`,
+          title: `${p.title} — 발표 슬라이드 — ${NAME}`,
+          desc: clip(['발표 슬라이드', b.headline || p.oneLiner, b.problem].filter(Boolean).join(' — ')),
+          image: og(p.id),
+          type: 'article',
+        };
+      });
+      // /about → about.html · /works/<id> → works/<id>.html · /works/<id>/slides → works/<id>/slides.html
+      // (vercel.json cleanUrls가 확장자 없는 주소로 내어 준다)
+      for (const pg of [...pages, ...slides]) {
         const file = resolve(outDir, `.${pg.path}.html`);
         mkdirSync(dirname(file), { recursive: true });
         writeFileSync(file, withMeta(base, pg));
@@ -118,7 +131,7 @@ function pageMeta() {
           .join('\n')}\n</urlset>\n`
       );
       writeFileSync(resolve(outDir, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
-      this.info?.(`page meta: ${pages.length} pages + sitemap.xml · robots.txt`);
+      this.info?.(`page meta: ${pages.length} pages + ${slides.length} slide decks + sitemap.xml · robots.txt`);
     },
   };
 }

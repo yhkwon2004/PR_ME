@@ -19,10 +19,30 @@ const lines = (arr, cls = '') => arr.map((l) => `<span class="line ${cls}"><span
 // 장면 표시: 장면 번호 · 장(01 소개 · 02 프로젝트 · 03 성과) · 장면 이름
 function kicker(scene, i) {
   const ch = scene.chapter ? `<span class="kicker-ch">CH ${esc(scene.chapter[0])}<span class="kicker-chn"> · ${esc(scene.chapter[1])}</span></span>` : '';
-  // 'ROBOTICS & AI — 로봇 · AI': 휴대폰에서는 큰 제목과 같은 영문을 접고 한글 이름만(한 줄에 들어가게)
+  // 'PART 2 OF 3 — 기 · 승 · 전 · 결': 휴대폰에서는 영문을 접고 한글만(한 줄에 들어가게)
   const [en, ko] = scene.kicker.split(' — ');
-  const txt = ko && /[가-힣]/.test(ko) ? `<span class="k-en">${esc(en)}<span class="k-sep"> — </span></span><span class="k-ko">${esc(ko)}</span>` : esc(scene.kicker);
+  // 기승전결이 있는 장면: 막의 글자마다 따로 — 지금 카드의 막에 불이 들어온다(bindReel)
+  const koHtml = scene.arc ? scene.arc.acts.map((a, j) => `<span class="k-act" data-act-k="${j}">${esc(a.act)}</span>`).join('&nbsp;· ') : sep(ko || '');
+  const txt = ko && /[가-힣]/.test(ko) ? `<span class="k-en">${esc(en)}<span class="k-sep"> — </span></span><span class="k-ko">${koHtml}</span>` : esc(scene.kicker);
   return `<p class="kicker" data-r><span class="kicker-no">SC ${pad(i)}</span>${ch}<span class="kicker-txt">${txt}</span></p>`;
+}
+// 기승전결: 카드마다 몇째 막인지 · 그 막의 첫 카드인지 · 발표 노트 — 막에 없는 카드는 null
+function arcOf(scene, list) {
+  const arc = scene.arc;
+  if (!arc) return null;
+  const acts = arc.acts.map((a, j) => ({ ...a, j }));
+  const cards = list.map((p) => {
+    const a = acts.find((x) => x.projects.includes(p.id));
+    return a ? { ...a, first: list.find((q) => a.projects.includes(q.id)) === p, note: arc.bridges?.[p.id] || '' } : null;
+  });
+  // 덱 막대의 눈금 묶음: 카드 순서대로 이어지는 같은 막을 한 묶음으로(막 글자 + 눈금 수)
+  const groups = [];
+  cards.forEach((c) => {
+    const g = groups[groups.length - 1];
+    if (g && c && g.j === c.j) g.n += 1;
+    else groups.push(c ? { act: c.act, name: c.name, j: c.j, n: 1 } : { act: '', j: -1, n: 1 });
+  });
+  return { cards, groups, close: arc.close || '' };
 }
 // 발표 순서(장마다 첫 장면) — 표지 아래, 누르면 그 장의 첫 장면으로
 const agendaOf = () => {
@@ -41,20 +61,26 @@ function stats(list = []) {
 
 // 덱 막대의 한 줄 수치(낮은 데스크톱): 수치마다 한 덩어리 — 막대에 다 들어가지 않으면 뒤 수치를 통째로 뺀다(premium.css), 주장이 '…'로 잘리지 않게.
 // 구분점 앞뒤는 같은 빈칸(NBSP — 덩어리 맨 앞의 빈칸도 접히지 않는다)이라 점이 가운데 서고, 복사 · 읽기 프로그램에도 '1종 · 2024'로 읽힌다
-const reelStats = (list) => (list ? list.map((s, k) => `<span>${k ? '&nbsp;·&nbsp;' : ''}${esc(s.value)} ${esc(s.label)}</span>`).join('') : '');
+// s.bar: 이 한 줄에서 '수치 이름표' 순서가 어색한 수치만 따로 적은 말(content.js — '대상 7건 중 6건')
+const reelStats = (list) => (list ? list.map((s, k) => `<span>${k ? '&nbsp;·&nbsp;' : ''}${s.bar ? esc(s.bar) : `${esc(s.value)} ${esc(s.label)}`}</span>`).join('') : '');
 
 // 카드 덱: 가운데 무대에 카드가 겹쳐 서고, 아래 막대에 번호 · 진행 눈금 · 넘김 버튼
 // cards · infos: 같은 순서의 카드와 설명 — 맨 끝에는 아카이브로 이어지는 '전체 보기' 카드와 설명
-function deck(cards, { count, label, noun, all, allLabel, stats = '', infos = [], end }) {
+// groups: 기승전결 — 눈금을 막마다 묶고 막 글자를 붙인다(막 사이가 벌어져 지금 어느 막인지 보인다).
+// 발표 노트(.deck-note)는 좁은 휴대폰에서 '노트'를 누르면 카드 위에 겹쳐 보인다(넓은 화면은 설명 줄 안에)
+function deck(cards, { count, label, noun, all, allLabel, stats = '', infos = [], end, groups }) {
   const n = count + (end ? 1 : 0);
-  return `<div class="deck-stage" role="group" aria-roledescription="carousel" aria-label="${esc(label)}">${cards.join('')}${end ? end.card : ''}</div>
-        <div class="deck-info"></div>
+  const ticks = groups
+    ? groups.map((g) => `<span class="deck-act"${g.j >= 0 ? ` data-act-k="${g.j}" title="${esc(`${g.act} · ${g.name}`)}"` : ''}>${g.act ? `<b>${esc(g.act)}</b>` : ''}${'<i></i>'.repeat(g.n)}</span>`).join('')
+    : '<i></i>'.repeat(count);
+  return `<div class="deck-stage" role="group" aria-roledescription="carousel" aria-label="${esc(label)}">${cards.join('')}${end ? end.card : ''}${groups ? '<div class="deck-note" hidden></div>' : ''}</div>
+        <div class="deck-info${groups ? ' has-arc' : ''}"></div>
         ${[...infos, ...(end ? [end.info] : [])].map((h) => `<template class="deck-tpl">${h}</template>`).join('')}
         <div class="deck-bar">
           <span class="deck-label"><b>${pad(count)}</b> ${esc(label)}${stats ? `<span class="reel-stats">${stats}</span>` : ''}</span>
           <span class="deck-nav"${n < 2 ? ' hidden' : ''}>
             <button type="button" class="deck-btn" data-reel="-1" aria-label="이전 ${noun}" data-label="이전 ${noun}">←</button>
-            <span class="deck-count" aria-hidden="true"><b class="deck-now">01</b><span class="deck-ticks">${'<i></i>'.repeat(count)}${end ? '<i class="is-all"></i>' : ''}</span><span class="deck-total">${pad(count)}</span></span>
+            <span class="deck-count" aria-hidden="true"><b class="deck-now">01</b><span class="deck-ticks${groups ? ' has-acts' : ''}">${ticks}${end ? '<i class="is-all"></i>' : ''}</span><span class="deck-total">${pad(count)}</span></span>
             <button type="button" class="deck-btn" data-reel="1" aria-label="다음 ${noun}" data-label="다음 ${noun}">→</button>
           </span>
           ${all ? `<a class="reel-all" href="${esc(all)}" data-link>${allLabel} <span aria-hidden="true">↗</span></a>` : ''}
@@ -170,14 +196,15 @@ function render(scene, i) {
   }
   if (L === 'reel') {
     const list = scene.projects.map(byId).filter(Boolean);
-    return `<div class="reel-scene">
+    const arc = arcOf(scene, list);
+    return `<div class="reel-scene${arc ? ' has-arc' : ''}">
       <div class="reel-head panel-content">
         ${kicker(scene, i)}
         <h2 class="title">${lines(scene.title)}</h2>
         ${scene.subtitle ? `<p class="subtitle" data-r>${sep(scene.subtitle)}</p>` : ''}
         ${scene.stats ? `<ul class="mini-stats" data-r>${scene.stats.map((s) => `<li><b>${esc(s.value)}</b><span>${esc(s.label)}</span></li>`).join('')}</ul>` : ''}
       </div>
-      <div class="reel deck panel-content" data-r>
+      <div class="reel deck panel-content${arc ? ' has-arc' : ''}" data-r>
         ${(() => {
           const cats = [...new Set(list.map((p) => p.category))];
           const href = `/works?c=${cats.join(',')}`;
@@ -191,13 +218,16 @@ function render(scene, i) {
               all: href,
               allLabel: '전체 보기',
               stats: reelStats(scene.stats),
-              infos: list.map(deckInfo),
+              infos: list.map((p, k) => deckInfo(p, { arc: arc?.cards[k] })),
+              groups: arc?.groups,
               end: {
                 card: deckAllCard({ href, label: `${field} 전체 보기`, total: ALL_PROJECTS.length, unit: 'PROJECTS', thumbs: moreThumbs(list) }),
                 info: deckAllInfo({
                   href,
                   title: `${field} 프로젝트 전체 보기`,
-                  line: `이 장면의 ${list.length}개를 포함해 프로젝트 ${ALL_PROJECTS.length}개를 분야별로 볼 수 있습니다.`,
+                  // 기승전결의 끝: 맺음말(close) — 없으면 아카이브 안내
+                  line: arc?.close || `이 장면의 ${list.length}개를 포함해 프로젝트 ${ALL_PROJECTS.length}개를 분야별로 볼 수 있습니다.`,
+                  close: !!arc?.close,
                   cta: `${field} 전체 보기`,
                   ghost: { href: '/works', label: `모든 프로젝트 ${ALL_PROJECTS.length}` },
                 }),
@@ -1073,16 +1103,51 @@ function bindReel(el, reducedMotion, onReelFocus, onCard, edge) {
       if (active === next && next.disabled) prev.focus({ preventScroll: true });
     }
   };
+  // 기승전결: 지금 카드의 막에 불을 켠다(머리줄의 막 글자 · 덱 막대의 눈금 묶음) — 지나온 막은 옅게, 끝 카드에서는 네 막 모두 지나온 것으로.
+  // 좁은 휴대폰의 발표 노트: 설명 줄의 '노트'를 누르면 카드 위에 노트가 겹쳐 보이고(카드를 넘기면 그 카드의 노트로), 다시 누르면 걷힌다
+  const actEls = [...el.querySelectorAll('[data-act-k]')];
+  const note = el.querySelector('.deck-note');
+  const reelEl = el.querySelector('.reel');
+  const arcSync = () => {
+    if (!actEls.length) return;
+    const di = tpls[reel.focus]?.content.firstElementChild;
+    const now = di?.dataset.act ?? '';
+    const end = !now;
+    actEls.forEach((x) => {
+      x.classList.toggle('is-now', x.dataset.actK === now);
+      x.classList.toggle('is-past', end || +x.dataset.actK < +now);
+    });
+    if (!note) return;
+    const text = di?.querySelector('.di-note')?.textContent || '';
+    const on = reelEl.classList.contains('is-notes') && !!text;
+    note.hidden = !on;
+    if (on) note.innerHTML = `<span class="dn-act">${di.querySelector('.di-act')?.innerHTML || ''}</span><span class="dn-t">${di.querySelector('.di-note').innerHTML}</span>`;
+    info.querySelectorAll('[data-notes]').forEach((b) => b.setAttribute('aria-pressed', String(reelEl.classList.contains('is-notes'))));
+  };
+  if (note)
+    el.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-notes]');
+      if (b) {
+        reelEl.classList.toggle('is-notes');
+        arcSync();
+      } else if (e.target.closest('.deck-note')) {
+        // 노트를 누르면 걷힌다(카드 넘기기는 노트 위에서 밀어도 된다 — 손가락 이벤트는 덱으로 올라간다)
+        reelEl.classList.remove('is-notes');
+        arcSync();
+      }
+    });
   el.addEventListener('reelfocus', (e) => {
     const dir = e.detail.entry ? 0 : Math.sign(e.detail.focus - e.detail.prev);
     if (e.detail.entry) fit();
     sync(dir);
     if (e.detail.focus !== e.detail.prev || !info.children.length) showInfo(dir);
+    arcSync();
     if (!e.detail.auto) onReelFocus?.(el, e.detail);
     onCard?.(el, reel.card, dir, reel.focus);
   });
   sync();
   showInfo(0);
+  arcSync();
 }
 
 // onEdge: 덱 끝에서 이어지는 장면 — { label(i, dir): '다음 장면 · 이름'(없으면 ''), cue(st|null), go(dir) }

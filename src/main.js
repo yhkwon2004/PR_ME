@@ -11,6 +11,8 @@ import './styles/beats.css';
 import './styles/guide.css';
 import './styles/perf.css';
 import './styles/clarity.css';
+import './styles/brief.css';
+// slides.css는 발표 슬라이드 모듈(pages/slides.js)과 함께 그 주소에서만 받는다
 
 import * as THREE from 'three';
 import gsap from 'gsap';

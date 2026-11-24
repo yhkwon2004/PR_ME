@@ -1,0 +1,476 @@
+/* ── 상세: 프로젝트 요약(PROJECT BRIEF) ───────────────────────────────
+   포트폴리오 한 꼭지처럼 읽히게: 정보 한 줄(기간 · 참여 인원 · 내 역할 · 핵심 결과) → 01 문제 → 02 솔루션 → 03 내 기여 →
+   04 문제 해결 기록(문제 → 해결 → 결과) → 05 결과 → 06 배운 점. 있는 항목만, 번호는 보이는 것끼리.
+   상자 없이 가는 선 · 작은 번호(고정폭) · 한국어 이름(본문 글꼴)으로 위계를 만든다 */
+.d-brief {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2vh var(--pad) 11vh;
+  text-align: left;
+}
+.pg-detail .d-brief .d-h {
+  padding: 0;
+  margin-bottom: 26px;
+}
+.db-headline {
+  max-width: 22em;
+  margin: 0 auto 46px;
+  font-size: clamp(25px, 2.9vw, 42px);
+  font-weight: 750;
+  line-height: 1.32;
+  letter-spacing: -0.032em;
+  text-align: center;
+  word-break: keep-all;
+  text-wrap: balance;
+}
+/* 쉼표 뒤 마디는 한 덩어리로(들어가면 한 줄에 — '폴대는 그대로, / 붙여 쓰는 수액 모니터링') */
+.db-hl-t {
+  display: inline-block;
+}
+
+/* 정보 한 줄 */
+.db-facts {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--line);
+}
+.db-facts[data-n='1'] { --n: 1; }
+.db-facts[data-n='2'] { --n: 2; }
+/* 칸이 적으면 표를 좁혀 가운데에(넓은 화면에 두 칸이 멀리 떨어지지 않게) */
+.db-facts[data-n='1'],
+.db-facts[data-n='2'] {
+  max-width: 760px;
+  margin-inline: auto;
+}
+.db-facts[data-n='3'] { --n: 3; }
+.db-facts[data-n='4'] {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.15fr) minmax(0, 1.2fr) minmax(0, 1.25fr);
+}
+.db-facts > div {
+  min-width: 0;
+  padding: 20px 24px 22px;
+}
+.db-facts > div:first-child {
+  padding-left: 2px;
+}
+.db-facts > div + div {
+  border-left: 1px solid var(--line);
+}
+.db-facts dt {
+  margin-bottom: 10px;
+  font-size: 12.5px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: var(--cc, var(--cyan));
+}
+.db-facts dd {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--fg);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.db-num {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+.db-size {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 15px;
+}
+.db-size .db-num {
+  font-family: var(--display);
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--cc, var(--fg));
+}
+.db-team {
+  display: block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.db-team:first-child {
+  margin-top: 0;
+}
+/* 팀 글 속 내 이름 */
+.db-team .me {
+  font-weight: 650;
+  color: var(--fg);
+}
+.db-roles {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.db-roles li + li {
+  margin-top: 4px;
+}
+.db-line {
+  display: block;
+}
+.db-line + .db-line {
+  margin-top: 6px;
+}
+.db-grade {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+  color: var(--tc, var(--cc, var(--fg)));
+}
+.db-grade .laurel {
+  width: 17px;
+  height: 17px;
+}
+.db-facts small {
+  color: var(--muted);
+}
+
+/* 01 … 06: 이름 칸(번호 · 한국어 · 영문 꼬리표) | 내용 */
+.db-blocks {
+  margin: 30px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.db-b {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 44px;
+  padding: 34px 0 36px;
+  border-top: 1px solid var(--line);
+}
+.db-b:first-child {
+  border-top: 0;
+}
+.db-k {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+.db-no {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: var(--cc, var(--orange));
+}
+.db-ko {
+  font-size: 22px;
+  font-weight: 750;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+}
+.db-en {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+}
+.db-v {
+  min-width: 0;
+}
+.db-p {
+  max-width: 40em;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.8;
+  color: var(--fg-2);
+  word-break: keep-all;
+  text-wrap: pretty;
+}
+.db-b[data-k='problem'] .db-p,
+.db-b[data-k='solution'] .db-p {
+  font-size: 19px;
+  color: var(--fg);
+}
+
+/* 목록: 앞에 짧은 선(기여) · 체크(결과) — 글자 기호가 아니라 그린 표시라 줄 맨 앞에 '·' '—'가 서지 않는다 */
+.db-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.db-list li {
+  position: relative;
+  padding-left: 24px;
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: var(--fg-2);
+  word-break: keep-all;
+  text-wrap: pretty;
+}
+.db-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.85em;
+  width: 11px;
+  height: 1px;
+  background: var(--cc, var(--cyan));
+}
+.db-list.is-check li::before {
+  top: 0.5em;
+  width: 9px;
+  height: 5px;
+  background: none;
+  border-left: 1.5px solid var(--cc, var(--cyan));
+  border-bottom: 1.5px solid var(--cc, var(--cyan));
+  transform: rotate(-45deg);
+}
+
+/* 문제 해결 기록: 한 건이 한 줄 — 문제 → 해결 → 결과(칸 사이 가는 선 위 작은 화살촉) */
+.db-trbl {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.db-trbl > li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  padding: 20px 22px 22px 18px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: rgba(238, 242, 247, 0.025);
+}
+.db-tno {
+  padding-top: 3px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--cc, var(--orange));
+}
+.db-trbl dl {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  margin: 0;
+}
+.db-tc {
+  position: relative;
+  min-width: 0;
+  padding: 0 20px;
+}
+.db-tc:first-child {
+  padding-left: 0;
+}
+.db-tc + .db-tc {
+  border-left: 1px solid var(--line);
+}
+.db-tc + .db-tc::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 3px;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid var(--cc, var(--cyan));
+  border-right: 1px solid var(--cc, var(--cyan));
+  background: var(--bg);
+  transform: rotate(45deg);
+}
+.db-tc dt {
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--muted);
+}
+.db-tc.is-out dt {
+  color: var(--cc, var(--cyan));
+}
+.db-tc dd {
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--fg-2);
+  word-break: keep-all;
+  overflow-wrap: anywhere; /* 띄어 쓰지 않은 긴 영문 묶음('Anaconda·PyTorch·TensorFlowTTS를')이 옆 칸으로 넘치지 않게 */
+  text-wrap: pretty;
+}
+.db-tc.is-out dd {
+  color: var(--fg);
+}
+
+.db-quote {
+  margin: 0;
+  padding: 2px 0 2px 24px;
+  border-left: 2px solid var(--cc, var(--cyan));
+}
+.db-quote p {
+  max-width: 36em;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.7;
+  letter-spacing: -0.015em;
+  word-break: keep-all;
+  text-wrap: pretty;
+}
+
+/* 행동 단추: 발표 슬라이드(채운 단추) + 링크 공유 */
+.d-acts {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.d-slides {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 20px;
+  border: 1px solid var(--fg);
+  border-radius: 999px;
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
+}
+.d-slides span {
+  font-size: 9px;
+}
+.d-slides:hover {
+  border-color: var(--cc, var(--cyan));
+  background: var(--cc, var(--cyan));
+}
+.d-slides:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+.d-share {
+  min-height: 42px;
+}
+
+@media (max-width: 1000px) {
+  .db-facts[data-n='4'],
+  .db-facts[data-n='3'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .db-facts > div {
+    padding: 16px 16px 18px;
+    border-top: 1px solid var(--line);
+  }
+  .db-facts > div:nth-child(-n + 2) {
+    border-top: 0;
+  }
+  .db-facts > div + div {
+    border-left: 0;
+  }
+  .db-facts > div:nth-child(2n) {
+    border-left: 1px solid var(--line);
+  }
+  .db-facts > div:nth-child(2n + 1) {
+    padding-left: 2px;
+  }
+  .db-facts[data-n='3'] > div:last-child {
+    grid-column: 1 / -1;
+  }
+  .db-b {
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 28px;
+  }
+}
+@media (max-width: 680px) {
+  .d-brief {
+    padding-bottom: 8vh;
+  }
+  .db-headline {
+    margin-bottom: 30px;
+  }
+  /* 역할 · 결과는 긴 글이라 한 줄 전체로 */
+  .db-facts[data-n='4'] > div:nth-child(n + 3) {
+    grid-column: 1 / -1;
+    padding-left: 2px;
+    border-left: 0;
+  }
+  /* 팀 구성 글이 길면 칸마다 한 줄 전체로(좁은 칸에서 '개발 / 4(권용현 …' 처럼 꺾이지 않게) */
+  .db-facts.has-long > div {
+    grid-column: 1 / -1;
+    padding-left: 2px;
+    border-left: 0;
+  }
+  .db-facts.has-long > div:nth-child(2) {
+    border-top: 1px solid var(--line);
+  }
+  .db-b {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 26px 0 28px;
+  }
+  .db-k {
+    flex-direction: row;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+  .db-ko {
+    font-size: 20px;
+  }
+  .db-p,
+  .db-b[data-k='problem'] .db-p,
+  .db-b[data-k='solution'] .db-p {
+    font-size: 16.5px;
+    line-height: 1.75;
+  }
+  .db-list li {
+    font-size: 15.5px;
+  }
+  .db-trbl > li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 16px 16px 18px;
+  }
+  .db-trbl dl {
+    grid-auto-flow: row;
+    gap: 0;
+  }
+  .db-tc,
+  .db-tc:first-child {
+    padding: 12px 0 0;
+  }
+  .db-tc:first-child {
+    padding-top: 0;
+  }
+  .db-tc + .db-tc {
+    margin-top: 12px;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .db-tc + .db-tc::before {
+    left: 14px;
+    top: -5px;
+    transform: rotate(135deg);
+  }
+  .db-quote p {
+    font-size: 17.5px;
+  }
+}
+@media (pointer: coarse) {
+  .d-slides,
+  .d-share {
+    min-height: 44px;
+  }
+}

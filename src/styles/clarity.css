@@ -205,3 +205,257 @@ html.is-pulling,
 html.is-pulling * {
   cursor: grabbing !important;
 }
+
+/* ── 기승전결 덱(로봇 · AI — content.js의 arc): 발표처럼 막(기 · 승 · 전 · 결)을 따라 ─────────────────
+   머리줄의 막 글자와 덱 막대의 눈금 묶음은 지금 카드의 막에 불이 들어오고(지나온 막은 옅게), 설명 줄에는 막 칩 · 그 막의 첫 카드에 막의 한 줄 ·
+   한 줄 소개 자리에 발표 노트. 좁은 휴대폰(600 미만)은 노트 대신 한 줄 소개와 '노트' 단추(누르면 카드 위에 노트가 겹친다) */
+.kicker .k-act {
+  opacity: 0.42;
+  transition:
+    opacity 0.4s,
+    color 0.4s,
+    text-shadow 0.4s;
+}
+.kicker .k-act.is-past {
+  opacity: 0.72;
+}
+.kicker .k-act.is-now {
+  opacity: 1;
+  color: var(--fg);
+  text-shadow: 0 0 12px rgba(94, 242, 255, 0.75);
+}
+/* 설명 줄: 막이 바뀌는 첫 카드만 막의 한 줄이 더해진다 — 글을 아래(덱 막대 쪽)에 붙여 제목 · 노트 · 단추가 카드마다 같은 자리에 */
+.deck-info.has-arc > .di {
+  align-self: end;
+}
+.di-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 10px 2px 8px;
+  border: 1px solid rgba(94, 242, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(94, 242, 255, 0.08);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--fg);
+}
+.di-act b {
+  color: var(--cyan);
+  font-weight: 750;
+}
+/* 막의 첫 카드: 막 칩 + 막의 한 줄이 분류 줄 자리에(넓은 화면) — 좁은 휴대폰은 분류 줄 아래에 따로(칩은 분류 줄에) */
+.di-actline {
+  margin: 0 auto;
+  max-width: 720px;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #bff7ff;
+  word-break: keep-all;
+  text-wrap: balance;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.9);
+}
+.di-actline .di-act {
+  margin-right: 6px;
+  vertical-align: 1px;
+}
+.di-actline + .di-title {
+  margin-top: 6px;
+}
+@media (min-width: 600px) {
+  .di-arc.is-act-start .di-meta {
+    display: none;
+  }
+}
+.di-note {
+  margin: 6px auto 0;
+  max-width: 720px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--fg-2);
+  word-break: keep-all;
+  /* 가운데 맞춘 두 줄 노트: 두 줄의 길이를 고르게(끝줄이 짧게 남지 않게) */
+  text-wrap: balance;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.85);
+}
+/* 노트가 있는 카드는 노트가 한 줄 소개를 대신한다(노트에 그 프로젝트의 문제 · 참여 · 결과가 다 들어 있다) */
+.di-arc.has-note .di-line,
+.di-nb {
+  display: none;
+}
+/* 프로젝트의 발표 슬라이드로(모든 프로젝트 덱) — 보조 단추 */
+.di-slides span {
+  font-size: 9px;
+  opacity: 0.8;
+}
+/* 기승전결 덱의 카드 크기: 설명 줄(막의 한 줄 · 두 줄 노트)이 길어진 만큼 — 낮은 데스크톱(높이 800 이하)에서 위 부제와 겹치지 않게 */
+@media (max-height: 800px) and (min-width: 821px) and (orientation: landscape), (max-height: 800px) and (min-width: 1101px) {
+  .reel.deck.has-arc:not(.aw-reel) {
+    --card-h: clamp(140px, calc(30 * var(--vh) - 24px), 216px);
+  }
+}
+.di-nb[aria-pressed='true'] {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+/* 기승전결의 맺음말(끝 카드): 한 줄 소개를 감추는 낮은 데스크톱에서도 보인다 */
+.deck-info .di-line.di-close {
+  display: block;
+  max-width: 60ch;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #bff7ff;
+  -webkit-line-clamp: unset;
+  text-wrap: balance;
+}
+/* 덱 막대: 눈금을 막마다 묶고(막 사이를 벌려) 막 글자는 눈금 위에 — 눈금을 조금 좁혀 막대의 폭은 그대로(왼쪽 한 줄 수치 두 개가 다 들어가게).
+   막마다 최소 폭(1.5em)을 두어 눈금이 하나뿐인 막('결')도 옆 막 글자와 붙어 '전결'로 읽히지 않게 — 눈금은 그 폭의 가운데에 */
+.deck-ticks.has-acts {
+  gap: 7px;
+}
+.deck-act {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 1.5em;
+}
+.deck-ticks.has-acts .deck-act i {
+  width: 5px;
+}
+.deck-ticks.has-acts .deck-act i.is-on {
+  width: 18px;
+}
+.deck-act b {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 7px);
+  transform: translateX(-50%);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--muted);
+  transition: color 0.4s;
+}
+.deck-act.is-past b {
+  color: rgba(94, 242, 255, 0.55);
+}
+.deck-act.is-now b {
+  color: var(--cyan);
+}
+/* 좁은 휴대폰의 발표 노트: 카드 자리에 겹쳐(손가락은 그대로 덱을 넘긴다 — 누르면 걷힌다) */
+.deck-note {
+  position: absolute;
+  inset: 0 var(--pad);
+  z-index: 30;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  padding: 16px 18px;
+  overflow: auto;
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  background: rgba(5, 7, 12, 0.88);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--fg);
+  word-break: keep-all;
+  text-wrap: pretty;
+  cursor: pointer;
+}
+.deck-note[hidden] {
+  display: none;
+}
+.dn-act {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--fg-2);
+}
+.dn-act b {
+  color: var(--cyan);
+}
+@media (min-width: 600px) {
+  .deck-note {
+    display: none;
+  }
+}
+@media (max-width: 599px) {
+  .di-note {
+    display: none;
+  }
+  /* 노트 대신 한 줄 소개(두 줄까지) — 막의 첫 카드는 막의 한 줄이 그 자리에 */
+  .di-arc.has-note .di-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    text-wrap: balance;
+  }
+  .di-arc.is-act-start .di-line {
+    display: none;
+  }
+  .di-nb {
+    display: inline-flex;
+  }
+  .di-actline {
+    margin-top: 8px;
+    font-size: 13.5px;
+  }
+  .di-actline .di-act {
+    display: none;
+  }
+  .di-act {
+    font-size: 11.5px;
+  }
+  .deck-ticks.has-acts {
+    gap: 8px;
+  }
+  .deck-act {
+    gap: 2px;
+    min-width: 1.6em;
+  }
+  .deck-ticks.has-acts .deck-act i {
+    width: 4px;
+  }
+  .deck-ticks.has-acts .deck-act i.is-on {
+    width: 14px;
+  }
+  .deck-act b {
+    font-size: 10.5px;
+  }
+}
+
+/* 막 글자가 눈금 위로 올라선 덱: 번호 알약(처음 만나는 덱의 빛나는 테두리)이 글자 줄까지 감싸게 — 글자가 테두리에 걸치지 않게 */
+.deck-ticks.has-acts {
+  margin-top: 16px;
+}
+.deck-count:has(.deck-ticks.has-acts) {
+  align-items: flex-end;
+  padding-top: 2px;
+}
+.deck-count:has(.deck-ticks.has-acts) .deck-now,
+.deck-count:has(.deck-ticks.has-acts) .deck-total {
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+/* 손가락으로 쓰는 태블릿(1024×768 등)에서도 덱 넘김 화살표는 40px — 휴대폰 폭에서만 키우던 것을 거친 포인터 전체로 */
+@media (pointer: coarse) {
+  .deck-nav .deck-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* 표지 머리줄(39 PROJECTS · 43 AWARDS): 뒤에 떠 있는 드론의 프로펠러 · 몸체 위에서도 읽히게 — 얇은 고정폭 글자에 어두운 번짐 */
+.hero .kicker {
+  text-shadow:
+    0 0 10px rgba(2, 3, 6, 0.95),
+    0 0 22px rgba(2, 3, 6, 0.85),
+    0 1px 2px rgba(2, 3, 6, 0.9);
+}
