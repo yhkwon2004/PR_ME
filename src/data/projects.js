@@ -1,5 +1,6 @@
 // 프로젝트 상세 데이터. projects.json은 scripts/build-projects.mjs가 노션·기록 수집 결과로 만든다.
-// briefs.json은 포트폴리오 요약(문제 · 솔루션 · 팀 · 역할 · 기여 · 문제 해결 기록 · 결과 · 배운 점 · 다음) — 사람이 고치는 파일.
+// briefs.json은 포트폴리오 요약(문제 · 솔루션 · 팀 · 역할 · 기여 · 문제 해결 기록 · 결과 · 배운 점 · 다음)과 기술 노트(tech — 사용 환경 · 처리 흐름 ·
+// 기술 풀이 · 기록) — 사람이 고치는 파일.
 // scripts/briefs-from-research.mjs가 조사 결과를 이 파일로 옮기고, 빈 항목은 화면(상세 · 발표 슬라이드)에서 감춘다
 import raw from './projects.json';
 import BRIEFS from './briefs.json';
@@ -53,6 +54,39 @@ function cleanBrief(b) {
   };
   return Object.values(out).some((v) => (Array.isArray(v) ? v.length : v)) ? out : null;
 }
+// 기술 노트(briefs.json의 tech): 한 줄 요약 · 사용 환경 · 처리 흐름 · 기술 풀이 · 기록 — 빈 항목은 빼고, 다 비었으면 null.
+// 풀이의 그림은 프로젝트 사진이면 그 사진 기록(크기 · 썸네일 · 종류)을 그대로 쓰고, 아니면(피치덱 그래프 SVG · 다른 프로젝트 사진)
+// 적힌 크기로 — SVG 그래프는 종류 'chart'(밝은 종이 위에 그린다)
+function cleanTech(t, images) {
+  if (!t || typeof t !== 'object') return null;
+  const arr = (v) => (Array.isArray(v) ? v : []);
+  const fig = (f) => {
+    const s = src(str(f?.src));
+    if (!s) return null;
+    const im = images.find((x) => x.src === s);
+    const caption = str(f.caption) || im?.caption || '';
+    if (im) return { ...im, caption };
+    const w = Math.round(Number(f.w) || 0);
+    const h = Math.round(Number(f.h) || 0);
+    const svg = /\.svg$/i.test(s);
+    // srcSm(+ wSm · hSm): 휴대폰 폭(680px 이하)에서 대신 쓰는 그림 — 글자를 키운 그래프 같은 것
+    const ss = src(str(f.srcSm));
+    const ws = Math.round(Number(f.wSm) || 0);
+    const hs = Math.round(Number(f.hSm) || 0);
+    const sm = ss && ws && hs ? { src: ss, ratio: ws / hs } : null;
+    return { file: s.slice(1), src: s, thumb: svg ? s : thumbOf(s), caption, kind: svg ? 'chart' : 'diagram', w, h, ratio: w && h ? w / h : 4 / 3, sm };
+  };
+  const out = {
+    lead: str(t.lead),
+    env: arr(t.env).map((x) => ({ k: str(x?.k), v: str(x?.v) })).filter((x) => x.k && x.v),
+    pipeline: arr(t.pipeline).map((x) => ({ t: str(x?.t), d: str(x?.d) })).filter((x) => x.t || x.d),
+    deep: arr(t.deep)
+      .map((x) => ({ h: str(x?.h), p: str(x?.p), list: strs(x?.list), figure: fig(x?.figure) }))
+      .filter((x) => x.h || x.p || x.list.length),
+    records: arr(t.records).map((x) => ({ when: str(x?.when), what: str(x?.what), result: str(x?.result) })).filter((x) => x.what || x.result),
+  };
+  return Object.values(out).some((v) => (Array.isArray(v) ? v.length : v)) ? out : null;
+}
 // 참여 인원 칸에 답이 되지 않는 글('팀 참가' · '동아리 팀 경기' · '팀 프로젝트')은 없는 것으로 — 사람 · 인원 · 팀 이름이 있을 때만 보인다
 const GENERIC_TEAM = /^(?:동아리\s*)?팀\s*(?:경기|참가|프로젝트|활동)?$/;
 const teamText = (t) => (GENERIC_TEAM.test(str(t).replace(/^동아리 /, '')) ? '' : str(t));
@@ -79,6 +113,7 @@ function normalize(p) {
     teamSize: brief?.team?.size || 0,
     role: brief?.role.length ? brief.role : p.role || [],
     brief,
+    tech: cleanTech(BRIEFS[p.id]?.tech, images),
     tools: p.tools || [],
     awards: p.awards || [],
     metrics: p.metrics || [],

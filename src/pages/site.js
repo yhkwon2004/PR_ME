@@ -20,6 +20,13 @@ export const sep = (s = '') =>
     .replace(/(\S)·/g, '$1&#8288;·')
     .replace(/([A-Za-z0-9])-(?=[A-Za-z0-9])/g, '$1-&#8288;')
     .replace(/ ([·—–→]) /g, '&nbsp;$1 ');
+// 기술 노트 글(상세 TECH NOTES · 슬라이드 기술 노트 장)만: sep()에 더해 닫는 괄호 · %와 뒤따르는 조사('빠름(+1)으로' · '97.3%였습니다')를
+// 떼지 않고(이음표), 수의 범위(18–40)와 수 · 단위(52 s · 500 mL)도 한 덩어리로 — 그림 설명처럼 다른 장과 함께 쓰는 글에는 쓰지 않는다
+export const tsep = (s = '') =>
+  sep(s)
+    .replace(/([)%])(?=[가-힣])/g, '$1&#8288;')
+    .replace(/(\d)–(\d)/g, '$1–&#8288;$2')
+    .replace(/(\d) (mL|ms|s|m|g|px|KB|Hz)(?![A-Za-z])/g, '$1&nbsp;$2');
 // 하이픈으로 이은 영문 낱말(End-to-End · IDEA-GO-ROUND · Do-Dream)을 한 덩어리(.nw)로 — 이미 esc()한 본문 글에만(속성 값에는 쓰지 않는다)
 export const hy = (h = '') => h.replace(/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g, '<span class="nw">$&</span>');
 // 한 줄 소개 끝의 '… 스마트팜 + 앱': '+ 앱'이 마지막 줄에 홀로 서지 않게 앞 낱말과 묶는다 — 짧은 끝 낱말('… 업사이클 상자')도 앞 낱말과
@@ -850,6 +857,99 @@ function briefSection(p, awards) {
   </section>`;
 }
 
+// 기술 노트(briefs.json의 tech): 한 줄 요약 → 01 사용 환경(이름 | 값 표) → 02 처리 흐름(번호 · 잇는 선) → 03 기술 풀이(글 · 목록 · 그림 —
+// 그림은 눌러 확대) → 04 기록(언제 · 무엇을 · 결과). 있는 것만, 번호는 보이는 것끼리 — 기술 노트가 없으면 구역을 두지 않는다.
+// 풀이에 쓴 프로젝트 사진은 아래 스토리 · 갤러리에서 다시 보이지 않는다(techFiles)
+export const techFiles = (p) => new Set((p.tech?.deep || []).map((d) => d.figure?.file).filter(Boolean));
+// 휴대폰 폭용 그림(figure.sm — 글자를 키운 세로 그래프)으로 바꾸는 기준: 세로 화면 · 680px 이하(눕힌 휴대폰은 넓은 그림 그대로).
+// <picture>의 source · 라이트박스 · CSS(brief.css · slides.css)와 같은 값
+export const SMALL_FIG = '(max-width: 680px) and (orientation: portrait)';
+// 확대 보기(라이트박스)의 풀이 그림: 그림 비율(fit · ratio)대로 확대 칸을 채운다 — 원래 크기에서 멈춰 본문보다 작아지지 않게(main.css .is-fit)
+export const techMedia = (p, small = false) =>
+  (p.tech?.deep || [])
+    .filter((d) => d.figure)
+    .map((d) => {
+      const f = small && d.figure.sm ? d.figure.sm : d.figure;
+      return { type: 'image', src: f.src, caption: d.figure.caption, paper: d.figure.kind === 'chart', fit: true, ratio: f.ratio };
+    });
+// 그림 한 장(<img>)에 휴대폰 폭용 그림이 있으면 <picture>로 감싼다(상세 페이지 — 슬라이드는 slides.js pic()이 그림 두 장을 CSS로 바꾼다)
+export const withSmall = (f, imgHtml) => (f.sm ? `<picture><source media="${SMALL_FIG}" srcset="${esc(f.sm.src)}" />${imgHtml}</picture>` : imgHtml);
+function techSection(p) {
+  const t = p.tech;
+  if (!t) return '';
+  const li = (x) => `<li>${caps(tsep(x))}</li>`;
+  let fk = 0;
+  const figure = (f) => {
+    const k = fk++;
+    // 세로 그림(논문 쪽 · 세로 화면)은 폭을 줄여 한 화면 높이 안에(.is-tall). 작은 사진(지도 한 장 352px 같은)은 원래 크기의
+    // 1.4배까지만 키운다 — 흐려지지 않게. 그래프(SVG)는 그림 크기에 맞춰 420 ~ 760px(4×4 패턴 같은 작은 그림이 화면 폭만큼 커지지 않게)
+    const mw = !f.w ? '' : `;--mw:${Math.round(f.kind === 'chart' ? Math.min(760, Math.max(420, f.w * 1.6)) : f.w * 1.4)}px`;
+    // 휴대폰 폭용 그림(f.sm)이 있으면 세로 화면 · 680px 이하에서 그 그림 · 그 비율로(brief.css의 [data-sm])
+    const ar = (r) => Math.min(2.6, Math.max(0.5, r)).toFixed(3);
+    return `<figure class="dt-figure${f.ratio < 0.95 ? ' is-tall' : ''}"${f.sm ? ' data-sm' : ''} style="--ar:${ar(f.ratio)}${f.sm ? `;--ar-sm:${ar(f.sm.ratio)}` : ''}${mw}"><button type="button" class="dt-fig" data-tfig="${k}" data-kind="${esc(f.kind || 'photo')}" aria-label="${esc(f.caption || '그림')} 크게 보기">${withSmall(f, img(f, { sizes: '(max-width: 820px) 100vw, 900px' }))}<span class="dt-zoom" aria-hidden="true">확대</span></button>${f.caption ? `<figcaption>${sep(f.caption)}</figcaption>` : ''}</figure>`;
+  };
+  const hasWhen = t.records.some((r) => r.when);
+  const blocks = [
+    [
+      'env',
+      '사용 환경',
+      'ENVIRONMENT',
+      t.env.length && `<dl class="dt-env">${t.env.map((e) => `<div><dt>${sep(e.k)}</dt><dd>${caps(tsep(e.v))}</dd></div>`).join('')}</dl>`,
+    ],
+    [
+      'pipeline',
+      '처리 흐름',
+      'PIPELINE',
+      t.pipeline.length &&
+        `<ol class="dt-flow">${t.pipeline
+          .map((s, k) => `<li><span class="dt-fno" aria-hidden="true">${pad(k + 1)}</span><div class="dt-ft">${s.t ? `<b>${caps(tsep(s.t))}</b>` : ''}${s.d ? `<p>${caps(tsep(s.d))}</p>` : ''}</div></li>`)
+          .join('')}</ol>`,
+    ],
+    [
+      'deep',
+      '기술 풀이',
+      'DEEP DIVE',
+      t.deep.length &&
+        `<div class="dt-deep">${t.deep
+          .map(
+            (d, k) => `<section class="dt-sec reveal">
+              ${d.h ? `<h4 class="dt-h"><span class="dt-sno">${pad(k + 1)}</span><span>${caps(tsep(d.h))}</span></h4>` : ''}
+              ${d.p ? `<p class="dt-p">${caps(tsep(d.p))}</p>` : ''}
+              ${d.list.length ? `<ul class="db-list dt-list">${d.list.map(li).join('')}</ul>` : ''}
+              ${d.figure ? figure(d.figure) : ''}
+            </section>`
+          )
+          .join('')}</div>`,
+    ],
+    [
+      'records',
+      '기록',
+      'RECORDS',
+      t.records.length &&
+        `<div class="dt-rec${hasWhen ? '' : ' no-when'}"><p class="dt-rec-h" aria-hidden="true">${hasWhen ? '<span>언제</span>' : ''}<span>무엇을</span><span>결과</span></p><ol>${t.records
+          .map(
+            (r) => `<li>${hasWhen ? `<span class="dt-when${koCls(r.when)}">${r.when ? sep(r.when) : '<i aria-hidden="true">—</i>'}</span>` : ''}<span class="dt-what">${caps(tsep(r.what))}</span><span class="dt-res">${caps(tsep(r.result))}</span></li>`
+          )
+          .join('')}</ol></div>`,
+    ],
+  ].filter(([, , , v]) => v);
+  if (!blocks.length && !t.lead) return '';
+  return `<section class="d-tech" aria-labelledby="d-tech-h">
+    <h2 class="d-h" id="d-tech-h">TECH NOTES</h2>
+    ${t.lead ? `<p class="dt-lead reveal">${caps(tsep(t.lead))}</p>` : ''}
+    ${
+      blocks.length
+        ? `<ol class="db-blocks dt-blocks">${blocks
+            .map(
+              ([key, ko, en, v], k) =>
+                `<li class="db-b${key === 'deep' ? '' : ' reveal'}" data-k="${key}"><h3 class="db-k"><span class="db-no">${pad(k + 1)}</span><span class="db-ko">${ko}</span><span class="db-en">${en}</span></h3><div class="db-v">${v}</div></li>`
+            )
+            .join('')}</ol>`
+        : ''
+    }
+  </section>`;
+}
+
 function detailPage(p) {
   const i = projects.indexOf(p);
   const next = projects[(i + 1) % projects.length];
@@ -868,11 +968,16 @@ function detailPage(p) {
   const gallery = detailImages(p);
   // 히어로 사진은 스토리에서 다시 쓰지 않고, 갤러리에는 스토리에 없던 사진만 — 같은 사진이 반복되지 않게
   const coverFile = p.cover?.file;
+  // 기술 노트의 풀이 그림으로 쓴 사진도 스토리 · 갤러리에서 다시 보이지 않게
+  const tf = techFiles(p);
   const story = p.story.map((s) =>
-    s.img && ((s.img.file === coverFile && p.story.length > 1) || !gallery.includes(s.img)) ? { ...s, img: null } : s
+    s.img && ((s.img.file === coverFile && p.story.length > 1) || !gallery.includes(s.img) || tf.has(s.img.file)) ? { ...s, img: null } : s
   );
+  // 기술 노트 · 요약이 있고, 그림을 빼고 나면 스토리에 사진이 한 장도 남지 않으면(사진이 모두 풀이 그림 · 대표 사진) 스토리 칸을 두지 않는다 —
+  // 같은 내용을 글 상자로만 한 번 더 늘어놓게 되므로(요약 · 기술 노트가 이미 담고 있다)
+  const storyShown = !(p.tech && p.brief && story.length && !story.some((s) => s.img));
   const storyImgs = new Set(story.map((s) => s.img?.file).filter(Boolean));
-  const rest = gallery.map((im, k) => ({ im, k })).filter(({ im }) => !storyImgs.has(im.file) && im.file !== coverFile);
+  const rest = gallery.map((im, k) => ({ im, k })).filter(({ im }) => !storyImgs.has(im.file) && im.file !== coverFile && !tf.has(im.file));
   const showGallery = rest.length > 0;
   return `<article class="pg pg-detail" data-cat="${esc(p.category)}">
     ${bar({ href: '/works', label: '프로젝트 목록' })}
@@ -903,6 +1008,8 @@ function detailPage(p) {
 
     ${briefSection(p, awards)}
 
+    ${techSection(p)}
+
     ${
       awards.length
         ? `<section class="d-awards reveal" data-media='${esc(JSON.stringify(certMedia))}'><h2 class="d-h">AWARDS<sup>${awards.length}</sup></h2><ul class="aw-row">${awards
@@ -926,7 +1033,7 @@ function detailPage(p) {
     }
 
     ${
-      story.length
+      story.length && storyShown
         ? `<section class="d-story">${story
             .map(
               (s, k) => `<div class="st-row${s.img ? (s.img.ratio < 0.85 ? ' is-tall' : '') : ' no-img'} reveal">
@@ -1331,6 +1438,11 @@ export function createSite({ lightbox, reducedMotion, onOpen, onClose }) {
       const media = detailImages(p).map((im) => ({ type: 'image', src: im.src, caption: im.caption }));
       page.querySelectorAll('[data-gallery]').forEach((b) =>
         b.addEventListener('click', () => lightbox.show({ media }, +b.dataset.gallery, b))
+      );
+      // 기술 노트의 풀이 그림: 그림끼리 넘기며 크게(그래프는 밝은 종이 위에)
+      // 휴대폰 폭에서는 글자를 키운 그래프(figure.sm)로 — 누를 때의 화면 폭으로 고른다
+      page.querySelectorAll('[data-tfig]').forEach((b) =>
+        b.addEventListener('click', () => lightbox.show({ media: techMedia(p, matchMedia(SMALL_FIG).matches) }, +b.dataset.tfig, b))
       );
       page.querySelectorAll('[data-yt]').forEach((b) => {
         // 썸네일을 못 받으면(막힌 망) 깨진 그림 대신 재생 단추만 남긴다

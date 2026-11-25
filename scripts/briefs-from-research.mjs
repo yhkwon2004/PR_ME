@@ -129,7 +129,8 @@ for (const r of list) {
 }
 
 // 프로젝트 순서대로, 필드도 정해진 순서로
-const FIELDS = ['headline', 'period', 'team', 'role', 'problem', 'solution', 'contribution', 'results', 'troubles', 'learned', 'next'];
+// tech(기술 노트)는 조사 결과로 옮기지 않지만, 이미 손으로 적어 둔 값은 합칠 때 지우지 않도록 함께 남긴다
+const FIELDS = ['headline', 'period', 'team', 'role', 'problem', 'solution', 'contribution', 'results', 'troubles', 'learned', 'next', 'tech'];
 const sorted = Object.fromEntries(
   Object.keys(merged)
     .sort((a, b) => (ORDER.indexOf(a) + 1 || 1e9) - (ORDER.indexOf(b) + 1 || 1e9))

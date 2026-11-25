@@ -474,3 +474,444 @@
     min-height: 44px;
   }
 }
+
+/* ── 상세: 기술 노트(TECH NOTES) ───────────────────────────────
+   PROJECT BRIEF 바로 아래, 같은 지면 규칙(가는 선 · 작은 번호 · 한국어 이름 | 내용)으로: 한 줄 요약 → 01 사용 환경(이름 | 값 표) →
+   02 처리 흐름(번호를 잇는 세로 선) → 03 기술 풀이(글 · 목록 · 그림 — 그림은 눌러 확대) → 04 기록(언제 · 무엇을 · 결과).
+   경로 · 함수 이름처럼 띄어 쓰지 않은 긴 영문은 좁은 화면에서 칸을 넘지 않게 어디서든 꺾는다 */
+.d-tech {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 11vh;
+  text-align: left;
+}
+.pg-detail .d-tech .d-h {
+  padding: 0;
+  margin-bottom: 26px;
+}
+.dt-lead {
+  max-width: 44em;
+  margin: 0 auto 40px;
+  padding: 22px 0 24px;
+  border-top: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--line);
+  font-size: 19px;
+  font-weight: 560;
+  line-height: 1.8;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.dt-blocks {
+  margin-top: 0;
+}
+
+/* 01 사용 환경: 이름 | 값 */
+.dt-env {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+.dt-env > div {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 20px;
+  padding: 12px 0 13px;
+  border-bottom: 1px solid var(--line);
+}
+.dt-env dt {
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.7;
+  color: var(--cc, var(--cyan));
+  word-break: keep-all;
+}
+.dt-env dd {
+  min-width: 0;
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--fg-2);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+/* 02 처리 흐름: 번호 원 — 세로 선 — 다음 번호 */
+.dt-flow {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dt-flow > li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 18px;
+  padding-bottom: 22px;
+}
+.dt-flow > li:last-child {
+  padding-bottom: 0;
+}
+/* 잇는 선: 이 번호 원 아래에서 다음 번호 원 위까지 */
+.dt-flow > li:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 19.5px;
+  top: 40px;
+  bottom: 2px;
+  width: 1px;
+  background: linear-gradient(var(--cc, var(--cyan)), var(--line-2));
+  opacity: 0.7;
+}
+.dt-fno {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--cc, var(--cyan));
+  border-radius: 50%;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--cc, var(--cyan));
+  background: var(--bg);
+}
+.dt-ft {
+  min-width: 0;
+  padding-top: 8px;
+}
+.dt-ft b {
+  display: block;
+  font-size: 17px;
+  font-weight: 720;
+  line-height: 1.45;
+  letter-spacing: -0.015em;
+  word-break: keep-all;
+}
+.dt-ft p {
+  max-width: 44em;
+  margin: 6px 0 0;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--fg-2);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+/* 03 기술 풀이: 꼭지마다 제목 · 글 · 목록 · 그림 */
+.dt-deep {
+  display: grid;
+  gap: 0;
+}
+.dt-sec {
+  min-width: 0;
+  padding: 0 0 38px;
+}
+.dt-sec + .dt-sec {
+  padding-top: 34px;
+  border-top: 1px solid var(--line);
+}
+.dt-h {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 0 14px;
+  font-size: 20px;
+  font-weight: 740;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+  text-wrap: balance;
+}
+.dt-sno {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  color: var(--cc, var(--orange));
+}
+.dt-p {
+  max-width: 42em;
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.85;
+  color: var(--fg-2);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.dt-list {
+  margin-top: 16px;
+  gap: 8px;
+}
+.dt-list li {
+  font-size: 15.5px;
+  overflow-wrap: anywhere;
+}
+.dt-figure {
+  margin: 24px 0 0;
+}
+.dt-fig {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: min(900px, var(--mw, 900px));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #0a0d12;
+  cursor: zoom-in;
+}
+/* 사진 · 화면 그림(그래프 말고)은 한 화면 높이 안으로 — 폭은 비율대로 줄인다(정사각형에 가까운 코드 화면이 화면보다 커지지 않게) */
+.dt-fig:not([data-kind='chart']) {
+  width: min(100%, calc(min(72vh, 640px) * var(--ar)));
+}
+/* 세로 그림: 화면 높이 안으로 — 폭은 비율대로 줄인다 */
+.dt-figure.is-tall .dt-fig {
+  width: min(100%, calc(min(72vh, 640px) * var(--ar)));
+}
+.dt-fig picture {
+  display: block;
+}
+.dt-fig img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--ar);
+  object-fit: contain;
+  transition: transform 0.6s var(--ease);
+}
+.dt-fig:hover img {
+  transform: scale(1.02);
+}
+/* 그래프(SVG): 글자가 어두워 밝은 종이 위에 */
+.dt-fig[data-kind='chart'] {
+  max-width: min(760px, var(--mw, 760px));
+  padding: clamp(12px, 2.2vw, 26px);
+  background: #f4efe8;
+}
+.dt-fig:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+.dt-zoom {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(5, 7, 12, 0.72);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg-2);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+/* 그래프: 위 모서리에는 칸 제목 · 설명이 있어 '확대'는 아래 오른쪽 — 종이 여백(패딩) 안에 앉아 글자를 덮지 않게 */
+.dt-fig[data-kind='chart'] .dt-zoom {
+  top: auto;
+  right: 6px;
+  bottom: 6px;
+  padding: 2px 8px;
+  line-height: 1.35;
+}
+/* 휴대폰 폭용 그림(data-sm — 글자를 키운 세로 그래프)은 세로 화면 · 680px 이하에서 그 비율로(눕힌 휴대폰은 넓은 그림 그대로).
+   site.js의 SMALL_FIG와 같은 값 */
+@media (max-width: 680px) and (orientation: portrait) {
+  .dt-figure[data-sm] .dt-fig {
+    --ar: var(--ar-sm);
+  }
+}
+.dt-fig:hover .dt-zoom,
+.dt-fig:focus-visible .dt-zoom {
+  opacity: 1;
+}
+.dt-figure figcaption {
+  max-width: 900px;
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+/* 04 기록: 언제 | 무엇을 | 결과 */
+.dt-rec ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line-2);
+}
+.dt-rec-h,
+.dt-rec li {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 22px;
+}
+.dt-rec.no-when .dt-rec-h,
+.dt-rec.no-when li {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+}
+.dt-rec-h {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--muted);
+}
+.dt-rec li {
+  padding: 14px 0 15px;
+  border-bottom: 1px solid var(--line);
+}
+.dt-when {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.75;
+  letter-spacing: 0.02em;
+  color: var(--cc, var(--cyan));
+  word-break: keep-all;
+}
+/* 날짜 대신 한국어로 적은 때('화면 시계 4월 29일')는 본문 글꼴로 */
+.dt-when.is-ko {
+  font-family: var(--sans);
+  letter-spacing: 0;
+}
+.dt-when i {
+  font-style: normal;
+  color: var(--muted);
+}
+.dt-what,
+.dt-res {
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.dt-what {
+  color: var(--fg-2);
+}
+.dt-res {
+  color: var(--fg);
+  font-weight: 560;
+}
+
+@media (max-width: 1000px) {
+  .dt-env > div {
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 14px;
+  }
+}
+@media (max-width: 680px) {
+  .d-tech {
+    padding-bottom: 8vh;
+  }
+  .dt-lead {
+    margin-bottom: 26px;
+    padding: 18px 0 20px;
+    font-size: 16.5px;
+    line-height: 1.75;
+  }
+  /* 사용 환경: 이름 위 · 값 아래 */
+  .dt-env > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+    padding: 11px 0 12px;
+  }
+  .dt-env dt {
+    font-size: 12.5px;
+  }
+  .dt-env dd {
+    font-size: 15px;
+  }
+  .dt-flow > li {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 14px;
+    padding-bottom: 18px;
+  }
+  .dt-flow > li:not(:last-child)::before {
+    left: 16.5px;
+    top: 34px;
+  }
+  .dt-fno {
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+  }
+  .dt-ft {
+    padding-top: 5px;
+  }
+  .dt-ft b {
+    font-size: 16px;
+  }
+  .dt-ft p {
+    font-size: 14.5px;
+  }
+  .dt-sec {
+    padding-bottom: 30px;
+  }
+  .dt-sec + .dt-sec {
+    padding-top: 26px;
+  }
+  .dt-h {
+    gap: 10px;
+    font-size: 18px;
+  }
+  .dt-p {
+    font-size: 15.5px;
+    line-height: 1.8;
+  }
+  .dt-list li {
+    font-size: 14.5px;
+  }
+  .dt-figure {
+    margin-top: 18px;
+  }
+  .dt-figure.is-tall .dt-fig {
+    width: min(100%, calc(64svh * var(--ar)));
+  }
+  .dt-figure figcaption {
+    font-size: 12.5px;
+  }
+  /* 기록: 한 건이 한 덩어리(언제 → 무엇을 → 결과) */
+  .dt-rec-h {
+    display: none;
+  }
+  .dt-rec li,
+  .dt-rec.no-when li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+    padding: 13px 0 14px;
+  }
+  .dt-when {
+    font-size: 12px;
+  }
+  .dt-when:has(i) {
+    display: none;
+  }
+  .dt-what {
+    font-size: 14.5px;
+  }
+  .dt-res {
+    font-size: 14.5px;
+  }
+  .dt-res::before {
+    content: '→ ';
+    content: '→ ' / '';
+    color: var(--cc, var(--cyan));
+    font-weight: 400;
+  }
+}
+@media (hover: none) {
+  .dt-zoom {
+    opacity: 1;
+  }
+}

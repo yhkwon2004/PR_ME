@@ -11,6 +11,13 @@
   charts/filter.svg   7장 · 흔들림 구간 원신호와 칼만필터 출력 (썸네일)
   charts/cnn-pattern.svg  7장 · CNN이 보는 4×4 상태 패턴 — 정상 · 이상 (썸네일)
 
+사이트 기술 노트(/works/iot-iv-pole)용 — 덱은 쓰지 않는다
+  charts/gyro-note.svg     gyro.svg와 같은 모의 신호, r · RMS 숫자 없이 맨 위에 '설명용 모의 신호 · 학습 장비(자이로 있음)'
+                           (16:10 — 슬라이드 그림 칸(약 480 px)에서도 눈금 글자가 11 px 안팎으로 읽히게 그림에 비해 글자를 크게)
+  charts/gyro-note-sm.svg  같은 그림을 휴대폰 폭(약 300 ~ 340 px)용 세로로, 글자를 크게
+  charts/cnn-pattern-key.svg  논문 그림 2(정상 · 이상 4×4 패턴)를 칸마다 값(+1 · 0 · −1)과 범례를 넣어 다시 그림
+  charts/cnn-pattern-key-sm.svg  같은 그림을 휴대폰 폭(약 280 ~ 340 px)용으로 — 두 패턴은 나란히 그대로, 여백을 줄이고 글자를 크게
+
 자료 그래프(덱의 막대 · 점 그래프는 모두 여기서 그린다 — HTML로 그리지 않는다)
   charts/clinic-24h.svg      3장 · 서울 동물병원 100곳 중 24시간 운영 약 8곳
   charts/dispute.svg         4장 · 동물병원 피해구제 접수 건수 2021 ~ 2026.6
@@ -217,6 +224,40 @@ def chart_gyro_mini():
     for txt, col in zip(leg.get_texts(), (HONEY, INK)):
         txt.set_color(col)
     fig.subplots_adjust(left=.075, right=.985, top=.86, bottom=.22)
+    return fig
+
+
+def chart_gyro_note(small=False):
+    """사이트 기술 노트용(/works/iot-iv-pole) — gyro.svg와 같은 모의 신호, 숫자(r · RMS)는 그리지 않는다(성과로 읽히지 않게).
+    맨 위에 '설명용 모의 신호 · 학습 장비(자이로 있음)'를 먼저 적고, 아래 칸은 덱 부록 A2의 말('학습한 보정을 적용한 뒤')을 쓴다.
+    small: 휴대폰 폭(약 300 ~ 340 px)에 들어가는 세로 그림 — 글자를 크게"""
+    t, gyro, dev, res, *_ = gyro_signals()
+    lim = float(max(abs(dev).max(), abs(res).max()) * 1.15)
+    size, tick, xl = (12, 11, 11) if small else (11, 10, 10)
+    fig, axs = plt.subplots(3, 1, sharex=True, figsize=(3.8, 4.6) if small else (6.0, 3.75), gridspec_kw=dict(hspace=.78))
+    rows = [(gyro, SAGE, '자이로 각속도 (°/s)'), (dev, HONEY, '같은 시각 무게 편차 (g)'), (res, INK, '학습한 보정을 적용한 뒤 (g)')]
+    for ax, (y, col, left) in zip(axs, rows):
+        ax.plot(t, y, color=col, lw=1.4 if small else 1.3, solid_joinstyle='round')
+        ax.set_title(left, loc='left', fontsize=size, fontweight='semibold', color=INK2, pad=5)
+        ax.grid(axis='y', color=GRID, lw=.8)
+        ax.set_axisbelow(True)
+        for side in ('top', 'right'):
+            ax.spines[side].set_visible(False)
+        ax.tick_params(labelsize=tick)
+    note = '설명용 모의 신호 · 학습 장비(자이로 있음)'
+    if small:
+        fig.text(.03, .975, note, fontsize=size, fontweight='bold', color=MUTE, ha='left', va='top')
+    else:
+        axs[0].set_title(note, loc='right', fontsize=size, fontweight='bold', color=MUTE, pad=5)
+    axs[0].set_ylim(-46, 46); axs[0].set_yticks([-40, 0, 40])
+    for ax in axs[1:]:
+        ax.set_ylim(-lim, lim); ax.set_yticks([-5, 0, 5])
+    axs[2].set_xlim(0, 12); axs[2].set_xticks(range(0, 13, 3 if small else 2))
+    axs[2].set_xlabel('시간 (s) · 20 Hz 샘플링', fontsize=xl, color=INK2, labelpad=4)
+    if small:
+        fig.subplots_adjust(left=.13, right=.965, top=.86, bottom=.14)
+    else:
+        fig.subplots_adjust(left=.085, right=.985, top=.92, bottom=.13)
     return fig
 
 
@@ -671,6 +712,48 @@ def chart_cnn_pattern():
     return fig
 
 
+def chart_cnn_pattern_key(small=False):
+    # 사이트 기술 노트용: 논문(상태 패턴 분석 기반 수액 이상 감지) 그림 2를 덱 색으로 다시 그린 것 — 칸마다 값, 아래 범례
+    # (a) 정상 상태 패턴 · (b) 이상 상태 패턴(막힘/폐색). 값과 배치는 논문 그림 그대로
+    # small: 휴대폰 폭(약 280 ~ 340 px)용 — 두 패턴은 나란히 그대로(정상 · 이상을 한눈에 견주게), 여백 · 사이를 줄이고 글자를 키운다.
+    # 칸 제목은 줄여 적고(뜻은 그림 설명에), 범례는 왼쪽 패턴 끝에 맞춰 아래 오른쪽 모서리('확대' 표시 자리)를 비운다
+    if small:
+        return _cnn_key(W=440, H=318, C=46, G=4, SEP=20, top=40,
+                        titles=('(a) 정상 패턴', '(b) 이상 · 막힘/폐색'), title_px=21, cell_px=22,
+                        legend=dict(px=20, sw=19, gap=22, pad=7, ty=300, box_dy=15, left=True))
+    return _cnn_key(W=560, H=316, C=50, G=5, SEP=70, top=44,
+                    titles=('(a) 정상 상태 패턴', '(b) 이상 상태 패턴 (막힘/폐색)'), title_px=16, cell_px=17,
+                    legend=dict(px=15, sw=16, gap=30, pad=8, ty=300, box_dy=13, left=False))
+
+
+def _cnn_key(W, H, C, G, SEP, top, titles, title_px, cell_px, legend):
+    fig, ax = canvas(W, H)
+    normal = [0, 1, 0, -1, 1, 0, 0, 0, 0, -1, 1, 0, -1, 0, 0, 1]
+    anomaly = [0, 0, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+    tone = {0: '#FBF8F4', 1: '#E9BE8C', -1: HONEY}
+    ink = {0: MUTE, 1: INK, -1: '#FFFFFF'}
+    label = {0: '0', 1: '+1', -1: '−1'}
+    side = 4 * C + 3 * G
+    left = (W - 2 * side - SEP) / 2
+    for x0, pat, title in ((left, normal, titles[0]), (left + side + SEP, anomaly, titles[1])):
+        say(ax, x0, 26, [(title, title_px, 700, INK2)])
+        for i, st in enumerate(pat):
+            r, c = divmod(i, 4)
+            x, y = x0 + c * (C + G), top + r * (C + G)
+            rbox(ax, x, y, C, C, 6, color=tone[st], ec=LINE if st == 0 else tone[st], lw=.9)
+            say(ax, x + C / 2, y + C / 2 + .36 * cell_px, [(label[st], cell_px, 700 if st else 500, ink[st])], ha='center')
+    # 범례: 칸 색 → 값 · 상태
+    items = [(-1, '−1 느림'), (0, '0 정상'), (1, '+1 빠름')]
+    lp, sw, gap, pad, ty = legend['px'], legend['sw'], legend['gap'], legend['pad'], legend['ty']
+    widths = [sw + pad + advance(txt, lp, 600) for _, txt in items]
+    x = left if legend['left'] else (W - sum(widths) - gap * (len(items) - 1)) / 2
+    for (st, txt), w in zip(items, widths):
+        rbox(ax, x, ty - legend['box_dy'], sw, sw, 4, color=tone[st], ec=LINE if st == 0 else tone[st], lw=.9)
+        say(ax, x + sw + pad, ty, [(txt, lp, 600, INK2)])
+        x += w + gap
+    return fig
+
+
 def chart_grade():
     # 14장: 동물용 의료기기 등급 — 위험이 클수록 위(좁게). INFU RETRO 구조는 1등급(신고) (덱의 자리 447 px 폭)
     W, H, RH, GAP = 447, 312, 55, 9
@@ -731,5 +814,10 @@ if __name__ == '__main__':
     save(chart_cost_stack(), 'cost-stack.svg')
     save(chart_entry(), 'entry.svg')
     save(chart_cnn_pattern(), 'cnn-pattern.svg')
+    # 사이트 기술 노트(/works/iot-iv-pole)용 — 덱은 쓰지 않는다
+    save(chart_cnn_pattern_key(), 'cnn-pattern-key.svg')
+    save(chart_cnn_pattern_key(small=True), 'cnn-pattern-key-sm.svg')
+    save(chart_gyro_note(), 'gyro-note.svg')
+    save(chart_gyro_note(small=True), 'gyro-note-sm.svg')
     save(chart_grade(), 'grade.svg', blurs={'hitsh': 14.7})                     # CSS: 1.4em blur
     print(f'  자이로-편차 r={r:.2f}, RMS {a:.2f} → {b:.2f} g')

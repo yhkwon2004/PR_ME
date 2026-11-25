@@ -31,6 +31,13 @@ export function createLightbox() {
       const img = document.createElement('img');
       img.src = m.src;
       img.alt = m.caption;
+      // 글자가 어두운 그래프(SVG)는 밝은 종이 위에 — 검은 바탕에서도 읽히게
+      if (m.paper) img.classList.add('is-paper');
+      // 기술 노트 풀이 그림(fit): 그림 비율대로 확대 칸을 채운다 — 원래 크기에서 멈춰 본문 그림보다 작게 열리지 않게(main.css .is-fit)
+      if (m.fit && m.ratio) {
+        img.classList.add('is-fit');
+        img.style.setProperty('--ar', m.ratio);
+      }
       media.appendChild(img);
     }
     // 설명은 글자로만 넣는다(마크업으로 해석하지 않음). '(재)광주정보문화산업진흥원장' · '㈜에스케이엠엔엠'처럼 앞에 붙은 법인 표시와

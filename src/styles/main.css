@@ -3118,6 +3118,27 @@ body.is-started.has-pointer .cursor {
   border: 1px solid var(--line-2);
   background: #000;
 }
+.lb-media img.is-paper {
+  box-sizing: border-box;
+  min-width: min(calc(88 * var(--vw)), 720px);
+  padding: clamp(10px, 2.4vw, 28px);
+  background: #f4efe8;
+}
+/* 기술 노트 풀이 그림(is-fit — lightbox.js): 그림 비율(--ar)대로 확대 칸(88vw · 1280px · 76vh)을 채운다 — 원래 크기에서 멈추면
+   본문에서 1.4배로 키운 사진 · 그래프가 '확대'를 눌렀을 때 오히려 작아진다. 종이(is-paper)는 여백까지 넣어 높이를 맞춘다.
+   휴대폰의 누르면 크게(.lightbox.is-zoom … width: 240vw)가 이기도록 휴대폰 규칙보다 앞에 둔다 */
+.lb-media img.is-fit {
+  width: min(calc(88 * var(--vw)), 1280px, calc(76 * var(--vh) * var(--ar)));
+  height: auto;
+}
+.lb-media img.is-fit.is-paper {
+  min-width: 0;
+  width: min(
+    calc(88 * var(--vw)),
+    1280px,
+    calc((76 * var(--vh) - 2 * clamp(10px, 2.4vw, 28px)) * var(--ar) + 2 * clamp(10px, 2.4vw, 28px))
+  );
+}
 .lightbox figcaption {
   max-width: min(calc(88 * var(--vw)), 1280px);
   margin-inline: auto;
@@ -3452,6 +3473,17 @@ body.is-started.has-pointer .cursor {
   .lb-media video {
     max-width: calc(calc(100 * var(--vw)) - 20px);
     max-height: calc(68 * var(--vh));
+  }
+  /* 기술 노트 풀이 그림: 휴대폰 칸(폭 100vw − 20px · 높이 68vh) 안에서 그림 비율대로 — 눕힌 휴대폰에서 높이에 걸려 옆에 빈 띠가 생기지 않게.
+     누르면 크게(아래 .lightbox.is-zoom)가 이기도록 그 앞에 둔다 */
+  .lb-media img.is-fit {
+    width: min(calc(100 * var(--vw) - 20px), calc(68 * var(--vh) * var(--ar)));
+  }
+  .lb-media img.is-fit.is-paper {
+    width: min(
+      calc(100 * var(--vw) - 20px),
+      calc((68 * var(--vh) - 2 * clamp(10px, 2.4vw, 28px)) * var(--ar) + 2 * clamp(10px, 2.4vw, 28px))
+    );
   }
   /* 그림을 누르면 크게 — 이 칸 안에서만 손가락으로 밀어 읽는다(몸 전체는 touch-action: none) */
   .lb-media img {

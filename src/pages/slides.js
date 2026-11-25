@@ -1,6 +1,6 @@
 // ── 프로젝트 발표 슬라이드(/works/<id>/slides) ──
-// 프로젝트 기록으로 바로 발표할 수 있는 웹 슬라이드를 만든다: 표지 → 문제 → 솔루션 → 과정 → 팀 · 역할 · 기여 → 문제 해결 기록 →
-// 결과 → 배운 점 · 링크. 요약(briefs.json)이 있으면 그것으로, 없으면 스토리(라벨 · 제목 · 글 · 사진)와 수치 · 수상으로 짠다.
+// 프로젝트 기록으로 바로 발표할 수 있는 웹 슬라이드를 만든다: 표지 → 문제 → 솔루션 → 과정 → 기술 노트(사용 환경 · 구성 → 기술 풀이 →
+// 실험 · 기록 — briefs.json의 tech가 있을 때) → 팀 · 역할 · 기여 → 문제 해결 기록 → 결과 → 배운 점 · 링크. 요약(briefs.json)이 있으면 그것으로, 없으면 스토리(라벨 · 제목 · 글 · 사진)와 수치 · 수상으로 짠다.
 // 데이터가 없는 슬라이드는 만들지 않는다 — 지어낸 문구는 넣지 않는다(제목 · 라벨만 고정 문구).
 // 넓은 가로 화면: 1600×900 무대 한 장을 화면에 맞춰 키우고 줄인다(구도 고정). 세로 화면 · 좁은 화면: 슬라이드를 세로로 이어
 // 한 화면에 한 장씩 스크롤(scroll-snap). 넘기기: ← → PageUp PageDown Space Home End · 휠 · 밀기 · 버튼, F 전체 화면, Esc 나가기.
@@ -10,7 +10,7 @@ import '../styles/slides.css';
 import { profile } from '../content.js';
 import { projects, categoryOf } from '../data/projects.js';
 import { awardsOf, TIER_KEY } from '../data/awards.js';
-import { esc, pad, sep, hy, caps, koCls, LAUREL, isCertScan, teamHtml } from './site.js';
+import { esc, pad, sep, tsep, hy, caps, koCls, LAUREL, isCertScan, teamHtml } from './site.js';
 
 const W0 = 1600;
 const H0 = 900;
@@ -48,7 +48,11 @@ function pic(im, { sizes = '50vw', eager = false } = {}) {
   const tw = im.w && im.h ? Math.round(im.w * Math.min(1, 720 / Math.max(im.w, im.h))) : 720;
   const set = `${tw < w ? `${esc(im.thumb)} ${tw}w, ` : ''}${esc(im.src)} ${w}w`;
   const ar = clamp(im.ratio || 4 / 3, 0.5, 2.6).toFixed(3);
-  return `<span class="sl-pic" data-kind="${esc(im.kind || 'photo')}" style="--ar:${ar}"><img src="${esc(im.thumb)}" srcset="${set}" sizes="${sizes}" alt="${esc(im.caption || '')}" width="${im.w || ''}" height="${im.h || ''}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" /></span>`;
+  // 휴대폰 폭용 그림(im.sm — 글자를 키운 세로 그래프)이 있으면 그림 두 장을 함께 두고 화면에서만 바꾼다(slides.css의 [data-sm] —
+  // 세로 화면 · 680px 이하). <picture>의 source로 바꾸면 인쇄(1600px 폭) 도중 그림이 바뀌어 PDF가 통째로 빈 쪽이 된다 — 인쇄는 늘 넓은 그림
+  const sm = im.sm ? ` data-sm style="--ar:${ar};--ar-sm:${clamp(im.sm.ratio, 0.5, 2.6).toFixed(3)}"` : ` style="--ar:${ar}"`;
+  const small = im.sm ? `<img class="is-sm" src="${esc(im.sm.src)}" alt="${esc(im.caption || '')}" loading="lazy" decoding="async" />` : '';
+  return `<span class="sl-pic" data-kind="${esc(im.kind || 'photo')}"${sm}><img src="${esc(im.thumb)}" srcset="${set}" sizes="${sizes}" alt="${esc(im.caption || '')}" width="${im.w || ''}" height="${im.h || ''}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" />${small}</span>`;
 }
 const fig = (im, opts) => (im ? `<figure class="sl-fig">${pic(im, opts)}${im.caption ? `<figcaption>${sep(im.caption)}</figcaption>` : ''}</figure>` : '');
 // 눈썹 줄: 번호(고정폭) · 한국어 이름(본문 글꼴) · 영문 꼬리표(고정폭)
@@ -58,7 +62,8 @@ const eye = (no, ko, en) =>
     .split(' · ')
     .map((t) => `<span class="nw">${esc(t)}</span>`)
     .join('&nbsp;· ')}</span>${en ? `<em>${esc(en)}</em>` : ''}</p>`;
-const list = (items, cls = '') => `<ul class="sl-list ${cls}">${items.map((t) => `<li>${caps(sep(t))}</li>`).join('')}</ul>`;
+// f: 글 다듬기(기술 노트 목록은 tsep — 괄호 · %와 조사, 수와 단위를 떼지 않게)
+const list = (items, cls = '', f = sep) => `<ul class="sl-list ${cls}">${items.map((t) => `<li>${caps(f(t))}</li>`).join('')}</ul>`;
 // 결과 목록에서 위 큰 수치와 같은 말은 뺀다(수치 값이 그대로 든 줄 — '기대' · '예상'이 붙은 줄은 남긴다)
 const notInMetrics = (metrics) => {
   const vals = metrics.map((m) => String(m.value).replace(/^[−+-]/, '').replace(/\s/g, '')).filter((v) => /\d/.test(v));
@@ -105,6 +110,10 @@ function plan(p) {
   const cat = categoryOf(p.category);
   const no = projects.indexOf(p) + 1;
   const cover = take(p.cover);
+  // 기술 노트의 풀이 그림은 그 풀이 장에서 보인다 — 문제 · 솔루션 · 과정 장이 같은 사진을 먼저 쓰지 않게 비워 둔다
+  const tech = p.tech || null;
+  const techFig = (d) => (d.figure && d.figure.file !== cover?.file ? d.figure : null);
+  (tech?.deep || []).forEach((d) => techFig(d) && used.add(d.figure.file));
   const lead = b?.headline || p.oneLiner;
   const coverMeta = [
     best
@@ -162,6 +171,68 @@ function plan(p) {
           )
           .join('')}</ol>`
       );
+    }
+  };
+
+  // 기술 노트(솔루션 · 과정 다음): 사용 환경 · 구성(이름 | 값 표 + 처리 흐름) → 기술 풀이(그림이 있는 꼭지는 한 장씩 글 | 그림,
+  // 글뿐인 꼭지는 이어지는 것끼리 두 꼭지씩 한 장) → 실험 · 기록(다섯 건 안팎씩 한 장). 문구는 데이터 그대로
+  const techSlides = () => {
+    if (!tech) return;
+    const { env, pipeline, deep, records } = tech;
+    if (env.length || pipeline.length) {
+      const envHtml = env.length ? `<dl class="sl-env">${env.map((e) => `<div><dt>${sep(e.k)}</dt><dd>${caps(tsep(e.v))}</dd></div>`).join('')}</dl>` : '';
+      const flowHtml = pipeline.length
+        ? `<ol class="sl-flow">${pipeline
+            .map((s, k) => `<li><span class="sl-fno">${pad(k + 1)}</span><div>${s.t ? `<b>${caps(tsep(s.t))}</b>` : ''}${s.d ? `<p>${caps(tsep(s.d))}</p>` : ''}</div></li>`)
+            .join('')}</ol>`
+        : '';
+      push(
+        'tech-env',
+        env.length && pipeline.length ? '사용 환경 · 구성' : env.length ? '사용 환경' : '처리 흐름',
+        env.length && pipeline.length ? 'ENVIRONMENT · PIPELINE' : env.length ? 'ENVIRONMENT' : 'PIPELINE',
+        `<div class="sl-tenv${envHtml && flowHtml ? '' : ' is-one'}">${envHtml ? `<div class="sl-tenv-a"><h3 class="sl-k">사용 환경</h3>${envHtml}</div>` : ''}${flowHtml ? `<div class="sl-tenv-b"><h3 class="sl-k">처리 흐름</h3>${flowHtml}</div>` : ''}</div>`
+      );
+    }
+    const sec = (d) =>
+      `${d.h ? `<h2 class="sl-th">${caps(tsep(d.h))}</h2>` : ''}${d.p ? `<p class="sl-tp">${caps(tsep(d.p))}</p>` : ''}${d.list.length ? list(d.list, 'sl-tlist', tsep) : ''}`;
+    let texts = [];
+    const flushTexts = () => {
+      for (let k = 0; k < texts.length; k += 2) {
+        const part = texts.slice(k, k + 2);
+        push('tech-notes', '기술 풀이', 'DEEP DIVE', `<div class="sl-tnotes n-${part.length}">${part.map((d) => `<section class="sl-tcol">${sec(d)}</section>`).join('')}</div>`);
+      }
+      texts = [];
+    };
+    deep.forEach((d) => {
+      const f = techFig(d);
+      if (!f) return texts.push(d);
+      flushTexts();
+      const tall = f.ratio < 0.95;
+      push(
+        'tech-deep',
+        '기술 풀이',
+        'DEEP DIVE',
+        `<div class="sl-tdeep${tall ? ' is-tall' : ''}"><div class="sl-ttext">${sec(d)}</div>${fig(f, { sizes: `(orientation: portrait) 100vw, ${tall ? 32 : 46}vw` })}</div>`
+      );
+    });
+    flushTexts();
+    if (records.length) {
+      const per = Math.ceil(records.length / Math.ceil(records.length / 5));
+      for (let k = 0; k < records.length; k += per) {
+        const part = records.slice(k, k + per);
+        // '언제' 칸은 이 장에 날짜가 하나라도 있을 때만(날짜 없는 기록만 모인 장에 '—'만 늘어서지 않게)
+        const hasWhen = part.some((r) => r.when);
+        push(
+          'tech-rec',
+          '실험 · 기록',
+          'RECORDS',
+          `<div class="sl-rec${hasWhen ? '' : ' no-when'}"><p class="sl-rec-h" aria-hidden="true">${hasWhen ? '<span>언제</span>' : ''}<span>무엇을</span><span>결과</span></p><ol>${part
+            .map(
+              (r) => `<li>${hasWhen ? `<span class="sl-rwhen${koCls(r.when)}">${r.when ? sep(r.when) : '<i aria-hidden="true">—</i>'}</span>` : ''}<span class="sl-rwhat">${caps(tsep(r.what))}</span><span class="sl-rres">${caps(tsep(r.result))}</span></li>`
+            )
+            .join('')}</ol></div>`
+        );
+      }
     }
   };
 
@@ -274,6 +345,7 @@ function plan(p) {
     };
     if (solution) push('solution', '솔루션', 'SOLUTION', split({ heading: solHead, text: solution, img: solImg(), rev: true, extra: toolsHtml }));
     processSlides(PROCESS);
+    techSlides();
     teamSlide(b.contribution);
     for (let k = 0; k < b.troubles.length; k += 3) {
       const part = b.troubles.slice(k, k + 3);
@@ -303,6 +375,7 @@ function plan(p) {
     // 도구는 제작 꼭지에(없으면 아이디어 · 문제가 아닌 첫 꼭지에) 한 번
     const toolAt = [told.findIndex((s) => s.label === 'BUILD'), told.findIndex((s) => s.label === 'IDEA'), told.findIndex((s) => s.label !== 'PROBLEM')].find((k) => k >= 0) ?? -1;
     told.forEach((s, k) => push('story', KO[s.label] || s.label, s.label, split({ heading: s.title, text: s.text, img: take(s.img), rev: k % 2 === 1, extra: k === toolAt ? toolsHtml : '' })));
+    techSlides();
     teamSlide([]);
     resultSlide([]);
     closeSlide(find('LEARNED')?.text || '');
@@ -382,6 +455,9 @@ export function createDeck(root, { reducedMotion = false, onExit } = {}) {
   // 넘치는 슬라이드만 글자를 조금씩 줄인다(무대 크기는 늘 같으니 한 번 재면 된다 — 세로 화면에서도 인쇄를 위해 무대로 잰다)
   function fit() {
     const was = root.classList.contains('is-flow');
+    // 무대로 재는 동안(is-flow를 잠깐 뗀 동안) 세로 넘김의 스크롤 칸이 줄어 스크롤이 0으로 돌아간다 — 재고 나서 제자리로
+    // (글꼴이 늦게 와 다시 잴 때 #5로 들어온 첫 화면이 1장으로 돌아가던 것)
+    const top = view.scrollTop;
     root.classList.remove('is-flow');
     slides.forEach((sl) => {
       const st = sl.querySelector('.sl-stage');
@@ -396,6 +472,7 @@ export function createDeck(root, { reducedMotion = false, onExit } = {}) {
       }
     });
     root.classList.toggle('is-flow', was);
+    if (was && top) view.scrollTop = top;
   }
   function setMode() {
     flow = mq.matches;
@@ -640,7 +717,10 @@ export function createDeck(root, { reducedMotion = false, onExit } = {}) {
   fit();
   document.fonts?.ready.then(() => alive && fit());
   paint();
-  if (flow && index) requestAnimationFrame(() => slides[index].scrollIntoView({ block: 'start' }));
+  if (flow && index) {
+    flowLock = performance.now() + 900; // 주소의 장(#5)으로 스크롤해 들어가는 동안 첫 장이 보인다고 번호를 되돌리지 않게
+    requestAnimationFrame(() => slides[index].scrollIntoView({ block: 'start' }));
+  }
   // 들어선 뒤에야 넘김 움직임을 켠다(첫 장이 미끄러져 들어오지 않게)
   requestAnimationFrame(() => requestAnimationFrame(() => alive && root.classList.add('is-ready')));
   // 첫 장을 그린 뒤부터 앞뒤 장의 사진을 미리 받는다(warm)

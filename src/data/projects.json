@@ -406,11 +406,11 @@
   "id": "airsim-driving",
   "title": "AirSim · CARLA 엔드투엔드 자율주행",
   "titleEn": "End-to-End Driving — AirSim · CARLA",
-  "year": "2024–2026",
+  "year": "2024",
   "period": "",
   "category": "mobility",
   "oneLiner": "가상환경(AirSim · CARLA)에서 End-to-End 딥러닝으로 학습시킨 자율주행",
-  "summary": "AirSim 가상 주행 환경에서 딥러닝 모델을 학습시켜 조향과 주차 신호 인식을 다룬 개인 프로젝트입니다. 언리얼 엔진 기반 CARLA 시뮬레이터를 Python API로 제어했습니다. End-to-End 학습으로 카메라 화면의 도로 곡률에 맞춰 조향하도록 하고, 전이 학습으로 가중치를 보완했습니다.",
+  "summary": "AirSim 가상 주행 환경에서 딥러닝 모델을 학습시켜 조향을 다룬 개인 프로젝트입니다. 언리얼 엔진 기반 AirSim(주택가 환경 AirSimNH)을 Python API로 제어했고, 같은 언리얼 엔진 기반의 CARLA도 함께 다뤘습니다. End-to-End 학습으로 카메라 화면의 도로 곡률에 맞춰 조향하도록 하고, 전이 학습으로 가중치를 보완했습니다.",
   "role": [
    "시뮬레이터 개발"
   ],
@@ -438,7 +438,7 @@
    {
     "label": "PROBLEM",
     "title": "실차 대신 가상환경",
-    "text": "실제 차량에서 반복하기 어려운 조향과 주차 신호 인식을 가상환경에서 먼저 검토했습니다.",
+    "text": "실제 차량에서 반복하기 어려운 조향 제어를 가상환경에서 먼저 검토했습니다.",
     "image": "media/projects/airsim-driving/03.webp"
    },
    {
@@ -449,14 +449,14 @@
    {
     "label": "BUILD",
     "title": "AirSim에서 딥러닝 학습",
-    "text": "AirSim 주행 환경에서 딥러닝을 학습시키고, 조향과 주차 신호 인식 기능을 연결했습니다.",
+    "text": "AirSim 주행 환경에서 딥러닝을 학습시키고, 모델의 출력을 차량의 조향 값으로 연결했습니다.",
     "image": "media/projects/airsim-driving/02.webp"
    },
    {
     "label": "BUILD",
-    "title": "Python API 제어",
-    "text": "언리얼 엔진 기반 CARLA 시뮬레이터를 구성하고 Python API로 차량을 제어했습니다.",
-    "image": "media/projects/carla-e2e/01.webp"
+    "title": "AirSim Python API 제어",
+    "text": "AirSimNH 주택가 환경에 Python API(airsim.CarClient)로 접속해 API 제어 모드를 켜고, 차량에 조향 값을 전달했습니다.",
+    "image": "media/projects/airsim-driving/05.webp"
    },
    {
     "label": "TEST",
@@ -506,17 +506,24 @@
    },
    {
     "file": "media/projects/airsim-driving/05.webp",
-    "caption": "회전 후 그늘진 주택가 도로를 주행",
+    "caption": "회전 후 그늘진 주택가 도로를 주행 — 왼쪽 위 HUD의 Steering 값",
     "kind": "screenshot",
     "w": 1280,
     "h": 720
    },
    {
-    "file": "media/projects/carla-e2e/01.webp",
-    "caption": "CARLA 0.9.14 공식 릴리스 이미지 (출처: CARLA)",
+    "file": "media/projects/airsim-driving/06.webp",
+    "caption": "END_TO_END 프로젝트 화면 — Training.py · test.py · utils.py, 모델 파일(model-001 · 002 · 004.h5, Best_model.h5, model-010.keras), 프레임마다 찍히는 Keras 추론 로그",
     "kind": "screenshot",
-    "w": 606,
-    "h": 351
+    "w": 640,
+    "h": 670
+   },
+   {
+    "file": "media/projects/airsim-driving/07.webp",
+    "caption": "AirSimNH 실행 창 — settings.json 로드, Control Mode: API, Accel 0.3 고정 · Steering 값 HUD",
+    "kind": "screenshot",
+    "w": 640,
+    "h": 536
    }
   ],
   "cover": "media/projects/airsim-driving/01.webp",
@@ -1787,14 +1794,16 @@
   "period": "2026.06 – 2026.07",
   "category": "ai",
   "oneLiner": "피해 사실을 시간순으로 정리하고 빠진 정보를 짚는 LLM 보조 시스템",
-  "summary": "학교폭력 피해 학생이 상담 전에 증거와 진술을 정리하도록 돕는 LLM 기반 시스템입니다. 내용을 새로 만들지 않고 사건 순서를 구조화하고 누락 정보를 탐지하도록 설계했습니다.",
+  "summary": "학교폭력 피해 학생이 상담 전에 증거와 진술을 정리하도록 돕는 LLM 기반 시스템입니다. 진술에서 뽑은 시간·인물·장소·행위를 3차원 배열에 담고 포인터 구조로 이어 사건 관계도와 타임라인을 만들며, AI는 사건 내용을 새로 쓰지 않고 저장된 항목 간 연결만 판단하도록 역할을 한정해 할루시네이션을 막고, 누락 정보를 탐지하도록 설계했습니다.",
   "role": [],
   "team": "Palette · 권용현, 김나현, 유현경, 한서윤",
   "tools": [
    "LLM",
    "NLP",
    "형태소 분석",
-   "문장 관계 분석"
+   "문장 관계 분석",
+   "3차원 배열",
+   "포인터 구조"
   ],
   "awards": [
    "2026 HUSS AI 경진대회 · 우수상(한국연구재단 이사장상) · 전국 2위"
@@ -1825,7 +1834,7 @@
    {
     "label": "BUILD",
     "title": "만들지 않고 정리",
-    "text": "판례·진술서로 문장 구조를 분석하고, 입력에서 시간·인물·장소·행위를 추출해 사건 Timeline과 누락 정보를 제시합니다."
+    "text": "판례·진술서로 문장 구조를 분석하고, 입력에서 시간·인물·장소·행위를 추출해 3차원 배열에 저장한 뒤 포인터로 사건·증거를 이어 관계도와 타임라인을 만들고 누락 정보를 묻습니다."
    },
    {
     "label": "RESULT",
@@ -1958,7 +1967,7 @@
    {
     "label": "VERIFY",
     "title": "옮기고, 흔들고, 넘어뜨리며",
-    "text": "원광대 간호학과와 함께 실제 병동처럼 폴대를 옮기고 흔들고 넘어뜨리는 모의 임상 테스트를 반복했습니다. 투여 완료 시점 예측 오차 ±5분 이내, 이상 상황 감지 5초 이내, 수액 10종 이상의 점도별 무게 자동 보정을 확인했습니다.",
+    "text": "원광대 간호학과와 함께 실제 병동처럼 폴대를 옮기고 흔들고 넘어뜨리는 모의 임상 테스트를 반복했습니다. 투여 완료 시점 예측 오차 ±5분 이내, 이상 상황 감지 5초 이내, 수액 10종의 점도별 무게 자동 보정을 확인했습니다.",
     "image": "media/projects/iot-iv-pole/14.webp"
    },
    {
@@ -2118,6 +2127,13 @@
     "kind": "photo",
     "w": 1280,
     "h": 960
+   },
+   {
+    "file": "media/projects/iot-iv-pole/19.webp",
+    "caption": "논문 2쪽 — 3단계 부호화 · 4×4 패턴 · 경량 CNN 구조 · 선행 연구 비교",
+    "kind": "document",
+    "w": 832,
+    "h": 1125
    }
   ],
   "cover": "media/projects/iot-iv-pole/07.webp",
@@ -2948,7 +2964,8 @@
   "team": "",
   "tools": [
    "Pixhawk",
-   "Mission Planner"
+   "Mission Planner",
+   "GPS"
   ],
   "awards": [
    "ROS 기반 자율주행 자동차 경진대회 · 우수상"
@@ -2976,7 +2993,7 @@
    {
     "label": "RESULT",
     "title": "ROS 경진대회 우수상",
-    "text": "Pixhawk 자율비행 드론으로 ROS 기반 자율주행 자동차 경진대회에서 우수상을 받았습니다.",
+    "text": "Pixhawk 기반 로버 · 드론 자율주행 작업으로 ROS를 이용한 자율주행 자동차 경진대회에서 우수상을 받았습니다.",
     "image": ""
    },
    {
@@ -2996,7 +3013,7 @@
    },
    {
     "file": "media/projects/pixhawk-drone/02.webp",
-    "caption": "비행제어기를 얹은 드론 프레임과 조종기",
+    "caption": "비행제어기와 GPS 모듈을 얹은 쿼드콥터 프레임과 RC 조종기",
     "kind": "photo",
     "w": 1040,
     "h": 1387
@@ -3747,10 +3764,24 @@
    },
    {
     "file": "media/projects/ros2-nav2/04.webp",
-    "caption": "RViz에 표시된 비용지도와 로봇 위치 추정",
+    "caption": "RViz에 표시된 비용지도와 AMCL 위치 추정 입자",
     "kind": "screenshot",
     "w": 643,
     "h": 760
+   },
+   {
+    "file": "media/projects/ros2-nav2/06.webp",
+    "caption": "Follow Waypoint 실습 영상 한 장면 — 왼쪽 Gazebo(LiDAR 스캔), 오른쪽 RViz2(Nav2 비용지도 · 전역 경로)",
+    "kind": "screenshot",
+    "w": 1280,
+    "h": 720
+   },
+   {
+    "file": "media/projects/ros2-nav2/07.webp",
+    "caption": "RViz2 창 — ROS 2 Humble nav2_bringup 구성과 Navigation 2 패널(남은 거리 12.94 m · 경과 52 s · Recoveries 0)",
+    "kind": "screenshot",
+    "w": 1256,
+    "h": 1396
    }
   ],
   "cover": "media/projects/ros2-nav2/01.webp",
